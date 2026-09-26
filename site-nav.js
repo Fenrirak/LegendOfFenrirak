@@ -151,7 +151,20 @@
                         entry.el.style.opacity = '';
                         entry.el.style.transform = '';
                     } else {
-                        entry.el.style.opacity = progress;
+                        /* Floored at 0.3, never 0 — matches the floor
+                           initRevealText already uses (0.25) below. An
+                           element below the fold gets this opacity the
+                           moment the page loads, before any scroll event
+                           fires, and Google's renderer doesn't scroll the
+                           page for you: leaving this at literal 0 meant
+                           every image in every .pop-group (most of the
+                           images on the page) rendered fully invisible on
+                           first load, which is exactly the kind of hidden
+                           content Google Images skips over. A 0.3 floor
+                           keeps the same fade-and-slide-up effect for real
+                           visitors while guaranteeing nothing is ever
+                           actually invisible in the rendered DOM. */
+                        entry.el.style.opacity = 0.3 + progress * 0.7;
                         entry.el.style.transform = 'translateY(' + (26 * (1 - progress)) + 'px)';
                     }
                 });
