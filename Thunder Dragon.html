@@ -608,6 +608,60 @@
     .reveal-text .word { opacity: 1; }
 }
 
+/* =========================================================================
+   Site-wide footer — used by every page. Edit here, not per-page.
+   ========================================================================= */
+
+.site-footer {
+    margin-top: 60px;
+    padding: 28px 20px 36px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    background: #16161a;
+    color: #9c9a95;
+}
+
+.site-footer .footer-inner {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.site-footer .footer-brand {
+    margin: 0;
+    color: rgb(242, 204, 143);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+.site-footer .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 18px;
+}
+
+.site-footer .footer-links a {
+    color: #9c9a95;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s ease;
+}
+
+.site-footer .footer-links a:hover {
+    color: rgb(242, 204, 143);
+}
+
+.site-footer .footer-copy {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
     </style>
 
     <style>
@@ -728,21 +782,21 @@ h3 { font-size: 17px; }
     font-size: 16px;
     padding: 11px 20px;
     border-radius: 999px;
-    border: 1px solid #9fb7cc;
-    /* A light, slightly misty blue -- distinct from the gold "do this next"
-       primary button and the crimson danger one, so an ordinary action
-       reads as its own third thing rather than a dimmer copy of either. */
-    background: linear-gradient(180deg, #e4edf6, #c9d9e8);
-    color: #223247;
+    border: 1px solid rgba(255, 255, 255, .22);
+    /* Neutral by default. Blue is reserved for the turn-action buttons
+       (.btn.action, below) -- everything else (Cancel, Back, Join, and
+       the rest) gets this instead. */
+    background: linear-gradient(180deg, #2b2b2b, #1c1c1c);
+    color: var(--cream);
     cursor: pointer;
     text-decoration: none;
     transition: background-color .2s ease, border-color .2s ease,
                 transform .2s ease, color .2s ease;
 }
 .btn:hover:not(:disabled) {
-    background: linear-gradient(180deg, #eef4fa, #d5e3f0);
+    background: linear-gradient(180deg, #363636, #262626);
     border-color: var(--gold);
-    color: #1a1108;
+    color: var(--gold-bright);
     transform: translateY(-2px);
 }
 .btn:disabled { opacity: .38; cursor: not-allowed; }
@@ -754,6 +808,21 @@ h3 { font-size: 17px; }
     font-weight: bold;
 }
 .btn.primary:hover:not(:disabled) { background: var(--gold-bright); color: #1a1108; }
+
+.btn.action {
+    /* A light, slightly misty blue -- distinct from the gold "do this next"
+       primary button and the crimson danger one, so a turn action reads as
+       its own third thing rather than a dimmer copy of either. Scoped to
+       the action row only; see the comment on .btn above. */
+    border-color: #9fb7cc;
+    background: linear-gradient(180deg, #e4edf6, #c9d9e8);
+    color: #223247;
+}
+.btn.action:hover:not(:disabled) {
+    background: linear-gradient(180deg, #eef4fa, #d5e3f0);
+    border-color: var(--gold);
+    color: #1a1108;
+}
 
 .btn.danger {
     background: linear-gradient(180deg, #262626, #191919);
@@ -1026,37 +1095,34 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 }
 .turn-banner.mine .whose { border-color: var(--gold); }
 .turn-banner .who { font-size: 25px; color: var(--cream); }
-/* Pulled out of the crowded banner row and pinned to the corner of the
-   screen instead, so an away-too-long countdown is something you cannot
-   help but see rather than one more word buried in a line of them. It
-   turns amber with 30 seconds left and red with 15, each with one clear
-   pulse of its own the moment it crosses that line -- and it is not shown
-   at all during a battle, which is not timed (see checkTimeout in
-   engine.js). */
-.turn-banner .timer {
-    position: fixed;
-    top: 14px;
-    right: 14px;
-    z-index: 70;
+/* Sits in the profile box's own header row (.me-top), next to your name,
+   rather than pinned to a corner of the screen -- so an away-too-long
+   countdown is somewhere you're already looking. It turns amber with 30
+   seconds left and red with 15, each with one clear pulse of its own the
+   moment it crosses that line -- and it is not shown at all during a
+   battle, which is not timed (see checkTimeout in engine.js). */
+.me-card .me-top .timer {
+    flex: 0 0 auto;
+    align-self: flex-start;
     margin: 0;
     font-family: 'Cutive Mono', 'Courier New', monospace;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: bold;
-    padding: 8px 16px;
+    padding: 5px 11px;
     border-radius: 999px;
     background: rgba(20, 18, 14, .88);
     border: 1px solid rgba(255, 255, 255, .18);
     color: #cfcfcf;
-    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .7);
+    box-shadow: 0 4px 12px -6px rgba(0, 0, 0, .7);
     transition: color .2s ease, border-color .2s ease, background-color .2s ease;
 }
-.turn-banner .timer:empty { display: none; }
-.turn-banner .timer.warn {
+.me-card .me-top .timer:empty { display: none; }
+.me-card .me-top .timer.warn {
     color: #f0c374;
     border-color: #d9a35c;
     background: rgba(58, 42, 14, .92);
 }
-.turn-banner .timer.critical {
+.me-card .me-top .timer.critical {
     color: #f0837a;
     border-color: #d2635a;
     background: rgba(58, 16, 14, .92);
@@ -1069,13 +1135,10 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 /* The one-off signal fired the instant the clock crosses 30s and again at
    15s -- a bright ring that blooms outward and fades, on top of whatever
    colour the badge has just changed to. */
-.turn-banner .timer.flash { animation: timer-flash .9s ease-out; }
+.me-card .me-top .timer.flash { animation: timer-flash .9s ease-out; }
 @keyframes timer-flash {
     0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, .85); }
     100% { box-shadow: 0 0 0 24px rgba(255, 255, 255, 0); }
-}
-@media (max-width: 720px) {
-    .turn-banner .timer { top: auto; bottom: 14px; right: 14px; font-size: 13.5px; padding: 7px 13px; }
 }
 
 /* The game clock. Always in the banner, whoever's turn it is, so a player
@@ -12387,11 +12450,9 @@ body.modal-cover #board * { animation-play-state: paused; }
                 esc(doing.text) +
             '</span>' +
             '<span class="muted">Turn ' + S.turnNo + '</span>' +
-            gameClockHtml() +
-            // The countdown only exists to stop an absent player stalling
-            // everyone else. On your own there is nobody to stall, so take
-            // your time -- but the game clock above is shown either way.
-            (S.solo ? '' : '<span class="timer" id="turn-timer"></span>');
+            gameClockHtml();
+            // The countdown itself now lives in the profile box (see
+            // heroBlockHtml), not pinned to the corner of the screen.
     }
 
     /* ---- what the game is waiting on -------------------------------------
@@ -13674,6 +13735,12 @@ body.modal-cover #board * { animation-play-state: paused; }
                     '<div class="me-where">' + esc(c.name) + ' &middot; On ' +
                         esc(E.square(x.pos).name) + '</div>' +
                 '</div>' +
+                // The countdown only exists to stop an absent player stalling
+                // everyone else. On your own there is nobody to stall, so
+                // take your time -- but the box is shown either way. Lives
+                // here, on the profile box, rather than pinned to a corner
+                // of the screen.
+                (S.solo ? '' : '<span class="timer" id="turn-timer"></span>') +
             '</div>' +
             '<div class="me-hp">' +
                 '<div class="bar hp"><i style="width:' +
@@ -13789,7 +13856,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         // When it is not ready, the button says how long it has left rather
         // than sitting there greyed out for no stated reason.
         buttons.push(btn('a-ability',
-            cls.ability.name + (abilityReady ? '' : ' \u00b7 in ' + abilityWait(p)), '',
+            cls.ability.name + (abilityReady ? '' : ' \u00b7 in ' + abilityWait(p)), 'action',
             !mine || blocked || !abilityReady ||
             (cls.ability.id === 'agile_footwork' && p.hasMoved)));
         // Unlike everything else in this list, the Merchant keeps no
@@ -13799,12 +13866,12 @@ body.modal-cover #board * { animation-play-state: paused; }
         // own square still waiting on a choice from you.
         const shopBlocked = !!S.battle || !!S.paused || holding ||
             (!!S.pending && S.pending.playerId === NET.PID);
-        buttons.push(btn('a-shop', 'Visit the Merchant', '', shopBlocked));
+        buttons.push(btn('a-shop', 'Visit the Merchant', 'action', shopBlocked));
         // Offering a trade is a turn action like any other. It used to be open
         // at all times, which read as an invitation and was not one: the panel
         // cannot come up over a battle or over somebody else's square, so the
         // button sat there lit and did nothing at all when it was pressed.
-        buttons.push(btn('a-trade', 'Propose a trade', '',
+        buttons.push(btn('a-trade', 'Propose a trade', 'action',
             S.players.length < 2 || !mine || blocked));
         // The Gold Forged Armour Set says you *may* pay in coins. Asking on
         // every single hit would be unbearable, so it is a standing choice
@@ -13812,7 +13879,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         const aInst = E.equippedArmour(p);
         const aItem = aInst ? D.ITEMS[aInst.id] : null;
         if (aItem && aItem.payInCoins) {
-            buttons.push(btn('a-coinpay', purseLabel(p), '',
+            buttons.push(btn('a-coinpay', purseLabel(p), 'action',
                 !!S.paused || holding || !!S.pending || !!S.battle));
         }
         /* Eating is not a turn action -- you may open your own pack on
@@ -13823,9 +13890,9 @@ body.modal-cover #board * { animation-play-state: paused; }
            business of your dinner. */
         const myPending = !!S.pending && S.pending.playerId === NET.PID;
         const cannotEat = !!S.paused || holding || myPending;
-        buttons.push(btn('a-steak-raw', 'Eat raw steak', '',
+        buttons.push(btn('a-steak-raw', 'Eat raw steak', 'action',
             p.steaks.raw < 1 || cannotEat));
-        buttons.push(btn('a-steak-cooked', 'Eat seared steak', '',
+        buttons.push(btn('a-steak-cooked', 'Eat seared steak', 'action',
             p.steaks.cooked < 1 || cannotEat));
         buttons.push(btn('a-end', 'End turn', 'primary', !mine || blocked));
 
@@ -17076,7 +17143,20 @@ ready.then((uid) => {
                         entry.el.style.opacity = '';
                         entry.el.style.transform = '';
                     } else {
-                        entry.el.style.opacity = progress;
+                        /* Floored at 0.3, never 0 — matches the floor
+                           initRevealText already uses (0.25) below. An
+                           element below the fold gets this opacity the
+                           moment the page loads, before any scroll event
+                           fires, and Google's renderer doesn't scroll the
+                           page for you: leaving this at literal 0 meant
+                           every image in every .pop-group (most of the
+                           images on the page) rendered fully invisible on
+                           first load, which is exactly the kind of hidden
+                           content Google Images skips over. A 0.3 floor
+                           keeps the same fade-and-slide-up effect for real
+                           visitors while guaranteeing nothing is ever
+                           actually invisible in the rendered DOM. */
+                        entry.el.style.opacity = 0.3 + progress * 0.7;
                         entry.el.style.transform = 'translateY(' + (26 * (1 - progress)) + 'px)';
                     }
                 });
