@@ -2610,6 +2610,37 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
     .code-box .code { font-size: 23px; letter-spacing: 4px; }
 }
 
+/* ---- big screens: snap the info boxes up as the screen grows ------------
+   Past the 1400px .wrap already capped at, a wider monitor bought nothing:
+   the sidebar stayed a fixed 360px, the log stayed 260px tall, and the
+   inventory grid packed no more cards per row -- so the game asked for the
+   same scrolling on a 27" screen as a 13" laptop, just with wider margins
+   either side of it. These snap the game screen, the sidebar, the log and
+   the inventory a size wider at a few width breakpoints as the screen grows
+   -- in steps, the way the rest of this file already breaks by width,
+   rather than stretching everything continuously with vw. */
+
+@media (min-width: 1401px) {
+    #screen-game .wrap { max-width: 1680px; }
+    .game-grid { grid-template-columns: minmax(0, 1fr) 400px; }
+    .log { max-height: 340px; }
+    .item-grid { grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); }
+}
+
+@media (min-width: 1700px) {
+    #screen-game .wrap { max-width: 1960px; }
+    .game-grid { grid-template-columns: minmax(0, 1fr) 440px; gap: 24px; }
+    .log { max-height: 420px; }
+    .hero-panel img { width: 96px; height: 96px; }
+    .item-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+}
+
+@media (min-width: 2000px) {
+    #screen-game .wrap { max-width: 2240px; }
+    .game-grid { grid-template-columns: minmax(0, 1fr) 480px; }
+    .log { max-height: 480px; }
+}
+
 /* ---- enemy crest (only Fenrirak has a portrait) ----------------------- */
 
 .crest {
