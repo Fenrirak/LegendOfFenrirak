@@ -608,60 +608,6 @@
     .reveal-text .word { opacity: 1; }
 }
 
-/* =========================================================================
-   Site-wide footer — used by every page. Edit here, not per-page.
-   ========================================================================= */
-
-.site-footer {
-    margin-top: 60px;
-    padding: 28px 20px 36px;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-    background: #16161a;
-    color: #9c9a95;
-}
-
-.site-footer .footer-inner {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    text-align: center;
-}
-
-.site-footer .footer-brand {
-    margin: 0;
-    color: rgb(242, 204, 143);
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.3px;
-}
-
-.site-footer .footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px 18px;
-}
-
-.site-footer .footer-links a {
-    color: #9c9a95;
-    text-decoration: none;
-    font-size: 13px;
-    transition: color 0.2s ease;
-}
-
-.site-footer .footer-links a:hover {
-    color: rgb(242, 204, 143);
-}
-
-.site-footer .footer-copy {
-    margin: 0;
-    font-size: 12px;
-    opacity: 0.7;
-}
-
     </style>
 
     <style>
@@ -2754,6 +2700,13 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
     background: radial-gradient(circle at 34% 30%, #4a423a, #16110c 70%);
     box-shadow: inset 0 1px 2px rgba(255,255,255,.28), 0 1px 1px rgba(255,255,255,.5);
 }
+
+/* Class-coloured dice. Flat and slightly translucent, on purpose -- no
+   gradient and no highlight, unlike the plain die above. `dice-<class>` is
+   set on .dice-die by ui.js, from whoever's throw it is. */
+.dice-die.dice-knight .dice-side { background: rgba(109, 115, 123, .75); border-color: #4c5156; }
+.dice-die.dice-archer .dice-side { background: rgba(184, 52, 44, .75);  border-color: #81241f; }
+.dice-die.dice-mage   .dice-side { background: rgba(79, 127, 176, .75); border-color: #37597b; }
 
 /* Where each face is nailed on: half the cube out from the middle, which
    is 39px for a 78px die. Faces off, and it is a flat card again. */
@@ -5973,6 +5926,12 @@ body.modal-cover #board * { animation-play-state: paused; }
         maxPlayers: 6,
         maxPerClass: 2,
         turnTimeoutMs: 90000,          // auto-skip after 90 seconds of inactivity
+        // How much of that timeout the live "walk me through it" tour may
+        // excuse in total, across however many times it's opened and closed
+        // in one turn -- generous (the tour itself takes about two minutes),
+        // but bounded, so a tour nobody ever closed (a tab that vanished
+        // mid-tour) cannot hold the turn open forever.
+        tutorialGraceMs: 300000,
         startingCoins: 0,
         // One weapon change and one armour change per turn, counted separately.
         equipChangesPerTurn: 1,
@@ -6336,6 +6295,15 @@ body.modal-cover #board * { animation-play-state: paused; }
             playStartedAt: null,
             pausedMs: 0,
             pausedAt: null,
+            // The live "walk me through it" tour, mid-turn. Excuses however
+            // much of the *current* player's own turn clock it eats, capped
+            // at tutorialGraceMs total (see checkTimeout/tutorialExemptMs) so
+            // a tour left open by a browser that vanished cannot hold the
+            // turn hostage forever the way a lost connection normally can't
+            // either. See setTutorialPause.
+            tutorialPausedFor: null,
+            tutorialPausedAt: null,
+            tutorialExemptMs: 0,
             // Stamped once, the moment Fenrirak falls, so the victory screen
             // is showing the time the game actually took rather than
             // whatever the clock has ticked on to since.
@@ -6499,6 +6467,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             state.turnIndex = 0;
             state.turnNo = 1;
             state.turnStartedAt = Date.now();
+            state.tutorialExemptMs = 0;
             state.playStartedAt = Date.now();
             beginTurn(state);
         }
@@ -6529,6 +6498,12 @@ body.modal-cover #board * { animation-play-state: paused; }
         p.armourSwaps = 0;
         p.path = [];          // last turn's walk, cleared so it is not replayed
         state.turnStartedAt = Date.now();
+        state.tutorialExemptMs = 0;
+        // Whichever player it belonged to, a tutorial pause from the turn
+        // that just ended has nothing left to protect -- it is somebody
+        // else's clock running now.
+        state.tutorialPausedFor = null;
+        state.tutorialPausedAt = null;
     }
 
     function isMyTurn(state, pid) {
@@ -6585,10 +6560,24 @@ body.modal-cover #board * { animation-play-state: paused; }
        counting down on the screen), so the clock the player is watching is
        the clock they are actually being held to. */
     function turnLimit(state) { return R.turnTimeoutMs; }
+
+    // However much of the current player's own turn clock the live
+    // walkthrough has excused -- whatever is already banked from an
+    // earlier open/close this turn, plus whatever the tour open right now
+    // has racked up -- capped in total at tutorialGraceMs so a tour that
+    // was simply never closed (a tab that vanished mid-tour) runs out and
+    // lets the ordinary away-too-long timeout take back over, rather than
+    // holding the turn open forever.
+    function tutorialExemptMs(state, now) {
+        let ms = state.tutorialExemptMs || 0;
+        if (state.tutorialPausedAt) ms += Math.max(0, now - state.tutorialPausedAt);
+        return Math.min(ms, R.tutorialGraceMs);
+    }
+
     function checkTimeout(state, now) {
         if (state.phase !== 'playing') return false;
         if (state.paused) return false;        // the clock stops with everything else
-        if ((now - (state.turnStartedAt || 0)) < turnLimit(state)) return false;
+        if ((now - (state.turnStartedAt || 0) - tutorialExemptMs(state, now)) < turnLimit(state)) return false;
 
         // A battle must be settled, not silently deleted — otherwise the AFK
         // player escapes and the other side never gets what they earned.
@@ -7050,6 +7039,7 @@ body.modal-cover #board * { animation-play-state: paused; }
            Every later exchange is restarted by passBattleTurn; this is the
            first one. */
         state.turnStartedAt = Date.now();
+        state.tutorialExemptMs = 0;
         log(state, p.name + ' faces ' + D.foeName(e) + '!', 'battle');
         // Where this fight's own log begins. Stamped after the line that
         // announces it, so the battle panel opens empty and fills with
@@ -7083,6 +7073,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         };
         // The opening exchange starts the battle clock -- see startEnemyBattle.
         state.turnStartedAt = Date.now();
+        state.tutorialExemptMs = 0;
         log(state, a.name + ' and ' + b.name + ' clash on ' + square(a.pos).name + '!', 'battle');
         state.battle.logFrom = state.logSeq | 0;
         return ok();
@@ -7341,6 +7332,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             log(state, p.name + ' may attack again.', 'item');
             b.phase = battlePhaseFor(state);
             state.turnStartedAt = Date.now();
+            state.tutorialExemptMs = 0;
             return ok();
         }
 
@@ -7477,6 +7469,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         const b = state.battle;
         b.turn = b.turn === 'a' ? 'b' : 'a';
         state.turnStartedAt = Date.now();
+        state.tutorialExemptMs = 0;
         // The monster does not move on its own. Its die is thrown by the player
         // it is fighting, exactly as somebody has to throw it at the table --
         // one roll, one strike, then the turn comes back.
@@ -7525,6 +7518,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             b.turn = 'a';
             b.phase = battlePhaseFor(state);
             state.turnStartedAt = Date.now();
+            state.tutorialExemptMs = 0;
             resetBattleTurnPotion(state);
         }
         return ok();
@@ -7623,6 +7617,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         b.turn = 'a';
         b.phase = battlePhaseFor(state);
         state.turnStartedAt = Date.now();
+        state.tutorialExemptMs = 0;
         resetBattleTurnPotion(state);
         return ok();
     }
@@ -8360,6 +8355,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             state.pausedAt = Date.now();
         } else {
             state.turnStartedAt = Date.now();
+            state.tutorialExemptMs = 0;
             if (state.pausedAt) {
                 state.pausedMs = (state.pausedMs || 0) + (Date.now() - state.pausedAt);
                 state.pausedAt = null;
@@ -8367,6 +8363,37 @@ body.modal-cover #board * { animation-play-state: paused; }
         }
         log(state, want ? 'The host paused the game.'
                         : 'The host resumed the game.', 'system');
+        return ok();
+    }
+
+    /* ---- pausing, just for the tour -------------------------------------
+       A much narrower door than the one above: it excuses only the clock on
+       the current player's own turn, and only the current player may open
+       or close it, so nobody else at the table is held up by it -- unlike
+       the host's pause, this needs no permission beyond it being your go.
+       See tutorialExemptMs() for how the excused time is worked out and
+       capped, and beginTurn() for it being let go the moment the turn is.
+       -------------------------------------------------------------------- */
+
+    function setTutorialPause(state, pid, on) {
+        const cur = currentPlayer(state);
+        // Not fail(): this fires as ordinary cleanup the moment a turn ends
+        // with the tour still open (see close() in ui.js), which is not
+        // something to trouble the player with.
+        if (!cur || cur.id !== pid) return { ok: false, error: 'Only on your own turn.', silent: true };
+        const want = !!on;
+        if (want) {
+            if (state.tutorialPausedFor === pid) return { ok: false, error: 'no-change', silent: true };
+            state.tutorialPausedFor = pid;
+            state.tutorialPausedAt = Date.now();
+            log(state, cur.name + ' paused their turn timer for the tutorial.', 'muted');
+        } else {
+            if (state.tutorialPausedFor !== pid) return { ok: false, error: 'no-change', silent: true };
+            state.tutorialExemptMs = tutorialExemptMs(state, Date.now());
+            state.tutorialPausedFor = null;
+            state.tutorialPausedAt = null;
+            log(state, cur.name + '\u2019s turn timer resumed.', 'muted');
+        }
         return ok();
     }
 
@@ -8440,6 +8467,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         buy:           (s, pid, a) => buy(s, pid, a.kind, a.id),
         payInCoins:    (s, pid, a) => payInCoins(s, pid, a.on, a.cap),
         setPaused:     (s, pid, a) => setPaused(s, pid, a.on),
+        setTutorialPause: (s, pid, a) => setTutorialPause(s, pid, a.on),
         resolvePending:(s, pid, a) => resolvePending(s, pid, a.choice),
         proposeTrade:  (s, pid, a) => proposeTrade(s, pid, a.toId, a.give, a.want),
         respondTrade:  (s, pid, a) => respondTrade(s, pid, a.tradeId, a.accept),
@@ -8493,7 +8521,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         battleRoll, battleAttack, battleAutoStrike, enemyRoll, enemyStrike,
         startEnemyBattle, startPvp, availableMoves, battleActorId,
         usePowerup, usePotion, eatSteak, cookSteaks, equip, useAbility, buy,
-        payInCoins, setPaused, playTimeMs,
+        payInCoins, setPaused, setTutorialPause, tutorialExemptMs, playTimeMs,
         proposeTrade, respondTrade, cancelTrade, collapse, closeGame,
         fragmentsOf, suitsClass, turnLimit,
         totalDefence, totalAttackBonus, diceModifier, diceChoosable,
@@ -9938,12 +9966,29 @@ body.modal-cover #board * { animation-play-state: paused; }
             cubeEl = stage.querySelector('.dice-cube');
         }
 
+        // Coloured by whoever is throwing, not by what the die lands on --
+        // set once as it goes up, from the one player id every call site
+        // already has at that moment (our own id for our own throw, `who`
+        // off the die itself for anybody else's). An enemy's throw, or one
+        // from a seat with no class chosen yet, simply leaves the die plain.
+        function colorFor(who) {
+            const p = (S && who) ? E.player(S, who) : null;
+            return (p && p.cls) || null;
+        }
+        function setDieClass(who) {
+            if (!dieEl) return;
+            dieEl.classList.remove('dice-knight', 'dice-archer', 'dice-mage');
+            const cls = colorFor(who);
+            if (cls) dieEl.classList.add('dice-' + cls);
+        }
+
         // Pitch it in. It comes in off one side of the screen, bounces its
         // way across and rolls to a stop somewhere over on the other -- on
         // top of whatever happens to be under it, because it is thrown onto
         // the game rather than into a window of its own.
-        function throwIt() {
+        function throwIt(who) {
             build();
+            setDieClass(who);
             clearTimeout(settleT);
             clearTimeout(holdT);
             clearTimeout(fadeT);
@@ -10162,7 +10207,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             // air before the answer comes back.
             expect() {
                 armed = true;
-                throwIt();
+                throwIt(NET.PID);
                 clearTimeout(giveUpT);
                 // If the action was refused there will be no throw. Do not
                 // leave the die hanging in the air.
@@ -10206,7 +10251,7 @@ body.modal-cover #board * { animation-play-state: paused; }
                        the next throw may well have been called. It is not
                        called a second time; it has been named once already. */
                     takeThrow();
-                    ROLL_CALL.whenFree(() => { throwIt(); land(die); });
+                    ROLL_CALL.whenFree(() => { throwIt(die.who); land(die); });
                     return true;
                 }
 
@@ -10220,7 +10265,7 @@ body.modal-cover #board * { animation-play-state: paused; }
                 takeThrow();
                 HOLD.whenFree(() => {
                     ROLL_CALL.play(die.who, ROLL_CALL.label(die.why), '', false, () => {
-                        throwIt();
+                        throwIt(die.who);
                         land(die);
                     });
                 });
@@ -12148,7 +12193,9 @@ body.modal-cover #board * { animation-play-state: paused; }
     function tickTimer() {
         const el = $('#turn-timer');
         if (!el || !S || S.phase !== 'playing') return;
-        const left = Math.max(0, E.turnLimit(S) - (Date.now() - (S.turnStartedAt || 0)));
+        if (S.tutorialPausedFor) { el.textContent = 'paused — tutorial'; return; }
+        const left = Math.max(0, E.turnLimit(S) -
+            (Date.now() - (S.turnStartedAt || 0) - E.tutorialExemptMs(S, Date.now())));
         el.textContent = left > 0 ? Math.ceil(left / 1000) + 's left' : 'skipping…';
     }
     setInterval(tickTimer, 1000);
@@ -14351,6 +14398,12 @@ body.modal-cover #board * { animation-play-state: paused; }
             if (!steps.length) return;
             at = 0;
             waiting = false;
+            // Multiplayer only -- solo has nobody else's game to hold up,
+            // and no clock of its own to protect either (see the timer's
+            // own S.solo check in renderBanner). Fire-and-forget: setTutorialPause
+            // is idempotent and act() swallows its own errors, so there is
+            // nothing here worth waiting on before the tour itself opens.
+            if (NET !== SOLO) act('setTutorialPause', { on: true });
             document.addEventListener('keydown', onKey);
             document.addEventListener('click', onDocClick, true);
             startVisual();
@@ -14364,6 +14417,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             document.removeEventListener('click', onDocClick, true);
             stopVisual();
             if (badge) { badge.remove(); badge = null; }
+            if (NET !== SOLO) act('setTutorialPause', { on: false });
         }
 
         // Called after every fresh snapshot from the network layer.
