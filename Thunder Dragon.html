@@ -728,18 +728,21 @@ h3 { font-size: 17px; }
     font-size: 16px;
     padding: 11px 20px;
     border-radius: 999px;
-    border: 1px solid var(--panel-edge);
-    background: linear-gradient(180deg, #262626, #191919);
-    color: #e8e8e8;
+    border: 1px solid #9fb7cc;
+    /* A light, slightly misty blue -- distinct from the gold "do this next"
+       primary button and the crimson danger one, so an ordinary action
+       reads as its own third thing rather than a dimmer copy of either. */
+    background: linear-gradient(180deg, #e4edf6, #c9d9e8);
+    color: #223247;
     cursor: pointer;
     text-decoration: none;
     transition: background-color .2s ease, border-color .2s ease,
                 transform .2s ease, color .2s ease;
 }
 .btn:hover:not(:disabled) {
-    background-color: #333;
+    background: linear-gradient(180deg, #eef4fa, #d5e3f0);
     border-color: var(--gold);
-    color: var(--gold-bright);
+    color: #1a1108;
     transform: translateY(-2px);
 }
 .btn:disabled { opacity: .38; cursor: not-allowed; }
@@ -752,7 +755,12 @@ h3 { font-size: 17px; }
 }
 .btn.primary:hover:not(:disabled) { background: var(--gold-bright); color: #1a1108; }
 
-.btn.danger { border-color: rgba(210, 99, 90, .5); color: #e6a49d; }
+.btn.danger {
+    background: linear-gradient(180deg, #262626, #191919);
+    border-color: rgba(210, 99, 90, .5);
+    color: #e6a49d;
+}
+.btn.danger:hover:not(:disabled) { background-color: #333; color: #f0837a; }
 .btn.small { font-size: 13.5px; padding: 7px 13px; }
 
 input[type=text], input[type=number], select {
@@ -1018,7 +1026,57 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 }
 .turn-banner.mine .whose { border-color: var(--gold); }
 .turn-banner .who { font-size: 25px; color: var(--cream); }
-.turn-banner .timer { margin-left: 10px; font-size: 16px; color: #9a9a9a; }
+/* Pulled out of the crowded banner row and pinned to the corner of the
+   screen instead, so an away-too-long countdown is something you cannot
+   help but see rather than one more word buried in a line of them. It
+   turns amber with 30 seconds left and red with 15, each with one clear
+   pulse of its own the moment it crosses that line -- and it is not shown
+   at all during a battle, which is not timed (see checkTimeout in
+   engine.js). */
+.turn-banner .timer {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 70;
+    margin: 0;
+    font-family: 'Cutive Mono', 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(20, 18, 14, .88);
+    border: 1px solid rgba(255, 255, 255, .18);
+    color: #cfcfcf;
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .7);
+    transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+}
+.turn-banner .timer:empty { display: none; }
+.turn-banner .timer.warn {
+    color: #f0c374;
+    border-color: #d9a35c;
+    background: rgba(58, 42, 14, .92);
+}
+.turn-banner .timer.critical {
+    color: #f0837a;
+    border-color: #d2635a;
+    background: rgba(58, 16, 14, .92);
+    animation: timer-pulse 1s ease-in-out infinite;
+}
+@keyframes timer-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+}
+/* The one-off signal fired the instant the clock crosses 30s and again at
+   15s -- a bright ring that blooms outward and fades, on top of whatever
+   colour the badge has just changed to. */
+.turn-banner .timer.flash { animation: timer-flash .9s ease-out; }
+@keyframes timer-flash {
+    0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, .85); }
+    100% { box-shadow: 0 0 0 24px rgba(255, 255, 255, 0); }
+}
+@media (max-width: 720px) {
+    .turn-banner .timer { top: auto; bottom: 14px; right: 14px; font-size: 13.5px; padding: 7px 13px; }
+}
 
 /* The game clock. Always in the banner, whoever's turn it is, so a player
    never has to go looking for it -- and it is what claims the free space on
@@ -1079,6 +1137,11 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 
 .board {
     position: relative;
+    /* The squares' own writing is sized off the board's own width (below)
+       rather than a fixed pixel count, so a bigger board -- a wider window,
+       a roomier layout -- carries bigger writing with it instead of leaving
+       the same small print stranded in a much bigger square. */
+    container-type: inline-size;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     /* Every row the same height, so a square with a long card on it does
@@ -1195,7 +1258,10 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
     color: #3f4536;
 }
 .sq .sq-name {
-    font-size: 11.5px;
+    /* Scales with the board's own width (see .board's container-type
+       above) between a floor that stays legible on a phone and a ceiling
+       that stops it running away with itself on a very wide board. */
+    font-size: clamp(9px, 1.7cqw, 15px);
     color: #2c3126;
     line-height: 1.2;
     padding-bottom: 3px;
@@ -1203,9 +1269,9 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 }
 /* Amberwood Village runs a hair longer than its neighbours' names -- a
    touch smaller keeps it on its one line without shrinking every square. */
-.sq.key-cloverdale .sq-name { font-size: 8px; }
+.sq.key-cloverdale .sq-name { font-size: clamp(6.5px, 1.18cqw, 10.5px); }
 .sq .sq-text {
-    font-size: 9.2px;
+    font-size: clamp(7.5px, 1.35cqw, 12.5px);
     color: #4d5443;
     line-height: 1.28;
     margin-top: 4px;
@@ -1219,7 +1285,7 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
     align-self: flex-end;
     margin-top: 4px;
     z-index: 3;
-    font-size: 8.5px;
+    font-size: clamp(7px, 1.25cqw, 11px);
     letter-spacing: .5px;
     color: #6b3f1d;
     background: rgba(242, 209, 138, .95);
@@ -1402,27 +1468,29 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
     position: relative; z-index: 3;
 }
 .token {
-    width: 36px; height: 36px;
+    width: 46px; height: 46px;
     border-radius: 50%;
     border: 2px solid #3f4536;
     background: #f6f3e6 center/86% no-repeat;
     box-shadow: 0 3px 6px rgba(0,0,0,.5);
     transition: transform .16s ease;
 }
-.sq .tokens .token + .token { margin-left: -13px; }
+.sq .tokens .token + .token { margin-left: -16px; }
 .token.me { border-color: #b8791f; border-width: 3px; }
-/* Whose go it is. The piece is ringed in gold and breathes gently, so the
-   turn can be found on the board without reading the banner. */
+/* Whose go it is. The piece is ringed in gold, stands taller than the rest
+   and breathes gently, so the turn can be found on the board at a glance
+   without reading the banner. */
 .token.turn {
     z-index: 2;
+    width: 58px; height: 58px;
     border-color: var(--gold-bright, #e4c14a);
     border-width: 3px;
-    box-shadow: 0 0 0 3px rgba(228, 193, 74, .32), 0 3px 6px rgba(0,0,0,.5);
+    box-shadow: 0 0 0 3px rgba(228, 193, 74, .32), 0 4px 9px rgba(0,0,0,.55);
     animation: token-turn 2s ease-in-out infinite;
 }
 @keyframes token-turn {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(228,193,74,.28), 0 3px 6px rgba(0,0,0,.5); }
-    50%      { box-shadow: 0 0 0 7px rgba(228,193,74,.10), 0 3px 6px rgba(0,0,0,.5); }
+    0%, 100% { box-shadow: 0 0 0 3px rgba(228,193,74,.28), 0 4px 9px rgba(0,0,0,.55); transform: scale(1); }
+    50%      { box-shadow: 0 0 0 8px rgba(228,193,74,.10), 0 4px 9px rgba(0,0,0,.55); transform: scale(1.05); }
 }
 /* Lifted for the moment it is stepping onto a square. */
 .token.walking { transform: scale(1.22) translateY(-5px); }
@@ -1657,7 +1725,8 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
     justify-content: center;
     z-index: 4;
 }
-.sq.gateway .token { width: 30px; height: 30px; }
+.sq.gateway .token { width: 38px; height: 38px; }
+.sq.gateway .token.turn { width: 46px; height: 46px; }
 
 /* ---- the causeway to the arena ----------------------------------------
    The only way over the water. It runs out of the near bank, under the Gate
@@ -1955,7 +2024,12 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 .log {
     max-height: 260px; overflow-y: auto;
     font-size: 13.5px; line-height: 1.55;
-    display: flex; flex-direction: column-reverse; gap: 5px;
+    /* Newest first: the narrator and the battle log both write each new
+       line in at the top of the array (see renderLog/renderBattleModal in
+       ui.js), and plain top-to-bottom flow is all that is needed to show
+       that line where it is easiest to find, without also having to keep
+       a scroll position pinned. */
+    display: flex; flex-direction: column; gap: 5px;
 }
 .log div { padding-left: 10px; border-left: 2px solid rgba(255,255,255,.08); }
 .log .t-system { color: var(--gold-bright); border-left-color: var(--gold); }
@@ -1983,7 +2057,32 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
    are marked on the card itself rather than by recolouring the stock, so the
    yellow/pink/white still means what it means in the photographs. */
 .item .btn { margin-top: 9px; width: 100%; }
-.item.equipped { border-width: 2px; border-color: var(--gold); }
+/* Equipped is the one thing on this panel that most needs to read at a
+   glance -- it is the only line that says what you would actually fight
+   with right now. A wider gold border plus a lit banner across the top of
+   the card, rather than the border alone, so it is unmistakable even at a
+   glance down a full grid of cards. */
+.item.equipped {
+    position: relative;
+    border-width: 3px;
+    border-color: var(--gold-bright, #e4c14a);
+    box-shadow: 0 0 0 3px rgba(228, 193, 74, .22), 0 4px 14px -4px rgba(228, 193, 74, .45);
+}
+.item.equipped::before {
+    content: 'Equipped';
+    position: absolute;
+    top: -9px; right: 10px;
+    z-index: 2;
+    background: linear-gradient(180deg, var(--gold-bright, #e4c14a), var(--gold, #d9a35c));
+    color: #1a1108;
+    font-family: 'Cutive Mono', 'Courier New', monospace;
+    font-size: 10.5px;
+    font-weight: bold;
+    letter-spacing: .4px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    box-shadow: 0 3px 8px -2px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.25);
+}
 
 .battle-statcard { max-width: 250px; margin: 16px auto 0; }
 
@@ -2286,11 +2385,18 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
 
 /* ---- battle ---------------------------------------------------------- */
 
-.battle-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: center; }
+.battle-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: start; }
 .battle-side { text-align: center; }
 .battle-side img { width: 96px; height: 96px; object-fit: contain; }
 .battle-side .bname { font-size: 17px; color: var(--cream); margin-top: 4px; }
-.battle-vs { font-size: 24px; color: var(--crimson); letter-spacing: 3px; }
+/* Lined up on the portraits above rather than the full height of the
+   column, now that a stat card sits underneath each side. */
+.battle-vs { font-size: 24px; color: var(--crimson); letter-spacing: 3px; margin-top: 38px; }
+/* Each side of the fight, with its own stat card directly under its own
+   portrait card -- your moves and the other side's are both a glance away,
+   in a battle against a monster or against another player alike. */
+.battle-col { display: flex; flex-direction: column; align-items: center; }
+.battle-col .battle-statcard { margin: 12px 0 0; max-width: 100%; }
 
 /* The same die as the overlay's, in miniature, showing what was just thrown. */
 .die {
@@ -2598,9 +2704,11 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
     /* Equal rows here too -- only a shorter floor. */
     .board { gap: 5px; padding: 8px; grid-template-rows: repeat(5, minmax(66px, 1fr)); }
     .sq { min-height: 66px; padding: 5px; }
-    .sq .sq-name { font-size: 10px; }
+    /* No fixed override here any more -- .sq-name's own clamp() already
+       scales with the board's width, phones included. */
     .sq .sq-badge { display: none; }
-    .token { width: 22px; height: 22px; }
+    .token { width: 28px; height: 28px; }
+    .token.turn { width: 36px; height: 36px; }
     /* There is no room for the second line on a phone, and the name goes
        over two lines instead of running off both sides of the arena. */
     .arena .arena-sub { display: none; }
@@ -4110,8 +4218,10 @@ body.modal-cover #board * { animation-play-state: paused; }
 
 /* The line it lands on takes the hit: a short gold flare, so the number
    going up is something you see happen rather than something you notice
-   later. */
-.me-stats .wide.steak-landed {
+   later. Written against any line in the block (not only the `.wide` ones)
+   so a chest key landing on the single-column Chest keys line flares the
+   same way a steak or a fragment does. */
+.me-stats div.steak-landed {
     animation: steak-landed .68s ease-out;
     border-radius: 6px;
 }
@@ -4120,10 +4230,27 @@ body.modal-cover #board * { animation-play-state: paused; }
     30%  { background: rgba(217, 163, 92, .38); }
     100% { background: transparent; }
 }
-.me-stats .wide.steak-landed b { animation: steak-landed-num .68s ease-out; }
+.me-stats div.steak-landed b { animation: steak-landed-num .68s ease-out; }
 @keyframes steak-landed-num {
     0%   { transform: scale(1.28); color: var(--gold-bright, #e4c14a); }
     100% { transform: scale(1);    color: inherit; }
+}
+
+/* A chest key or key fragment won off a monster flies home exactly the way
+   a steak does -- the same fixed-position flight, just a smaller charm
+   rather than a whole cut of meat. See STEAK/DROP in ui.js. */
+.drop-fly {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: min(16vw, 84px);
+    height: auto;
+    z-index: 4200;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(.2);
+    opacity: 0;
+    filter: drop-shadow(0 14px 20px rgba(0, 0, 0, .55));
+    will-change: transform, opacity;
 }
 
 /* The legend's colour chips. The board's own square colours are written
@@ -5244,6 +5371,27 @@ body.modal-cover #board * { animation-play-state: paused; }
     // to upload beside the page and nothing that can 404.
     const STEAK_URI = artUri(STEAK_ART);
 
+    // Small flying icons for a chest key or key fragment won off a monster
+    // (see winPve in engine.js and the DROP module in ui.js) -- the same
+    // gold the Chest keys and Key fragments lines are already drawn in
+    // (compare .frag.have in style.css), just given a shape of its own.
+    const CHEST_KEY_ART =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' +
+        '<circle cx="21" cy="22" r="13" fill="#f0d78a" stroke="#20180f" stroke-width="2.5"/>' +
+        '<circle cx="21" cy="22" r="5.2" fill="#20180f"/>' +
+        '<rect x="29" y="19" width="27" height="6" rx="1.5" fill="#e4c14a" stroke="#20180f" stroke-width="2.5"/>' +
+        '<rect x="43" y="25" width="5" height="9" fill="#e4c14a" stroke="#20180f" stroke-width="2.2"/>' +
+        '<rect x="51" y="25" width="5" height="12" fill="#e4c14a" stroke="#20180f" stroke-width="2.2"/>' +
+        '</svg>';
+    const KEY_FRAGMENT_ART =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' +
+        '<path d="M32 4 L50 26 L40 60 L24 60 L14 26 Z" fill="#f0d78a" ' +
+        'stroke="#20180f" stroke-width="2.5" stroke-linejoin="round"/>' +
+        '<path d="M32 4 L32 60 M14 26 L50 26" stroke="#c79a34" stroke-width="2" opacity=".6"/>' +
+        '</svg>';
+    const CHEST_KEY_URI = artUri(CHEST_KEY_ART);
+    const KEY_FRAGMENT_URI = artUri(KEY_FRAGMENT_ART);
+
     const CLASS_ORDER = ['knight', 'archer', 'mage'];
 
     /* ------------------------------------------------------------------ */
@@ -5987,7 +6135,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         ITEM_DECK, POWERUPS, POWERUP_DECK,
         MERCHANT_POTIONS, MERCHANT_GEAR, SUBTYPE_OWNER,
         BOARD, DECOR, START_INDEX, ARENA_INDEX, KEY_FRAGMENTS_NEEDED, RULES,
-        STEAK_URI, foeName
+        STEAK_URI, CHEST_KEY_URI, KEY_FRAGMENT_URI, foeName
     };
 
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -6608,38 +6756,13 @@ body.modal-cover #board * { animation-play-state: paused; }
     function checkTimeout(state, now) {
         if (state.phase !== 'playing') return false;
         if (state.paused) return false;        // the clock stops with everything else
+        // A battle runs on its own back-and-forth -- waiting on somebody
+        // else's roll or strike is not the same as sitting idle on your own
+        // go -- so the ordinary turn clock does not reach into a fight at
+        // all any more, online or solo. There is no separate battle timer
+        // either: a fight simply is not timed.
+        if (state.battle) return false;
         if ((now - (state.turnStartedAt || 0) - tutorialExemptMs(state, now)) < turnLimit(state)) return false;
-
-        // A battle must be settled, not silently deleted — otherwise the AFK
-        // player escapes and the other side never gets what they earned.
-        const b = state.battle;
-        if (b) {
-            const actorId = battleActorId(state);
-            if (b.kind === 'pvp') {
-                const afk = player(state, actorId);
-                const other = player(state, actorId === b.aId ? b.bId : b.aId);
-                if (afk && other) {
-                    log(state, afk.name + ' was away too long and forfeits the duel.', 'muted');
-                    return !!winPvp(state, other, afk);
-                }
-                // A duel is never settled as though it were a monster fight --
-                // if either side of it can no longer be found, there is
-                // nothing left to award. Clear it and move the turn on rather
-                // than falling into the PvE branch below.
-                state.battle = null;
-                state.pending = null;
-                advanceTurn(state);
-                return true;
-            }
-            const p = player(state, b.aId);
-            if (p) {
-                log(state, p.name + ' was away too long and flees the fight.', 'muted');
-                losePve(state, p);
-                advanceTurn(state);
-                return true;
-            }
-            state.battle = null;
-        }
 
         state.pending = null;
         const cur = currentPlayer(state);
@@ -7710,6 +7833,11 @@ body.modal-cover #board * { animation-play-state: paused; }
             if (giveFragment(p, sq.keyFragment)) {
                 log(state, p.name + ' recovers key fragment ' + sq.keyFragment +
                            ' (' + p.keyFragments + '/3).', 'item');
+                // Stamped with a running number the same way a won steak is,
+                // so the client that owns this player can fly the drop across
+                // the screen to the fragments line exactly once.
+                state.dropSeq = (state.dropSeq | 0) + 1;
+                state.lastDrop = { playerId: p.id, n: state.dropSeq, kind: 'fragment' };
             } else {
                 log(state, p.name + ' already carries key fragment ' + sq.keyFragment +
                            ' — there is only one of each.', 'muted');
@@ -7718,6 +7846,8 @@ body.modal-cover #board * { animation-play-state: paused; }
         if (sq.chestKey) {
             p.chestKeys += sq.chestKey;
             log(state, p.name + ' recovers a chest key.', 'item');
+            state.dropSeq = (state.dropSeq | 0) + 1;
+            state.lastDrop = { playerId: p.id, n: state.dropSeq, kind: 'chestKey' };
         }
         noteBattleEnd(state, b, asPlayer(p), asEnemy(b.enemyId));
         state.battle = null;
@@ -8031,9 +8161,16 @@ body.modal-cover #board * { animation-play-state: paused; }
     function buy(state, pid, kind, id) {
         const p = player(state, pid);
         if (!p) return fail('Unknown player.');
-        if (!isMyTurn(state, pid)) return fail('You can only trade with the Merchant on your turn.');
+        // The Merchant used to deal only on your own go. He now keeps the
+        // same hours as everybody else at the table -- open on anyone's
+        // turn, so waiting your turn is not the only time to spend your
+        // coins. Only a battle in progress (which occupies the one shared
+        // panel) or your own square-choice still waiting on you shuts the
+        // stall for a moment.
         if (state.battle) return fail('The Merchant will not deal during a battle.');
-        if (state.pending) return fail('Resolve the square first.');
+        if (state.pending && state.pending.playerId === pid) {
+            return fail('Resolve your own square first.');
+        }
 
         if (kind === 'gear') {
             const def = D.ITEMS[id];
@@ -9901,6 +10038,56 @@ body.modal-cover #board * { animation-play-state: paused; }
         }[c]));
     }
 
+    /* ------------------------------------------------------------------ */
+    /* Names in the narrator, coloured to match the class dice              */
+    /*                                                                     */
+    /* Every log line is plain text -- "Aria the Knight rolled a 4" -- with */
+    /* no player id attached to it, so the only way to know whose name is   */
+    /* sitting in a line is to look for it. This finds every current        */
+    /* player's name inside a line of the log and wraps it in the same      */
+    /* colour their die is thrown in (see .dice-die.dice-<class> in         */
+    /* style.css), so a name in the narrator reads as whose it is at a      */
+    /* glance, the same way the die already does on the table.              */
+    /* ------------------------------------------------------------------ */
+
+    // Lifted straight off style.css's .dice-die.dice-<class> colours,
+    // brightened enough to stay readable as text on the narrator's dark
+    // background rather than as a translucent die face.
+    const DICE_NAME_COLOUR = { knight: '#a7acb3', archer: '#e0574a', mage: '#6fa8dd' };
+
+    function nameColourRe() {
+        // Longest name first, so "Aria" cannot swallow half of "Ariadne"
+        // before the regex ever gets a chance at the longer one.
+        const names = (S && S.players || [])
+            .filter(p => p.cls && p.name && DICE_NAME_COLOUR[p.cls])
+            .map(p => ({ name: p.name, colour: DICE_NAME_COLOUR[p.cls] }))
+            .sort((a, b) => b.name.length - a.name.length);
+        if (!names.length) return null;
+        const byName = {};
+        names.forEach(n => { if (!(n.name in byName)) byName[n.name] = n.colour; });
+        const pattern = names.map(n => n.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+        return { re: new RegExp('(' + pattern + ')', 'g'), byName: byName };
+    }
+
+    // Escapes as it goes, so this replaces plain esc(text) rather than
+    // running alongside it -- there is exactly one place html-safety happens
+    // for a line of the log.
+    function colourNames(text) {
+        text = String(text == null ? '' : text);
+        const found = nameColourRe();
+        if (!found) return esc(text);
+        let out = '', last = 0, m;
+        found.re.lastIndex = 0;
+        while ((m = found.re.exec(text))) {
+            out += esc(text.slice(last, m.index));
+            out += '<span style="color:' + found.byName[m[1]] +
+                   ';font-weight:600">' + esc(m[1]) + '</span>';
+            last = m.index + m[1].length;
+        }
+        out += esc(text.slice(last));
+        return out;
+    }
+
     // m:ss under an hour, h:mm:ss once a game runs long -- the game clock and
     // the victory screen both read a game's playing time this same way, so a
     // long fight and a quick one are never shown to two different rules.
@@ -10725,6 +10912,88 @@ body.modal-cover #board * { animation-play-state: paused; }
         };
     })();
 
+    /* ------------------------------------------------------------------ */
+    /* A chest key or key fragment won off a monster                       */
+    /*                                                                     */
+    /* The same idea as STEAK just above: it swells in the middle of the   */
+    /* screen, then flies to the line it belongs on -- Chest keys or Key   */
+    /* fragments -- and that line flares as it lands. Driven off           */
+    /* state.lastDrop, stamped by winPve in engine.js with a running       */
+    /* number the same way the steak is, so it plays once and only for the */
+    /* player it belongs to.                                               */
+    /* ------------------------------------------------------------------ */
+
+    const DROP = (function () {
+        let primed = false, seen = 0;
+
+        function play(kind) {
+            const targetId = kind === 'chestKey' ? '#me-chestkeys' : '#me-fragments';
+            const target = $(targetId) || $('#side-hero .mate.you');
+            const img = document.createElement('img');
+            img.className = 'drop-fly';
+            img.src = kind === 'chestKey' ? D.CHEST_KEY_URI : D.KEY_FRAGMENT_URI;
+            img.alt = '';
+            img.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(img);
+
+            let gone = false;
+            const done = () => {
+                if (gone) return;
+                gone = true;
+                img.remove();
+            };
+            const failsafe = setTimeout(done, 5000);
+
+            const r = target ? target.getBoundingClientRect() : null;
+            const toX = r ? r.left + r.width / 2 : window.innerWidth - 60;
+            const toY = r ? r.top + r.height / 2 : 60;
+            const midX = window.innerWidth / 2;
+            const midY = window.innerHeight / 2;
+            const dx = toX - midX, dy = toY - midY;
+
+            if (!img.animate) {                       // very old browser
+                clearTimeout(failsafe);
+                setTimeout(done, 40);
+                return;
+            }
+            const anim = img.animate([
+                { offset: 0,   transform: 'translate(-50%, -50%) scale(.2)  rotate(-10deg)', opacity: 0 },
+                { offset: .16, transform: 'translate(-50%, -50%) scale(1.15) rotate(4deg)',  opacity: 1 },
+                { offset: .26, transform: 'translate(-50%, -50%) scale(1)    rotate(0deg)',  opacity: 1 },
+                { offset: .5,  transform: 'translate(-50%, -50%) scale(1)    rotate(0deg)',  opacity: 1 },
+                { offset: 1,   transform: 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' +
+                                           dy + 'px)) scale(.15) rotate(16deg)', opacity: .3 }
+            ], { duration: 1500, easing: 'cubic-bezier(.34,.02,.24,1)', fill: 'forwards' });
+
+            anim.onfinish = () => {
+                clearTimeout(failsafe);
+                const row = $(targetId);
+                if (row) {
+                    row.classList.remove('steak-landed');
+                    void row.offsetWidth;
+                    row.classList.add('steak-landed');
+                    setTimeout(() => row.classList.remove('steak-landed'), 700);
+                }
+                done();
+            };
+            anim.oncancel = () => { clearTimeout(failsafe); done(); };
+        }
+
+        return {
+            saw(state) {
+                const s = state && state.lastDrop;
+                const n = (s && typeof s.n === 'number') ? s.n : 0;
+                // The first snapshot of a room is history, not a drop that
+                // was just won.
+                if (!primed) { primed = true; seen = n; return; }
+                if (!s || n === seen) return;
+                seen = n;
+                if (s.playerId !== NET.PID) return;   // not yours to catch
+                play(s.kind);
+            }
+        };
+    })();
+
     const TURN_ANNOUNCE = (function () {
         let back = null, cardEl = null, portraitEl = null, nameEl = null, subEl = null;
         let hideT = null;
@@ -11447,11 +11716,13 @@ body.modal-cover #board * { animation-play-state: paused; }
         reaped = false;
         enterRoom._hb = setInterval(() => {
             if (!S || S.phase !== 'playing') return;
+            // A battle is not on the clock at all any more -- nothing to
+            // check, and nothing worth the write.
+            if (S.battle) return;
             if (Date.now() - (S.turnStartedAt || 0) < E.turnLimit(S)) return;
 
-            const waitingOn = S.battle ? E.battleActorId(S) :
-                (S.pending ? S.pending.playerId :
-                    (E.currentPlayer(S) || {}).id);
+            const waitingOn = S.pending ? S.pending.playerId :
+                (E.currentPlayer(S) || {}).id;
             if (!waitingOn || waitingOn === NET.PID) return;
 
             NET.act(ROOM, 'timeoutCheck', {}).catch(() => {});
@@ -11527,6 +11798,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         DICE.saw(state);
         ZAP.saw(state);
         STEAK.saw(state);
+        DROP.saw(state);
         BATTLE_END.saw(state);
         retireAnsweredPanel();
         TURN_ANNOUNCE.saw(state);
@@ -12221,13 +12493,31 @@ body.modal-cover #board * { animation-play-state: paused; }
                             : name + ' has moved' };
     }
 
+    // Which side of the 30s / 15s line the countdown was on last tick, so
+    // the one-off flash fires exactly once per crossing rather than every
+    // second the badge happens to still be under the line.
+    let timerTier = null;
     function tickTimer() {
         const el = $('#turn-timer');
         if (!el || !S || S.phase !== 'playing') return;
-        if (S.tutorialPausedFor) { el.textContent = 'paused — tutorial'; return; }
+        // No countdown during a battle -- a fight is not timed at all any
+        // more (see checkTimeout in engine.js), so there is nothing here
+        // worth showing while one is on.
+        if (S.battle) { el.textContent = ''; el.className = 'timer'; timerTier = null; return; }
+        if (S.tutorialPausedFor) { el.textContent = 'paused — tutorial'; el.className = 'timer'; timerTier = null; return; }
         const left = Math.max(0, E.turnLimit(S) -
             (Date.now() - (S.turnStartedAt || 0) - E.tutorialExemptMs(S, Date.now())));
-        el.textContent = left > 0 ? Math.ceil(left / 1000) + 's left' : 'skipping…';
+        const secs = Math.ceil(left / 1000);
+        el.textContent = left > 0 ? secs + 's left' : 'skipping…';
+        const tier = secs <= 15 ? 'critical' : secs <= 30 ? 'warn' : null;
+        el.className = 'timer' + (tier ? ' ' + tier : '');
+        if (tier && tier !== timerTier) {
+            // Restart the flash animation even if it's already mid-run.
+            el.classList.remove('flash');
+            void el.offsetWidth;
+            el.classList.add('flash');
+        }
+        timerTier = tier;
     }
     setInterval(tickTimer, 1000);
 
@@ -13397,8 +13687,13 @@ body.modal-cover #board * { animation-play-state: paused; }
                 '<div><span>Coins</span><b>' + x.coins + '</b></div>' +
                 '<div><span>Energy</span><b>' + x.energy + '</b></div>' +
                 '<div><span>Attack</span><b>+' + E.totalAttackBonus(x) + '</b></div>' +
-                '<div><span>Chest keys</span><b>' + x.chestKeys + '</b></div>' +
-                '<div class="wide"><span>Key fragments</span>' +
+                /* Same idea as the steak line below: a won chest key or key
+                   fragment flies here and the line flares as it lands, on
+                   your own block only. */
+                '<div' + (isMe ? ' id="me-chestkeys"' : '') +
+                    '><span>Chest keys</span><b>' + x.chestKeys + '</b></div>' +
+                '<div class="wide"' + (isMe ? ' id="me-fragments"' : '') +
+                    '><span>Key fragments</span>' +
                     fragmentsHtml(x) + '</div>' +
                 /* The id is on your own line and nobody else's. The steak
                    flies to it and the line flares as it lands, and neither
@@ -13497,7 +13792,14 @@ body.modal-cover #board * { animation-play-state: paused; }
             cls.ability.name + (abilityReady ? '' : ' \u00b7 in ' + abilityWait(p)), '',
             !mine || blocked || !abilityReady ||
             (cls.ability.id === 'agile_footwork' && p.hasMoved)));
-        buttons.push(btn('a-shop', 'Visit the Merchant', '', !mine || blocked));
+        // Unlike everything else in this list, the Merchant keeps no
+        // particular hours: he deals on anyone's turn, not only your own.
+        // The only things that still shut the stall are a battle in
+        // progress (the one shared panel is showing that instead) and your
+        // own square still waiting on a choice from you.
+        const shopBlocked = !!S.battle || !!S.paused || holding ||
+            (!!S.pending && S.pending.playerId === NET.PID);
+        buttons.push(btn('a-shop', 'Visit the Merchant', '', shopBlocked));
         // Offering a trade is a turn action like any other. It used to be open
         // at all times, which read as an invitation and was not one: the panel
         // cannot come up over a battle or over somebody else's square, so the
@@ -13525,7 +13827,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             p.steaks.raw < 1 || cannotEat));
         buttons.push(btn('a-steak-cooked', 'Eat seared steak', '',
             p.steaks.cooked < 1 || cannotEat));
-        buttons.push(btn('a-end', 'End turn', '', !mine || blocked));
+        buttons.push(btn('a-end', 'End turn', 'primary', !mine || blocked));
 
         // The two that end things stand together underneath, matched and
         // side by side, set apart from the things you do on your turn.
@@ -13645,7 +13947,7 @@ body.modal-cover #board * { animation-play-state: paused; }
 
     function renderLog() {
         $('#log').innerHTML = (S.log || []).slice(-60).reverse()
-            .map(l => '<div class="t-' + esc(l.tone) + '">' + esc(l.t) + '</div>').join('');
+            .map(l => '<div class="t-' + esc(l.tone) + '">' + colourNames(l.t) + '</div>').join('');
     }
 
     /* ------------------------------------------------------------------ */
@@ -13842,7 +14144,6 @@ body.modal-cover #board * { animation-play-state: paused; }
     function guideHtml() {
         const R = D.RULES;
         const turnSecs = Math.round(R.turnTimeoutMs / 1000);
-        const fightSecs = Math.round(R.battleTimeoutMs / 1000);
 
         const step = (n, title, body) =>
             '<li><span class="guide-num">' + n + '</span>' +
@@ -13877,10 +14178,10 @@ body.modal-cover #board * { animation-play-state: paused; }
                  'Wherever you stop, that square happens: draw a card, fight, heal, take coins, ' +
                  'open a chest. A panel comes up and asks you anything it needs to know.') +
             step(3, 'Anything else you fancy',
-                 'On your own go you may also visit <b>the Merchant</b>, <b>propose a trade</b>, ' +
-                 'or use your class <b>ability</b> — that one is once every ' +
-                 R.abilityCooldownTurns + ' of your turns. You may change one weapon and one ' +
-                 'armour a turn.') +
+                 'On your own go you may also <b>propose a trade</b> or use your class ' +
+                 '<b>ability</b> — that one is once every ' + R.abilityCooldownTurns +
+                 ' of your turns. You may change one weapon and one armour a turn. ' +
+                 '<b>The Merchant</b> keeps different hours: see below.') +
             step(4, 'End your turn',
                  'Press <b>End turn</b> to hand over. You get a hunting roll on the way out, ' +
                  'which is where steaks come from.') +
@@ -13892,33 +14193,53 @@ body.modal-cover #board * { animation-play-state: paused; }
             R.foodPoisoningRoll + ' and it is food poisoning instead, and you lose ' +
             R.foodPoisoningLoss + ' health.' +
         '</div>' +
-
-        '<h3 class="guide-h">Fighting</h3>' +
-        '<div class="guide-facts">' +
-            '<div class="guide-fact"><b>3 or more</b>' +
-                '<span>on the die and you connect. A 1 or a 2 misses.</span></div>' +
-            '<div class="guide-fact"><b>attack &minus; defence</b>' +
-                '<span>is what actually gets through.</span></div>' +
-            '<div class="guide-fact"><b>Energy</b>' +
-                '<span>starts at ' + R.startingEnergy +
-                ' and builds each turn. Your heavy move costs a lot of it.</span></div>' +
-            '<div class="guide-fact"><b>' + R.enemyMinDamage + ' damage, minimum</b>' +
-                '<span>is what a monster always gets through, however high your defence.</span></div>' +
+        '<div class="guide-note">' +
+            '<b>The Merchant is open any time</b> — press <b>Visit the Merchant</b> whenever ' +
+            'you like, even while you are waiting on somebody else\u2019s turn. He only ' +
+            'shuts the stall during a battle, or while you have a square choice of your ' +
+            'own still waiting on an answer.' +
         '</div>' +
-        '<p class="guide-p">' +
-            'A fight goes turn by turn: roll to see whether you connect, then pick the move to ' +
-            'use. Monsters are run by the computer and always use the hardest attack they can ' +
-            'afford, and no amount of defence brings one of their hits below ' +
-            R.enemyMinDamage + ' damage. Lose, and you go back to the Start with your health ' +
-            'restored — you keep your coins and everything you were carrying.' +
-        '</p>' +
 
-        '<h3 class="guide-h">Meeting another player</h3>' +
-        '<p class="guide-p">' +
-            'Land on a square somebody is already standing on and you <b>have to fight them</b>. ' +
-            'It is not optional. Win and you take some of their coins — and you still get ' +
-            'whatever the square itself was going to give you, because you did land on it.' +
-        '</p>' +
+        '<h3 class="guide-h">Fighting, step by step</h3>' +
+        '<ol class="guide-steps">' +
+            step(1, 'How a fight starts',
+                 'Land on a monster square and the fight begins right away. Land on a square ' +
+                 'somebody else is already standing on and you fight them instead — either way ' +
+                 'it is not optional, and nothing else on the board happens until it is over.') +
+            step(2, 'Roll to see if you connect',
+                 'One die each go. <b>3 or more</b> and you connect — a 1 or a 2 misses outright, ' +
+                 'and your go ends with nothing landed. The battle screen shows the die and waits ' +
+                 'for it to finish before saying which.') +
+            step(3, 'Connect, and you pick a move',
+                 'Your class\u2019s own moves are listed right there on your stat card, under your ' +
+                 'portrait — each with what it costs in Energy and what it hits for. Energy starts ' +
+                 'at ' + R.startingEnergy + ' and builds every turn, so a heavy move is usually ' +
+                 'worth waiting for rather than the first go you have it.') +
+            step(4, 'What actually gets through',
+                 'It is <b>attack minus defence</b> — your move\u2019s damage against whatever the ' +
+                 'other side is carrying or wearing. The one exception is a monster\u2019s own hit: ' +
+                 'it always gets through for at least ' + R.enemyMinDamage +
+                 ' damage, however high your defence is.') +
+            step(5, 'It keeps going without you, in between',
+                 'A monster is run by the computer and always swings with the hardest attack it ' +
+                 'can afford — there is nothing to click on its go. Against another player, it is ' +
+                 'one hit each: roll, strike, then it is the other side\u2019s turn, back and forth ' +
+                 'until somebody\u2019s health runs out.') +
+            step(6, 'You are not locked out of everything else',
+                 'A potion, a raw or seared steak, and — for a class whose ability works mid-fight ' +
+                 '— your <b>ability</b>, can all still be used on your own go inside a battle. ' +
+                 'Equipping a different weapon or armour has to wait until the fight is over.') +
+            step(7, 'Winning and losing',
+                 'Beat a monster and you get what the square promised — coins, and sometimes a ' +
+                 'chest key or a key fragment, which flies straight to where it belongs. Beat ' +
+                 'another player and you take some of their coins. Lose, either way, and you go ' +
+                 'back to the Start with your health restored — you keep your coins and everything ' +
+                 'you were carrying.') +
+        '</ol>' +
+        '<div class="guide-note">' +
+            'A battle is not on the clock. Take whatever time you need to read the moves and pick ' +
+            'one — nobody\u2019s go can be skipped out from under them for taking too long in a fight.' +
+        '</div>' +
 
         '<h3 class="guide-h">The squares</h3>' +
         guideSquareLegend() +
@@ -13933,8 +14254,9 @@ body.modal-cover #board * { animation-play-state: paused; }
             '<li><b>Your things</b> sit under the board — weapons, armour, potions, ' +
                 'power-ups, steaks, coins and chest keys. You equip and use them from there.</li>' +
             '<li><b>Playing with other people</b>, a turn runs on ' + turnSecs +
-                ' seconds and each go in a fight on ' + fightSecs +
-                ' seconds, so nobody can hold the table up. On your own there is no clock.</li>' +
+                ' seconds, so nobody can hold the table up outside a fight — that countdown sits ' +
+                'in the corner of the screen and warns you as it runs low. A battle itself is not ' +
+                'timed, on your own or online. On your own, nothing at all is timed.</li>' +
             '<li><b>The host</b> may pause the game, and may end it for everybody.</li>' +
             '<li><b>The narrator</b> down the right-hand side says everything that happens. ' +
                 'If you missed something, it is in there.</li>' +
@@ -14812,7 +15134,11 @@ body.modal-cover #board * { animation-play-state: paused; }
         const incoming = (S.trades || []).find(t =>
             t.status === 'open' && t.toId === NET.PID);
 
-        if (S.battle || S.pending) openPanel = null;
+        // A battle takes the one shared panel outright, whoever it belongs
+        // to. A pending square choice only takes it from the player who has
+        // to answer it -- it must not also slam the Merchant shut for
+        // somebody else who opened it while waiting their turn.
+        if (S.battle || (S.pending && S.pending.playerId === NET.PID)) openPanel = null;
 
         /* Whatever the player has open on top, they keep -- unless it belonged
            to a fight that is now over. */
@@ -14942,18 +15268,34 @@ body.modal-cover #board * { animation-play-state: paused; }
                                     : 'Waiting for the other side…')
                           : 'You are watching this battle.') +
             '</div>' +
+            // Each side of the fight in its own column, its stat card
+            // directly under its own portrait card -- your class's moves
+            // and the other side's (a player's class, or the monster's) are
+            // both a glance away, in a duel or a monster fight alike.
             '<div class="battle-top">' +
-                sideHtml('<img src="' + esc(D.CLASSES[a.cls].art) + '" alt="' + esc(a.name) +
-                         '">', a.hp, a.maxHp, a.name, 'hp', 'side-a', a.energy, a.bonusHp) +
+                '<div class="battle-col">' +
+                    sideHtml('<img src="' + esc(D.CLASSES[a.cls].art) + '" alt="' + esc(a.name) +
+                             '">', a.hp, a.maxHp, a.name, 'hp', 'side-a', a.energy, a.bonusHp) +
+                    '<div class="battle-statcard">' + statCardHtml({
+                        name: D.CLASSES[a.cls].name, art: D.CLASSES[a.cls].art,
+                        hp: D.CLASSES[a.cls].hp, defence: D.CLASSES[a.cls].defence,
+                        moves: D.CLASSES[a.cls].moves
+                    }) + '</div>' +
+                '</div>' +
                 '<div class="battle-vs">VS</div>' +
-                sideHtml(foePortrait, foeHp, foeMax, foe.name, isPvp ? 'hp' : 'enemy',
-                         'side-b', isPvp ? foe.energy : b.enemyEnergy, isPvp ? foe.bonusHp : 0) +
-            '</div>' +
-            // The monster's own stat card, as it is dealt on the table.
-            (isPvp ? '' : '<div class="battle-statcard">' + statCardHtml({
-                name: foe.name, hp: foe.maxHp || b.enemyMaxHp, defence: foe.defence,
-                moves: foe.moves, svg: enemyPic(foe, 58)
-            }) + '</div>');
+                '<div class="battle-col">' +
+                    sideHtml(foePortrait, foeHp, foeMax, foe.name, isPvp ? 'hp' : 'enemy',
+                             'side-b', isPvp ? foe.energy : b.enemyEnergy, isPvp ? foe.bonusHp : 0) +
+                    '<div class="battle-statcard">' + (isPvp ? statCardHtml({
+                        name: D.CLASSES[foe.cls].name, art: D.CLASSES[foe.cls].art,
+                        hp: D.CLASSES[foe.cls].hp, defence: D.CLASSES[foe.cls].defence,
+                        moves: D.CLASSES[foe.cls].moves
+                    }) : statCardHtml({
+                        name: foe.name, hp: foe.maxHp || b.enemyMaxHp, defence: foe.defence,
+                        moves: foe.moves, svg: enemyPic(foe, 58)
+                    })) + '</div>' +
+                '</div>' +
+            '</div>';
 
         /* The flat die in the panel, and what it came to.
 
@@ -15082,7 +15424,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             '<div class="log" style="max-height:150px">' +
             (battleLines.length
                 ? battleLines.slice(-12).reverse()
-                    .map(l => '<div class="t-' + esc(l.tone) + '">' + esc(l.t) + '</div>').join('')
+                    .map(l => '<div class="t-' + esc(l.tone) + '">' + colourNames(l.t) + '</div>').join('')
                 : '<div class="t-muted">Nothing yet — the fight has not started.</div>') +
             '</div>';
 
