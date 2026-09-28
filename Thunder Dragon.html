@@ -856,7 +856,20 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 .screen { display: none; }
 .screen.active { display: block; }
 
-.wrap { max-width: 1400px; margin: 0 auto; padding: 0 18px 50px; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 0 clamp(20px, 4.5vw, 72px) 50px; }
+
+/* Game screen: more room at the two screen edges WITHOUT reshaping the board.
+   Narrowing the columns alone squished the board, because its row height is
+   set by its contents, not its width. So the whole game layout is scaled as one
+   piece (board, text and sidebar together, so proportions cannot change) and the
+   side padding is divided by the same factor so the edge gap stays what the
+   clamp() above says. */
+#screen-game { --z: .93; }
+#screen-game .wrap {
+    zoom: var(--z);
+    padding-left: calc(clamp(20px, 4.5vw, 72px) / var(--z));
+    padding-right: calc(clamp(20px, 4.5vw, 72px) / var(--z));
+}
 
 /* ---- home ------------------------------------------------------------ */
 
