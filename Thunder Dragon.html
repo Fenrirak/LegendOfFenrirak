@@ -856,7 +856,7 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
 .screen { display: none; }
 .screen.active { display: block; }
 
-.wrap { max-width: 1400px; margin: 0 auto; padding: 0 clamp(20px, 4.5vw, 72px) 50px; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 0 18px 50px; }
 
 /* ---- home ------------------------------------------------------------ */
 
@@ -1214,8 +1214,6 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
        than over it, so the board is shorter than it used to be, not
        taller. */
     grid-template-rows: repeat(5, minmax(0, 1fr));
-    /* Height follows width, so the board scales in proportion. */
-    aspect-ratio: 7 / 3.9;
     gap: 9px;
     padding: 20px;
     border-radius: 5px;
@@ -2752,7 +2750,8 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
     .game-grid { grid-template-columns: 1fr; }
     .lobby-grid { grid-template-columns: 1fr; }
     /* Still every row the same height, only a shorter floor. */
-    .board { grid-template-rows: repeat(5, minmax(0, 1fr)); }
+    .board { grid-template-rows: repeat(5, minmax(84px, 1fr)); }
+    .sq { min-height: 84px; }
     .sq .sq-text { display: none; }
     /* The name on the disc is sized off the disc -- see .arena-title -- so
        there is nothing to override here by window width any more. Doing so
@@ -2766,7 +2765,7 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
     .home-hero h1 { font-size: 30px; }
     .class-picker { grid-template-columns: 1fr; }
     /* Equal rows here too -- only a shorter floor. */
-    .board { gap: 5px; padding: 8px; grid-template-rows: repeat(5, minmax(0, 1fr)); aspect-ratio: 7 / 5; }
+    .board { gap: 5px; padding: 8px; grid-template-rows: repeat(5, minmax(66px, 1fr)); }
     .sq { min-height: 66px; padding: 5px; }
     /* No fixed override here any more -- .sq-name's own clamp() already
        scales with the board's width, phones included. */
