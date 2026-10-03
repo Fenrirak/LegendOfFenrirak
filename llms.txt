@@ -27,4 +27,5 @@ Gallery photos (board games, cards, characters, book cover, timeline, Minecraft 
 - [Creators](https://fenrirak.github.io/Legend-of-Fenrirak/Creators.html): Meet the team behind Legend of Fenrirak.
 - [The Thunder Dragon](https://fenrirak.github.io/Legend-of-Fenrirak/Thunder%20Dragon.html): Play the board game online, up to 6 players.
 - [The Ice Dragon](https://fenrirak.github.io/Legend-of-Fenrirak/Ice%20Dragon.html): Play the board game online, up to 6 players.
+- [The Oblivion Dragon](https://fenrirak.github.io/Legend-of-Fenrirak/Oblivion%20Dragon.html): Play the board game online, up to 6 players, or against 1-5 computer players.
 - [Showdowns](https://fenrirak.github.io/Legend-of-Fenrirak/Testplay%20Showdowns.html): A free, single-player online board game — battle AI opponents on a board of terrains and chests.

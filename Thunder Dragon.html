@@ -9,8 +9,8 @@
 
     <title>Legend of Fenrirak | The Thunder Dragon — Play Online</title>
 
-    <link rel="icon" type="image/png" href="Favicon.png">
-    <link rel="apple-touch-icon" href="Favicon.png">
+    <link rel="icon" type="image/png" href="Favicon.png?v=9dcbe526">
+    <link rel="apple-touch-icon" href="Favicon.png?v=9dcbe526">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
     <link rel="canonical" href="https://fenrirak.github.io/Legend-of-Fenrirak/Thunder%20Dragon.html">
@@ -24,9 +24,9 @@
     <meta property="og:description" content="Play Legend of Fenrirak™, The Thunder Dragon online with up to 6 players.">
     <meta property="og:url" content="https://fenrirak.github.io/Legend-of-Fenrirak/Thunder%20Dragon.html">
     <meta property="og:site_name" content="Legend of Fenrirak">
-    <meta property="og:image" content="https://fenrirak.github.io/Legend-of-Fenrirak/Fenrirak.png">
+    <meta property="og:image" content="https://fenrirak.github.io/Legend-of-Fenrirak/Fenrirak.png?v=1d95aed6">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://fenrirak.github.io/Legend-of-Fenrirak/Fenrirak.png">
+    <meta name="twitter:image" content="https://fenrirak.github.io/Legend-of-Fenrirak/Fenrirak.png?v=1d95aed6">
 
     <style>
 /* ==== site-nav.css ==== */
@@ -4684,7 +4684,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         "name": "Legend of Fenrirak: The Thunder Dragon",
         "url": "https://fenrirak.github.io/Legend-of-Fenrirak/Thunder%20Dragon.html",
         "description": "Play Legend of Fenrirak™, The Thunder Dragon online with up to 6 players. Pick a Knight, Archer or Mage, gather the three key fragments and bring down Fenrirak.",
-        "image": "https://fenrirak.github.io/Legend-of-Fenrirak/Fenrirak.png",
+        "image": "https://fenrirak.github.io/Legend-of-Fenrirak/Fenrirak.png?v=1d95aed6",
         "genre": "Board Game",
         "numberOfPlayers": {"@type": "QuantitativeValue", "minValue": 1, "maxValue": 6},
         "isPartOf": {"@type": "WebSite", "name": "Legend of Fenrirak", "url": "https://fenrirak.github.io/Legend-of-Fenrirak/index.html"}
@@ -4782,6 +4782,10 @@ body.modal-cover #board * { animation-play-state: paused; }
                     <a href="Ice Dragon.html">
                         <svg viewBox="0 0 24 24"><path d="M12 2v20M4.5 6l15 12M19.5 6l-15 12"/></svg>
                         <span>The Ice Dragon</span>
+                    </a>
+                    <a href="Oblivion Dragon.html">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c-5 0-8-4-7-9 1-3 4-5 4-9 3 2 5 5 5 8 1-1 2-3 2-5 4 3 5 8 3 11-1 2-4 4-7 4Z"/></svg>
+                        <span>The Oblivion Dragon</span>
                     </a>
                 </div>
             </div>
@@ -4995,7 +4999,7 @@ body.modal-cover #board * { animation-play-state: paused; }
 
     // `art` is filled in further down: each class is drawn as flat vector art
     // and handed out as a data: URI, so there are no character PNGs to upload
-    // any more. Knight.png, Archer.png and Mage.png are what those drawings
+    // any more. Knight.png?v=5b4a86e8, Archer.png?v=b55619cd and Mage.png?v=f437b181 are what those drawings
     // were taken from.
     const CLASSES = {
         knight: {
@@ -5081,7 +5085,7 @@ body.modal-cover #board * { animation-play-state: paused; }
     /* ------------------------------------------------------------------ */
     /* The characters, drawn                                               */
     /*                                                                     */
-    /* Knight.png, Archer.png and Mage.png are the canonical look, and      */
+    /* Knight.png?v=5b4a86e8, Archer.png?v=b55619cd and Mage.png?v=f437b181 are the canonical look, and      */
     /* these are those three redrawn as flat vector art: blocks of colour   */
     /* inside one hard dark outline, straight edges and simple curves, no   */
     /* shading and no gradients -- the same way the monsters and the board  */
@@ -16614,7 +16618,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         $('#over-body').innerHTML =
             '<div class="victory">' +
             '<div class="vtitle">Victory</div>' +
-            '<img src="Fenrirak.png" alt="Fenrirak">' +
+            '<img src="Fenrirak.png?v=1d95aed6" alt="Fenrirak">' +
             '<h2>' + esc(w ? w.name : 'Someone') + ' has slain Fenrirak.</h2>' +
             timeHtml +
             '<p class="muted">' + (w && w.id === NET.PID
