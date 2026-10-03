@@ -693,7 +693,8 @@
     --bg-top: #0a080c;              /* the table under everything */
     --bg-mid: #060606;
     --bg-bottom: #030303;
-    --flame: #590016;               /* the flames in the background and the embers */
+    --flame: #590016;               /* the flames in the background */
+    --ember: #4a1a6a;               /* the specks drifting up over them */
     --title: #a274d4;               /* the main header: one solid violet, no gradient */
     --gold: rgb(217, 163, 92);
     --gold-bright: rgb(242, 204, 143);
@@ -758,7 +759,7 @@ body {
     bottom: -12px;
     width: 4px; height: 4px;
     border-radius: 50%;
-    background: var(--flame);
+    background: var(--ember);
     opacity: 0;
     animation: ember-rise linear infinite;
 }
@@ -1014,18 +1015,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 /* The reminder under the board that its squares can be read. */
 .board-note {
     display: flex; align-items: center; justify-content: center; gap: 10px;
-    width: fit-content; max-width: 100%; margin: 12px auto 0; padding: 6px 16px 6px 6px;
+    width: fit-content; max-width: 100%; margin: 12px auto 0; padding: 7px 18px;
     font-size: 14px; color: var(--cream); text-align: left;
     background: color-mix(in srgb, var(--accent) 26%, transparent);
     border: 1px solid var(--btn-edge); border-radius: 999px;
 }
 .board-note b { color: var(--marker); }
-.board-note .bn-icon {
-    width: 28px; height: 28px; flex: none; border-radius: 50%;
-    display: grid; place-items: center;
-    background: var(--marker); color: var(--marker-ink);
-}
-.board-note .bn-icon svg { width: 17px; height: 17px; fill: currentColor; stroke: none; }
 .board {
     position: relative;
     width: 100%;
@@ -1402,6 +1397,61 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
 .battle h2 { margin-bottom: 4px; }
 .battle .round { font-size: 12.5px; color: var(--muted); }
+
+/* The round, and everybody in the order they strike. */
+.order-track { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+.order-track .ot-round { margin-right: 4px; }
+.order-track .ot { padding: 2px 9px; border-radius: 999px; border: 1px solid var(--panel-edge); background: rgba(0, 0, 0, .25); color: var(--text); }
+.order-track .ot.now { border-color: var(--marker); color: var(--marker); }
+.order-track .ot.down { text-decoration: line-through; opacity: .5; }
+.order-track .ot-sep { color: var(--accent-soft); }
+
+/* The attack just used, across the top of the fight. */
+.blow-line {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 12px; padding: 9px 12px;
+    background: rgba(0, 0, 0, .32);
+    border: 1px solid var(--panel-edge); border-left: 4px solid var(--btn-edge); border-radius: 10px;
+    font-size: 14.5px; line-height: 1.35; color: var(--cream);
+}
+.blow-line .bl-icon { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--btn-bottom); }
+.blow-line .bl-icon svg { width: 20px; height: 20px; }
+.blow-line .bl-text { flex: 1; min-width: 0; }
+.blow-line .bl-text small { display: block; font-size: 12px; color: var(--oblivion-soft); margin-top: 1px; }
+.blow-line .mv { color: var(--gold-bright); }
+.blow-line .why { font-size: 13px; color: var(--muted); }
+.blow-line .bl-dmg { flex: none; text-align: center; line-height: 1; min-width: 56px; }
+.blow-line .bl-dmg b { display: block; font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 24px; color: #ff6a5a; }
+.blow-line .bl-dmg small { font-size: 10px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
+.blow-line.quiet { color: var(--muted); border-left-color: var(--panel-edge); }
+.blow-line.fresh { animation: blow-in .55s ease-out; }
+@keyframes blow-in {
+    from { transform: translateY(-6px); opacity: 0; background: color-mix(in srgb, var(--accent) 55%, transparent); }
+    to { transform: none; opacity: 1; background: rgba(0, 0, 0, .32); }
+}
+
+/* The final battle: Fenrirak and Helen across the top, your side under
+   them, and a heading of its own. */
+.modal:has(> .battle.boss) { border-color: var(--btn-edge); }
+.battle.boss .boss-head { text-align: center; padding-right: 0; }
+.battle.boss .boss-head h2 { justify-content: center; font-size: 28px; letter-spacing: 2px; margin: 0; }
+.battle.boss .boss-sub {
+    display: flex; align-items: center; gap: 12px; margin-top: 2px;
+    font-size: 11.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--oblivion-soft);
+}
+.battle.boss .boss-sub::before, .battle.boss .boss-sub::after { content: ''; flex: 1; height: 1px; background: var(--panel-edge); }
+.battle.boss .order-track { justify-content: center; margin-top: 8px; }
+.battle-field.boss { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.battle-field.boss .side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; gap: 6px 12px; }
+.battle-field.boss .side.one { grid-template-columns: minmax(0, 1fr); width: calc(50% - 6px); margin: 0 auto; }
+/* Side by side, the two fighters' cards line up and their stat cards
+   start level. */
+.battle-field.boss .fighter-wrap { display: grid; grid-row: span 2; grid-template-rows: subgrid; gap: 6px; }
+.battle-field.boss .unit-card { align-self: start; }
+.vs-line { display: flex; align-items: center; gap: 14px; font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 22px; color: var(--accent-soft); }
+.vs-line::before, .vs-line::after { content: ''; flex: 1; height: 1px; background: var(--panel-edge); }
+.fighter.big .hp-bar { height: 18px; border-radius: 9px; }
+.fighter.big .hp-bar .txt { font-size: 12px; }
 .battle-field { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: start; margin: 14px 0 10px; }
 .battle-field .vs { font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 26px; color: var(--accent); align-self: center; }
 .side { display: flex; flex-direction: column; gap: 10px; }
@@ -1449,6 +1499,21 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     pointer-events: none;
 }
 .fighter .dmg-pop.heal { color: #9be09f; }
+.fighter .atk-tag {
+    position: absolute; left: 12px; top: -10px; max-width: calc(100% - 24px);
+    font-size: 11.5px; font-weight: bold; color: var(--btn-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    background: var(--btn-top); border: 1px solid var(--btn-edge); border-radius: 6px; padding: 1px 8px;
+}
+/* The stat card: the attack last used, and the one a monster uses next. */
+.paper .p-move.last, .paper .p-move.next { border-left: 3px solid; padding-left: 6px; margin-left: -9px; }
+.paper .p-move.last { border-color: var(--accent); }
+.paper .p-move.next { border-color: var(--blood); }
+.mv-tag {
+    display: inline-block; margin-left: 6px; padding: 0 5px; border-radius: 4px; vertical-align: 1px;
+    font-size: 9.5px; font-weight: bold; letter-spacing: .4px; text-transform: uppercase; color: #fff;
+}
+.mv-tag.last { background: var(--accent); }
+.mv-tag.next { background: var(--blood); }
 @keyframes pop-up { from { transform: translateY(8px); opacity: 0; } 20% { opacity: 1; } to { transform: translateY(-26px); opacity: 0; } }
 .energy-row { display: flex; align-items: center; gap: 3px; margin-top: 5px; flex-wrap: wrap; }
 .energy-row .pip { width: 9px; height: 13px; border-radius: 3px; background: #1d2a36; border: 1px solid #0b1218; }
@@ -1514,6 +1579,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .battle-log .t-heal { color: #9be09f; }
 .battle-log .t-death, .battle-log .t-system { color: var(--gold-bright); }
 .battle-log .t-muted { color: var(--muted); }
+.log .mv, .battle-log .mv { color: var(--cream); }
 .modal-back.dock { background: transparent; backdrop-filter: none; pointer-events: none; align-items: flex-end; }
 .modal-back.dock .modal { pointer-events: auto; margin-bottom: 4px; max-height: 46vh; box-shadow: 0 -10px 40px rgba(0, 0, 0, .65), 0 0 0 1px var(--accent); }
 /* On a wide screen the board is on the left, so the question docks beside
@@ -1544,6 +1610,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .modal-back.mini { background: transparent; backdrop-filter: none; pointer-events: none; align-items: flex-end; justify-content: flex-end; }
 .modal-back.mini .modal { pointer-events: auto; max-width: 340px; padding: 10px 14px; animation: none; }
 .mini-bar { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.mini-bar .mini-what { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mini-bar .mini-what small { font-size: 12px; color: var(--muted); line-height: 1.35; }
 .mini-bar .btn { margin-left: auto; }
 
 /* ---- shops ---- */
@@ -1847,6 +1915,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     .board { min-width: 780px; }
     .battle-field { grid-template-columns: 1fr; }
     .battle-field .vs { text-align: center; }
+    .battle-field.boss .side { grid-template-columns: minmax(0, 1fr); }
+    .battle-field.boss .side.one { width: auto; }
     .sq-detail { grid-template-columns: 1fr; }
     .sq-detail .pic { max-width: 240px; margin: 0 auto; }
     .trade-cols, .mods-cols, .guide-pick-grid { grid-template-columns: 1fr; }
@@ -2108,10 +2178,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         <div class="game-layout">
             <section class="g-board">
                 <div class="board-scroll"><div class="board" id="board"></div></div>
-                <p class="board-note">
-                    <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 7.6v12.6l3.2-3.1 2.3 5.1 2.4-1.1-2.3-5h4.4z"/><path d="M9.4 2.4v2.2M4.6 4.4l1.6 1.6M2.6 9.2h2.2M14.2 4.4l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-                    <span><b>Click any square</b> on the board to read its full description.</span>
-                </p>
+                <p class="board-note"><span><b>Click any square</b> on the board to read its full description.</span></p>
             </section>
 
             <aside class="g-side">
@@ -2232,7 +2299,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             ],
             ability: {
                 id: 'iron_body', name: 'Iron Body', inBattle: true,
-                text: 'Ignore minimum damage for the opponent’s next 3 attacks.'
+                text: 'Ignore minimum damage for the opponent’s next 2 attacks.'
             },
             colour: '#b9bec7'
         }
@@ -2267,125 +2334,129 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* loot: gold, fragment (pendant fragment #), keys (chest keys),       */
     /* chest (a Monster Chest: 1 Chest Key opens it for 1 Gemstone),        */
     /* joins (the Barbarian follows you afterwards).                       */
+    /*                                                                     */
+    /* Every monster but Fenrirak and Helen has 20 more HP and 15 more     */
+    /* damage on each attack than the planning doc gives (the user's      */
+    /* change, 2026-10-04).                                                */
     /* ------------------------------------------------------------------ */
 
     const ENEMIES = {
         sentry_soldiers: {
-            id: 'sentry_soldiers', plural: true, name: 'Sentry Soldiers', hp: 80, defence: 5,
+            id: 'sentry_soldiers', plural: true, name: 'Sentry Soldiers', hp: 100, defence: 5,
             moves: [
-                move('halberd_strike', 'Halberd Strike', 25, 1),
-                move('reinforcement_call', 'Reinforcement Call', 45, 5, 3,
+                move('halberd_strike', 'Halberd Strike', 40, 1),
+                move('reinforcement_call', 'Reinforcement Call', 60, 5, 3,
                      [{ t: 'heal', value: 25 }, { t: 'empower', value: 20, uses: 1 }],
                      'Heal 25 HP and +20 DMG for your next attack.')
             ],
             loot: { gold: 15, fragment: 1 }
         },
         bandits: {
-            id: 'bandits', plural: true, name: 'Bandits', hp: 75, defence: 5,
+            id: 'bandits', plural: true, name: 'Bandits', hp: 95, defence: 5,
             moves: [
-                move('frenzy', 'Frenzy', 20, 1),
-                move('dagger_rampage', 'Dagger Rampage', 75, 5, 3)
+                move('frenzy', 'Frenzy', 35, 1),
+                move('dagger_rampage', 'Dagger Rampage', 90, 5, 3)
             ],
             loot: { gold: 20, chest: true }
         },
         thieves: {
-            id: 'thieves', plural: true, name: 'Thieves', hp: 100, defence: 5,
+            id: 'thieves', plural: true, name: 'Thieves', hp: 120, defence: 5,
             passives: [{
                 id: 'silent_hands', name: 'Silent Hands',
                 text: 'The opponent loses 5 Gold at the start of every Thieves’ turn, ' +
                       'if they do not have enough gold, they take 15 damage instead.'
             }],
             moves: [
-                move('shadow_strike', 'Shadow Strike', 45, 1, 0,
+                move('shadow_strike', 'Shadow Strike', 60, 1, 0,
                      [{ t: 'weaken', value: 5, uses: 1 }],
                      'The opponent does 5 less damage on their next turn.'),
-                move('smoke_bomb', 'Smoke Bomb', 15, 5, 3,
+                move('smoke_bomb', 'Smoke Bomb', 30, 5, 3,
                      [{ t: 'steal' }],
                      'The opponent loses an equipped item of their choice.')
             ],
             loot: { gold: 50, keys: 1 }
         },
         orc_warriors: {
-            id: 'orc_warriors', plural: true, name: 'Orc Warriors', hp: 125, defence: 15,
+            id: 'orc_warriors', plural: true, name: 'Orc Warriors', hp: 145, defence: 15,
             passives: [{
                 id: 'mountain_magic', name: 'Mountain Magic',
                 text: 'Orc Warriors heal 10 HP at every start of their turn.'
             }],
             moves: [
-                move('charge', 'Charge', 40, 1),
-                move('wreak_havoc', 'Wreak Havoc', 100, 5, 3,
+                move('charge', 'Charge', 55, 1),
+                move('wreak_havoc', 'Wreak Havoc', 115, 5, 3,
                      [{ t: 'weaken', value: 10, uses: 1 }],
                      'The opponent does 10 less damage on their next turn.')
             ],
             loot: { gold: 35, chest: true }
         },
         orc_scouts: {
-            id: 'orc_scouts', plural: true, name: 'Orc Scouts', hp: 100, defence: 5,
+            id: 'orc_scouts', plural: true, name: 'Orc Scouts', hp: 120, defence: 5,
             moves: [
-                move('ruin', 'Ruin', 40, 1),
-                move('mayhem', 'Mayhem', 90, 5, 3,
+                move('ruin', 'Ruin', 55, 1),
+                move('mayhem', 'Mayhem', 105, 5, 3,
                      [{ t: 'weaken', value: 5, uses: 1 }],
                      'The opponent does 5 less damage on their next turn.')
             ],
             loot: { gold: 10, chest: true }
         },
         veteran_soldiers: {
-            id: 'veteran_soldiers', plural: true, name: 'Veteran Soldiers', hp: 135, defence: 15,
+            id: 'veteran_soldiers', plural: true, name: 'Veteran Soldiers', hp: 155, defence: 15,
             moves: [
-                move('guarding_strike', 'Guarding Strike', 35, 1, 0,
+                move('guarding_strike', 'Guarding Strike', 50, 1, 0,
                      [{ t: 'guard', value: 10 }],
                      '+10 Defence during your opponent’s next attack.'),
-                move('crossbow_volley', 'Crossbow Volley', 120, 5, 3)
+                move('crossbow_volley', 'Crossbow Volley', 135, 5, 3)
             ],
             loot: { gold: 45, keys: 1 }
         },
         barbarian: {
-            id: 'barbarian', name: 'Barbarian', hp: 100, defence: 10, proper: false,
+            id: 'barbarian', name: 'Barbarian', hp: 120, defence: 10, proper: false,
             moves: [
-                move('battle_roar', 'Battle Roar', 30, 1),
-                move('tackle', 'Tackle', 45, 3),
-                move('rampage', 'Rampage', 110, 5, 4,
+                move('battle_roar', 'Battle Roar', 45, 1),
+                move('tackle', 'Tackle', 60, 3),
+                move('rampage', 'Rampage', 125, 5, 4,
                      [{ t: 'weaken', value: 5, uses: 3 }],
                      'The opponent does 5 less damage for their next 3 attacks.')
             ],
             loot: { gold: 30, fragment: 2, joins: true }
         },
         soldier_garrison: {
-            id: 'soldier_garrison', name: 'Soldier Garrison', hp: 140, defence: 15,
+            id: 'soldier_garrison', name: 'Soldier Garrison', hp: 160, defence: 15,
             passives: [{
                 id: 'overwhelming_force', name: 'Overwhelming Force',
                 text: 'All opponent attacks deal 5 less damage.'
             }],
             moves: [
-                move('spear_charge', 'Spear Charge', 40, 1),
-                move('spear_barrage', 'Spear Barrage', 95, 5, 3)
+                move('spear_charge', 'Spear Charge', 55, 1),
+                move('spear_barrage', 'Spear Barrage', 110, 5, 3)
             ],
             loot: { gold: 45, fragment: 3 }
         },
         royal_soldiers: {
-            id: 'royal_soldiers', plural: true, name: 'Royal Soldiers', hp: 110, defence: 15,
+            id: 'royal_soldiers', plural: true, name: 'Royal Soldiers', hp: 130, defence: 15,
             passives: [{
                 id: 'royal_attackers', name: 'Royal Attackers',
                 text: 'When health is at 50 or lower, deal 20 more DMG with each attack.'
             }],
             moves: [
-                move('halberd_charge', 'Halberd Charge', 45, 1),
-                move('royal_assault', 'Royal Assault', 100, 5, 3)
+                move('halberd_charge', 'Halberd Charge', 60, 1),
+                move('royal_assault', 'Royal Assault', 115, 5, 3)
             ],
             loot: { gold: 30, fragment: 4 }
         },
         royal_guards: {
-            id: 'royal_guards', plural: true, name: 'Royal Guards', hp: 180, defence: 15,
+            id: 'royal_guards', plural: true, name: 'Royal Guards', hp: 200, defence: 15,
             passives: [{
                 id: 'royal_protectors', name: 'Royal Protectors',
                 text: 'When health is at 50 or lower, take 25 less damage from each ' +
                       'attack, and deal +10 DMG.'
             }],
             moves: [
-                move('formation_strike', 'Formation Strike', 45, 1, 0,
+                move('formation_strike', 'Formation Strike', 60, 1, 0,
                      [{ t: 'guard', value: 5 }],
                      '+5 Defence during your opponent’s next attack.'),
-                move('royal_retribution', 'Royal Retribution', 150, 5, 4)
+                move('royal_retribution', 'Royal Retribution', 165, 5, 4)
             ],
             loot: { gold: 50, fragment: 5 }
         },
@@ -2490,7 +2561,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'staff_of_light', name: 'Staff of Light', attack: 30, text: '+30 DMG.' },
         { id: 'staff_of_power', name: 'Staff of Power', attack: 30, weakenHit: 5,
           text: '+30 DMG, the opponent deals 5 less damage during their next attack.' },
-        { id: 'staff_of_life', name: 'Staff of Life', attack: 35, heal1E: 5, price: 100,
+        { id: 'staff_of_life', name: 'Staff of Life', attack: 35, heal1E: 5, price: 120,
           text: '+35 DMG, heal 5 HP after every 1 energy attack.' },
         { id: 'crestium_staff', name: 'Crestium Staff', attack: 40, text: '+40 DMG.' }
     ]);
@@ -2501,7 +2572,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'relic_of_steel', name: 'Relic of Steel', defence: 20, text: '+20 Defence.' },
         { id: 'cape_of_protection', name: 'Cape of Protection', defence: 25, text: '+25 Defence.' },
         { id: 'crown_of_invisibility', name: 'Crown of Invisibility', defence: 30, text: '+30 Defence.' },
-        { id: 'high_mages_robe', name: 'High Mage’s Robe', defence: 30, attack: 5, price: 70,
+        { id: 'high_mages_robe', name: 'High Mage’s Robe', defence: 30, attack: 5, price: 90,
           text: '+30 Defence, deal 5 more damage.' },
         { id: 'ring_of_illusions', name: 'Ring of Illusions', defence: 35, weaken1E: 5,
           text: '+35 Defence. 1 Energy attacks cause opponents to deal 5 less damage for ' +
@@ -2516,7 +2587,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'rapidfire_crossbow', name: 'Rapidfire Crossbow', attack: 25, text: '+25 DMG.' },
         { id: 'falcon_bow', name: 'Falcon Bow', attack: 25, bonus5E: 10,
           text: '+25 DMG, all 5 energy attacks deal 10 more damage.' },
-        { id: 'arcane_bow', name: 'Arcane Bow', attack: 30, bonus1E: 5, price: 75,
+        { id: 'arcane_bow', name: 'Arcane Bow', attack: 30, bonus1E: 5, price: 95,
           text: '+30 DMG, all 1 energy attacks deal 5 more damage.' },
         { id: 'celestial_bow', name: 'Celestial Bow', attack: 35, healHit: 5,
           text: '+35 DMG, heal 5 HP after every attack.' }
@@ -2534,7 +2605,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'hunters_garb', name: 'Hunter’s Garb', defence: 35, moveUpTo: 2,
           text: '+35 Defence, add up to 2 to your movement die rolls.' },
         { id: 'fenrirak_scales_cloak', name: 'Fenrirak Scales’ Cloak', defence: 35,
-          moveUpTo: 1, fenrirakPvp: true, price: 95,
+          moveUpTo: 1, fenrirakPvp: true, price: 115,
           text: '+35 Defence, you may use Fenrirak’s 5 energy attack in PvP battles ' +
                 '(Energy still applies), add up to 1 to your movement die rolls.' },
         { id: 'starlight_cloak', name: 'Starlight Cloak', defence: 40, moveUpTo: 3,
@@ -2551,7 +2622,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'crimsonblade_katana', name: 'Crimsonblade Katana', attack: 20, bonus1E: 5,
           text: '+20 DMG, all 1 energy attacks deal 5 more damage.' },
         { id: 'fenriraks_tailblade', name: 'Fenrirak’s Tailblade', attack: 25, defence: 5,
-          price: 80, text: '+25 DMG, +5 Defence.' },
+          price: 100, text: '+25 DMG, +5 Defence.' },
         { id: 'mythical_montante', name: 'Mythical Montante', attack: 35, text: '+35 DMG.' }
     ]);
     gear('knight', 'armour', [
@@ -2565,7 +2636,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'full_plate', name: 'Full Plate', defence: 30, moveFixed: -1,
           text: '+30 Defence, minus 1 to movement die rolls.' },
         { id: 'obsidian_chainmail', name: 'Obsidian Chainmail', defence: 35, moveFixed: -1,
-          bonus1E: 5, price: 75,
+          bonus1E: 5, price: 95,
           text: '+35 Defence, minus 1 to movement die rolls. 1 energy attacks deal 5 more damage.' },
         { id: 'runed_plate_armour', name: 'Runed Plate Armour', defence: 45, moveFixed: -1,
           bonus5E: 10,
@@ -2580,7 +2651,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'war_hammer', name: 'War Hammer', attack: 20, text: '+20 DMG.' },
         { id: 'blood_axe', name: 'Blood Axe', attack: 25, text: '+25 DMG.' },
         { id: 'warbreaker', name: 'Warbreaker', attack: 30, text: '+30 DMG.' },
-        { id: 'obsidian_spear', name: 'Obsidian Spear', attack: 30, price: 70, text: '+30 DMG.' },
+        { id: 'obsidian_spear', name: 'Obsidian Spear', attack: 30, price: 90, text: '+30 DMG.' },
         { id: 'death_bringer', name: 'Death Bringer', attack: 35, text: '+35 DMG.' }
     ]);
     gear('barbarian', 'armour', [
@@ -2590,7 +2661,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'studded_leather_jacket', name: 'Studded Leather Jacket', defence: 20, text: '+20 Defence.' },
         { id: 'berserkers_chestplate', name: 'Berserker’s Chestplate', defence: 25, text: '+25 Defence.' },
         { id: 'warforged_armour', name: 'Warforged Armour', defence: 30, text: '+30 Defence.' },
-        { id: 'razor_plate', name: 'Razor Plate', defence: 30, thorns: 5, price: 85,
+        { id: 'razor_plate', name: 'Razor Plate', defence: 30, thorns: 5, price: 105,
           text: '+30 Defence, opponent takes 5 damage when they attack the Barbarian ' +
                 '(Excluding Fenrirak and Oblivion Mage Helen).' },
         { id: 'crystal_scale_mail', name: 'Crystal Scale Mail', defence: 35, lowRegen: 5,
@@ -2693,19 +2764,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         for (let n = 0; n < POTION_DECK_WEIGHTS[id]; n++) POTION_DECK.push(id);
     });
 
-    // The Merchant. Unlimited stock of everything.
+    // The Merchant. Unlimited stock of everything. Every price here is 15 Gold
+    // over the planning doc's, and his gear 20 over (the user's change, 2026-10-04).
     const MERCHANT_POTIONS = [
-        { id: 'healing_potion', price: 25 },
-        { id: 'potion_of_awakening', price: 45 },
-        { id: 'potion_of_concentration', price: 30 },
-        { id: 'rage_potion', price: 55 },
-        { id: 'potion_of_energy', price: 50 },
-        { id: 'potion_of_adrenaline', price: 90 },
-        { id: 'potion_of_stoneskin', price: 25 },
-        { id: 'potion_of_ironskin', price: 35 },
-        { id: 'potion_of_control', price: 50 },
-        { id: 'potion_of_agility', price: 75 },
-        { id: 'merchants_tranquility', price: 230, alt: { gold: 100, gems: 3 } }
+        { id: 'healing_potion', price: 40 },
+        { id: 'potion_of_awakening', price: 60 },
+        { id: 'potion_of_concentration', price: 45 },
+        { id: 'rage_potion', price: 70 },
+        { id: 'potion_of_energy', price: 65 },
+        { id: 'potion_of_adrenaline', price: 105 },
+        { id: 'potion_of_stoneskin', price: 40 },
+        { id: 'potion_of_ironskin', price: 50 },
+        { id: 'potion_of_control', price: 65 },
+        { id: 'potion_of_agility', price: 90 },
+        { id: 'merchants_tranquility', price: 245, alt: { gold: 115, gems: 3 } }
     ];
 
     // Astrix's Alchemy, square 23. Only open to whoever is standing on it.
@@ -2782,12 +2854,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: '8a', name: 'Thorn Bush Valley', row: 6, col: 3, next: ['9a'], pic: 'thorns',
           route: 'long', action: 'thorn_valley', damage: 15,
           text: 'Skip your next turn and take 15 DMG.' },
-        { id: '9a', name: 'Smuggler’s Alley', row: 6, col: 2, next: ['10a'], pic: 'smugglers',
-          route: 'long', action: 'smugglers', damage: 5, gold: 15,
-          text: 'Take 5 DMG and lose 15 Gold.' },
-        { id: '10a', name: 'Noble’s Secret', row: 6, col: 1, next: ['11a'], pic: 'secret',
+        { id: '9a', name: 'Noble’s Secret', row: 6, col: 2, next: ['10a'], pic: 'secret',
           route: 'long', action: 'nobles_secret', gold: 40,
           text: 'Get 40 Gold or 1 Gemstone.' },
+        { id: '10a', name: 'Smuggler’s Alley', row: 6, col: 1, next: ['11a'], pic: 'smugglers',
+          route: 'long', action: 'smugglers', damage: 5, gold: 15,
+          text: 'Take 5 DMG and lose 15 Gold.' },
         { id: '11a', name: 'Thieves’ Guild', row: 6, col: 0, next: ['12a'], pic: 'guild',
           route: 'long', action: 'battle', enemy: 'thieves', text: 'Fight Thieves.' },
         { id: '12a', name: 'Lost Flame Forge', row: 5, col: 0, next: ['13'], pic: 'forge',
@@ -2795,18 +2867,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
           text: 'You may draw 2 item cards for 5 Gold.' },
         { id: '13', name: 'Orc Training Camp', row: 4, col: 0, next: ['14'], pic: 'orc_camp',
           route: 'long', action: 'battle', enemy: 'orc_warriors', text: 'Fight Orc Warriors.' },
-        { id: '14', name: 'Cursed Ruins', row: 4, col: 1, next: ['15'], pic: 'ruins',
-          route: 'long', action: 'roll', roll: 'cursed_ruins',
-          text: 'Roll a die. If it’s odd, lose 20 Gold, if it’s even, take 10 DMG.' },
+        { id: '14', name: 'Forsaken Road', row: 4, col: 1, next: ['15'], pic: 'forsaken',
+          route: 'long', action: 'forsaken', value: 3,
+          text: '-3 on your next movement roll, minimum of 0.' },
         { id: '15', name: 'Vault of Comets', row: 4, col: 2, next: ['16'], pic: 'vault',
           route: 'long', action: 'key_swap', gems: 2,
           text: 'You may get 2 Gemstones for 1 Chest Key.' },
         { id: '16', name: 'Cliff of Doom', row: 3, col: 2, next: ['17'], pic: 'cliff',
           route: 'long', action: 'roll', roll: 'cliff_of_doom',
           text: 'Roll a die. If it’s odd, take 50 DMG, if it’s even, take 20 DMG.' },
-        { id: '17', name: 'Forsaken Road', row: 2, col: 2, next: ['18'], pic: 'forsaken',
-          route: 'long', action: 'forsaken', value: 3,
-          text: '-3 on your next movement roll, minimum of 0.' },
+        { id: '17', name: 'Cursed Ruins', row: 2, col: 2, next: ['18'], pic: 'ruins',
+          route: 'long', action: 'roll', roll: 'cursed_ruins',
+          text: 'Roll a die. If it’s odd, lose 20 Gold, if it’s even, take 10 DMG.' },
         { id: '18', name: 'Chest of Majesties', row: 2, col: 1, next: ['19'], pic: 'majesties',
           route: 'long', action: 'key_swap', gems: 1,
           text: 'You may get 1 Gemstone for 1 Chest Key.' },
@@ -4269,7 +4341,6 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += stone('M40 70h50v190H40zM210 70h50v190h-50z', STONE_SHADE);
         s += stone('M34 42h12v12H34zM58 42h14v12H58zM84 42h12v12H84zM204 42h12v12h-12zM228 42h14v12h-14zM254 42h12v12h-12z', STONE_LIT, 2.6);
         s += stone('M34 54h62v20H34zM204 54h62v20h-62z', STONE_LIT);
-        s += grp('#1b1418', P('M58 0 65 28M58 0 51 28z'));
         s += grp(CRIMSON, P('M65 20 65-12 95-4 65 4zM235 20V-12l30 8-30 8z'), 'stroke-width="2.6"');
         s += line('M65 42V-14M235 42V-14', INK, 3);
         // the keep
@@ -4464,9 +4535,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return a;
     }
 
-    function log(state, text, tone) {
+    function log(state, text, tone, mv) {
         state.logSeq = (state.logSeq | 0) + 1;
-        state.log.push({ t: text, tone: tone || 'info', at: Date.now(), n: state.logSeq });
+        const line = { t: text, tone: tone || 'info', at: Date.now(), n: state.logSeq };
+        if (mv) line.mv = mv;           // the attack the line is about
+        state.log.push(line);
         if (state.log.length > 150) state.log.splice(0, state.log.length - 150);
     }
 
@@ -4482,7 +4555,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* Gold                                                                */
     /*                                                                     */
     /* "*If the amount is odd, after halving the price, round it down to    */
-    /* the nearest 5." 15 halves to 5, 45 to 20, 230 to 115.               */
+    /* the nearest 5." 15 halves to 5, 45 to 20, 245 to 120.               */
     /* ------------------------------------------------------------------ */
 
     function halve(n) { return Math.floor(n / 2 / 5) * 5; }
@@ -6145,7 +6218,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             ' for ' + calc.net + ' damage';
         if (calc.pierced) line += ' (ignoring all Defence)';
         if (calc.floored) line += ' (the minimum)';
-        log(state, line + '.', att.kind === 'enemy' ? 'enemy' : 'hit');
+        log(state, line + '.', att.kind === 'enemy' ? 'enemy' : 'hit', move.name);
+        noteBlow(b, { by: att.key, move: move.name, moveId: move.id, aimed: tgt.key, on: hit.key, dmg: calc.net });
         if (calc.wasted) log(state, 'The blow did no damage, so the potion is wasted.', 'muted');
 
         // What was spent on this blow.
@@ -6173,6 +6247,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             }
         }
         return calc;
+    }
+
+    // The attack just used, kept on the fight so everybody watching can be
+    // told who used what on whom, not only the one who chose it.
+    function noteBlow(b, blow) {
+        b.blows = (b.blows | 0) + 1;
+        blow.n = b.blows;
+        b.lastBlow = blow;
     }
 
     function applyMoveFx(state, b, att, tgt, move) {
@@ -6374,7 +6456,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (!tgt) { endStep(state); return ok(); }
             strike(state, b, u, tgt, m);
         } else {
-            log(state, unitName(state, u, true) + ' ' + vb(u, 'casts', 'cast') + ' ' + m.name + '.', 'enemy');
+            log(state, unitName(state, u, true) + ' ' + vb(u, 'casts', 'cast') + ' ' + m.name + '.', 'enemy', m.name);
+            noteBlow(b, { by: u.key, move: m.name, moveId: m.id, spell: true });
             applyMoveFx(state, b, u, null, m);
         }
         if (settleDeaths(state)) return ok();
@@ -6629,8 +6712,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             p.buffs.push({ kind: 'dmg', value: 10, uses: 2, from: 'Runed Relic', keep: true });
             log(state, p.name + ' will deal +10 DMG on their next 2 attacks.', 'item');
         } else if (ab.id === 'iron_body') {
-            p.buffs.push({ kind: 'ignoreMin', value: 0, uses: 3, from: 'Iron Body', keep: true });
-            log(state, p.name + ' ignores minimum damage for the next 3 enemy attacks.', 'item');
+            p.buffs.push({ kind: 'ignoreMin', value: 0, uses: 2, from: 'Iron Body', keep: true });
+            log(state, p.name + ' ignores minimum damage for the next 2 enemy attacks.', 'item');
         } else if (ab.id === 'agile_footwork') {
             p.agile = 2;
             log(state, p.name + ' may add up to 2 to this movement roll.', 'item');
@@ -7911,6 +7994,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         archer: ['Wren', 'Fletcher'],
         mage: ['Ilyana', 'Corvin']
     };
+    // For when one of those is already somebody's name at the table.
+    const SPARE_NAMES = ['Tamsin', 'Oswin', 'Maelis', 'Brannoc'];
     const MAX_BOTS = D.RULES.maxBots;
     function isBotId(id) { return /^bot_\d$/.test(id || ''); }
 
@@ -7939,11 +8024,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         state.soloBots = n;
         const classes = botClasses(n, mine);
         state.players = state.players.filter(p => !isBotId(p.id));
-        const seen = {};
+        // No two players with one name: a bot never takes yours.
+        const taken = {};
+        state.players.forEach(p => { taken[String(p.name || '').toLowerCase()] = true; });
         classes.forEach((cls, i) => {
-            const k = seen[cls] = (seen[cls] || 0) + 1;
             const id = 'bot_' + (i + 1);
-            E.addPlayer(state, id, BOT_NAMES[cls][k - 1] || ('Bot ' + (i + 1)), true);
+            const name = BOT_NAMES[cls].concat(SPARE_NAMES).find(n => !taken[n.toLowerCase()]) || ('Bot ' + (i + 1));
+            taken[name.toLowerCase()] = true;
+            E.addPlayer(state, id, name, true);
             E.chooseClass(state, id, cls);
         });
         // The narrator does not need a line for every reshuffle.
@@ -9006,7 +9094,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             else if (b.phase === 'ask') step = 'choosing what the Thieves take';
             else {
                 const u = E.curUnit(b);
-                if (u) step = u.kind === 'enemy' ? E.unitName(S, u, true) + (E.isPlural(u) ? ' attack' : ' attacks') : E.unitName(S, u, true) + ' chooses an attack';
+                if (u && u.kind === 'enemy') step = E.unitName(S, u, true) + ' ' + enemyIsUsing(b, u, false);
+                else if (u) step = E.unitName(S, u, true) + ' chooses an attack';
             }
             return where + (step ? ': ' + step : '') + '.';
         }
@@ -9160,7 +9249,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     // above it.
     function logLines(lines) {
         return lines.slice().reverse().map(l => '<div class="t-' + esc(l.tone || 'info') + '" data-n="' + l.n + '">' +
-            colourNames(l.t) + '</div>').join('');
+            logText(l) + '</div>').join('');
+    }
+    // A line about an attack has the attack's name picked out.
+    function logText(l) {
+        const t = String(l.t);
+        const i = l.mv ? t.indexOf(l.mv) : -1;
+        if (i < 0) return colourNames(t);
+        return colourNames(t.slice(0, i)) + '<b class="mv">' + esc(l.mv) + '</b>' + colourNames(t.slice(i + l.mv.length));
     }
 
     let logSeen = 0;
@@ -9443,7 +9539,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const countKind = k => p.inventory.filter(it => E.itemDef(it) && E.itemDef(it).kind === k).length;
         la.innerHTML = '<h3>All Armours <small>' + countKind('armour') + ' · best on top</small></h3><div class="rows">' + gearRows(p, 'armour') + '</div>';
         lw.innerHTML = '<h3>All Weapons <small>' + countKind('weapon') + ' · best on top</small></h3><div class="rows">' + gearRows(p, 'weapon') + '</div>';
-        lp.innerHTML = '<h3>Potions <small>' + p.potions.length + ' · movement first, then best</small></h3><div class="rows">' + potionRows(p) + '</div>';
+        lp.innerHTML = '<h3>Potions <small>' + p.potions.length + '</small></h3><div class="rows">' + potionRows(p) + '</div>';
         la.querySelector('.rows').scrollTop = sa;
         lw.querySelector('.rows').scrollTop = sw;
         lp.querySelector('.rows').scrollTop = sp;
@@ -9574,7 +9670,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const pips = [];
         const shown = Math.max(5, u.energy);
         for (let i = 0; i < Math.min(shown, 12); i++) pips.push('<span class="pip' + (i < u.energy ? ' on' : '') + '"></span>');
-        let passives = '';
+        let passives = '', extra = '';
+        if (u.enemyId === 'oblivion_mage' && !u.down) {
+            const fen = b.units.find(x => x.enemyId === 'fenrirak');
+            if (fen && !fen.down) extra = '<span class="chip purple" title="Loyal Servant: every blow aimed at Helen lands on Fenrirak">Shielded by Fenrirak</span>';
+        }
+        const lb = b.lastBlow;
+        const tag = lb && lb.by === u.key ? '<span class="atk-tag">' + (lb.spell ? 'Cast ' : 'Used ') + esc(lb.move) + '</span>' : '';
         if (u.kind === 'enemy') {
             const pas = D.ENEMIES[u.enemyId].passives || [];
             if (pas.length) {
@@ -9588,7 +9690,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<div style="min-width:0"><div class="fn">' + esc(E.unitName(S, u, true).replace(/^The /, '')) + '</div><div class="fr">' + esc(role) + '</div>' +
             hpBarHtml({ hp: o.hp, maxHp: o.maxHp, bonusHp: o.bonusHp }, u.kind === 'ally' ? 'ally' : '', fin ? before : undefined) +
             '<div class="energy-row">' + pips.join('') + '<span class="en">' + u.energy + ' energy</span></div>' +
-            '<div class="chips">' + buffChips(E.buffsOf(S, u)) + '</div>' + passives + '</div>' + pop + '</div>';
+            '<div class="chips">' + extra + buffChips(E.buffsOf(S, u)) + '</div>' + passives + '</div>' + pop + tag + '</div>';
     }
 
     // A fighter's stat card: what it is printed with, as the class, the
@@ -9608,7 +9710,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             name = c.name; hp = E.maxHpFor(S, pl); defence = c.defence; moves = c.moves;
             extra = '<div class="p-sec">Ability: ' + esc(c.ability.name) + '</div><div class="p-small">' + esc(c.ability.text) + '</div>';
         }
-        const moveHtml = moves.map(moveLine).join('');
+        // A monster always uses the strongest attack it can afford, so the
+        // one it will use next is known before it is used.
+        const next = u.kind === 'enemy' && !u.down ? E.chooseEnemyMove(b, u) : null;
+        const moveHtml = moves.map(m => moveLine(m, u.lastMove === m.id, !!next && next.id === m.id)).join('');
         return '<div class="paper unit-card"><div class="p-name">' + esc(name) + '</div>' +
             '<div class="p-row"><span>HP: ' + hp + '</span><span>Defence: ' + defence + (b.kind === 'pvp' ? ' (PvP base)' : '') + '</span></div>' +
             (u.kind === 'enemy' ? extra : '') + '<div class="p-sec">Moves</div>' + moveHtml +
@@ -9648,7 +9753,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (sig !== modalSig) {
                 modalSig = sig;
                 $('#modal').className = 'modal';
-                $('#modal').innerHTML = '<div class="mini-bar">' + A.ICONS.sword(18) + '<span>' + colourNames(whatIsHappening()) + '</span>' +
+                const last = blowText(b);
+                $('#modal').innerHTML = '<div class="mini-bar">' + A.ICONS.sword(18) + '<div class="mini-what"><span>' + colourNames(whatIsHappening()) + '</span>' +
+                    (last ? '<small>' + colourNames(last) + '</small>' : '') + '</div>' +
                     '<button class="btn small" id="b-show">Watch</button></div>';
                 bind('b-show', () => { miniBattle = null; modalSig = ''; renderModal(); });
             }
@@ -9660,9 +9767,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const sig = 'battle:' + b.logFrom + '|' + JSON.stringify(b) + '|' + S.logSeq + '|' + selTarget + '|' + (p ? p.potions.length + ':' + p.hp + ':' + p.bonusHp : '') +
             '|' + JSON.stringify(S.barbarian);
 
-        let h = '<div class="battle">';
+        let h = '<div class="battle' + (b.kind === 'boss' ? ' boss' : '') + '">';
         if (!involved) h += '<button class="x-btn" id="b-hide" title="Watch from the board" aria-label="Watch from the board">' + X_ICONS.min + '</button>';
-        h += battleHead(b) + battleField(b);
+        h += battleHead(b) + blowHtml(b) + battleField(b);
 
         // Whose blow it is.
         let status, mineNow = false;
@@ -9674,7 +9781,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             status = b.ask.pid === (p && p.id) ? b.ask.prompt : 'Waiting for ' + E.player(S, b.ask.pid).name + ' to choose…';
             mineNow = b.ask.pid === (p && p.id);
         } else if (cur && cur.kind === 'enemy') {
-            status = E.unitName(S, cur, true) + (E.isPlural(cur) ? ' are' : ' is') + ' attacking…';
+            status = E.unitName(S, cur, true) + ' ' + enemyIsUsing(b, cur, true) + '…';
         } else if (cur) {
             status = myStep ? (cur.kind === 'ally' ? 'Choose the Barbarian’s attack' : 'Your turn: choose an attack') :
                 'Waiting for ' + E.unitName(S, cur) + '…';
@@ -9716,16 +9823,88 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return 'Battle: ' + enemyName(b.units.find(u => u.kind === 'enemy').enemyId, true).replace(/^The /, '');
     }
     function battleHead(b) {
-        return '<h2>' + esc(battleTitle(b)) + '</h2><div class="round">Round ' + b.round +
-            (b.kind === 'boss' ? ' · Fenrirak, then you, then Oblivion Mage Helen' : '') + '</div>';
+        if (b.kind === 'boss') {
+            return '<div class="boss-head"><h2>The Final Battle</h2><div class="boss-sub">Fenrirak’s Arena</div></div>' + orderTrack(b);
+        }
+        return '<h2>' + esc(battleTitle(b)) + '</h2>' + orderTrack(b);
+    }
+    // The round, and everybody in the order they strike: whose turn it is
+    // picked out, the fallen struck through.
+    function orderTrack(b) {
+        let h = '<div class="order-track"><span class="ot-round">Round ' + b.round + '</span>';
+        if (!b.order.length) return h + '<span class="ot-note">Rolling for who strikes first</span></div>';
+        const cur = E.curUnit(b);
+        return h + b.order.map(k => {
+            const u = E.unit(b, k);
+            if (!u) return '';
+            return '<span class="ot' + (u === cur && !u.down ? ' now' : '') + (u.down ? ' down' : '') + '">' + colourNames(fighterName(u)) + '</span>';
+        }).join('<span class="ot-sep" aria-hidden="true">›</span>') + '</div>';
+    }
+    function fighterName(u) {
+        if (u.kind === 'ally') return 'Barbarian';
+        return E.unitName(S, u, true).replace(/^The /, '');
+    }
+    // A fighter as a sentence names it: "the Bandits", "Wren", "the Barbarian".
+    function whoIs(u, capital) {
+        if (u.kind === 'ally') return (capital ? 'The' : 'the') + ' Barbarian';
+        return E.unitName(S, u, capital);
+    }
+    // "is attacking with Frenzy", or "is casting Circle of Calamity".
+    function enemyIsUsing(b, u, progressive) {
+        const m = E.chooseEnemyMove(b, u);
+        const pl = E.isPlural(u);
+        if (!progressive) return (m.damage > 0 ? (pl ? 'attack' : 'attacks') + ' with ' : (pl ? 'cast ' : 'casts ')) + m.name;
+        return (pl ? 'are ' : 'is ') + (m.damage > 0 ? 'attacking with ' : 'casting ') + m.name;
+    }
+    // The attack just used, in one plain line (the corner bar while watching).
+    function blowText(b) {
+        const lb = b && b.lastBlow;
+        const by = lb && E.unit(b, lb.by);
+        if (!by) return '';
+        if (lb.spell) return whoIs(by, true) + ' cast ' + lb.move + '.';
+        const on = E.unit(b, lb.on);
+        return whoIs(by, true) + ' used ' + lb.move + (on ? ' on ' + whoIs(on) : '') + ': ' + lb.dmg + ' damage.';
+    }
+    // ... and as the strip across the top of the fight. It slides in when it
+    // is new, so a blow cannot pass unseen.
+    let blowSeen = '';
+    function blowHtml(b) {
+        const lb = b.lastBlow;
+        const by = lb && E.unit(b, lb.by);
+        if (!by) {
+            const first = b.order.length ? E.curUnit(b) : null;
+            return '<div class="blow-line quiet"><span class="bl-icon">' + A.ICONS.sword(18) + '</span><div class="bl-text">No attacks yet.' +
+                (first ? ' ' + colourNames(whoIs(first, true)) + (E.isPlural(first) ? ' strike' : ' strikes') + ' first.' : '') + '</div></div>';
+        }
+        const key = b.logFrom + ':' + lb.n;
+        const fresh = key !== blowSeen;
+        blowSeen = key;
+        const on = lb.on ? E.unit(b, lb.on) : null, aimed = lb.aimed ? E.unit(b, lb.aimed) : null;
+        let h = '<b>' + colourNames(whoIs(by, true)) + '</b> ' + (lb.spell ? 'cast' : 'used') + ' <b class="mv">' + esc(lb.move) + '</b>';
+        if (on) h += ' on <b>' + colourNames(whoIs(on)) + '</b>';
+        if (on && aimed && aimed !== on) {
+            h += ' <span class="why">(' + (on.kind === 'ally' ? 'guarding ' : 'meant for ') + colourNames(whoIs(aimed)) + ')</span>';
+        }
+        const m = E.movesOf(S, by).find(x => x.id === lb.moveId);
+        return '<div class="blow-line' + (fresh ? ' fresh' : '') + '"><span class="bl-icon">' + A.ICONS.sword(18) + '</span>' +
+            '<div class="bl-text"><div>' + h + '</div>' + (m && m.text ? '<small>' + esc(m.text) + '</small>' : '') + '</div>' +
+            (lb.spell ? '' : '<div class="bl-dmg"><b>' + (lb.dmg ? '\u2212' + lb.dmg : '0') + '</b><small>damage</small></div>') + '</div>';
     }
     // Every fighter with its stat card straight under it, as The Thunder
-    // Dragon has them: your class, your Barbarian, the monster.
+    // Dragon has them: your class, your Barbarian, the monster. The final
+    // battle stands Fenrirak and Helen across the top and your side under
+    // them, so neither column runs on for twice the other's length.
     function battleField(b, fin) {
         const column = list => list.map(u => '<div class="fighter-wrap">' + fighterHtml(b, u, fin ? fin[u.key] : null) +
             unitCardHtml(b, u) + '</div>').join('');
-        return '<div class="battle-field"><div class="side">' + column(b.units.filter(u => u.side === 'A')) + '</div>' +
-            '<div class="vs">VS</div><div class="side">' + column(b.units.filter(u => u.side === 'B')) + '</div></div>';
+        const a = b.units.filter(u => u.side === 'A'), z = b.units.filter(u => u.side === 'B');
+        if (b.kind === 'boss') {
+            return '<div class="battle-field boss"><div class="side foes">' + column(z) + '</div>' +
+                '<div class="vs-line"><span>VS</span></div>' +
+                '<div class="side mine' + (a.length < 2 ? ' one' : '') + '">' + column(a) + '</div></div>';
+        }
+        return '<div class="battle-field"><div class="side">' + column(a) + '</div>' +
+            '<div class="vs">VS</div><div class="side">' + column(z) + '</div></div>';
     }
     // The fight's own log, newest on top.
     function battleLogHtml(b) {
@@ -9748,7 +9927,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         else if (lb.kind === 'boss') fell = 'Fenrirak and Oblivion Mage Helen are defeated!';
         else if (loser.enemyId) fell = D.foeName(D.ENEMIES[loser.enemyId], true) + (D.ENEMIES[loser.enemyId].plural ? ' are' : ' is') + ' defeated!';
         else fell = loser.name + ' is defeated!';
-        const h = '<div class="battle">' + battleHead(b) + battleField(b, fin) +
+        const h = '<div class="battle' + (b.kind === 'boss' ? ' boss' : '') + '">' + battleHead(b) + blowHtml(b) + battleField(b, fin) +
             '<div class="battle-status"><span>' + colourNames(fell) + '</span></div>' + battleLogHtml(b) + '</div>';
         const m = $('#modal');
         const keep = m.scrollTop;
@@ -10063,9 +10242,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     /* ---- a square ------------------------------------------------------ */
 
-    function moveLine(m) {
-        return '<div class="p-move"><b>' + esc(m.name) + '</b>: ' + m.damage + ' DMG' + (m.cost ? ', minus ' + m.cost + ' energy' : '') +
-            ' <span class="p-small">(' + m.energy + ' Energy)</span>' + (m.text ? '<br><span class="p-small">' + esc(m.text) + '</span>' : '') + '</div>';
+    // In a fight `last` marks the attack this fighter used last and `next`
+    // the one a monster will use on its next turn.
+    function moveLine(m, last, next) {
+        const tags = (last ? '<span class="mv-tag last">last used</span>' : '') + (next ? '<span class="mv-tag next">next</span>' : '');
+        return '<div class="p-move' + (last ? ' last' : '') + (next ? ' next' : '') + '"><b>' + esc(m.name) + '</b>: ' + m.damage + ' DMG' +
+            (m.cost ? ', minus ' + m.cost + ' energy' : '') + ' <span class="p-small">(' + m.energy + ' Energy)</span>' + tags +
+            (m.text ? '<br><span class="p-small">' + esc(m.text) + '</span>' : '') + '</div>';
     }
 
     // A monster's card. Its health, defence, passives and attacks are a
@@ -10094,7 +10277,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<div class="p-name">' + esc(e.name) + '</div>' +
             '<div class="p-row"><span>HP: ' + hp + (hp !== e.hp ? ' <span class="p-small">(' + e.hp + ' printed)</span>' : '') + '</span><span>Defence: ' + e.defence + '</span></div>' +
             (e.passives || []).map(x => '<div class="p-move"><b>' + esc(x.name) + '</b> (Passive): <span class="p-small">' + esc(x.text) + '</span></div>').join('') +
-            '<div class="p-sec">Moves</div>' + e.moves.map(moveLine).join('') + lootHtml +
+            '<div class="p-sec">Moves</div>' + e.moves.map(m => moveLine(m)).join('') + lootHtml +
             '</div></div>';
     }
 
@@ -10329,7 +10512,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return '<div class="paper class-card' + (mineCls === cls ? ' mine' : '') + (full ? ' full' : '') + '" data-cls="' + cls + '" role="button" tabindex="0">' +
             '<div class="p-name"><span>' + c.name + '</span><img class="p-art" src="' + artFor(cls) + '" alt=""></div>' +
             '<div class="p-row"><span>HP: ' + (c.hp + (S && S.mods && S.mods.liveliness ? 20 : 0)) + '</span><span>Defence: ' + c.defence + '</span></div>' +
-            '<div class="p-sec">Moves</div>' + c.moves.map(moveLine).join('') +
+            '<div class="p-sec">Moves</div>' + c.moves.map(m => moveLine(m)).join('') +
             '<div class="p-sec">Ability: ' + esc(c.ability.name) + '</div><div class="p-small">' + esc(c.ability.text) + '</div>' +
             '<div class="taken">' + (mineCls === cls ? 'Your class' : taken + ' / ' + D.RULES.maxPerClass + ' taken') + '</div></div>';
     }
@@ -10559,7 +10742,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 { id: 'eq-weapon', title: 'Equipped weapon', body: 'What you are fighting with. Its bonus is added to every attack.' },
                 { id: 'list-armour', title: 'All your armour', body: 'Everything you own, best on top. Equip a piece on your turn, one change a turn.' },
                 { id: 'list-weapons', title: 'All your weapons', body: 'Best on top, the same way.' },
-                { id: 'list-potions', title: 'Potions', body: 'Speed potions (movement) on top, then best. Drink movement potions before you roll, ' +
+                { id: 'list-potions', title: 'Potions', body: 'Every potion you carry. Drink movement potions before you roll, ' +
                     'battle potions during a fight.' },
                 { id: 'log-card', title: 'The game log', body: 'Everything that has happened, the newest at the top.' },
                 { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles, or click his stall on the board.' },
@@ -10944,7 +11127,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const box = $('.embers');
         if (!box || box.childElementCount) return;
         let h = '';
-        for (let i = 0; i < 26; i++) {
+        for (let i = 0; i < 34; i++) {
             const left = Math.random() * 100;
             const dur = 9 + Math.random() * 11;
             const delay = -Math.random() * dur;
