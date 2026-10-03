@@ -678,7 +678,7 @@
        Every accent colour in the game comes from this block, so a whole
        new colour scheme is a change of values here and nowhere else. */
     --accent: #5a2a7e;              /* outlines, focus rings, VS */
-    --accent-soft: #9a72bd;         /* hover edges, the small caps over the title */
+    --accent-soft: #9a72bd;         /* hover edges, the turn timer's ring */
     --btn-top: #4e1a6e;             /* the main buttons */
     --btn-bottom: #330d4a;
     --btn-edge: #8a5aae;
@@ -797,7 +797,7 @@ a { color: var(--gold-bright); }
     border: 1px solid var(--panel-edge);
     border-radius: var(--radius);
     padding: 16px;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, .38), inset 0 1px 0 color-mix(in srgb, var(--accent-soft) 6%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .38);
 }
 
 .btn {
@@ -880,7 +880,6 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     from { transform: translateY(0) scale(1); }
     to   { transform: translateY(-6px) scale(1.02); }
 }
-.kicker { margin: 0 0 4px; color: var(--accent-soft); letter-spacing: 3px; text-transform: uppercase; font-size: 13px; }
 .hero-text h1 {
     font-size: 48px;
     margin-bottom: 14px;
@@ -992,7 +991,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
 .game-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.62fr) minmax(330px, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
     grid-template-areas:
         "board side"
         "lower lower";
@@ -1012,6 +1011,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 /* ---- the board ---- */
 
 .board-scroll { width: 100%; }
+/* The reminder under the board that its squares can be read. */
+.board-note {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 10px 0 0; font-size: 13px; color: var(--muted); text-align: center;
+}
+.board-note svg { width: 17px; height: 17px; flex: none; fill: none; stroke: var(--accent-soft); stroke-width: 2; stroke-linecap: round; }
 .board {
     position: relative;
     width: 100%;
@@ -1040,7 +1045,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     color: var(--paper-ink);
     border: 2px solid #3b2a20;
     border-radius: .8cqw;
-    box-shadow: 0 .3cqw .6cqw rgba(0, 0, 0, .45), inset 0 .35cqw 0 var(--band, #b8a27a);
+    box-shadow: 0 .3cqw .6cqw rgba(0, 0, 0, .45);
     cursor: pointer;
     font: inherit;
     text-align: center;
@@ -1048,7 +1053,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     transition: transform .12s ease, box-shadow .12s ease, outline-color .12s ease;
     outline: 0 solid transparent;
 }
-.sq:hover { transform: translateY(-.15cqw) scale(1.04); z-index: 4; box-shadow: 0 .6cqw 1.4cqw rgba(0, 0, 0, .55), inset 0 .35cqw 0 var(--band, #b8a27a); }
+.sq:hover { transform: translateY(-.15cqw) scale(1.04); z-index: 4; box-shadow: 0 .6cqw 1.4cqw rgba(0, 0, 0, .55); }
 .sq:focus-visible { outline: 3px solid var(--accent); }
 .sq .sq-num {
     position: absolute; top: .2cqw; left: .3cqw;
@@ -1077,15 +1082,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 }
 .sq .sq-tag.stop { background: #a8242c; }
 .sq .sq-tag.opt { background: #b9822a; }
-.sq.k-battle { --band: #a8242c; }
-.sq.k-heal { --band: #4f9a54; }
-.sq.k-shop { --band: #d9a33c; }
-.sq.k-roll { --band: #8a5ac8; }
-.sq.k-draw { --band: #3a7fd2; }
-.sq.k-bad { --band: #6a4a3a; }
-.sq.k-start { --band: #e2b13c; background: linear-gradient(180deg, #fff3cf, #f2d88a); }
-.sq.k-split { --band: #3a3a3a; }
-.sq.here { box-shadow: 0 0 0 .3cqw var(--marker), inset 0 .35cqw 0 var(--band, #b8a27a); z-index: 3; }
+.sq.k-start { background: linear-gradient(180deg, #fff3cf, #f2d88a); }
+.sq.here { box-shadow: 0 0 0 .3cqw var(--marker); z-index: 3; }
 .sq.landing { outline: .3cqw solid var(--marker); outline-offset: .1cqw; }
 .sq.landing.hot { background: linear-gradient(180deg, #fff5c8, #f5d97a); transform: scale(1.06); z-index: 5; }
 .sq .land-badge {
@@ -1165,7 +1163,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 }
 .timer .tlabel { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
 .timer.low .ring b { color: var(--bad); }
-.timer.untimed b { font-size: 26px; }
+.timer.untimed .ring b { font-size: 16px; color: var(--muted); letter-spacing: 1px; }
 
 .actions { display: flex; flex-direction: column; gap: 8px; }
 .actions h3 { margin: 0; }
@@ -1368,13 +1366,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .enemy-card { margin-top: 14px; display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: start; }
 .enemy-card .art { width: 120px; height: 120px; background: radial-gradient(circle, #3a2a30, #1a1214); border-radius: 12px; border: 1px solid #5a3a3a; display: grid; place-items: center; overflow: hidden; }
 .enemy-card .art svg, .enemy-card .art img { width: 100%; height: 100%; object-fit: contain; }
+.paper .p-hidden { margin: 6px 0 2px; padding: 6px 8px; border: 1.5px dashed #9a8560; border-radius: 8px; color: #5a4a36; font-size: 12.5px; }
 
 /* ---- the battle ---------------------------------------------------- */
 
 .battle h2 { margin-bottom: 4px; }
 .battle .round { font-size: 12.5px; color: var(--muted); }
-.battle-field { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin: 14px 0 10px; }
-.battle-field .vs { font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 26px; color: var(--accent); }
+.battle-field { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: start; margin: 14px 0 10px; }
+.battle-field .vs { font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 26px; color: var(--accent); align-self: center; }
 .side { display: flex; flex-direction: column; gap: 10px; }
 .fighter {
     display: grid; grid-template-columns: 76px 1fr; gap: 10px; align-items: center;
@@ -1385,6 +1384,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     transition: box-shadow .2s ease, transform .2s ease;
 }
 .fighter.big { grid-template-columns: 110px 1fr; }
+/* Each fighter with its stat card straight under it. */
+.fighter-wrap { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.paper.unit-card { font-size: 12px; padding: 8px 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, .3); }
+.paper.unit-card .p-name { font-size: 14px; }
 .fighter .pt { width: 76px; height: 76px; border-radius: 12px; background: radial-gradient(circle, #3a2a30, #1a1214); overflow: hidden; display: grid; place-items: center; }
 .fighter.big .pt { width: 110px; height: 110px; }
 .fighter .pt img, .fighter .pt svg { width: 100%; height: 100%; object-fit: contain; }
@@ -1473,6 +1476,25 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 @media (min-width: 1181px) {
     .modal-back.dock { justify-content: flex-end; }
     .modal-back.dock .modal { max-width: min(560px, 37vw); max-height: 70vh; }
+}
+/* How far to move: a small card, so the board it asks about stays in view. */
+.modal.compact { max-width: 380px; padding: 14px 16px; }
+.modal-back.dock .modal.compact { max-width: 380px; max-height: 60vh; }
+.move-ask h2 { font-size: 17px; margin: 0 0 4px; }
+.move-ask .sub { font-size: 12.5px; margin-bottom: 8px; line-height: 1.4; }
+.move-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
+.move-pick {
+    font-family: inherit; color: var(--cream); text-align: center;
+    background: linear-gradient(180deg, var(--btn2-top), var(--btn2-bottom));
+    border: 1px solid var(--line); border-radius: 10px; padding: 6px 5px; cursor: pointer;
+    transition: border-color .15s ease, transform .1s ease;
+}
+.move-pick:hover { border-color: var(--accent-soft); transform: translateY(-1px); }
+.move-pick.primary { border-color: var(--btn-edge); box-shadow: inset 0 0 0 1px var(--accent); }
+.move-pick b { display: block; font-size: 20px; line-height: 1.1; }
+.move-pick span {
+    font-size: 10.5px; color: var(--muted); line-height: 1.25; margin-top: 2px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .modal-back.mini { background: transparent; backdrop-filter: none; pointer-events: none; align-items: flex-end; justify-content: flex-end; }
 .modal-back.mini .modal { pointer-events: auto; max-width: 340px; padding: 10px 14px; animation: none; }
@@ -1662,7 +1684,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 /* ---- cards that come and go ---- */
 
 .turn-card {
-    position: fixed; left: 50%; top: 32%;
+    position: fixed; left: 50%; top: max(38%, 200px);
     transform: translate(-50%, -50%) scale(.9);
     z-index: 3500; pointer-events: none;
     text-align: center;
@@ -1680,7 +1702,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .turn-card span { color: var(--gold-bright); font-size: 14px; }
 
 .bend {
-    position: fixed; left: 50%; top: 40%;
+    position: fixed; left: 50%; top: max(38%, 200px);
     transform: translate(-50%, -50%);
     z-index: 3600; pointer-events: none; text-align: center;
     opacity: 0; transition: opacity .3s ease;
@@ -1797,7 +1819,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     .timer { flex-direction: row; gap: 12px; justify-content: flex-start; padding: 8px 14px !important; }
     .timer .ring { width: 54px; height: 54px; }
     .timer .ring b { font-size: 14px; }
-    .timer.untimed b { font-size: 20px; }
+    .timer.untimed .ring b { font-size: 13px; }
     .stats { grid-template-columns: 1fr 1fr; }
     .home-steps { grid-template-columns: 1fr; }
     .solo-buttons { flex-direction: column; }
@@ -1944,7 +1966,6 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             <div class="home-hero">
                 <div class="hero-art" id="hero-art"></div>
                 <div class="hero-text">
-                    <p class="kicker">Legend of Fenrirak&trade;</p>
                     <h1>The Oblivion Dragon</h1>
                     <p>
                         Oblivion Mage Helen has taken Thornwick, the secret kingdom, and Fenrirak
@@ -2042,6 +2063,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         <div class="game-layout">
             <section class="g-board">
                 <div class="board-scroll"><div class="board" id="board"></div></div>
+                <p class="board-note">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
+                    <span>Click any square on the board to read its full description.</span>
+                </p>
             </section>
 
             <aside class="g-side">
@@ -2741,7 +2766,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
           route: 'long', action: 'key_swap', gems: 1,
           text: 'You may get 1 Gemstone for 1 Chest Key.' },
         { id: '19', name: 'Orc’s Outpost', row: 2, col: 0, next: ['20'], pic: 'orc_outpost',
-          route: 'long', action: 'battle', enemy: 'orc_scouts', text: 'Fight Orc Scouts.' },
+          route: 'long', action: 'battle', enemy: 'orc_scouts', stop: true,
+          text: 'Fight Orc Scouts. STOP: your move ends here, however far you rolled.' },
         { id: '20', name: 'Tip & Tap’s Trip Traps', row: 1, col: 0, next: ['21'], pic: 'traps',
           route: 'long', action: 'roll', roll: 'trip_traps',
           text: 'Roll a die. If 1-4, take 40 damage, if 5-6, take 10 damage.' },
@@ -3134,6 +3160,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     const STEEL_L = '#c3c9d1';
     const CRIMSON = '#9c1f22';
     const GOLD = '#e2b13c';
+    const ROYAL_RED = '#7a1418';
+    const ROYAL_NAVY = '#1f2d52';
 
     function grp(fill, body, extra) {
         return '<g ' + K + ' fill="' + fill + '"' + (extra ? ' ' + extra : '') + '>' + body + '</g>';
@@ -3226,24 +3254,45 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp(STEEL_L, P('M' + x + ' ' + (top - 9) + 'l3.4 9h-6.8z'));
     }
 
+    // The palace's own livery, worn by the Royal Soldiers (dark red) and the
+    // Royal Guards (navy): a long double-breasted coat to the knee, two rows
+    // of gold buttons, a gold collar, gold epaulettes with a fringe, gold
+    // cuffs and a black belt.
+    function royalCoat(colour) {
+        return grp(colour, P('M3 32h8v18H3zM29 32h8v18h-8z')) +
+            grp(GOLD, P('M3 47.5h8v3.5H3zM29 47.5h8v3.5h-8z')) +
+            grp(colour, P('M8 30c4-3 20-3 24 0l3 34H5z')) +
+            line('M20 54.5V64', INK, 1.4) +
+            line('M15 29.6 20 36 25 29.6', GOLD, 1.8) +
+            [38, 42.5, 47].map(y => dot(16.6, y, 1.15, GOLD) + dot(23.4, y, 1.15, GOLD)).join('') +
+            grp('#1b1418', P('M5.6 51h28.8v3.4H5.6z')) + grp(GOLD, P('M18 50.6h4v4.2h-4z')) +
+            grp(GOLD, P('M1.5 28.6h10.5v4H1.5zM28 28.6h10.5v4H28z')) +
+            line('M3 33v2.6M5.6 33v2.6M8.2 33v2.6M10.8 33v2.6M29.2 33v2.6M31.8 33v2.6M34.4 33v2.6M37 33v2.6', GOLD, .9);
+    }
+
     function soldier(o) {
         const tab = o.tabard || CRIMSON;
         const trim = o.trim || INK;
         const arm = o.mail || '#8d939b';
         let s = '';
-        if (o.weapon === 'halberd') s += halberd(34, -10);
+        // Low enough that the spike on top stays inside the picture.
+        if (o.weapon === 'halberd') s += halberd(34, 4);
         if (o.weapon === 'spear') s += spear(34, -4, 86);
         // legs, boots
         s += grp(o.legs || '#3b3a42', P('M12 58h7v18h-7zM21 58h7v18h-7z'));
         s += grp('#2a1d1a', P('M10 74h10v6H10zM20 74h10v6H20z'));
-        // arms in mail
-        s += grp(arm, P('M3 32h8v20H3zM29 32h8v20h-8z'));
-        // the tabard
-        s += grp(tab, P('M8 30c4-3 20-3 24 0l2 30H6z'));
-        if (o.plate) s += grp(STEEL_L, P('M10 30c4-2 16-2 20 0l1 10H9z'));
-        s += line('M7 50h26', INK, 3);
-        if (o.gold) s += line('M7.5 50h25', GOLD, 1.4) + line('M20 31v18', GOLD, 1.4);
-        s += thornSigil(20, 40, o.gold ? GOLD : trim);
+        if (o.coat) {
+            s += royalCoat(o.coat);
+        } else {
+            // arms in mail
+            s += grp(arm, P('M3 32h8v20H3zM29 32h8v20h-8z'));
+            // the tabard
+            s += grp(tab, P('M8 30c4-3 20-3 24 0l2 30H6z'));
+            if (o.plate) s += grp(STEEL_L, P('M10 30c4-2 16-2 20 0l1 10H9z'));
+            s += line('M7 50h26', INK, 3);
+            if (o.gold) s += line('M7.5 50h25', GOLD, 1.4) + line('M20 31v18', GOLD, 1.4);
+            s += thornSigil(20, 40, o.gold ? GOLD : trim);
+        }
         // hands
         s += grp(SKIN, '<circle cx="7" cy="54" r="3.6"/><circle cx="33" cy="54" r="3.6"/>');
         // the head
@@ -3259,11 +3308,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             s += grp(STEEL, P('M11 20c0-11 18-11 18 0l5 4H6z')) + line('M12 19h16', INK, 2);
         } else if (o.helm === 'royal') {
             s += grp(GOLD, P('M9 17h22c-1-8-5-11-11-11S10 9 9 17z')) +
-                grp(CRIMSON, P('M20 6c-2-6 6-9 10-6-4 0-6 2-7 6z'));
+                grp(o.plume || CRIMSON, P('M20 6c-2-6 6-9 10-6-4 0-6 2-7 6z'));
         } else if (o.helm === 'great') {
             s += grp(STEEL_L, P('M12 7h16v22c0 3-4 4-8 4s-8-1-8-4z')) +
                 line('M14 17h12M20 12v14', INK, 2.2) + line('M12 7h16', GOLD, 2) +
-                grp(CRIMSON, P('M20 7c-1-7 7-10 12-7-5 0-8 3-9 7z'));
+                grp(o.plume || CRIMSON, P('M20 7c-1-7 7-10 12-7-5 0-8 3-9 7z'));
         } else if (o.helm === 'hood') {
             s += grp(o.hood || '#4b3f33', P('M10 22c-1-14 21-14 20 0l2 8H8z'));
         }
@@ -3400,7 +3449,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
         soldier_garrison:
             // a wall of tower shields with the spears standing over it
-            spear(14, 2, 70) + spear(36, -2, 74) + spear(58, 2, 70) + spear(80, -2, 74) +
+            spear(14, 14, 58) + spear(36, 11, 61) + spear(58, 14, 58) + spear(80, 11, 61) +
             [6, 28, 50, 72].map((x, i) =>
                 grp(STEEL, P('M' + (x + 4) + ' ' + (30 - (i % 2) * 3) + 'h14l-2-4c-1-6-9-6-10 0z')) +
                 grp(SKIN, P('M' + (x + 6) + ' ' + (31 - (i % 2) * 3) + 'h10v8h-10z')) +
@@ -3412,15 +3461,17 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 thornSigil(x + 13, 62, INK)
             ).join(''),
 
+        // The palace livery: dark red for the Royal Soldiers, navy for the
+        // Royal Guards.
         royal_soldiers:
-            soldier({ x: 52, y: 6, s: .96, helm: 'royal', weapon: 'halberd', tabard: '#2b2326', gold: true }) +
-            soldier({ x: 10, y: 14, s: 1.04, helm: 'royal', weapon: 'halberd', tabard: '#2b2326', gold: true }),
+            soldier({ x: 52, y: 6, s: .96, helm: 'royal', weapon: 'halberd', coat: ROYAL_RED, plume: '#f4f0e2', legs: '#2b2326', gold: true }) +
+            soldier({ x: 10, y: 14, s: 1.04, helm: 'royal', weapon: 'halberd', coat: ROYAL_RED, plume: '#f4f0e2', legs: '#2b2326', gold: true }),
 
         royal_guards:
-            soldier({ x: 56, y: 6, s: .92, helm: 'great', weapon: 'sword', tabard: '#2b2326', gold: true, plate: true,
-                      shield: true, shieldFill: '#2b2326', crown: true, mail: STEEL_L }) +
-            soldier({ x: 14, y: 12, s: 1.06, helm: 'great', weapon: 'sword', tabard: '#2b2326', gold: true, plate: true,
-                      shield: true, shieldFill: CRIMSON, crown: true, mail: STEEL_L })
+            soldier({ x: 56, y: 6, s: .92, helm: 'great', weapon: 'sword', coat: ROYAL_NAVY, legs: '#1b1f2e', gold: true,
+                      shield: true, shieldFill: ROYAL_NAVY, crown: true }) +
+            soldier({ x: 14, y: 12, s: 1.06, helm: 'great', weapon: 'sword', coat: ROYAL_NAVY, legs: '#1b1f2e', gold: true,
+                      shield: true, shieldFill: ROYAL_NAVY, crown: true })
     };
 
     /* ---- the two bosses: placeholders --------------------------------
@@ -3493,6 +3544,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             dot(-6, -4, 1.3, '#c8342b') + dot(4, -6, 1.3, '#c8342b') + dot(9, -2, 1.1, '#c8342b'));
     }
 
+    // A glass beer mug, its handle on the left, standing on (x, y) and
+    // tipped `tilt` degrees towards the right, full of amber ale with the
+    // foam spilling over the rim.
+    function beerMug(x, y, tilt) {
+        return '<g transform="translate(' + x + ' ' + y + ') rotate(' + tilt + ')">' +
+            '<path d="M-8-19h-5c-3 0-4 2-4 5v5c0 3 1 5 4 5h5" fill="none" stroke="' + INK + '" stroke-width="4.2"/>' +
+            '<path d="M-8-19h-5c-3 0-4 2-4 5v5c0 3 1 5 4 5h5" fill="none" stroke="#e4ecef" stroke-width="2"/>' +
+            grp('#f0a530', P('M-8-23h16V-2H-8z')) +
+            line('M-4.6-19V-6', '#ffe08a', 1.6) + line('M4.4-20V-5', '#c8801c', 1.2) +
+            grp('#d8e4ea', P('M-9-2h18v3.4H-9z')) +
+            grp('#f8f4ea', P('M-10-22c-1-4 3-6 6-4 2-3 7-3 9 0 3-2 7 0 5 4 1 2-1 3-3 3v3c0 1.4-2 1.4-2 0v-3H-1v5c0 1.4-2 1.4-2 0v-5h-4c-2 0-3-1-3-3z')) +
+            '</g>';
+    }
+
     const SQUARE_ART = {
         start:
             grp('#8e877c', P('M10 40h44v6H10z')) + grp('#a39b8f', P('M16 34h32v6H16z')) +
@@ -3528,12 +3593,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M14 26h14', '#6a4a2e', 1.4) + line('M32 8v10', '#6a4a2e', 1.4) +
             grp('#7c6a52', P('M0 46c10-4 20-4 30 0 4-3 30-3 34 0z')),
 
+        // Two of the kingdom's sentries walking their beat, halberds up.
         patrol:
-            halberd(18, 6).replace(/M18 6V94/g, 'M18 6V46') +
-            '<g transform="translate(46 0) scale(-1 1)">' + line('M0 6V46', INK, 4.6) + line('M0 6V46', '#7a5232', 2.4) +
-            grp(STEEL_L, P('M0 11l11 3v12L0 23z')) + '</g>' +
-            grp(STEEL, P('M18 30h28l-5-5c-2-9-16-9-18 0z')) + line('M22 25h20', STEEL_L, 1.4) +
-            grp(CRIMSON, P('M24 30h16v10H24z')) + thornSigil(32, 35, INK),
+            grp('#7c6a52', P('M0 45c16-3 48-3 64 0v3H0z')) +
+            soldier({ x: 33, y: 7.4, s: .46, helm: 'kettle', weapon: 'halberd', tabard: '#7d1a1c' }) +
+            soldier({ x: 9, y: 8.2, s: .46, helm: 'kettle', weapon: 'halberd' }),
 
         thorns: thornBush(20, 40, 1.1) + thornBush(44, 42, .9) + grp('#c8342b', P('M30 22c-2 3-2 5 0 6 2-1 2-3 0-6z')),
 
@@ -3612,10 +3676,21 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M12 24h40M12 32h40M32 24v20', GOLD, 2.2) + grp(GOLD, P('M29 30h6v6h-6z')) +
             crown(32, 10, .9),
 
+        // The orcs' outpost: a rough log watchtower on four legs, a lookout
+        // under a hide roof, a ladder up the middle, their green banner with
+        // its skull, and sharpened stakes round the foot of it.
         orc_outpost:
-            grp('#8a6a44', P('M18 44l4-26h20l4 26h-4l-3-18H25l-3 18z')) +
-            grp('#a07a50', P('M16 12h32v8H16z')) + line('M16 12l4-6h24l4 6', INK, 2) +
-            line('M50 12V2', INK, 2) + grp('#4a7a2e', P('M50 2h10l-3 4 3 4H50z')),
+            grp('#6a5238', P('M0 44c14-3 50-3 64 0v4H0z')) +
+            line('M22 45 26 17M42 45 38 17', INK, 4.4) + line('M22 45 26 17M42 45 38 17', '#8a6a44', 2.4) +
+            line('M24.5 40 39.5 25M39.5 40 24.5 25', '#5a3f28', 1.8) +
+            line('M29.6 45 30.6 20M34.4 45 33.4 20', '#5a3f28', 1.5) +
+            line('M29.8 41h4.4M30 36h4M30.2 31h3.6M30.4 26h3.2', '#5a3f28', 1.3) +
+            grp('#8a6a44', P('M19 16h26v4H19z')) +
+            grp('#a07a50', P('M21 9h22v7H21z')) + line('M25.4 9v7M29.8 9v7M34.2 9v7M38.6 9v7', '#6a4a2e', 1.1) +
+            grp('#7a5a3a', P('M18 9.5 32 1.5l14 8z')) +
+            line('M46 9V1', INK, 1.6) + grp('#4a7a2e', P('M46 1h11l-3 3.6 3 3.6H46z')) +
+            dot(50.6, 4.4, 1.7, '#f4f0e2') + dot(50, 4.1, .45) + dot(51.2, 4.1, .45) +
+            grp('#a07a50', P('M3 46l2-9 2 9zM8 46l2-11 2 11zM13 46l2-8 2 8zM47 46l2-8 2 8zM52 46l2-11 2 11zM57 46l2-9 2 9z')),
 
         traps:
             grp('#7a808a', P('M10 38c0-10 6-14 14-14s14 4 14 14z')) +
@@ -3646,23 +3721,68 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M14 26v18M22 26v18M42 26v18M50 26v18', '#a89878', 2.4) +
             grp('#5a3a22', P('M28 44V32h8v12z')) + coin(56, 12, 3.6),
 
+        // A market day in the square: a wooden stall under a striped awning
+        // with a scalloped edge, apples, cabbages and bread on its counter,
+        // and a farmer's handcart piled with pumpkins beside it.
         market:
-            grp('#a07a50', P('M8 28h48v16H8z')) +
-            grp('#e8dcc4', P('M4 28 10 14h44l6 14z')) + line('M14 14l-4 14M24 14l-2 14M34 14v14M44 14l2 14M54 14l4 14', CRIMSON, 3) +
-            dot(16, 26, 3.2, '#d23a3a') + dot(23, 25, 3.2, '#d23a3a') + grp('#5a9a3a', '<circle cx="40" cy="25" r="4"/>') + dot(48, 26, 3, '#f0a93c'),
+            grp('#8a8278', P('M0 43h64v5H0z')) + line('M6 45.5h6M20 45h7M36 46h6M50 45h7', '#6a645c', 1.1) +
+            line('M5 43V12M31 43V12', INK, 3.2) + line('M5 43V12M31 43V12', '#7a5232', 1.6) +
+            grp('#8a5a32', P('M2 30h32v7H2z')) + line('M2 33.5h32', '#6a4a2e', 1.1) +
+            grp('#f1e6cf', P('M1 7h34v8H1z')) +
+            grp(CRIMSON, P('M6.7 7h5.6v8H6.7zM18 7h5.6v8H18zM29.4 7h5.6v8h-5.6z'), 'stroke-width="1"') +
+            '<path d="M1 15a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0' +
+            'a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0z" fill="' + CRIMSON + '" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/>' +
+            dot(7.6, 27.6, 2.4, '#d23a3a') + dot(12, 27.6, 2.4, '#d23a3a') + dot(9.8, 24.4, 2.4, '#d23a3a') +
+            '<circle cx="18.8" cy="27" r="3.2" fill="#6aa83f" stroke="' + INK + '" stroke-width="1.4"/>' +
+            line('M17.4 25.4l1.4 1.6 1.6-1.6', '#3f6a24', 1) +
+            grp('#d39a4a', P('M24 30c0-5 9-5 9 0z'), 'stroke-width="1.4"') + line('M26.5 27.5l1-1.5M29.5 27.5l1-1.5', '#9a6a2a', 1) +
+            '<circle cx="51" cy="38" r="6.2" fill="#8a5a32" stroke="' + INK + '" stroke-width="2"/>' +
+            line('M51 32v12M45 38h12M46.8 33.8l8.4 8.4M55.2 33.8l-8.4 8.4', '#5a3a22', 1.1) + dot(51, 38, 1.4, '#5a3a22') +
+            '<circle cx="45.5" cy="26.5" r="3.6" fill="#f08a2a" stroke="' + INK + '" stroke-width="1.5"/>' +
+            '<circle cx="52.5" cy="25.6" r="4.2" fill="#f08a2a" stroke="' + INK + '" stroke-width="1.5"/>' +
+            '<circle cx="58.4" cy="27.4" r="2.8" fill="#6aa83f" stroke="' + INK + '" stroke-width="1.4"/>' +
+            line('M52.5 21.4v-1.8M45.5 22.9v-1.4', '#3f6a24', 1.3) +
+            grp('#a07a50', P('M39 28h23l-2 7H41z')) + line('M41 31.5h20', '#6a4a2e', 1) +
+            line('M39 30 34 25', INK, 2.2),
 
         adv_inn:
             house(10, 44, 30, 20, '#6a4a2e', '#d8c49a') +
             line('M46 14h12M52 14v6', INK, 2) + grp('#b07a44', P('M44 20h16v14H44z')) +
             line('M47 23l10 8M57 23l-10 8', INK, 1.8),
 
+        // Ametin's Inn: two storeys of timber and white plaster, the upper
+        // one jutting out over the street, warm light in every window, smoke
+        // from the chimney, and its sign -- a crescent moon -- hung out over
+        // the road.
         inn:
-            house(12, 44, 32, 22, '#2e4a6a', '#e8d6b0') + grp('#f4d23c', P('M32 30h6v6h-6z')) +
-            '<path d="M54 10a6 6 0 1 0 4 10 5 5 0 1 1-4-10z" fill="#f4e38a" stroke="' + INK + '" stroke-width="1.4"/>',
+            grp('#c9c2b4', P('M39 4c-2-3 2-5 4-3 1-2 5-2 5 1 2 0 3 2 1 3z'), 'stroke-width="1.2"') +
+            grp('#6a6a72', P('M37 6h5v9h-5z'), 'stroke-width="1.6"') +
+            grp('#2e4a6a', P('M3 17 25 3l22 14z')) + line('M10 13h30M16 9h18', '#24384f', 1) +
+            grp('#efe2c0', P('M5 17h40v11H5z')) +
+            line('M17 17v11M33 17v11M5 17l12 11M17 17 5 28M33 17l12 11M45 17 33 28', '#5a3a22', 1.5) +
+            grp('#f4d23c', P('M21.5 19.5h7v6h-7z'), 'stroke-width="1.6"') + line('M25 19.5v6M21.5 22.5h7', '#5a3a22', 1.1) +
+            grp('#5a3a22', P('M4 28h42v2.4H4z'), 'stroke-width="1.6"') +
+            grp('#efe2c0', P('M8 30.4h34V44H8z')) +
+            grp('#5a3a22', P('M21 44V37c0-4.5 8-4.5 8 0v7z'), 'stroke-width="1.6"') + dot(27.4, 40.6, .8, '#f4d23c') +
+            grp('#f4d23c', P('M11 33h6v6h-6zM33 33h6v6h-6z'), 'stroke-width="1.6"') +
+            line('M14 33v6M11 36h6M36 33v6M33 36h6', '#5a3a22', 1) +
+            line('M45 23h15M48 23v4M57 23v4', INK, 1.5) +
+            grp('#8a5a32', P('M46 27h13v10H46z'), 'stroke-width="1.6"') +
+            '<path d="M52.6 28.8a3.6 3.6 0 1 0 3.2 5.6 2.9 2.9 0 1 1-3.2-5.6z" fill="#f4e38a" stroke="' + INK + '" stroke-width="1"/>' +
+            dot(56, 7, 1, '#f4e38a') + dot(61.5, 13, .9, '#f4e38a') + dot(52, 12, .8, '#f4e38a'),
 
+        // The Golden Dice: a gold die with 1 to the front, 2 on top and 3 on
+        // the side, numbered as a real die is (opposite faces make 7).
         dice:
-            grp('#f0c33c', P('M18 12h28v28H18z')) + grp('#c8962a', P('M18 12l6-6h28l-6 6zM46 12l6-6v28l-6 6z')) +
-            dot(24, 18, 2.2) + dot(32, 26, 2.2) + dot(40, 34, 2.2) + dot(40, 18, 2.2) + dot(24, 34, 2.2),
+            grp('#f0c33c', P('M17 15h26v26H17z')) +
+            grp('#f8dc78', P('M17 15l9-8h26l-9 8z')) +
+            grp('#c8962a', P('M43 15l9-8v26l-9 8z')) +
+            dot(30, 28, 3.6) +
+            '<ellipse cx="26.7" cy="12.6" rx="2.4" ry="1.3" fill="' + INK + '"/>' +
+            '<ellipse cx="42.3" cy="9.4" rx="2.4" ry="1.3" fill="' + INK + '"/>' +
+            '<ellipse cx="45.7" cy="18.3" rx="1.4" ry="2.3" fill="' + INK + '"/>' +
+            '<ellipse cx="47.5" cy="24" rx="1.4" ry="2.3" fill="' + INK + '"/>' +
+            '<ellipse cx="49.3" cy="29.7" rx="1.4" ry="2.3" fill="' + INK + '"/>',
 
         garrison:
             grp('#8a8278', P('M4 44V20h56v24z')) + grp('#6a5a4a', P('M2 20 32 8l30 12z')) +
@@ -3672,13 +3792,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#8a8278', P('M14 44V34h36v10z')) + grp('#a39b8f', P('M20 34V20h24v14z')) +
             grp('#7ad4ff', P('M32 6l6 8-6 10-6-10z')),
 
+        // The Wild Brewery: two foaming mugs of its ale, raised and clinking,
+        // a splash flying off them.
         brewery:
-            grp('#a06a3a', P('M6 22h24v22H6z')) + line('M6 28h24M6 38h24', '#6a4a2a', 1.6) +
-            grp('#a06a3a', P('M34 26h24v18H34z')) + line('M34 31h24M34 39h24', '#6a4a2a', 1.6) +
-            grp('#f4f0e2', P('M6 22c0-5 6-6 8-3 2-4 10-3 10 0 3-2 6 0 6 3z')),
+            beerMug(19, 45, 13) +
+            '<g transform="translate(64 0) scale(-1 1)">' + beerMug(19, 45, 13) + '</g>' +
+            [[32, 9, 1.6], [28, 5.6, 1.1], [36.2, 5.2, 1.2], [32.4, 3, .8]].map(d =>
+                '<circle cx="' + d[0] + '" cy="' + d[1] + '" r="' + d[2] + '" fill="#f8f4ea" stroke="' + INK + '" stroke-width=".8"/>').join(''),
 
         royal_patrol:
-            line('M22 46V4', INK, 3) + grp('#2b2326', P('M23 6h26v24l-13-5-13 5z')) + line('M23 6h26', GOLD, 2) +
+            line('M22 46V4', INK, 3) + grp(ROYAL_RED, P('M23 6h26v24l-13-5-13 5z')) + line('M23 6h26', GOLD, 2) +
             crown(36, 16, .75) + line('M46 46V10', INK, 3.6) + line('M46 46V10', '#7a5232', 1.8) +
             grp(STEEL_L, P('M46 12l9 3v9l-9-3z')),
 
@@ -3687,10 +3810,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M22 24v20M28 24v20M34 24v20M40 24v20M18 32h28M18 40h28', '#4a4e55', 1.8) +
             line('M4 10v-4h4v4M14 10v-4h4v4M46 10v-4h4v4M56 10v-4h4v4', INK, 1.6),
 
+        // King's Square: the old king in gold on his column above the
+        // fountain, water falling from the bowl at his feet into the basin,
+        // and the royal banners at either side of the square.
         kings_square:
-            grp('#8a8278', P('M10 44c0-6 44-6 44 0z')) + grp('#7ad4ff', P('M14 42c0-4 36-4 36 0z')) +
-            grp('#a39b8f', P('M28 40V24h8v16z')) + crown(32, 18, .9) +
-            line('M26 30c-4 2-6 6-6 10M38 30c4 2 6 6 6 10', '#7ad4ff', 1.6),
+            grp('#a39b8f', P('M0 42h64v6H0z')) + line('M5 45h6M19 44.6h6M37 45.4h6M52 44.6h6', '#7c746a', 1.1) +
+            line('M6 42V6M58 42V6', INK, 1.8) +
+            grp(ROYAL_RED, P('M7 7h9v14l-4.5-3L7 21zM48 7h9v14l-4.5-3L48 21z'), 'stroke-width="1.6"') +
+            crown(11.5, 13.2, .36) + crown(52.5, 13.2, .36) +
+            grp('#8a8278', P('M12 42v-7h40v7z')) + grp('#7ad4ff', P('M14 35h36l-1.6 2.4H15.6z'), 'stroke-width="1.4"') +
+            grp('#a39b8f', P('M29 35V25h6v10z')) +
+            grp('#a39b8f', P('M23 23h18c0 3.6-4.4 5.6-9 5.6S23 26.6 23 23z')) +
+            line('M23.6 25c-2.4 3-3.2 6-3.2 10M40.4 25c2.4 3 3.2 6 3.2 10', '#7ad4ff', 1.5) +
+            grp(GOLD, P('M28.5 22.6 30 13.4h4l1.5 9.2z'), 'stroke-width="1.6"') +
+            '<circle cx="32" cy="11.2" r="2.5" fill="' + GOLD + '" stroke="' + INK + '" stroke-width="1.4"/>' +
+            line('M34.6 14.2 37.4 6.6', GOLD, 1.4) + dot(37.6, 6.2, 1, GOLD) +
+            crown(32, 8, .3),
 
         watchtower:
             grp('#8a8278', P('M22 46V14h20v32z')) + grp('#9e968a', P('M18 8h28v8H18z')) +
@@ -3724,36 +3859,60 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '" aria-hidden="true">' + body + '</svg>';
     }
 
-    // The Oblivion Pendant: five wedges of one disc. A fragment is its wedge.
+    // The Oblivion Pendant: a pentagon, point up, cut from its middle into
+    // five wedges -- one for each Pendant Fragment. A fragment is its wedge.
+    function pentagonPoint(cx, cy, r, i) {
+        const a = (-90 + i * 72) * Math.PI / 180;
+        return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    }
+    const xy = pt => pt[0].toFixed(2) + ' ' + pt[1].toFixed(2);
+
     function pendant(have, px) {
-        let s = '<circle cx="12" cy="12" r="10.6" fill="#2a2024" stroke="' + INK + '" stroke-width="1.4"/>';
+        // A point-up pentagon is taller above its middle than below it, so
+        // its middle sits a little low to centre the whole of it in the box.
+        const c = [12, 13], R = 10.8;
+        const v = [0, 1, 2, 3, 4].map(i => pentagonPoint(c[0], c[1], R, i));
+        let s = '<path d="M' + v.map(xy).join('L') + 'z" fill="#2a2024" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/>';
         for (let i = 0; i < 5; i++) {
-            const a0 = (-90 + i * 72) * Math.PI / 180, a1 = (-90 + (i + 1) * 72) * Math.PI / 180;
-            const x0 = 12 + 9.4 * Math.cos(a0), y0 = 12 + 9.4 * Math.sin(a0);
-            const x1 = 12 + 9.4 * Math.cos(a1), y1 = 12 + 9.4 * Math.sin(a1);
             const on = have.indexOf(i + 1) >= 0;
-            s += '<path d="M12 12L' + x0.toFixed(2) + ' ' + y0.toFixed(2) + 'A9.4 9.4 0 0 1 ' + x1.toFixed(2) + ' ' +
-                y1.toFixed(2) + 'z" fill="' + (on ? '#e2b13c' : '#3d3238') + '" stroke="' + (on ? '#7a4a12' : '#55484e') +
-                '" stroke-width="1"/>';
+            s += '<path d="M' + xy(c) + 'L' + xy(pentagonPoint(c[0], c[1], R - 1.3, i)) + 'L' +
+                xy(pentagonPoint(c[0], c[1], R - 1.3, i + 1)) + 'z" fill="' + (on ? '#e2b13c' : '#3d3238') +
+                '" stroke="' + (on ? '#7a4a12' : '#55484e') + '" stroke-width="1" stroke-linejoin="round"/>';
         }
-        s += '<circle cx="12" cy="12" r="2.6" fill="' + (have.length >= 5 ? '#c8342b' : '#55484e') + '" stroke="' + INK + '" stroke-width="1"/>';
+        const gem = [0, 1, 2, 3, 4].map(i => pentagonPoint(c[0], c[1], 2.9, i));
+        s += '<path d="M' + gem.map(xy).join('L') + 'z" fill="' + (have.length >= 5 ? '#c8342b' : '#55484e') +
+            '" stroke="' + INK + '" stroke-width="1" stroke-linejoin="round"/>';
         return svgIcon(s, '0 0 24 24', px || 22, 'pendant');
     }
 
     function fragment(n, px) {
-        const i = n - 1;
-        const a0 = (-90 + i * 72) * Math.PI / 180, a1 = (-90 + (i + 1) * 72) * Math.PI / 180;
-        const mid = (a0 + a1) / 2;
-        const cx = 12 - 4 * Math.cos(mid), cy = 12 - 4 * Math.sin(mid);
-        const r = 13;
-        const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
-        const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
-        return svgIcon('<path d="M' + cx.toFixed(2) + ' ' + cy.toFixed(2) + 'L' + x0.toFixed(2) + ' ' + y0.toFixed(2) +
-            'A' + r + ' ' + r + ' 0 0 1 ' + x1.toFixed(2) + ' ' + y1.toFixed(2) + 'z" fill="#e2b13c" stroke="' + INK +
+        // The wedge on its own, moved so its middle is the middle of the box.
+        const R = 18;
+        const p0 = pentagonPoint(0, 0, R, n - 1), p1 = pentagonPoint(0, 0, R, n);
+        const dx = 12 - (p0[0] + p1[0]) / 3, dy = 12 - (p0[1] + p1[1]) / 3;
+        const at = q => [q[0] + dx, q[1] + dy];
+        return svgIcon('<path d="M' + xy(at([0, 0])) + 'L' + xy(at(p0)) + 'L' + xy(at(p1)) + 'z" fill="#e2b13c" stroke="' + INK +
             '" stroke-width="1.4" stroke-linejoin="round"/>' +
-            '<text x="12" y="16" text-anchor="middle" font-size="8" font-weight="700" fill="' + INK + '">' + n + '</text>',
+            '<text x="12" y="15" text-anchor="middle" font-size="8" font-weight="700" fill="' + INK + '">' + n + '</text>',
             '-2 -2 28 28', px || 20, 'frag');
     }
+
+    // The gear on the modifiers button: eight even, square-topped teeth
+    // round a solid wheel with the hole through its middle, all of it on the
+    // centre of its box.
+    const GEAR_PATH = (function () {
+        const c = 12, R = 11, r = 8.1, hole = 3.4, n = 8, step = Math.PI * 2 / n;
+        const pt = (a, rad) => (c + rad * Math.cos(a)).toFixed(2) + ' ' + (c + rad * Math.sin(a)).toFixed(2);
+        let d = '';
+        for (let i = 0; i < n; i++) {
+            const a = -Math.PI / 2 + i * step;
+            if (!i) d += 'M' + pt(a - step * .27, r);
+            d += 'L' + pt(a - step * .16, R) + 'A' + R + ' ' + R + ' 0 0 1 ' + pt(a + step * .16, R) +
+                'L' + pt(a + step * .27, r) + 'A' + r + ' ' + r + ' 0 0 1 ' + pt(a + step * .73, r);
+        }
+        return d + 'Z' + 'M' + (c + hole) + ' ' + c + 'A' + hole + ' ' + hole + ' 0 1 0 ' + (c - hole) + ' ' + c +
+            'A' + hole + ' ' + hole + ' 0 1 0 ' + (c + hole) + ' ' + c + 'Z';
+    })();
 
     const ICONS = {
         gold: px => svgIcon(coin(12, 12, 9), '0 0 24 24', px || 18),
@@ -3769,9 +3928,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         sword: px => svgIcon(sword(12, 13, 45, .5), '0 0 24 24', px || 18),
         energy: px => svgIcon('<path d="M13 2 5 13h6l-1 9 8-12h-6z" fill="#7ad4ff" stroke="' + INK + '" stroke-width="1.4"/>',
             '0 0 24 24', px || 18),
-        gear: px => svgIcon('<path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="currentColor" stroke-width="1.8"/>' +
-            '<path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.8-1L14.8 3h-3.6l-.4 2.6a7.4 7.4 0 0 0-1.8 1l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 0 0 1.8 1l.4 2.4h3.6l.4-2.4a7.4 7.4 0 0 0 1.8-1l2.4 1 2-3.4z" ' +
-            'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>', '0 0 24 24', px || 22),
+        gear: px => svgIcon('<path d="' + GEAR_PATH + '" fill="currentColor" fill-rule="evenodd"/>', '0 0 24 24', px || 22),
         skull: px => svgIcon('<path d="M12 3c-5 0-8 3-8 7 0 3 2 5 3 5v3h10v-3c1 0 3-2 3-5 0-4-3-7-8-7z" fill="#e8e0d0" stroke="' + INK +
             '" stroke-width="1.4"/><circle cx="9" cy="11" r="2" fill="' + INK + '"/><circle cx="15" cy="11" r="2" fill="' + INK + '"/>',
             '0 0 24 24', px || 18),
@@ -3788,10 +3945,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* One drawing the size of the whole board -- 12 x 7 cells of 100 each */
     /* -- laid under the squares, so the scenery shows through and around   */
     /* them. The roads run square to square; the mountain the long route    */
-    /* snakes round comes in off the left edge; walls flank the main route; */
+    /* snakes round comes in off the left edge; a wall runs along the outer */
+    /* side of the main route;                                              */
     /* the castle stands in the middle with the Oblivion Mage's shield on   */
     /* its east gate; the Merchant's humble stall stands near the Start.    */
     /* ------------------------------------------------------------------ */
+
+    // The castle is drawn 300 wide and scaled down into the middle of its
+    // three-by-three cells, so there is open ground round it. Its east gate
+    // is at (271, 152) in its own drawing; the shield stands in front of it,
+    // well clear of the Royal Cleric's Temple.
+    const CASTLE_AT = { x: 750, y: 350, scale: 0.86 };
+    const SHIELD_AT = { x: CASTLE_AT.x + (271 - 150) * CASTLE_AT.scale - 2, y: 350, scale: 0.9 };
+    // Where the castle and the Merchant's stall are, on the 1200 x 700
+    // board, for the buttons laid over them.
+    const ARENA_BOX = { x: 622, y: 204, w: 256, h: 268 };
+    const MERCHANT_BOX = { x: 944, y: 432, w: 146, h: 108 };
 
     function cellCentre(sq) {
         const rs = sq.rowSpan || 1, cs = sq.colSpan || 1;
@@ -3819,13 +3988,31 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function mountain() {
-        // The flank of a mountain far bigger than the board, coming in off
-        // its left edge, which is why the long route has to wind round it.
+        // The end of a range far bigger than the board. Its summits stand off
+        // the left edge, and what comes onto the board is one great spur
+        // pushed out into the bend the long route has to wind round. Nothing
+        // slopes back down to the edge: the rock climbs towards it and
+        // carries on past it, and the same range shows between the squares
+        // all the way up that side of the board.
+        const DARK = '#45403c', ROCK = '#5b5550', LIT = '#6d665f', SNOW = '#e8e4dc', CREASE = '#38332f';
         return '<g>' +
-            grp('#5b5550', P('M-20 430 40 250 95 320 140 230 230 400 250 440z'), 'stroke-width="3.5"') +
-            grp('#6d665f', P('M40 250 70 330 52 430H-20zM140 230 170 340 150 440H230z'), 'stroke-width="3"') +
-            grp('#e8e4dc', P('M40 250 57 286 47 296 32 282zM140 230 158 270 142 284 126 262z'), 'stroke-width="2.4"') +
-            line('M95 320 110 380M182 320 196 390', '#463f3a', 3) +
+            // the range itself, running on up the edge of the board
+            grp(DARK, P('M-40-30 L16 14 L8 52 L26 98 L12 146 L30 196 L-40 230z')) +
+            grp(DARK, P('M-40 470 L24 486 L14 530 L30 578 L-40 600z')) +
+            // the spur's far side, in shadow, higher than the near side
+            grp(DARK, P('M-40 120 L26 182 L46 166 L84 240 L114 226 L158 300 L188 292 L226 376 L242 436 L-40 470z')) +
+            // the near side of the spur
+            grp(ROCK, P('M-40 176 L16 222 L36 206 L74 292 L106 276 L148 346 L174 334 L212 414 L222 466 L-40 478z')) +
+            // its faces turned to the light
+            grp(LIT, P('M36 206 L54 272 L42 344 L66 476 H128 L118 380 L106 276 L74 292z')) +
+            grp(LIT, P('M174 334 L190 386 L178 468 H222 L212 414z')) +
+            // snow on the heights, cut off where the board ends
+            grp(SNOW, P('M-40 176 L16 222 L6 238 L-40 214z')) +
+            grp(SNOW, P('M36 206 L50 238 L40 246 L28 222z')) +
+            grp(SNOW, P('M106 276 L120 304 L108 310 L96 290z')) +
+            grp(SNOW, P('M46 166 L60 194 L50 200 L38 180z')) +
+            // the gullies down its sides
+            line('M16 222 L24 300 L14 390 M106 276 L118 380 M148 346 L156 420', CREASE, 3) +
             '</g>';
     }
 
@@ -3846,8 +4033,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function merchantHut() {
-        // A humble stall: a plank counter, four posts and a patched canvas
-        // roof, with the merchant standing behind his wares.
+        // A humble stall: a plank counter, four posts and a flat, oblong
+        // canvas roof with a patch on it, the merchant standing behind his
+        // wares.
         return '<g class="merchant-hut">' +
             grp('#8a6a44', P('M20 70h120v40H20z'), 'stroke-width="3.4"') +
             line('M20 84h120M20 98h120', '#6a4a2e', 2) +
@@ -3857,9 +4045,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp(SKIN, '<circle cx="80" cy="38" r="9"/>', 'stroke-width="3"') +
             grp('#7a5a3a', P('M70 34c0-10 20-10 20 0z'), 'stroke-width="3"') +
             dot(77, 39, 1.6) + dot(83, 39, 1.6) +
-            // the canvas roof, patched
-            grp('#d8c49a', P('M14 30 80 6l66 24-6 6H20z'), 'stroke-width="3.4"') +
-            grp('#b8a478', P('M98 14l18 6-6 6-16-5z'), 'stroke-width="2"') +
+            // the canvas roof: one plain oblong across the posts, its hem
+            // turned under along the front edge, and a square patch
+            grp('#d8c49a', P('M10 4h140v22H10z'), 'stroke-width="3.4"') +
+            line('M12 20.5h136', '#b8a478', 2.2) +
+            grp('#b8a478', P('M100 7h22v10H100z'), 'stroke-width="2"') +
+            line('M103 9.5v5M119 9.5v5', '#8a7a58', 1.2) +
             // wares on the counter
             flask(44, 62, .8, '#d23a3a') + flask(58, 64, .7, '#3a7fd2') + flask(112, 62, .8, '#3ab06a') +
             grp('#f4e9d0', P('M44 78h72v12H44z'), 'stroke-width="2.4"') +
@@ -3867,24 +4058,41 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '</g>';
     }
 
+    // Stone laid in courses: the stone's own colour, then the joints between
+    // the blocks over it (every other block a shade lighter, so a wall is
+    // never one flat colour), then the hard outline round the lot.
+    const BRICKS_ID = 'lof-castle-bricks';
+    const BRICKS = '<defs><pattern id="' + BRICKS_ID + '" width="44" height="20" patternUnits="userSpaceOnUse">' +
+        '<path d="M23.5 1.6h20v8.4h-20zM12.5 11.6h20v8.4h-20z" fill="#ffffff" fill-opacity=".06"/>' +
+        '<path d="M0 .75H44M0 10.75H44M.75 0v10.75M22.75 0v10.75M11.75 10.75V20M33.75 10.75V20" fill="none" stroke="#110c0f" stroke-width="1.5"/>' +
+        '<path d="M1.6 2.3h20M23.6 2.3h20M12.6 12.3h20M34.6 12.3H44M0 12.3h10.8" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="1"/>' +
+        '</pattern></defs>';
+    function stone(d, fill, sw) {
+        return '<path d="' + d + '" fill="' + fill + '"/><path d="' + d + '" fill="url(#' + BRICKS_ID + ')"/>' +
+            '<path d="' + d + '" fill="none" stroke="' + INK + '" stroke-width="' + (sw || 2.8) + '" stroke-linejoin="round"/>';
+    }
+
     function castle() {
-        // Fenrirak's Arena: the kingdom's castle, taken. Dark stone, red
-        // banners, fire in the windows and the purple shield on the gate.
-        let s = '<g class="castle">';
+        // Fenrirak's Arena: the kingdom's castle, taken. Dark stone blocks,
+        // red banners, fire in the windows and the purple shield on the
+        // east gate.
+        let s = '<g class="castle">' + BRICKS;
         // the moat of fire
         s += '<path d="M10 268c40-16 240-16 280 0l-6 18c-40-12-228-12-268 0z" fill="#8a1c12" stroke="' + INK + '" stroke-width="3"/>';
         s += '<path class="lava" d="M24 272c40-10 212-10 252 0" fill="none" stroke="#ff8a2a" stroke-width="4" stroke-dasharray="14 10"/>';
-        // back towers
-        s += grp('#2e272c', P('M40 70h50v190H40zM210 70h50v190h-50z'), 'stroke-width="3.6"');
-        s += grp('#3d3439', P('M34 54h62v20H34zM204 54h62v20h-62z'), 'stroke-width="3"');
-        s += line('M34 54v-12h12v12M58 54v-12h14v12M84 54v-12h12v12M204 54v-12h12v12M228 54v-12h14v12M254 54v-12h12v12', INK, 3);
+        // back towers, their battlements and the merlons along the top
+        s += stone('M40 70h50v190H40zM210 70h50v190h-50z', '#2e272c');
+        s += stone('M34 42h12v12H34zM58 42h14v12H58zM84 42h12v12H84zM204 42h12v12h-12zM228 42h14v12h-14zM254 42h12v12h-12z', '#3d3439', 2.6);
+        s += stone('M34 54h62v20H34zM204 54h62v20h-62z', '#3d3439');
         s += grp('#1b1418', P('M58 0 65 28M58 0 51 28z'));
         s += grp(CRIMSON, P('M65 20 65-12 95-4 65 4zM235 20V-12l30 8-30 8z'), 'stroke-width="2.6"');
         s += line('M65 42V-14M235 42V-14', INK, 3);
         // the keep
-        s += grp('#352d33', P('M80 100h140v170H80z'), 'stroke-width="3.6"');
-        s += grp('#463c42', P('M72 84h156v22H72z'), 'stroke-width="3"');
-        for (let x = 72; x < 228; x += 26) s += line('M' + x + ' 84v-12h13v12', INK, 3);
+        s += stone('M80 100h140v170H80z', '#352d33');
+        let merlons = '';
+        for (let x = 72; x < 228; x += 26) merlons += 'M' + x + ' 72h13v12h-13z';
+        s += stone(merlons, '#463c42', 2.6);
+        s += stone('M72 84h156v22H72z', '#463c42');
         // windows with fire behind them
         [[100, 130], [190, 130], [145, 120]].forEach(w => {
             s += '<path d="M' + (w[0] - 7) + ' ' + (w[1] + 22) + 'V' + w[1] + 'c0-9 14-9 14 0v22z" fill="#ff7a1a" stroke="' + INK + '" stroke-width="2.6"/>';
@@ -3898,8 +4106,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // the great gate
         s += '<path d="M126 270V214c0-30 48-30 48 0v56z" fill="#1b1418" stroke="' + INK + '" stroke-width="3.4"/>';
         s += line('M134 214v56M142 206v64M150 204v66M158 206v64M166 214v56M126 236h48M126 254h48', '#4a3f45', 2.4);
-        // the east gate on the right wall, and the shield across it
-        s += '<path d="M262 236v-30c0-12 18-12 18 0v30z" fill="#1b1418" stroke="' + INK + '" stroke-width="3"/>';
+        // the east gate, level with the road from the temple, where the
+        // shield stands across it
+        s += '<path d="M262 170v-28c0-12 18-12 18 0v28z" fill="#1b1418" stroke="' + INK + '" stroke-width="3"/>';
         s += '</g>';
         return s;
     }
@@ -3929,8 +4138,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += '<rect width="1200" height="700" fill="url(#ground)"/>';
         s += '<rect width="1200" height="700" fill="url(#grass)"/>';
         // scorched earth round the castle
-        s += '<ellipse cx="750" cy="370" rx="260" ry="210" fill="#1a1210" opacity=".45"/>';
-        s += line('M610 520l30-26 20 14 26-30M900 200l-24 24 10 18M640 190l22 20-6 22M880 500l-18-20-22 10', '#ff6a1a', 2.6);
+        s += '<ellipse cx="750" cy="362" rx="236" ry="196" fill="#1a1210" opacity=".45"/>';
+        s += line('M622 508l28-24 20 14 24-28M884 218l-24 24 10 18M626 238l20 18-6 20M872 492l-18-20-22 10', '#ff6a1a', 2.6);
 
         // the roads, square to square
         const main = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '25', '26', '27', '28', '29', '30',
@@ -3938,8 +4147,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const long = ['7', '8a', '9a', '10a', '11a', '12a', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25'];
         s += '<path d="' + roadPath(B, long) + '" fill="none" stroke="#2a2018" stroke-width="44" stroke-linejoin="round"/>';
         s += '<path d="' + roadPath(B, long) + '" fill="none" stroke="#6a5238" stroke-width="36" stroke-linejoin="round" stroke-dasharray="2 0"/>';
-        s += '<path d="' + roadPath(B, main) + ' L' + (cellCentre(B['37']).x - 70) + ' 350" fill="none" stroke="#2a2018" stroke-width="48" stroke-linejoin="round"/>';
-        s += '<path d="' + roadPath(B, main) + ' L' + (cellCentre(B['37']).x - 70) + ' 350" fill="none" stroke="url(#cobble)" stroke-width="40" stroke-linejoin="round"/>';
+        // the main road runs on from the temple to the castle's east gate
+        const gate = ' L' + SHIELD_AT.x.toFixed(1) + ' ' + SHIELD_AT.y;
+        s += '<path d="' + roadPath(B, main) + gate + '" fill="none" stroke="#2a2018" stroke-width="48" stroke-linejoin="round"/>';
+        s += '<path d="' + roadPath(B, main) + gate + '" fill="none" stroke="url(#cobble)" stroke-width="40" stroke-linejoin="round"/>';
 
         // the mountain the long route winds round, and the foothills
         s += mountain();
@@ -3947,13 +4158,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += rocks(170, 160, 1.2) + rocks(290, 180, 1) + deadTree(230, 175, 1.1);
         s += deadTree(330, 360, 1) + rocks(320, 470, .9);
 
-        // walls either side of the main route: the safe way through
-        s += wallRun(372, 110, 590) + wallRun(528, 110, 590);
+        // the wall between the main route and the long one: the safe way
+        // through. (Only the outer side is walled; the inner side, facing
+        // the castle, is open.)
+        s += wallRun(372, 110, 590);
 
-        // the castle, in the arena's three cells, and the shield on its gate
-        s += '<g transform="translate(600 200)">' + castle() + '</g>';
-        s += '<g transform="translate(897 352)">' + shield() + '</g>';
-        s += brazier(590, 300, 1.2) + brazier(590, 470, 1.2) + brazier(930, 470, 1) + brazier(930, 260, 1);
+        // the castle, in the middle of the arena's three cells, and the
+        // shield on its gate
+        s += '<g transform="translate(' + CASTLE_AT.x + ' ' + CASTLE_AT.y + ') scale(' + CASTLE_AT.scale + ') translate(-150 -150)">' + castle() + '</g>';
+        s += '<g transform="translate(' + SHIELD_AT.x.toFixed(1) + ' ' + SHIELD_AT.y + ') scale(' + SHIELD_AT.scale + ')">' + shield() + '</g>';
+        s += brazier(606, 300, 1.2) + brazier(606, 462, 1.2) + brazier(930, 470, 1) + brazier(930, 260, 1);
 
         // the Merchant's humble stall, near the Start
         s += '<g transform="translate(940 432) scale(.95)">' + merchantHut() + '</g>';
@@ -3985,6 +4199,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         SQUARE_ART: SQUARE_ART,
         ICONS: ICONS,
         boardScene: boardScene,
+        ARENA_BOX: ARENA_BOX,
+        MERCHANT_BOX: MERCHANT_BOX,
         castleSvg: () => wrap(castle(), '0 -40 300 330'),
         merchantSvg: () => wrap(merchantHut(), '0 0 160 112'),
         enemySvg: id => ENEMY_ART[id] ? wrap(ENEMY_ART[id]) : '',
@@ -4104,6 +4320,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return lost;
     }
 
+    // Gold a square or a roll takes off you. Short of it, you hand over all
+    // you have and the rest comes out of your health instead: 1 damage for
+    // every Gold you could not pay. `damage` is any damage the square does
+    // anyway, taken in the same blow.
+    function forfeitGold(state, p, n, from, damage) {
+        const paid = loseGold(p, n);
+        const short = n - paid;
+        log(state, from + ' takes ' + paid + ' Gold from ' + p.name +
+            (short ? ' — ' + short + ' short, paid in health instead' : '') + '.', 'death');
+        const hurt = (damage || 0) + short;
+        if (hurt > 0) squareDamage(state, p, hurt, from);
+        return paid;
+    }
+
     // What the Merchant asks, with Fleeing Merchant's half price.
     function merchantPrice(state, base) { return mod(state, 'fleeingMerchant') ? halve(base) : base; }
 
@@ -4146,7 +4376,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             away: false,
             lastSeen: Date.now(),
             deaths: 0,
-            kills: 0
+            kills: 0,
+            fought: []              // every monster this player has faced: its stat card stays hidden until then
         };
     }
 
@@ -4162,6 +4393,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function ownedItem(p, u) { return p.inventory.find(it => it.uid === u) || null; }
     function weaponOf(p) { return p.weaponUid ? ownedItem(p, p.weaponUid) : null; }
     function armourOf(p) { return p.armourUid ? ownedItem(p, p.armourUid) : null; }
+
+    // A monster's numbers are a secret until you have fought it yourself.
+    function hasFought(p, enemyId) { return !!(p && p.fought && p.fought.indexOf(enemyId) >= 0); }
+    function meet(p, enemyId) {
+        if (!p.fought) p.fought = [];
+        if (p.fought.indexOf(enemyId) < 0) p.fought.push(enemyId);
+    }
 
     function hasBarbarian(state, p) {
         return !!(p && state.barbarian && state.barbarian.ownerId === p.id);
@@ -4747,6 +4985,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
        outcome:
          landed     the whole roll walked out
          split      reached the Route Split with steps left: choose a route
+         stop       reached any other STOP with steps left: the move ends there
          optional   an Optional Stop with steps left: stop or carry on
          shield     the Oblivion Mage's shield, without the fragments
          arena      through the shield and into the arena  */
@@ -4782,7 +5021,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             remaining -= 1;
             path.push(pos);
             const sq = square(pos);
-            if (remaining > 0 && sq.stop) { outcome = 'split'; break; }
+            if (remaining > 0 && sq.stop) { outcome = sq.id === D.SPLIT ? 'split' : 'stop'; break; }
             if (remaining > 0 && isOptionalStop(state, sq)) { outcome = 'optional'; break; }
         }
         return { pos: pos, path: path, remaining: remaining, outcome: outcome };
@@ -4818,6 +5057,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                         plural(w.remaining, 'space') + '.'
             };
             return ok();
+        }
+        if (w.outcome === 'stop') {
+            log(state, square(p.pos).name + ' is a STOP: ' + p.name + ' halts there with ' +
+                plural(w.remaining, 'space') + ' unwalked.', 'move');
         }
         if (w.outcome === 'optional') {
             state.pending = {
@@ -4923,12 +5166,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 squareDamage(state, p, sq.damage, sq.name);
                 return ok();
 
-            case 'smugglers': {
-                const lost = loseGold(p, sq.gold);
-                log(state, 'Smugglers lift ' + lost + ' Gold from ' + p.name + '.', 'death');
-                squareDamage(state, p, sq.damage, sq.name);
+            case 'smugglers':
+                forfeitGold(state, p, sq.gold, sq.name, sq.damage);
                 return ok();
-            }
 
             case 'nobles_secret':
                 state.pending = {
@@ -4953,25 +5193,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 return ok();
 
             case 'nobles_district': {
-                const opts = [];
-                if (p.gold >= sq.gold) opts.push({ key: 'gold', label: 'Lose 40 Gold' });
+                // Short of 40 Gold, paying means all you have plus the rest
+                // in health.
+                const short = Math.max(0, sq.gold - p.gold);
+                const opts = [{ key: 'gold', label: 'Lose 40 Gold' + (short ? ' (you have ' + p.gold + ': take ' + short + ' damage for the rest)' : '') }];
                 [weaponOf(p), armourOf(p)].forEach(inst => {
                     if (inst) opts.push({ key: inst.uid, label: 'Lose your ' + itemDef(inst).name });
                 });
-                if (!opts.length) {
-                    const lost = loseGold(p, sq.gold);
-                    log(state, 'The nobles take what little ' + p.name + ' has: ' + lost + ' Gold.', 'death');
+                if (opts.length === 1) {
+                    forfeitGold(state, p, sq.gold, sq.name);
                     return ok();
                 }
-                if (opts.length === 1 && opts[0].key === 'gold') {
-                    loseGold(p, sq.gold);
-                    log(state, p.name + ' pays the nobles 40 Gold.', 'death');
-                    return ok();
-                }
-                state.pending = {
-                    type: 'choose', playerId: p.id, squareId: sq.id, options: opts,
-                    prompt: sq.text + (p.gold < sq.gold ? ' You do not have 40 Gold, so it must be an item.' : '')
-                };
+                state.pending = { type: 'choose', playerId: p.id, squareId: sq.id, options: opts, prompt: sq.text };
                 return ok();
             }
 
@@ -5021,7 +5254,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         switch (sq.roll) {
             case 'cursed_ruins':
                 if (even) squareDamage(state, p, 10, sq.name);
-                else log(state, 'The ruins curse ' + p.name + ' out of ' + loseGold(p, 20) + ' Gold.', 'death');
+                else forfeitGold(state, p, 20, sq.name);
                 break;
             case 'cliff_of_doom':
                 squareDamage(state, p, even ? 20 : 50, sq.name);
@@ -5031,7 +5264,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 break;
             case 'golden_dice':
                 if (even) gainGold(state, p, 20, 'The Golden Dice');
-                else log(state, p.name + ' loses ' + loseGold(p, 20) + ' Gold at The Golden Dice.', 'death');
+                else forfeitGold(state, p, 20, sq.name);
                 break;
             case 'palace_gates':
                 if (even) log(state, 'The guards at the Palace Gates let ' + p.name + ' pass.', 'muted');
@@ -5129,8 +5362,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     } else gainGold(state, p, sq.gold, sq.name);
                 } else if (sq.action === 'nobles_district') {
                     if (choice === 'gold') {
-                        loseGold(p, sq.gold);
-                        log(state, p.name + ' pays the nobles 40 Gold.', 'death');
+                        forfeitGold(state, p, sq.gold, sq.name);
                     } else {
                         const inst = ownedItem(p, choice);
                         if (inst) {
@@ -5343,6 +5575,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         b.units.push(enemyUnit(state, enemyId));
         b.order = b.units.map(u => u.key);
         state.battle = b;
+        meet(p, enemyId);
         log(state, p.name + ' faces ' + D.foeName(D.ENEMIES[enemyId]) + '!', 'battle');
         b.logFrom = state.logSeq | 0;
         b.idx = 0;
@@ -5360,6 +5593,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         b.units.push(obm);
         b.order = b.units.map(u => u.key);
         state.battle = b;
+        meet(p, 'fenrirak');
+        meet(p, 'oblivion_mage');
         log(state, p.name + ' enters the arena. Fenrirak and Oblivion Mage Helen rise to meet them!', 'battle');
         b.logFrom = state.logSeq | 0;
         b.idx = 0;
@@ -6040,8 +6275,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             state.phase = 'over';
             state.winner = p.id;
             state.finishedPlayMs = playTimeMs(state, Date.now());
-            log(state, '★ ' + p.name + ' has defeated Fenrirak and Oblivion Mage Helen. ' +
-                'The final legend is theirs! ★', 'system');
+            log(state, p.name + ' has defeated Fenrirak and Oblivion Mage Helen. ' +
+                'The final legend is theirs!', 'system');
             return;
         }
         const enemyId = enemyIds[0];
@@ -6761,7 +6996,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         makeRoomCode, createGame, addPlayer, removePlayer, chooseClass, setMods, startGame,
         rollForOrder, currentPlayer, isMyTurn, advanceTurn, checkTimeout, turnLimit,
         player, square, previewWalk, moveOffer, isOptionalStop, fragmentsNeeded, hasFragments,
-        weaponOf, armourOf, itemDef, ownedItem, suits, hasBarbarian,
+        weaponOf, armourOf, itemDef, ownedItem, suits, hasBarbarian, hasFought,
         availableMoves, computeHit, battleActorId, inBattle, curUnit, unit, unitName,
         controllerOf, opponents, defaultTarget, movesOf, chooseEnemyMove, enemyTarget, isPlural,
         attackParts, defenceParts, body, buffsOf, oblivionControlOn, tranquil,
@@ -7900,7 +8135,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         let inFlight = false;
         const queue = [];
         let timers = [];
-        const THROW_MS = 1200, SPIN_MS = 700, HOLD_MS = 2400, FADE_MS = 450;
+        // HOLD_MS: how long a landed die lies on the table when nothing is
+        // waiting for it; READ_MS: the least it stays, to be read, when a
+        // question or a card is waiting to go up.
+        const THROW_MS = 1200, SPIN_MS = 700, HOLD_MS = 2400, READ_MS = 900, FADE_MS = 450;
+        let landedAt = 0, hurried = false;
         const FACE_ROT = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
         let spinX = 360, spinY = 720, thrownAt = 0;
 
@@ -8000,15 +8239,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             cubeEl.classList.add('settled');
             timers.push(setTimeout(() => {
                 inFlight = false;
-                if (queue.length) { throwIt(queue.shift()); return; }
-                timers.push(setTimeout(fade, HOLD_MS));
+                landedAt = Date.now();
+                if (queue.length && !BANNERS.showing()) { throwIt(queue.shift()); return; }
+                timers.push(setTimeout(fade, hurried ? READ_MS : HOLD_MS));
+                hurried = false;
                 afterSettle();
             }, settleMs + 40));
         }
 
         function fade() {
             stage.classList.add('going');
-            timers.push(setTimeout(() => stage.classList.remove('on', 'going', 'landed'), FADE_MS));
+            // Gone: whatever was waiting for the table to clear can go up.
+            timers.push(setTimeout(() => { stage.classList.remove('on', 'going', 'landed'); afterSettle(); }, FADE_MS));
         }
 
         return {
@@ -8018,11 +8260,25 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!primed) { primed = true; seen = n; return; }
                 if (!die || n === seen) return;
                 seen = n;
-                if (inFlight) { if (queue.length < 3) queue.push(die); return; }
+                // Not over a card that is up: it waits for the card to go.
+                if (inFlight || BANNERS.showing()) { if (queue.length < 3) queue.push(die); return; }
                 throwIt(die);
             },
             reset(state) { primed = false; if (state) this.saw(state); },
-            busy() { return inFlight || queue.length > 0; }
+            busy() { return inFlight || queue.length > 0; },
+            flying() { return inFlight; },
+            showing() { return !!(stage && stage.classList.contains('on')); },
+            // Something is waiting to go up: the die stays only long enough
+            // to be read, then goes. One still in the air does the same once
+            // it lands.
+            hurry() {
+                if (!stage || !stage.classList.contains('on') || stage.classList.contains('going')) return;
+                if (inFlight) { hurried = true; return; }
+                clearTimers();
+                timers.push(setTimeout(fade, Math.max(0, READ_MS - (Date.now() - landedAt))));
+            },
+            // A card has gone: a throw that was waiting for it goes now.
+            release() { if (!inFlight && queue.length) throwIt(queue.shift()); }
         };
     })();
 
@@ -8041,11 +8297,66 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     /* ------------------------------------------------------------------ */
     /* Things that play over the board and then go                         */
+    /*                                                                     */
+    /* The big cards across the middle of the screen -- a fight ending, the */
+    /* turn changing hands -- take turns. A duel that ends a turn used to   */
+    /* put "DEFEATED" and "Bob's turn" up on top of each other; now each    */
+    /* waits for the one before it to go, and none goes up over a die      */
+    /* still in the air or a piece still walking.                          */
     /* ------------------------------------------------------------------ */
+
+    const BANNERS = (function () {
+        const queue = [];
+        let showing = false, wait = null;
+        function pump() {
+            clearTimeout(wait);
+            if (showing || !queue.length) return;
+            if (DICE.flying() || WALK.busy()) { wait = setTimeout(pump, 150); return; }
+            // A die that has landed is cleared away first, so the card never
+            // goes up over it, not even while it fades.
+            if (DICE.showing()) { DICE.hurry(); wait = setTimeout(pump, 100); return; }
+            const next = queue.shift();
+            showing = true;
+            next.play(() => {
+                showing = false;
+                DICE.release();
+                // A breath between one card going and the next coming.
+                if (queue.length) wait = setTimeout(pump, 160);
+                else afterSettle();
+            });
+        }
+        return {
+            // A newer "whose turn" replaces one still waiting to go up: only
+            // the latest is worth showing.
+            add(kind, play) {
+                if (kind === 'turn') {
+                    for (let i = queue.length - 1; i >= 0; i--) if (queue[i].kind === kind) queue.splice(i, 1);
+                }
+                queue.push({ kind: kind, play: play });
+                pump();
+            },
+            showing: () => showing,
+            busy: () => showing || queue.length > 0,
+            reset() { queue.length = 0; clearTimeout(wait); }
+        };
+    })();
+
+    // Up, held, and down again. Timers rather than animation frames: a tab
+    // in the background holds frames back, and a card would go up after it
+    // was meant to have come down.
+    function playCard(el, holdMs, done) {
+        el.classList.remove('show');
+        void el.offsetWidth;
+        el.classList.add('show');
+        setTimeout(() => {
+            el.classList.remove('show');
+            setTimeout(done, 300);
+        }, holdMs);
+    }
 
     // The turn changing hands.
     const TURN = (function () {
-        let el = null, key = '', primed = false, showing = false, t = null;
+        let el = null, key = '', primed = false;
         return {
             saw(state) {
                 if (state.phase !== 'playing') { key = ''; primed = true; return; }
@@ -8054,31 +8365,24 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!primed) { primed = true; key = k; return; }
                 if (k === key || !cur) return;
                 key = k;
-                if (!el) { el = document.createElement('div'); el.className = 'turn-card'; document.body.appendChild(el); }
                 const mine = cur.id === NET.PID;
-                el.style.setProperty('--seat', seatColour(cur.id));
-                el.innerHTML = portrait(cur) + '<b>' + (mine ? 'Your turn!' : esc(cur.name) + '’s turn') + '</b>' +
+                const colour = seatColour(cur.id);
+                const html = portrait(cur) + '<b>' + (mine ? 'Your turn!' : esc(cur.name) + '’s turn') + '</b>' +
                     '<span>Round ' + state.turnNo + '</span>';
-                showing = true;
-                // Not on an animation frame: a tab in the background holds
-                // those back, and the card would go up after it was taken down.
-                el.classList.remove('show');
-                void el.offsetWidth;
-                el.classList.add('show');
-                clearTimeout(t);
-                t = setTimeout(() => {
-                    el.classList.remove('show');
-                    setTimeout(() => { showing = false; afterSettle(); }, 300);
-                }, 1500);
+                BANNERS.add('turn', done => {
+                    if (!el) { el = document.createElement('div'); el.className = 'turn-card'; document.body.appendChild(el); }
+                    el.style.setProperty('--seat', colour);
+                    el.innerHTML = html;
+                    playCard(el, 1500, done);
+                });
             },
-            reset() { primed = false; key = ''; },
-            busy() { return showing; }
+            reset() { primed = false; key = ''; }
         };
     })();
 
     // A fight ending.
     const BEND = (function () {
-        let el = null, seen = 0, primed = false, showing = false, bendT = null;
+        let el = null, seen = 0, primed = false;
         return {
             saw(state) {
                 const lb = state.lastBattle;
@@ -8086,33 +8390,39 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!primed) { primed = true; seen = n; return; }
                 if (!lb || n === seen) return;
                 seen = n;
-                if (!el) { el = document.createElement('div'); el.className = 'bend'; document.body.appendChild(el); }
                 const my = me();
                 const won = my && lb.winner && lb.winner.name === my.name && !lb.winner.enemyId;
                 const lost = my && lb.loser && lb.loser.name === my.name && !lb.loser.enemyId;
                 const nm = (side, cap) => side.enemyId ? D.foeName(D.ENEMIES[side.enemyId], cap) : side.name;
                 let big, small, watch = false;
-                if (won) { big = 'VICTORY'; small = 'You defeated ' + nm(lb.loser) + '!'; }
-                else if (lost) { big = 'DEFEATED'; small = nm(lb.winner, true) + ' won. Back to the Start \u2014 you keep everything.'; }
+                // A duel's loser keeps their gear but not their Gold.
+                const duel = lb.kind === 'pvp';
+                if (won) { big = 'VICTORY'; small = 'You defeated ' + nm(lb.loser) + (duel ? ' and take their Gold!' : '!'); }
+                else if (lost) {
+                    big = 'DEFEATED';
+                    small = duel ? nm(lb.winner, true) + ' wins the duel and takes your Gold. Back to the Start.'
+                        : nm(lb.winner, true) + ' won. Back to the Start \u2014 you keep everything.';
+                }
                 else {
                     watch = true;
                     big = lb.winner.enemyId ? lb.loser.name + ' falls' : lb.winner.name + ' wins';
                     small = lb.winner.enemyId ? nm(lb.loser) + ' is defeated by ' + nm(lb.winner) : lb.winner.name + ' defeats ' + nm(lb.loser);
                 }
-                el.className = 'bend' + (lost || (watch && lb.winner.enemyId) ? ' lose' : '') + (watch ? ' watch' : '');
-                el.innerHTML = '<b>' + big + '</b><span>' + esc(small) + '</span>';
-                showing = true;
-                el.classList.remove('show');
-                void el.offsetWidth;
-                el.classList.add('show');
-                clearTimeout(bendT);
-                bendT = setTimeout(() => {
-                    el.classList.remove('show');
-                    setTimeout(() => { showing = false; afterSettle(); }, 300);
-                }, 2100);
+                const cls = 'bend' + (lost || (watch && lb.winner.enemyId) ? ' lose' : '') + (watch ? ' watch' : '');
+                const html = '<b>' + big + '</b><span>' + esc(small) + '</span>';
+                BANNERS.add('bend', done => {
+                    if (!el) { el = document.createElement('div'); document.body.appendChild(el); }
+                    el.className = cls;
+                    el.innerHTML = html;
+                    playCard(el, 2100, () => {
+                        // The fight is over: its window goes with the banner,
+                        // rather than staying up under whatever comes next.
+                        if (S && !S.battle && /^(battle:|mini)/.test(modalSig)) closeModal();
+                        done();
+                    });
+                });
             },
-            reset(state) { primed = false; if (state) this.saw(state); },
-            busy() { return showing; }
+            reset(state) { primed = false; if (state) this.saw(state); }
         };
     })();
 
@@ -8126,7 +8436,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!primed) { primed = true; seen = n; return; }
                 if (!z || n === seen) return;
                 seen = n;
-                notice(z.who + ' is thrown back by the Oblivion Mage’s shield!');
+                afterTheDie(() => notice(z.who + ' is thrown back by the Oblivion Mage’s shield!'));
             },
             reset(state) { primed = false; if (state) this.saw(state); }
         };
@@ -8143,15 +8453,17 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!d || n === seen) return;
                 seen = n;
                 if (d.playerId !== NET.PID) return;
-                if (!el) { el = document.createElement('div'); el.className = 'draw-toast'; document.body.appendChild(el); }
-                el.classList.remove('going');
-                el.innerHTML = d.names.map((nm, i) => {
-                    const pot = Object.keys(D.POTIONS).find(k => D.POTIONS[k].name === nm);
-                    return '<div class="dcard' + (pot ? ' potion' : '') + '" style="animation-delay:' + (i * 0.12) + 's">' +
-                        esc(nm) + '</div>';
-                }).join('');
-                clearTimeout(t);
-                t = setTimeout(() => el.classList.add('going'), 2800);
+                afterTheDie(() => {
+                    if (!el) { el = document.createElement('div'); el.className = 'draw-toast'; document.body.appendChild(el); }
+                    el.classList.remove('going');
+                    el.innerHTML = d.names.map((nm, i) => {
+                        const pot = Object.keys(D.POTIONS).find(k => D.POTIONS[k].name === nm);
+                        return '<div class="dcard' + (pot ? ' potion' : '') + '" style="animation-delay:' + (i * 0.12) + 's">' +
+                            esc(nm) + '</div>';
+                    }).join('');
+                    clearTimeout(t);
+                    t = setTimeout(() => el.classList.add('going'), 2800);
+                });
             },
             reset(state) { primed = false; if (state) this.saw(state); }
         };
@@ -8165,8 +8477,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* and the card saying whose turn it is has gone.                       */
     /* ------------------------------------------------------------------ */
 
+    // Run `fn` once no die is in the air or lying on the table, hurrying
+    // one that is only lying there off it.
+    function afterTheDie(fn) {
+        if (!DICE.busy() && !DICE.showing()) { fn(); return; }
+        DICE.hurry();
+        setTimeout(() => afterTheDie(fn), 120);
+    }
+
     const settleQueue = [];
-    function tableBusy() { return DICE.busy() || WALK.busy() || TURN.busy() || BEND.busy(); }
+    function tableBusy() { return DICE.busy() || WALK.busy() || BANNERS.busy(); }
     function whenSettled(fn) { if (!tableBusy()) fn(); else settleQueue.push(fn); }
     function afterSettle() {
         if (tableBusy()) return;
@@ -8217,13 +8537,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 '<span class="sq-pic">' + A.squareSvg(sq.pic) + '</span>' +
                 squareTag(sq) + '</button>';
         });
-        const ar = D.SQUARES[D.ARENA];
-        html += '<button class="hot arena" data-sq="' + D.ARENA + '" style="left:' + (ar.col * CW + 0.6).toFixed(3) + '%;top:' +
-            (ar.row * CH + 0.4).toFixed(3) + '%;width:' + (ar.colSpan * CW - 1.2).toFixed(3) + '%;height:' +
-            (ar.rowSpan * CH - 0.8).toFixed(3) + '%" aria-label="Fenrirak’s Arena">' +
+        // The castle and the Merchant's stall, where art.js drew them on the
+        // 1200 x 700 board.
+        const box = b => 'left:' + (b.x / 12).toFixed(3) + '%;top:' + (b.y / 7).toFixed(3) + '%;width:' +
+            (b.w / 12).toFixed(3) + '%;height:' + (b.h / 7).toFixed(3) + '%';
+        html += '<button class="hot arena" data-sq="' + D.ARENA + '" style="' + box(A.ARENA_BOX) + '" aria-label="Fenrirak’s Arena">' +
             '<span class="hot-label">Fenrirak’s Arena</span></button>';
-        // The Merchant's stall (drawn in art.js at 940,432 on the 1200 x 700 board).
-        html += '<button class="hot merchant" id="merchant-hot" style="left:78.6%;top:61.8%;width:12.4%;height:15%" ' +
+        html += '<button class="hot merchant" id="merchant-hot" style="' + box(A.MERCHANT_BOX) + '" ' +
             'aria-label="The Merchant"><span class="hot-label">Merchant</span></button>';
         html += '<div class="tokens" id="tokens"></div>';
         board.innerHTML = html;
@@ -8535,13 +8855,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const t = timerState();
         el.classList.remove('low', 'untimed');
         if (!t) { el.innerHTML = '<div class="tlabel">Turn timer</div>'; return; }
+        const track = '<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" style="stroke:var(--btn2-top)" stroke-width="7"/></svg>';
         if (t.untimed) {
             el.classList.add('untimed');
-            el.innerHTML = '<div class="ring"><b>∞</b></div><div class="tlabel">Untimed — single player</div>';
+            el.innerHTML = '<div class="ring">' + track + '<b>Off</b></div><div class="tlabel">Untimed — single player</div>';
             return;
         }
         if (t.enemy) {
-            el.innerHTML = '<div class="ring"><b>⚔</b></div><div class="tlabel">Enemy’s move</div>';
+            el.innerHTML = '<div class="ring">' + track + '<b>' + A.ICONS.sword(30) + '</b></div><div class="tlabel">Enemy’s move</div>';
             return;
         }
         const frac = t.left / t.limit;
@@ -8585,9 +8906,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             h += btn('a-ability', esc(ab.name), '', !can.ok, can.ok ? ab.text : can.why, st.text);
             h += btn('a-merchant', 'Merchant', '', E.inBattle(S, p.id), 'Buy potions and gear', 'any time');
             h += btn('a-trade', 'Trade', '', !(free), 'Offer another player a trade', 'your turn');
-            h += btn('a-end', 'End turn', '', !(free && p.hasMoved), p.hasMoved ? '' : 'Roll to move first');
-        }
-        h += btn('a-guide', 'How to play', 'ghost', false);
+            h += btn('a-guide', 'How to play', 'ghost', false);
+            h += btn('a-end', 'End turn', 'primary span2', !(free && p.hasMoved), p.hasMoved ? '' : 'Roll to move first');
+        } else h += btn('a-guide', 'How to play', 'ghost', false);
         h += '</div><div class="act-row">';
         if (isHost() && !isSolo()) {
             h += btn('a-pause', S.paused ? 'Resume' : 'Pause', 'small', false);
@@ -8613,15 +8934,29 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         bind('a-leave', confirmLeave);
     }
 
+    // Newest on top. Reading at the top, you see each new line arrive;
+    // scrolled further down, you keep your place while new lines go in
+    // above it.
+    function logLines(lines) {
+        return lines.slice().reverse().map(l => '<div class="t-' + esc(l.tone || 'info') + '" data-n="' + l.n + '">' +
+            colourNames(l.t) + '</div>').join('');
+    }
+
     let logSeen = 0;
     function renderLog() {
         const el = $('#log');
-        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
         const last = S.log.length ? S.log[S.log.length - 1].n : 0;
         if (last === logSeen && el.childElementCount) return;
+        const before = logSeen, from = el.scrollTop;
         logSeen = last;
-        el.innerHTML = S.log.map(l => '<div class="t-' + esc(l.tone || 'info') + '">' + colourNames(l.t) + '</div>').join('');
-        if (atBottom || el.childElementCount < 6) el.scrollTop = el.scrollHeight;
+        el.innerHTML = logLines(S.log);
+        if (from < 30) { el.scrollTop = 0; return; }
+        let added = 0;
+        for (const row of el.children) {
+            if (+row.getAttribute('data-n') <= before) break;
+            added += row.offsetHeight;
+        }
+        el.scrollTop = from + added;
     }
 
     /* ------------------------------------------------------------------ */
@@ -8948,6 +9283,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (tableBusy()) { whenSettled(() => {}); return; }
         const p = me();
         const b = S.battle;
+        // Nor over a die that has landed: it is read, it goes, then the
+        // question (or the fight) goes up. Its going calls this again.
+        const wants = b || (p && S.pending && S.pending.playerId === p.id) ||
+            (p && (S.trades || []).some(t => t.toId === p.id && t.status === 'open'));
+        if (wants && DICE.showing()) { DICE.hurry(); return; }
         if (b) { renderBattle(); return; }
         selTarget = null;
         if (p && S.pending && S.pending.playerId === p.id) { renderPending(); return; }
@@ -8994,7 +9334,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const pas = D.ENEMIES[u.enemyId].passives || [];
             if (pas.length) {
                 const off = E.tranquil(b, u.side);
-                passives = pas.map(x => '<div class="passives' + (off && !x.untouchable ? ' off' : '') + '" title="' + esc(x.text) + '">✦ ' +
+                passives = pas.map(x => '<div class="passives' + (off && !x.untouchable ? ' off' : '') + '" title="' + esc(x.text) + '">Passive: ' +
                     esc(x.name) + '</div>').join('');
             }
         }
@@ -9004,6 +9344,30 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             hpBarHtml({ hp: o.hp, maxHp: o.maxHp, bonusHp: o.bonusHp }, u.kind === 'ally' ? 'ally' : '') +
             '<div class="energy-row">' + pips.join('') + '<span class="en">' + u.energy + ' energy</span></div>' +
             '<div class="chips">' + buffChips(E.buffsOf(S, u)) + '</div>' + passives + '</div>' + pop + '</div>';
+    }
+
+    // A fighter's stat card: what it is printed with, as the class, the
+    // Barbarian or the monster card in the box has it.
+    function unitCardHtml(b, u) {
+        let name, hp, defence, moves, extra = '';
+        if (u.kind === 'enemy') {
+            const e = D.ENEMIES[u.enemyId];
+            name = e.name; hp = E.enemyMaxHp(S, u.enemyId); defence = e.defence; moves = e.moves;
+            extra = (e.passives || []).map(x => '<div class="p-move"><b>' + esc(x.name) + '</b> (Passive): <span class="p-small">' +
+                esc(x.text) + '</span></div>').join('');
+        } else if (u.kind === 'ally') {
+            name = D.BARBARIAN.name; hp = E.barbarianMaxHp(S); defence = D.BARBARIAN.defence; moves = D.BARBARIAN.moves;
+        } else {
+            const pl = E.player(S, u.pid);
+            const c = D.CLASSES[pl.cls];
+            name = c.name; hp = E.maxHpFor(S, pl); defence = c.defence; moves = c.moves;
+            extra = '<div class="p-sec">Ability: ' + esc(c.ability.name) + '</div><div class="p-small">' + esc(c.ability.text) + '</div>';
+        }
+        const moveHtml = moves.map(moveLine).join('');
+        return '<div class="paper unit-card"><div class="p-name">' + esc(name) + '</div>' +
+            '<div class="p-row"><span>HP: ' + hp + '</span><span>Defence: ' + defence + (b.kind === 'pvp' ? ' (PvP base)' : '') + '</span></div>' +
+            (u.kind === 'enemy' ? extra : '') + '<div class="p-sec">Moves</div>' + moveHtml +
+            (u.kind === 'enemy' ? '' : extra) + '</div>';
     }
 
     function moveSumHtml(b, u, tgt, m) {
@@ -9038,7 +9402,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (sig !== modalSig) {
                 modalSig = sig;
                 $('#modal').className = 'modal';
-                $('#modal').innerHTML = '<div class="mini-bar">⚔ ' + colourNames(whatIsHappening()) +
+                $('#modal').innerHTML = '<div class="mini-bar">' + A.ICONS.sword(18) + '<span>' + colourNames(whatIsHappening()) + '</span>' +
                     '<button class="btn small" id="b-show">Watch</button></div>';
                 bind('b-show', () => { miniBattle = null; modalSig = ''; renderModal(); });
             }
@@ -9059,8 +9423,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             (b.kind === 'boss' ? ' · Fenrirak, then you, then Oblivion Mage Helen' : '') + '</div>';
         const sideA = b.units.filter(u => u.side === 'A');
         const sideB = b.units.filter(u => u.side === 'B');
-        h += '<div class="battle-field"><div class="side">' + sideA.map(u => fighterHtml(b, u)).join('') + '</div>' +
-            '<div class="vs">VS</div><div class="side">' + sideB.map(u => fighterHtml(b, u)).join('') + '</div></div>';
+        // Every fighter with its stat card straight under it, as The Thunder
+        // Dragon has them: your class, your Barbarian, the monster.
+        const column = list => list.map(u => '<div class="fighter-wrap">' + fighterHtml(b, u) + unitCardHtml(b, u) + '</div>').join('');
+        h += '<div class="battle-field"><div class="side">' + column(sideA) + '</div>' +
+            '<div class="vs">VS</div><div class="side">' + column(sideB) + '</div></div>';
 
         // Whose blow it is.
         let status, mineNow = false;
@@ -9089,15 +9456,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         }
         if (myStep) h += battleControls(b, cur, p);
 
-        // The fight's own log.
+        // The fight's own log, newest on top.
         const lines = S.log.filter(l => l.n > b.logFrom);
-        h += '<div class="battle-log" id="battle-log">' + (lines.length ? lines.map(l => '<div class="t-' + esc(l.tone) + '">' +
-            colourNames(l.t) + '</div>').join('') : '<div class="t-muted">The fight begins.</div>') + '</div>';
+        h += '<div class="battle-log" id="battle-log">' + (lines.length ? logLines(lines) :
+            '<div class="t-muted">The fight begins.</div>') + '</div>';
         h += '</div>';
 
         if (showModal(h, 'wide', sig)) {
             const bl = $('#battle-log');
-            if (bl) bl.scrollTop = bl.scrollHeight;
+            if (bl) bl.scrollTop = 0;
             bind('b-hide', () => { miniBattle = bid; modalSig = ''; renderModal(); });
             bind('b-order', () => act('battleOrderRoll'));
             $$('[data-ask]').forEach(x => x.addEventListener('click', () => act('battleAnswer', { choice: x.getAttribute('data-ask') })));
@@ -9186,9 +9553,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     /* ---- the questions your square asks -------------------------------- */
 
+    // Where a choice of move lands, in a word or two.
+    function shortWalk(w) {
+        const sq = D.SQUARES[w.pos];
+        switch (w.outcome) {
+            case 'split': return 'Route Split' + (w.remaining ? ' +' + w.remaining : '');
+            case 'shield': return 'The shield!';
+            case 'arena': return 'The arena';
+            case 'stop': return sq.name + ' (STOP)';
+            default: return sq.name;
+        }
+    }
+
     function walkLabel(w, p) {
         const sq = D.SQUARES[w.pos];
         switch (w.outcome) {
+            case 'stop': return walkLabel(Object.assign({}, w, { outcome: 'landed' }), p) + ' — a STOP: your move ends there';
             case 'split': {
                 if (!p || !w.remaining) return 'Route Split \u2014 then choose a route';
                 const at = Object.assign({}, p, { pos: w.pos, route: null });
@@ -9221,25 +9601,28 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         let h = '';
         switch (pend.type) {
             case 'move': {
-                h += '<h2>You rolled a ' + pend.raw + '</h2><div class="sub">How far do you move? ' +
-                    (pend.sources.length ? 'Bonuses and costs: ' + esc(pend.sources.join(', ')) + '.' : '') +
-                    ' The squares you could land on are marked on the board.</div><div class="choice-grid">';
+                // Kept small: the board it is asking about has to stay in view.
+                // Each choice names where it lands; the whole story is in its
+                // tooltip and lit up on the board.
+                h += '<div class="move-ask"><h2>You rolled a ' + pend.raw + ' — how far?</h2>' +
+                    (pend.sources.length ? '<div class="sub">' + esc(pend.sources.join(' · ')) + '</div>' : '') +
+                    '<div class="move-grid">';
                 for (let t = pend.min; t <= pend.max; t++) {
                     const w = t ? E.previewWalk(S, p, t, null) : null;
-                    h += '<button class="choice-btn' + (t === pend.raw + pend.fixed ? ' primary' : '') + '" data-total="' + t + '">' +
-                        '<span class="big-n">' + t + '</span><span>' + esc(w ? walkLabel(w, p) : 'Stay where you are') + '</span></button>';
+                    h += '<button class="move-pick' + (t === pend.raw + pend.fixed ? ' primary' : '') + '" data-total="' + t + '" title="' +
+                        esc(w ? walkLabel(w, p) : 'Stay where you are') + '"><b>' + t + '</b><span>' + esc(w ? shortWalk(w) : 'Stay put') + '</span></button>';
                 }
-                h += '</div>';
+                h += '</div></div>';
                 break;
             }
             case 'route': {
                 const main = pend.remaining ? E.previewWalk(S, p, pend.remaining, 'main') : null;
                 const long = pend.remaining ? E.previewWalk(S, p, pend.remaining, 'long') : null;
                 h += sqPicHtml(D.SPLIT) + '<h2>Route Split</h2><div class="sub">' + esc(pend.prompt) + '</div><div class="choice-grid">' +
-                    '<button class="choice-btn" data-route="main"><b>↑ The main route</b><span>Short and walled. Soldier Patrol (Pendant ' +
+                    '<button class="choice-btn" data-route="main"><b>The main route</b><span>Short and walled. Soldier Patrol (Pendant ' +
                     'Fragment #1), Roan’s Tavern, Commoner’s Quarter, Darkwood Pass, Breson’s Bakery.</span>' +
                     (main ? '<span class="gold" style="margin-top:6px">Your ' + plural(pend.remaining, 'space') + (pend.remaining === 1 ? ' lands on: ' : ' land on: ') + esc(walkLabel(main)) + '</span>' : '') + '</button>' +
-                    '<button class="choice-btn" data-route="long"><b>← The long route</b><span>Longer and more dangerous, with the richest ' +
+                    '<button class="choice-btn" data-route="long"><b>The long route</b><span>Longer and more dangerous, with the richest ' +
                     'rewards: the Thieves’ Guild, the orc camps, The Thorned Pyrite and Astrix’s Alchemy. No Fragment #1 this way.</span>' +
                     (long ? '<span class="gold" style="margin-top:6px">Your ' + plural(pend.remaining, 'space') + (pend.remaining === 1 ? ' lands on: ' : ' land on: ') + esc(walkLabel(long)) + '</span>' : '') + '</button>' +
                     '</div>';
@@ -9297,7 +9680,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 h += '<h2>' + esc(pend.type) + '</h2><div class="modal-actions"><button class="btn primary" data-roll="1">OK</button></div>';
         }
         const dock = pend.type === 'move' || pend.type === 'route' || pend.type === 'optional';
-        if (showModal(h, pend.type === 'astrix' || dock ? 'mid' : '', sig, dock)) {
+        if (showModal(h, pend.type === 'move' ? 'compact' : (pend.type === 'astrix' || dock ? 'mid' : ''), sig, dock)) {
             $$('[data-total]').forEach(x => {
                 const t = +x.getAttribute('data-total');
                 x.addEventListener('click', () => act('resolvePending', { choice: t }));
@@ -9395,6 +9778,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             ' <span class="p-small">(' + m.energy + ' Energy)</span>' + (m.text ? '<br><span class="p-small">' + esc(m.text) + '</span>' : '') + '</div>';
     }
 
+    // A monster's card. Its health, defence, passives and attacks are a
+    // secret until you have fought it yourself; what it leaves behind is
+    // not, because that is why you would go looking for it.
     function enemyCardHtml(id) {
         const e = D.ENEMIES[id];
         const hp = S ? E.enemyMaxHp(S, id) : e.hp;
@@ -9403,16 +9789,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (e.loot.gold) loot.push((S ? E.payout(S, e.loot.gold) : e.loot.gold) + ' Gold');
             if (e.loot.fragment) loot.push('Pendant Fragment #' + e.loot.fragment);
             if (e.loot.keys) loot.push(plural(e.loot.keys, 'Chest Key'));
-            if (e.loot.chest) loot.push('a Monster Chest (1 Chest Key → 1 Gemstone)');
+            if (e.loot.chest) loot.push('a Monster Chest (open it with 1 Chest Key for 1 Gemstone)');
             if (e.loot.joins) loot.push('he follows you as your Barbarian (Ally)');
         }
         const art = enemyPic(id);
+        const lootHtml = loot.length ? '<div class="p-sec">Loot</div><div>' + esc(loot.join(', ')) + '</div>' : '';
+        if (!E.hasFought(me(), id)) {
+            return '<div class="enemy-card unknown"><div class="art">' + art + '</div><div class="paper">' +
+                '<div class="p-name">' + esc(e.name) + '</div>' +
+                '<div class="p-hidden">Health, defence and attacks: unknown until you have fought here yourself.</div>' +
+                lootHtml + '</div></div>';
+        }
         return '<div class="enemy-card"><div class="art">' + art + '</div><div class="paper">' +
             '<div class="p-name">' + esc(e.name) + '</div>' +
             '<div class="p-row"><span>HP: ' + hp + (hp !== e.hp ? ' <span class="p-small">(' + e.hp + ' printed)</span>' : '') + '</span><span>Defence: ' + e.defence + '</span></div>' +
             (e.passives || []).map(x => '<div class="p-move"><b>' + esc(x.name) + '</b> (Passive): <span class="p-small">' + esc(x.text) + '</span></div>').join('') +
-            '<div class="p-sec">Moves</div>' + e.moves.map(moveLine).join('') +
-            (loot.length ? '<div class="p-sec">Loot</div><div>' + esc(loot.join(', ')) + '</div>' : '') +
+            '<div class="p-sec">Moves</div>' + e.moves.map(moveLine).join('') + lootHtml +
             '</div></div>';
     }
 
@@ -9737,7 +10129,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             ' defeated Fenrirak and Oblivion Mage Helen.</div></div>' +
             '<div class="muted">Game time ' + fmtClock(S.finishedPlayMs || E.playTimeMs(S, Date.now())) + ' · ' + plural(S.turnNo | 0, 'round') + '</div>' +
             '<table><tr><th>Player</th><th>Class</th><th>Fragments</th><th>Gold</th><th>Gems</th><th>Monsters beaten</th><th>Deaths</th></tr>' +
-            rows.map(p => '<tr><td style="color:' + seatColour(p.id) + '">' + esc(p.name) + (p.id === S.winner ? ' ★' : '') + '</td><td>' + className(p.cls) +
+            rows.map(p => '<tr><td style="color:' + seatColour(p.id) + '">' + esc(p.name) + (p.id === S.winner ? ' <span class="chip good">Winner</span>' : '') + '</td><td>' + className(p.cls) +
                 '</td><td>' + p.fragments.length + '</td><td>' + p.gold + '</td><td>' + p.gems + '</td><td>' + (p.kills | 0) + '</td><td>' + (p.deaths | 0) + '</td></tr>').join('') +
             '</table><button class="btn primary" id="over-home">Back to the start</button></div>';
         bind('over-home', () => backHome(''));
@@ -9758,8 +10150,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 '<b>Walk me through it</b><span>The real screen on your real turn, lit up one thing at a time — including how to click ' +
                 'a square to read what it does.</span><i>' + (blocked ? esc(blockedLabel(blocked)) : 'Live · press each button for real') + '</i></button>' +
                 '<button class="guide-pick-card" id="gp-rules">' + A.ICONS.pendant([1, 2, 3, 4, 5], 26) +
-                '<b>Read the rules</b><span>The whole rulebook on one page: every square, every class and enemy, fighting, potions, ' +
-                'the Barbarian and the modifiers.</span><i>Reference · any time</i></button></div></div>', 'mid');
+                '<b>Read the rules</b><span>The whole rulebook on one page: moving, fighting, potions, the Pendant Fragments, ' +
+                'the Barbarian and the three classes.</span><i>Reference · any time</i></button></div></div>', 'mid');
             bind('gp-walk', () => { closePanel(); SPOT.open(); });
             bind('gp-rules', openRules);
         });
@@ -9775,23 +10167,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function rulesHtml() {
-        const sqRows = D.BOARD.filter(s => s.id !== '0').map(s => '<tr><td>' + esc(s.id) + '</td><td>' + esc(s.name) + '</td><td>' +
-            esc(s.text) + '</td></tr>').join('');
         const clsRows = D.CLASS_ORDER.map(id => {
             const c = D.CLASSES[id];
             return '<tr><td><b>' + c.name + '</b></td><td>' + c.hp + '</td><td>' + c.defence + '</td><td>' +
                 c.moves.map(m => esc(m.name) + ' ' + m.damage + ' (' + m.energy + 'E' + (m.cost ? ', −' + m.cost : '') + ')').join('<br>') +
                 '</td><td>' + esc(c.ability.name) + ': ' + esc(c.ability.text) + '</td></tr>';
-        }).join('');
-        const enRows = Object.keys(D.ENEMIES).map(id => {
-            const e = D.ENEMIES[id];
-            const sq = D.BOARD.find(s => s.enemy === id);
-            return '<tr><td><b>' + esc(e.name) + '</b>' + (sq ? '<br><span class="muted">Square ' + sq.id + '</span>' : '<br><span class="muted">The arena</span>') +
-                '</td><td>' + e.hp + '</td><td>' + e.defence + '</td><td>' +
-                e.moves.map(m => esc(m.name) + ' ' + m.damage + ' (' + m.energy + 'E' + (m.cost ? ', −' + m.cost : '') + ')' + (m.text ? ' — ' + esc(m.text) : '')).join('<br>') +
-                (e.passives ? '<br>' + e.passives.map(x => '<i>' + esc(x.name) + ':</i> ' + esc(x.text)).join('<br>') : '') + '</td><td>' +
-                (e.loot ? esc([e.loot.gold ? e.loot.gold + ' Gold' : '', e.loot.fragment ? 'Fragment #' + e.loot.fragment : '',
-                    e.loot.keys ? e.loot.keys + ' Key' : '', e.loot.chest ? 'Monster Chest' : '', e.loot.joins ? 'joins you' : ''].filter(Boolean).join(', ')) : '') + '</td></tr>';
         }).join('');
         return '<div class="rules"><h2>' + A.ICONS.flame(26) + 'The Oblivion Dragon — the rules</h2>' +
             '<p class="lore">Fenrirak has been controlled by Oblivion Mage Helen in Thornwick, the secret kingdom. The players are competing to stop ' +
@@ -9806,16 +10186,19 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             'Forsaken Road’s −3, always apply. A roll can never go below 0.</p>' +
             '<p><b>Click any square on the board to read exactly what it does.</b> The board only shows each square’s name and picture.</p>' +
             '<h3>Squares and stops</h3><p>Land on a square and do what it says. Damage done directly by a square cannot be reduced by defence or ' +
-            'potions. <b>STOP</b> (the Route Split): you must stop there, choose a route, then carry on with the rest of your roll. <b>Optional ' +
+            'potions. <b>STOP</b>: you must stop there, however far you rolled. At the Route Split you choose a route, then carry on with ' +
+            'the rest of your roll; at Orc’s Outpost your move ends and you fight the Orc Scouts. <b>Optional ' +
             'stop</b> (the Royal Cleric’s Temple): choose whether to stop and do it, or carry on. The main route is short and the only way to ' +
             'Pendant Fragment #1; the long route is longer and more dangerous, with the richest rewards.</p>' +
+            '<p><b>Gold you do not have.</b> When a square or a roll takes more Gold than you are carrying, you hand over all you have and ' +
+            'take the rest as damage: 1 damage for every Gold you are short.</p>' +
             '<h3>Weapons and armour</h3><p>One weapon and one armour at a time. You may change each once a turn, never during a battle. Starter ' +
             'gear breaks after 10 uses. Item cards are locked to your class.</p>' +
             '<h3>Abilities</h3><p>On your own turn (also during a battle on your turn), roll a die: even and it works; odd and it fails. A success can ' +
             'only happen once every 3 of your turns; a failure costs nothing but you can only try once a turn.</p>' +
             '<h3>Battles</h3><p>Everybody starts a battle on 1 energy and gains 1 after each of their turns. Every attack lands — there is no ' +
-            'roll to hit. Choose an attack you have the energy for; “minus N energy” is taken off when you use it. Order: choose attack → ' +
-            'pay energy → deal damage → next fighter. You always attack first, except in the final battle (Fenrirak, then you, then Helen). ' +
+            'roll to hit. Choose an attack you have the energy for; “minus N energy” is taken off when you use it. Each blow goes: choose ' +
+            'an attack, pay its energy, deal the damage, then the next fighter. You always attack first, except in the final battle (Fenrirak, then you, then Helen). ' +
             'A battle is played to the finish before your turn moves on, and your energy goes back to 1 afterwards. Enemies always use the highest ' +
             'energy attack they can afford.</p>' +
             '<p><b>Damage</b> = (Base + Attack Abilities + Potions/Modifiers) − (Defence + Defensive Abilities + Defence Potions/Modifiers). ' +
@@ -9824,7 +10207,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<h3>Death</h3><p>At 0 HP you go back to the Start with everything you own and full health. Every time you land on Start you get a ' +
             'Special Potion (+10 HP) — only one at a time — and every monster you beat comes back to life.</p>' +
             '<h3>Monsters</h3><p>Land on a monster’s square to fight it. Monsters start every battle on full health and 1 energy and their ' +
-            'abilities are on from the start. Some leave a Monster Chest: 1 Chest Key opens it for 1 Gemstone.</p>' +
+            'abilities are on from the start. A monster’s health, defence and attacks stay hidden until you have fought it yourself; ' +
+            'after that its square shows its whole stat card. Some leave a Monster Chest: 1 Chest Key opens it for 1 Gemstone.</p>' +
             '<h3>The Barbarian</h3><p>Beat the Barbarian at the Adventurers’ Inn and he follows you as your Barbarian (Ally): he fights at your ' +
             'side in every battle, you choose his attacks, and you can give him Barbarian gear. Monsters take turns striking you and him. There is ' +
             'only one: while he follows somebody, nobody else can fight him for Pendant Fragment #2. If his player dies (or he is struck down) he ' +
@@ -9840,11 +10224,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<h3>Trading and the Merchant</h3><p>Only Gold, Pendant Fragments, Potions, Gemstones, Weapons and Armour can be traded, and both sides ' +
             'must agree. The Merchant is open any time except during your battles (click his stall on the board). Astrix’s Alchemy only sells ' +
             'to whoever is standing on it.</p>' +
-            '<h3>Modifiers</h3><ul>' + D.MODIFIERS.map(m => '<li><b>' + esc(m.name) + '</b> (' + m.side + '): ' + esc(m.text) + '</li>').join('') +
-            '</ul><p class="muted">' + esc(D.HALVING_NOTE) + '</p>' +
-            '<h3>Characters</h3><table><tr><th>Class</th><th>HP</th><th>DEF</th><th>Moves</th><th>Ability</th></tr>' + clsRows + '</table>' +
-            '<h3>Enemies</h3><table><tr><th>Enemy</th><th>HP</th><th>DEF</th><th>Moves and abilities</th><th>Loot</th></tr>' + enRows + '</table>' +
-            '<h3>Every square</h3><table><tr><th>#</th><th>Square</th><th>What it does</th></tr>' + sqRows + '</table></div>';
+            '<h3>Characters</h3><table><tr><th>Class</th><th>HP</th><th>DEF</th><th>Moves</th><th>Ability</th></tr>' + clsRows + '</table></div>';
     }
 
     /* ---- the walkthrough ------------------------------------------------
@@ -9874,10 +10254,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 { id: 'turn-timer', title: 'The turn timer', body: isSolo() ? 'Playing on your own there is no clock.' :
                     'Each turn has 90 seconds. Away too long and the turn is skipped; in a fight, the clock plays your strongest attack for you.' },
                 { id: 'board', title: 'The board', body: 'Every square shows only its name and picture. Your piece is ringed in gold. The main route goes ' +
-                    'up between the walls; the long route winds round the mountain. The castle in the middle is Fenrirak’s Arena, behind the ' +
+                    'up beside the wall; the long route winds round the mountain. The castle in the middle is Fenrirak’s Arena, behind the ' +
                     'Oblivion Mage’s purple shield.' },
                 { id: 'board', title: 'Click a square', square: true, body: '<b>Click any square on the board now</b> to see what it does — ' +
-                    'its full description, and for a monster, its whole stat card. Close the card when you have read it and the tour carries on.' },
+                    'its full description, and what a monster leaves behind. A monster’s own numbers stay hidden until you have fought it. ' +
+                    'Close the card when you have read it and the tour carries on.' },
                 { id: 'a-roll', title: 'Roll & move', live: true, body: 'Press it for real. One die decides how far you walk; if anything adds to ' +
                     'or takes from it, you choose how far once it lands, with the squares you could reach marked on the board.' },
                 { id: 'a-ability', title: ab ? ab.name : 'Your ability', live: true, body: ab ? esc(ab.text) + ' Roll even to use it; once every 3 of your turns.' : '' },
@@ -9889,7 +10270,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 { id: 'list-weapons', title: 'All your weapons', body: 'Best on top, the same way.' },
                 { id: 'list-potions', title: 'Potions', body: 'Speed potions (movement) on top, then best. Drink movement potions before you roll, ' +
                     'battle potions during a fight.' },
-                { id: 'log-card', title: 'The game log', body: 'Everything that has happened, in order.' },
+                { id: 'log-card', title: 'The game log', body: 'Everything that has happened, the newest at the top.' },
                 { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles — or click his stall on the board.' },
                 { id: 'a-trade', title: 'Trade', live: true, body: 'Offer another player Gold, Fragments, Potions, Gemstones, Weapons or Armour.' },
                 { id: 'a-end', title: 'End turn', live: true, body: 'Press it when you are done. This is the last stop of the tour.' }
@@ -10067,6 +10448,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     function resetWatchers(state) {
         DICE.reset(state);
+        BANNERS.reset();
         TURN.reset();
         BEND.reset(state);
         ZAP.reset(state);
@@ -10151,7 +10533,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (panel) closePanel();
             SPOT.close();
             // Let the last blow and the banner play before the curtain.
-            setTimeout(() => { if (S && S.phase === 'over') { showScreen('screen-over'); renderOver(); } }, BEND.busy() ? 2600 : 600);
+            whenSettled(() => setTimeout(() => { if (S && S.phase === 'over') { showScreen('screen-over'); renderOver(); } }, 500));
             reapFinishedRoom();
         } else {
             showScreen('screen-game');
