@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Legend of Fenrirak | The Oblivion Dragon — Play Online</title>
+    <title>Legend of Fenrirak | The Oblivion Dragon: Play Online</title>
 
     <link rel="icon" type="image/png" href="Favicon.png">
     <link rel="apple-touch-icon" href="Favicon.png">
@@ -20,7 +20,7 @@
     <meta name="description"
         content="Play Legend of Fenrirak™, The Oblivion Dragon online with up to 6 players, or against the computer.">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Legend of Fenrirak | The Oblivion Dragon — Play Online">
+    <meta property="og:title" content="Legend of Fenrirak | The Oblivion Dragon: Play Online">
     <meta property="og:description" content="Play Legend of Fenrirak™, The Oblivion Dragon online with up to 6 players, or against the computer.">
     <meta property="og:url" content="https://fenrirak.github.io/Legend-of-Fenrirak/Oblivion%20Dragon.html">
     <meta property="og:site_name" content="Legend of Fenrirak">
@@ -669,7 +669,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Comfortaa:wght@400;600&family=Cutive+Mono:wght@400&display=swap');
 
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
    style.css
    ========================================================================= */
 
@@ -693,7 +693,7 @@
     --bg-top: #0a080c;              /* the table under everything */
     --bg-mid: #060606;
     --bg-bottom: #030303;
-    --flame: #4a1a6a;               /* the flames in the background and the embers */
+    --flame: #590016;               /* the flames in the background and the embers */
     --title: #a274d4;               /* the main header: one solid violet, no gradient */
     --gold: rgb(217, 163, 92);
     --gold-bright: rgb(242, 204, 143);
@@ -1013,10 +1013,19 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .board-scroll { width: 100%; }
 /* The reminder under the board that its squares can be read. */
 .board-note {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin: 10px 0 0; font-size: 13px; color: var(--muted); text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: fit-content; max-width: 100%; margin: 12px auto 0; padding: 6px 16px 6px 6px;
+    font-size: 14px; color: var(--cream); text-align: left;
+    background: color-mix(in srgb, var(--accent) 26%, transparent);
+    border: 1px solid var(--btn-edge); border-radius: 999px;
 }
-.board-note svg { width: 17px; height: 17px; flex: none; fill: none; stroke: var(--accent-soft); stroke-width: 2; stroke-linecap: round; }
+.board-note b { color: var(--marker); }
+.board-note .bn-icon {
+    width: 28px; height: 28px; flex: none; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--marker); color: var(--marker-ink);
+}
+.board-note .bn-icon svg { width: 17px; height: 17px; fill: currentColor; stroke: none; }
 .board {
     position: relative;
     width: 100%;
@@ -1212,7 +1221,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .hp-bar.ally .fill { background: linear-gradient(180deg, #f0a46a, #b0602c); }
 /* Three across when the card has room for them, two when it is narrow (a
    1280px screen), so "Chest Keys" and "Deaths" are never cut off. */
-.profile { container-type: inline-size; }
+/* (the container is the block above the Barbarian: a container cannot
+   also be a subgrid, and the profile card is one when he follows you) */
+.prof-main { container-type: inline-size; }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .stat { background: rgba(0, 0, 0, .25); border-radius: 8px; padding: 6px 8px; display: flex; align-items: center; gap: 6px; font-size: 13px; min-width: 0; }
 .stat > div { min-width: 0; }
@@ -1273,7 +1284,25 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .equip .eq-card .txt { font-size: 12.5px; line-height: 1.35; }
 .equip .eq-card .uses { font-family: 'Cutive Mono', monospace; font-size: 12px; margin-top: 6px; color: #6a1414; }
 .equip .eq-card.empty { background: rgba(0, 0, 0, .25); color: var(--muted); border: 1px dashed #5a4a44; font-family: inherit; box-shadow: none; }
-.equip .barb-line { font-size: 12px; color: var(--muted); }
+.eq-part { display: flex; flex-direction: column; gap: 10px; min-width: 0; flex: 1; }
+.equip .eq-part.barb { flex: none; }
+.equip .eq-part.barb .eq-card { min-height: 0; padding: 8px 10px; }
+.equip .eq-part.barb .eq-card .nm { font-size: 13.5px; }
+.equip .eq-part.barb .eq-card .big { font-size: 16px; }
+.equip .eq-part.barb .eq-card .txt { font-size: 11.5px; }
+.equip .eq-part.barb .eq-card .uses { font-size: 11px; margin-top: 3px; }
+.prof-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* With the Barbarian following you the row splits in two at the dashed
+   line in the middle card: your armour and weapon cards stop level with
+   it, and his take the space below. */
+.g-me.with-barb > .equip, .g-me.with-barb > .profile {
+    grid-row: span 2;
+    display: grid; grid-template-rows: subgrid; row-gap: 0;
+}
+.g-me.with-barb .prof-main { border-bottom: 1px dashed var(--panel-edge); padding-bottom: 12px; }
+.g-me.with-barb .ally-box { border-top: 0; padding-top: 12px; align-self: start; }
+.g-me.with-barb .eq-part.barb { padding-top: 12px; }
 
 /* the three lists */
 .list { display: flex; flex-direction: column; min-width: 0; max-height: 470px; }
@@ -1331,8 +1360,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     position: absolute; top: 12px; right: 12px;
     width: 34px; height: 34px; border-radius: 50%;
     border: 1px solid var(--panel-edge); background: rgba(0, 0, 0, .3); color: var(--cream);
-    font-size: 20px; cursor: pointer; line-height: 1;
+    display: grid; place-items: center; padding: 0; cursor: pointer;
 }
+.x-btn svg { width: 18px; height: 18px; display: block; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .x-btn:hover { border-color: var(--accent-soft); }
 
 .choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
@@ -1433,8 +1463,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     text-align: center; font-size: 15px; color: var(--gold-bright);
     background: rgba(0, 0, 0, .3); border-radius: 10px; padding: 8px; margin-bottom: 10px;
 }
-.battle-status.me { color: var(--btn-ink); background: linear-gradient(180deg, var(--status-top), var(--status-bottom)); font-weight: bold; }
-.battle-status.me span { color: var(--btn-ink) !important; }
+.battle-status.me {
+    display: flex; align-items: center; gap: 14px;
+    background: none; border-radius: 0; padding: 4px 0;
+    font-size: 16px; font-weight: bold; letter-spacing: .3px;
+}
+.battle-status.me::before, .battle-status.me::after { content: ''; flex: 1; height: 1px; background: var(--btn-edge); }
+.battle-status.me > span { color: var(--title); }
 .controls h4 { margin: 10px 0 6px; font-size: 13px; color: var(--muted); font-weight: normal; letter-spacing: .5px; text-transform: uppercase; }
 .targets { display: flex; gap: 6px; flex-wrap: wrap; }
 .targets button {
@@ -1459,8 +1494,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .move-btn .sum { font-size: 11.5px; color: var(--muted); line-height: 1.35; }
 .move-btn .sum b { color: #ffd7a8; }
 .move-btn .fx { font-size: 11.5px; color: #c9b8ff; margin-top: 3px; }
-.bpotions { display: flex; flex-wrap: wrap; gap: 6px; }
-.bpotions .btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 5px 9px; }
+.bpotions { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.bpot {
+    font-family: inherit; text-align: left; color: var(--cream);
+    display: flex; flex-direction: column; gap: 2px;
+    background: linear-gradient(180deg, var(--btn2-top), var(--btn2-bottom));
+    border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; cursor: pointer;
+}
+.bpot b { font-size: 13px; }
+.bpot span { font-size: 12px; line-height: 1.3; color: var(--gold-bright); }
+.bpot i { font-style: normal; font-size: 11px; line-height: 1.3; color: var(--muted); }
+.bpot:hover:not(:disabled) { border-color: var(--accent-soft); }
+.bpot:disabled { opacity: .5; cursor: not-allowed; }
 .limits { font-size: 11.5px; color: var(--muted); margin-left: 6px; }
 .battle-log { margin-top: 12px; max-height: 150px; overflow-y: auto; font-size: 12.5px; line-height: 1.45; background: rgba(0, 0, 0, .28); border-radius: 10px; padding: 8px 10px; }
 .battle-log div { padding: 1px 0; }
@@ -1971,7 +2016,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                         Oblivion Mage Helen has taken Thornwick, the secret kingdom, and Fenrirak
                         answers to her now. Race your rivals through the kingdom, win all five
                         Pendant Fragments to break her shield, and bring down the dragon and the
-                        mage together &mdash; before anybody else does.
+                        mage together.
                     </p>
                     <p class="muted">2 to 6 players online, or on your own against 1 to 5 computer players.</p>
                 </div>
@@ -2013,7 +2058,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 <ol class="home-steps">
                     <li><span class="home-num">1</span><div><b>Roll &amp; move</b><span>One die. Some gear and potions let you add to it or take from it.</span></div></li>
                     <li><span class="home-num">2</span><div><b>Do the square</b><span>Click any square on the board to read exactly what it does.</span></div></li>
-                    <li><span class="home-num">3</span><div><b>Fight for the fragments</b><span>Every attack lands. Spend energy wisely &mdash; heavy attacks cost it.</span></div></li>
+                    <li><span class="home-num">3</span><div><b>Fight for the fragments</b><span>Every attack lands. Spend energy wisely: heavy attacks cost it.</span></div></li>
                     <li><span class="home-num">4</span><div><b>Break the shield</b><span>All five Pendant Fragments open the way to Fenrirak and Helen.</span></div></li>
                 </ol>
                 <div class="home-quickfacts">
@@ -2033,7 +2078,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         <div class="wrap">
             <div class="code-box">
                 <span class="muted" id="code-label">Room code</span>
-                <span class="code" id="lobby-code">&mdash;</span>
+                <span class="code" id="lobby-code"></span>
                 <button class="btn small" id="btn-copy">Copy invite link</button>
                 <button class="btn small danger" id="btn-leave-lobby">Leave</button>
                 <button class="gear-btn" id="btn-mods" title="Modifiers" aria-label="Modifiers" style="display:none"></button>
@@ -2064,8 +2109,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             <section class="g-board">
                 <div class="board-scroll"><div class="board" id="board"></div></div>
                 <p class="board-note">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
-                    <span>Click any square on the board to read its full description.</span>
+                    <span class="bn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 7.6v12.6l3.2-3.1 2.3 5.1 2.4-1.1-2.3-5h4.4z"/><path d="M9.4 2.4v2.2M4.6 4.4l1.6 1.6M2.6 9.2h2.2M14.2 4.4l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+                    <span><b>Click any square</b> on the board to read its full description.</span>
                 </p>
             </section>
 
@@ -2110,8 +2155,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     <script>
 /* ==== game-oblivion/data.js ==== */
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
-   data.js — every number in the game, transcribed from the planning doc
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   data.js: every number in the game, transcribed from the planning doc
    ("Legend of Fenrirak, The Oblivion Dragon/PLANNING ... .md").
 
    Nothing in here does anything. The rules live in engine.js and read from
@@ -2698,7 +2743,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     const BOARD = [
         { id: '0', name: 'Start', row: 6, col: 11, next: ['1'], pic: 'start', action: 'start',
           text: 'Every journey begins here. Every time you land on Start you get a ' +
-                'Special Potion (+10 HP) — you can only carry one at a time.' },
+                'Special Potion (+10 HP). You can only carry one at a time.' },
         { id: '1', name: 'Draw 2 Potion Cards', row: 6, col: 10, next: ['2'], pic: 'potions',
           action: 'draw_potion', count: 2, text: 'Draw 2 potion cards.' },
         { id: '2', name: 'Draw 1 Item Card', row: 6, col: 9, next: ['3'], pic: 'item',
@@ -2929,8 +2974,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     <script>
 /* ==== game-oblivion/art.js ==== */
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
-   art.js — every picture in the game, drawn.
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   art.js: every picture in the game, drawn.
 
    Nothing here is a file. Every character, monster, square and model on
    the board is inline SVG cut the same way The Thunder Dragon's are: flat
@@ -3167,6 +3212,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return '<g ' + K + ' fill="' + fill + '"' + (extra ? ' ' + extra : '') + '>' + body + '</g>';
     }
     function P(d) { return '<path d="' + d + '"/>'; }
+    // grp with an outline of its own thickness. (grp's `extra` cannot change
+    // it: an attribute given twice keeps only the first.)
+    function grpW(fill, sw, body) {
+        return '<g stroke="' + INK + '" stroke-width="' + sw + '" stroke-linejoin="round" stroke-linecap="round" fill="' +
+            fill + '">' + body + '</g>';
+    }
     function line(d, colour, width) {
         return '<path d="' + d + '" fill="none" stroke="' + (colour || INK) + '" stroke-width="' +
             (width || 2) + '" stroke-linecap="round" stroke-linejoin="round"/>';
@@ -3359,6 +3410,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // the near pauldron, spiked
         if (o.pauldron) s += grp('#7d838b', P('M14 40c2-8 14-10 18-2l-2 8H16z')) +
             grp(STEEL_L, P('M18 34l2-6 3 6zM25 32l2-7 3 7z'));
+        // the weapon, its haft through a fist
+        if (o.weapon === 'axe') s += orcAxe(22, 68, -4);
+        if (o.weapon === 'club') s += orcClub(78, 66, -8);
         // fists
         s += grp(d, '<circle cx="22" cy="68" r="6"/><circle cx="78" cy="66" r="6"/>');
         // the head
@@ -3375,11 +3429,24 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return '<g transform="translate(' + o.x + ' ' + o.y + ') scale(' + (o.s || 1) + ')">' + s + '</g>';
     }
 
-    function cleaver(x, y) {
-        return '<g transform="translate(' + x + ' ' + y + ')">' +
-            line('M0 0V22', INK, 5) + line('M0 0V22', '#6a4a2e', 3) +
-            grp(STEEL_L, P('M-6-30h16v30H-6z')) + grp(STEEL, P('M4-26h4v6h-4z')) +
-            line('M-6-30V0', '#eef1f5', 1.6) + '</g>';
+    // A bearded war axe, the blade turned outward, held at (x, y) and leant
+    // `tilt` degrees; and a spiked club. Both drawn upright about the fist.
+    function orcAxe(x, y, tilt) {
+        return '<g transform="translate(' + x + ' ' + y + ') rotate(' + tilt + ')">' +
+            line('M0 16V-58', INK, 7) + line('M0 16V-58', '#6a4a2e', 4.2) +
+            line('M0 6v-4M0-50v-4', '#4a3220', 4.2) +
+            grp(STEEL, P('M-2.4-56c-7-2-13 1-15.6 8-2.2 6.4-1.4 13.6 2.6 18.6 2-6 6-10.6 13-12.6z')) +
+            line('M-15.4-47.6c-1.6 5.4-1 11 1.6 15.4', STEEL_L, 2.2) +
+            grp(STEEL, P('M2.4-52l8 2.6-8 3.4z')) +
+            grp('#4a3220', P('M-3-58h6v5h-6z')) + '</g>';
+    }
+    function orcClub(x, y, tilt) {
+        return '<g transform="translate(' + x + ' ' + y + ') rotate(' + tilt + ')">' +
+            line('M0 14V-24', INK, 7) + line('M0 14V-24', '#7a5232', 4.2) +
+            grp(STEEL, P('M-8-38l-7-1.4 6-4zM-7-48l-6-4 7-1zM8-36l7-.6-6 4.4zM7.4-46.6l6.4-3.4-.6 6.6zM-2-55.4 0-62l2 6.6z')) +
+            grp('#8a6a44', P('M-4.6-22c-5-9-6.4-22-1.6-29.6 3.6-5.4 8.8-5.4 12.4 0 4.8 7.6 3.4 20.6-1.6 29.6z')) +
+            line('M-2-46c0 6 0 12 1 18M3-44c1 5 1 10 0 14', '#6a4a2e', 1.4) +
+            line('M-5.4-25h10.8', INK, 2.6) + line('M-5.4-25h10.8', '#4a3220', 1.4) + '</g>';
     }
 
     function hooded(o) {
@@ -3427,11 +3494,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             hooded({ x: 16, y: 6, s: 1.06, cloak: '#3a2d46', edge: '#211a29', dagger: true, purse: true }) +
             grp('#a7a1ad', P('M62 92c0-6 10-8 13-3 4-5 14-3 13 3z'), 'opacity=".75"'),
 
+        // the one behind with a spiked club, the one in front with his axe
         orc_warriors:
-            orc({ x: 46, y: 8, s: .62, green: '#5c8a38', dark: '#3f6326' }) +
-            cleaver(83, 36) +
-            orc({ x: 2, y: 6, s: .9, pauldron: true, mohawk: true }) +
-            cleaver(20, 50),
+            orc({ x: 46, y: 10, s: .62, green: '#5c8a38', dark: '#3f6326', weapon: 'club' }) +
+            orc({ x: 6, y: 6, s: .9, pauldron: true, mohawk: true, weapon: 'axe' }),
 
         orc_scouts:
             // a bow on the back one, a spear on the front
@@ -3533,8 +3599,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function gemShape(x, y, s, fill) {
-        return at(x, y, s, grp(fill || '#d6365c', P('M-7-3-4-7h8l3 4-7 9z')) +
-            line('M-7-3h14M-4-7-1-3 0 6M4-7 1-3', '#ffffff', .9));
+        const OUT = 'M-9-2-5-7H5L9-2 0 9z';
+        return at(x, y, s,
+            '<path d="' + OUT + '" fill="' + (fill || '#d6365c') + '"/>' +
+            '<path d="M-9-2-5-7-2.5-2zM-2.5-2 0-7 2.5-2zM-9-2h6.5L0 9z" fill="#ffffff" fill-opacity=".38"/>' +
+            '<path d="M2.5-2 5-7 9-2zM9-2H2.5L0 9z" fill="#000000" fill-opacity=".2"/>' +
+            '<path d="M-9-2H9M-5-7-2.5-2 0-7 2.5-2 5-7M-2.5-2 0 9 2.5-2" fill="none" stroke="' + INK + '" stroke-width=".8" stroke-linejoin="round"/>' +
+            '<path d="' + OUT + '" fill="none" stroke="' + INK + '" stroke-width="1.5" stroke-linejoin="round"/>' +
+            '<path d="M-5.6-4.6l.6 1.3 1.3.6-1.3.6-.6 1.3-.6-1.3-1.3-.6 1.3-.6z" fill="#ffffff"/>');
     }
 
     function thornBush(x, y, s) {
@@ -3558,14 +3630,47 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '</g>';
     }
 
+    // A flower head: a ring of petals round a yellow middle.
+    function flower(x, y, r, col) {
+        let p = '';
+        for (let i = 0; i < 5; i++) {
+            const a = (-90 + i * 72) * Math.PI / 180;
+            p += '<circle cx="' + (x + r * .62 * Math.cos(a)).toFixed(2) + '" cy="' + (y + r * .62 * Math.sin(a)).toFixed(2) + '" r="' + (r * .55).toFixed(2) + '"/>';
+        }
+        return grpW(col, .8, p) + dot(x, y, r * .38, '#f4d23c');
+    }
+    function tulip(x, y, h, col) {
+        return line('M' + x + ' ' + y + 'v-' + h, '#3f7d3a', 1.2) +
+            grpW(col, .8, P('M' + (x - 1.8) + ' ' + (y - h - 3.2) + 'l1 1.4.8-1.6.8 1.6 1-1.4v2.2c0 1.6-.8 2.4-1.8 2.4s-1.8-.8-1.8-2.4z'));
+    }
+    // A wild hop cone, hanging.
+    function hop(x, y) {
+        return grpW('#b8d86a', .9, P('M' + x + ' ' + y + 'c2.2 0 2.8 2.6 1.6 5.2-.6 1.2-1 1.8-1.6 2.4-.6-.6-1-1.2-1.6-2.4-1.2-2.6-.6-5.2 1.6-5.2z')) +
+            line('M' + (x - 1.2) + ' ' + (y + 2.6) + 'h2.4M' + (x - 1) + ' ' + (y + 4.8) + 'h2', '#7a9a3a', .7);
+    }
+    function hopLeaf(x, y, r) {
+        return '<g transform="translate(' + x + ' ' + y + ') rotate(' + r + ')">' +
+            grpW('#4a8a3a', .9, P('M0 0c-2.6-1-3.6-3.6-2-5.6.6 1 1.4 1.4 2 1.2.2-1.6 1.4-2.6 2.2-2.6 0 1.4.6 2.4 1.8 2.6.8 2.6-1.4 4.6-4 4.4z')) + '</g>';
+    }
+
     const SQUARE_ART = {
+        // The Start: a stone gateway with the road running out through it,
+        // a red banner flying over the arch and a torch burning either side.
         start:
-            grp('#8e877c', P('M10 40h44v6H10z')) + grp('#a39b8f', P('M16 34h32v6H16z')) +
-            line('M24 34V6', INK, 3.6) + line('M24 34V6', '#7a5232', 1.8) +
-            grp(CRIMSON, P('M25 7c8-3 14 3 24 0v14c-10 3-16-3-24 0z')) +
-            '<circle cx="36" cy="14" r="3.4" fill="' + GOLD + '" stroke="' + INK + '" stroke-width="1.4"/>' +
-            line('M12 30v-6M52 30v-6', INK, 2.4) +
-            grp('#ff8c2a', P('M12 24c-3-3 0-7 0-9 2 3 4 6 0 9zM52 24c-3-3 0-7 0-9 2 3 4 6 0 9z')),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            grpW('#f4e9c8', 1.6, P('M22 44V25c0-8.6 20-8.6 20 0v19z')) +
+            '<path d="M22.8 36c4-2.6 7-2.6 10 0 2.4-1.8 5.4-2 8.4-.6V43.2H22.8z" fill="#8aa85a"/>' +
+            grpW('#c9b48a', 1.4, P('M24.6 48 30.4 34.6h3.2L39.4 48z')) +
+            line('M28.4 40.6h7.2M26.8 44.4h10.4', '#a08a5a', .9) +
+            grp('#a39b8f', P('M12 44V24C12 9 52 9 52 24v20H42V25c0-8.6-20-8.6-20 0v19z')) +
+            line('M12 31.5h10M12 38h10M42 31.5h10M42 38h10M22 25.4 13.4 21.8M25.4 18.6 21.2 15M38.6 18.6 42.8 15M42 25.4l8.6-3.6', '#7c746a', 1.3) +
+            grpW('#c9c2b4', 1.6, P('M29.4 9.8h5.2l-.8 6.8h-3.6z')) +
+            line('M32 10V1', INK, 1.8) +
+            grpW(CRIMSON, 1.6, P('M33 1.4c4.4-1.6 7.4 1.6 12 0v7c-4.6 1.6-7.6-1.6-12 0z')) +
+            dot(39, 5, 1.4, GOLD) +
+            line('M7.4 30h4.6M56.6 30H52', INK, 1.8) + line('M7.4 30v-4M56.6 30v-4', '#6a4a2e', 2.4) +
+            grpW('#ff8c2a', 1.2, P('M7.4 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6zM56.6 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6z')) +
+            dot(7.6, 23.6, 1, '#ffd04a') + dot(56.8, 23.6, 1, '#ffd04a'),
 
         potion: flask(32, 30, 1.25, '#d23a3a'),
         potions: flask(22, 30, 1.05, '#d23a3a') + flask(42, 32, 1, '#3a7fd2'),
@@ -3574,12 +3679,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#7a5a3a', P('M14 14h22v22c0 6-11 10-11 10s-11-4-11-10z')) +
             grp(STEEL_L, P('M17 17h16v18c0 4-8 7-8 7s-8-3-8-7z')) + thornSigil(25, 27, CRIMSON) +
             sword(42, 26, 30, .9),
+        // Draw 2 Item Cards: a bow, a mage's staff with its orb, a sword.
         items:
-            line('M16 6c10 8 10 32 0 40', INK, 4) + line('M16 6c10 8 10 32 0 40', '#8a5a32', 2.2) +
-            line('M16 6V46', INK, 1) +
-            grp('#7a5a3a', P('M24 14h22v22c0 6-11 10-11 10s-11-4-11-10z')) +
-            grp(STEEL_L, P('M27 17h16v18c0 4-8 7-8 7s-8-3-8-7z')) +
-            sword(48, 26, 28, .85),
+            line('M14 6c10 8 10 32 0 40', INK, 4) + line('M14 6c10 8 10 32 0 40', '#8a5a32', 2.2) +
+            line('M14 6V46', INK, 1) +
+            line('M27 46 34.6 14', INK, 4.4) + line('M27 46 34.6 14', '#6a4a2e', 2.4) +
+            line('M28.4 40.4l1.6.4M33.2 20.4l1.6.4', GOLD, 2) +
+            line('M32.6 13.2c-2.6-1.6-3.2-5.4-1-8.2M37.6 14.4c2.8-1 4.2-4.6 2.6-7.8', INK, 3.2) +
+            line('M32.6 13.2c-2.6-1.6-3.2-5.4-1-8.2M37.6 14.4c2.8-1 4.2-4.6 2.6-7.8', GOLD, 1.6) +
+            '<circle cx="35.4" cy="8.6" r="4.4" fill="#9b5cff" stroke="' + INK + '" stroke-width="1.6"/>' +
+            '<ellipse cx="34" cy="7.2" rx="1.4" ry="1" fill="#e6d4ff"/>' +
+            '<path d="M44 4.6l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7zM25.6 7l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" fill="#c79bff" stroke="' + INK + '" stroke-width=".6"/>' +
+            sword(51, 27, 28, .85),
 
         key:
             '<circle cx="18" cy="24" r="10" fill="#f0d78a" stroke="' + INK + '" stroke-width="2.4"/>' +
@@ -3620,7 +3731,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#efe2c0', P('M10 12h30c-4 2-4 22 0 26H10c4-4 4-24 0-26z')) +
             line('M16 20h16M16 25h16M16 30h10', '#9a8a6a', 1.4) +
             '<circle cx="34" cy="34" r="5" fill="#b0242c" stroke="' + INK + '" stroke-width="1.6"/>' +
-            gemShape(52, 24, 1.3, '#d6365c') + line('M50 10l1 4M58 14l-3 2', '#f4f0e2', 1.4),
+            gemShape(52, 24, 1.15, '#d6365c'),
 
         darkwood:
             pine(14, 34, .95, '#1c3226') + pine(48, 34, .9, '#1c3226') + pine(31, 38, 1.15, '#22392b') +
@@ -3692,11 +3803,32 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             dot(50.6, 4.4, 1.7, '#f4f0e2') + dot(50, 4.1, .45) + dot(51.2, 4.1, .45) +
             grp('#a07a50', P('M3 46l2-9 2 9zM8 46l2-11 2 11zM13 46l2-8 2 8zM47 46l2-8 2 8zM52 46l2-11 2 11zM57 46l2-9 2 9z')),
 
+        // Tip & Tap's Trip Traps: an iron jaw-trap set open among the
+        // leaves, its springs out to either side, and a tripwire strung
+        // low between two stakes with a bell hung on it.
         traps:
-            grp('#7a808a', P('M10 38c0-10 6-14 14-14s14 4 14 14z')) +
-            line('M12 36l3-6 3 6 3-6 3 6 3-6 3 6 3-6 3 6', INK, 1.6) +
-            grp('#5a5e66', P('M6 38h36v4H6z')) +
-            line('M40 30h22', '#c9b48a', 1.6) + line('M44 26v8M58 26v8', '#6a4a2e', 2.4),
+            grp('#6a5238', P('M0 42c16-3 48-3 64 0v6H0z')) +
+            [[10, 45, -20, '#8a6a2a'], [39, 45.4, 25, '#6a7a2a'], [3.6, 40.6, 10, '#9a5a22'], [30, 46.6, -35, '#7a6a2a']].map(l =>
+                '<g transform="translate(' + l[0] + ' ' + l[1] + ') rotate(' + l[2] + ')">' +
+                grpW(l[3], .7, P('M-2.6 0c1.2-1.4 3.8-1.4 5.2 0-1.4 1.4-4 1.4-5.2 0z')) + line('M-2.6 0h4.6', '#4a3220', .5) + '</g>').join('') +
+            grpW('#4a4e55', 1.4, P('M1 33.2h6.4v3.4H1zM35 33.2h6.4v3.4H35z')) +
+            '<ellipse cx="21" cy="35" rx="15" ry="6.4" fill="#4a4e55" stroke="' + INK + '" stroke-width="2"/>' +
+            '<ellipse cx="21" cy="35" rx="11" ry="4.2" fill="#5a4630" stroke="' + INK + '" stroke-width="1.2"/>' +
+            (function () {
+                let t = '';
+                for (let i = 0; i < 14; i++) {
+                    const a = i / 14 * Math.PI * 2, w = Math.PI / 14 * .8;
+                    const pt = (rx, ry, ang, lift) => (21 + rx * Math.cos(ang)).toFixed(2) + ' ' + (35 + ry * Math.sin(ang) - (lift || 0)).toFixed(2);
+                    t += 'M' + pt(11.6, 4.6, a - w) + 'L' + pt(6.6, 2, a, 2.8) + 'L' + pt(11.6, 4.6, a + w) + 'z';
+                }
+                return grpW(STEEL_L, .8, P(t));
+            })() +
+            '<ellipse cx="21" cy="35.4" rx="3.6" ry="1.5" fill="#9aa1aa" stroke="' + INK + '" stroke-width="1"/>' +
+            line('M47 44V24M61 44V24', INK, 3.4) + line('M47 44V24M61 44V24', '#8a6a44', 1.8) +
+            grpW('#8a6a44', 1.2, P('M45.3 24l1.7-3.4 1.7 3.4zM59.3 24l1.7-3.4 1.7 3.4z')) +
+            line('M47 30.6c4.6.6 9.4.6 14 0', '#d9cdb0', 1.1) +
+            line('M54 31v1.6', INK, .9) +
+            grpW(GOLD, 1, P('M51.8 36.6c0-3 1-4.2 2.2-4.2s2.2 1.2 2.2 4.2z')) + dot(54, 37.4, .9, INK),
 
         pyrite:
             grp('#3d2a4a', P('M8 44V22h48v22z')) + grp(GOLD, P('M4 22 32 6l28 16z')) +
@@ -3716,10 +3848,25 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             dot(24, 18, 3, '#7aec8a') + dot(34, 14, 2.4, '#7aec8a') + dot(42, 19, 2, '#7aec8a') +
             flask(8, 34, .45, '#9b5cff') + flask(56, 34, .45, '#d23a3a'),
 
+        // Noble's District: a grand townhouse behind gilded railings, its
+        // pillared porch, a crest over the door, tall lit windows under a
+        // slate roof.
         district:
-            grp('#e8dcc4', P('M8 44V22h48v22z')) + grp('#8e1c24', P('M4 22 32 8l28 14z')) +
-            line('M14 26v18M22 26v18M42 26v18M50 26v18', '#a89878', 2.4) +
-            grp('#5a3a22', P('M28 44V32h8v12z')) + coin(56, 12, 3.6),
+            grp('#8a8278', P('M0 44h64v4H0z')) +
+            grpW('#8a6a5a', 1.6, P('M14 4.6h5v6h-5zM45 4.6h5v6h-5z')) +
+            grpW('#4a4058', 2, P('M5 18 11 9h42l6 9z')) + line('M10 13.6h44', '#3a3248', 1) +
+            grpW('#efe2c0', 2, P('M6 18h52v26H6z')) +
+            line('M6 30.6h52', '#c9b88e', 1.4) +
+            [10, 17.6, 41.4, 49].map(x => grpW('#f4d23c', 1.2, P('M' + x + ' 27.6v-5.2c0-1.8 4.6-1.8 4.6 0v5.2z')) +
+                grpW('#f4d23c', 1.2, P('M' + x + ' 40.4v-6.2c0-1.8 4.6-1.8 4.6 0v6.2z')) +
+                line('M' + (x + 2.3) + ' 22v5.4M' + (x + 2.3) + ' 33.6v6.6M' + x + ' 36.6h4.6', '#8a6a2a', .8)).join('') +
+            grpW('#f4f0e2', 1.6, P('M23 19.4 32 12.6l9 6.8z')) + dot(32, 16.8, 1.5, GOLD) +
+            grpW('#f4f0e2', 1, P('M24.4 19.4h2.4V42h-2.4zM28.4 19.4h2v22.6h-2zM33.6 19.4h2v22.6h-2zM37.2 19.4h2.4V42h-2.4z')) +
+            grpW('#6a1414', 1.4, P('M30.4 42v-7.4c0-2.4 3.2-2.4 3.2 0V42z')) +
+            grpW('#c9c2b4', 1, P('M22 42h20v2H22z')) +
+            line('M3 37.6V44M6.4 37.6V44M9.8 37.6V44M13.2 37.6V44M16.6 37.6V44M20 37.6V44M44 37.6V44M47.4 37.6V44M50.8 37.6V44M54.2 37.6V44M57.6 37.6V44M61 37.6V44', INK, 1.1) +
+            line('M2 39.6h19M43 39.6h19', INK, 1.1) +
+            [3, 6.4, 9.8, 13.2, 16.6, 20, 44, 47.4, 50.8, 54.2, 57.6, 61].map(x => dot(x, 37.2, .9, GOLD)).join(''),
 
         // A market day in the square: a wooden stall under a striped awning
         // with a scalloped edge, apples, cabbages and bread on its counter,
@@ -3792,13 +3939,28 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#8a8278', P('M14 44V34h36v10z')) + grp('#a39b8f', P('M20 34V20h24v14z')) +
             grp('#7ad4ff', P('M32 6l6 8-6 10-6-10z')),
 
-        // The Wild Brewery: two foaming mugs of its ale, raised and clinking,
-        // a splash flying off them.
+        // The Wild Brewery: a cask on its cradle, its ale running from the
+        // brass tap into a foaming tankard, and wild hops climbing over it.
         brewery:
-            beerMug(19, 45, 13) +
-            '<g transform="translate(64 0) scale(-1 1)">' + beerMug(19, 45, 13) + '</g>' +
-            [[32, 9, 1.6], [28, 5.6, 1.1], [36.2, 5.2, 1.2], [32.4, 3, .8]].map(d =>
-                '<circle cx="' + d[0] + '" cy="' + d[1] + '" r="' + d[2] + '" fill="#f8f4ea" stroke="' + INK + '" stroke-width=".8"/>').join(''),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            line('M3 44c-1.6-9 .4-19 4.6-26C12 10.6 18 5.6 26 4.6c8.4-1 15 2.6 19.6 9 3.6 5 5.8 12 6.6 20M45.6 13.6c4.4-3 9.2-2.6 12.4 1', '#2f5a24', 1.6) +
+            hopLeaf(4.2, 32, -20) + hopLeaf(8.6, 17, 10) + hopLeaf(51.6, 25, 30) + hopLeaf(56.4, 13.6, 60) +
+            grpW('#6a4a2e', 1.6, P('M7 44 11.4 32H28.6L33 44z')) + line('M14 44l3-8M26 44l-3-8', '#4a3220', 1.2) +
+            '<circle cx="20" cy="19.4" r="14" fill="#3a3238" stroke="' + INK + '" stroke-width="2"/>' +
+            '<circle cx="20" cy="19.4" r="10.6" fill="#b07a44" stroke="' + INK + '" stroke-width="1.4"/>' +
+            line('M11 15.2h18M9.6 19.4h20.8M11 23.6h18', '#8a5a32', 1.1) +
+            '<circle cx="20" cy="19.4" r="1.6" fill="#5a3a22"/>' +
+            dot(20, 6.6, .9, '#8a8f96') + dot(32.8, 19.4, .9, '#8a8f96') + dot(7.2, 19.4, .9, '#8a8f96') +
+            grpW(GOLD, 1.2, P('M31.6 25.4h6.4v3h-6.4zM35.2 28.4h2.6v3.2h-2.6zM33.4 25.4v-2.6h2.4v2.6z')) +
+            line('M36.5 32v3.4', '#f0a530', 1.5) +
+            grpW('#a0703a', 1.4, P('M31.4 36.6h10.6V44H31.4z')) +
+            line('M31.4 39h10.6M31.4 42h10.6', '#6a4a2e', .9) +
+            '<path d="M42 37.8h2.2c1.6 0 2.2 1 2.2 2.4v.6c0 1.4-.6 2.2-2.2 2.2H42" fill="none" stroke="' + INK + '" stroke-width="2.6"/>' +
+            '<path d="M42 37.8h2.2c1.6 0 2.2 1 2.2 2.4v.6c0 1.4-.6 2.2-2.2 2.2H42" fill="none" stroke="#a0703a" stroke-width="1.2"/>' +
+            grpW('#f8f4ea', 1.1, P('M30.6 37.4c-.8-2.2 1.2-3.6 3-2.6.8-1.8 4-2 5 0 1.8-1 3.8.4 3.4 2.4.6 1-.2 1.8-1.2 1.6v1.4c0 .9-1.4.9-1.4 0v-1.4h-6.6c-1.4 0-2.4-.4-2.2-1.4z')) +
+            line('M3 44c-1.6-9 .4-19 4.6-26C12 10.6 18 5.6 26 4.6', '#3f7d3a', .9) +
+            hop(6.2, 22.6) + hop(15.2, 6.4) + hop(46.6, 15.6) + hop(52.2, 28) + hop(57.6, 15.4) +
+            hopLeaf(25, 5.6, -70) + hopLeaf(40, 7.6, 90),
 
         royal_patrol:
             line('M22 46V4', INK, 3) + grp(ROYAL_RED, P('M23 6h26v24l-13-5-13 5z')) + line('M23 6h26', GOLD, 2) +
@@ -3832,11 +3994,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M18 8v-3h5v3M29 8v-3h6v3M41 8v-3h5v3', INK, 1.6) +
             grp('#f4d23c', P('M29 22h6v8h-6z')) + line('M32 5V-2', INK, 1.4),
 
+        // The Royal Garden: a clipped hedge in rose, the blossom tree, a
+        // stone urn spilling flowers, and a bed of tulips along the front.
         garden:
-            grp('#2f5a2e', P('M2 44V30c0-6 16-6 16 0v14zM46 44V30c0-6 16-6 16 0v14z')) +
-            grp('#3a6a34', '<circle cx="32" cy="22" r="10"/>') + grp('#6a4a2e', P('M30 32h4v12h-4z')) +
-            dot(8, 32, 2, '#d23a5a') + dot(14, 36, 2, '#d23a5a') + dot(52, 33, 2, '#d23a5a') + dot(57, 37, 2, '#d23a5a') +
-            dot(28, 18, 1.6, '#f4f0e2') + dot(36, 24, 1.6, '#f4f0e2'),
+            grp('#6a4a2e', P('M0 44h64v4H0z')) +
+            grp('#2f5a2e', P('M2 44V30c0-6 16-6 16 0v14z')) +
+            flower(6.4, 32.4, 2.6, '#d23a5a') + flower(13.4, 35.4, 2.6, '#d23a5a') + flower(7.6, 39.6, 2.4, '#d23a5a') +
+            grp('#3a6a34', '<circle cx="31" cy="20" r="10"/>') + grp('#6a4a2e', P('M29 30h4v14h-4z')) +
+            flower(26.6, 16.4, 2.2, '#f7c6d6') + flower(34.6, 21.6, 2.2, '#f7c6d6') + flower(31, 13.4, 1.9, '#f7c6d6') +
+            tulip(21, 44, 4.6, '#e2b13c') + tulip(24.4, 44, 5.4, '#d23a5a') + tulip(37.6, 44, 5.4, '#9b5cff') + tulip(41, 44, 4.6, '#d23a5a') +
+            hopLeaf(47.6, 29.6, -40) + hopLeaf(60.2, 30, 40) +
+            grpW('#a39b8f', 1.6, P('M49 44h10l-1.4-4h-7.2zM52.2 40V37h3.6v3z')) +
+            grpW('#a39b8f', 1.8, P('M45.6 30h16.8c0 4.6-3.6 7-8.4 7s-8.4-2.4-8.4-7z')) +
+            line('M45.6 30h16.8', '#7c746a', 1) +
+            flower(48.6, 27.4, 2.6, '#f4f0e2') + flower(54, 25.2, 2.8, '#9b5cff') + flower(59.4, 27.4, 2.6, '#e2b13c'),
 
         temple:
             grp('#f2ece0', P('M10 44V24h44v20z')) + grp('#f2ece0', P('M14 24c0-14 36-14 36 0z')) +
@@ -3844,7 +4015,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#e2b13c', P('M28 44V34c0-4 8-4 8 0v10z')),
 
         castle:
-            grp('#3a3238', P('M4 44V16h12v6h6v-6h20v6h6v-6h12v28z')) +
+            grp('#6a6b66', P('M4 44V16h12v6h6v-6h20v6h6v-6h12v28z')) +
             line('M4 16v-4h4v4M12 16v-4h4v4M48 16v-4h4v4M56 16v-4h4v4', INK, 1.6) +
             grp('#1b1418', P('M26 44V32c0-6 12-6 12 0v12z')) + grp(CRIMSON, P('M18 8h6v8h-6zM40 8h6v8h-6z')) +
             '<ellipse cx="62" cy="30" rx="4" ry="12" fill="#9b5cff" opacity=".7"/>'
@@ -3916,7 +4087,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     const ICONS = {
         gold: px => svgIcon(coin(12, 12, 9), '0 0 24 24', px || 18),
-        gem: px => svgIcon(gemShape(12, 13, 1.3, '#d6365c'), '0 0 24 24', px || 18),
+        gem: px => svgIcon(gemShape(12, 12.2, 1.15, '#d6365c'), '0 0 24 24', px || 18),
         key: px => svgIcon('<circle cx="7" cy="12" r="5" fill="#f0d78a" stroke="' + INK + '" stroke-width="1.6"/>' +
             '<circle cx="7" cy="12" r="1.8" fill="' + INK + '"/>' +
             '<path d="M11.5 10.6h10v2.8h-10zM17 13.4h2v3.6h-2zM20 13.4h1.8v4.6H20z" fill="#e4c14a" stroke="' + INK +
@@ -3931,6 +4102,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         gear: px => svgIcon('<path d="' + GEAR_PATH + '" fill="currentColor" fill-rule="evenodd"/>', '0 0 24 24', px || 22),
         skull: px => svgIcon('<path d="M12 3c-5 0-8 3-8 7 0 3 2 5 3 5v3h10v-3c1 0 3-2 3-5 0-4-3-7-8-7z" fill="#e8e0d0" stroke="' + INK +
             '" stroke-width="1.4"/><circle cx="9" cy="11" r="2" fill="' + INK + '"/><circle cx="15" cy="11" r="2" fill="' + INK + '"/>',
+            '0 0 24 24', px || 18),
+        dead: px => svgIcon('<path d="M12 2.6c-5.1 0-8.4 3.3-8.4 7.7 0 2.9 1.4 4.8 3.2 5.8v3.6h10.4v-3.6c1.8-1 3.2-2.9 3.2-5.8 0-4.4-3.3-7.7-8.4-7.7z" fill="#e8e0d0" stroke="' +
+            INK + '" stroke-width="1.4" stroke-linejoin="round"/>' +
+            '<path d="M6.9 8.1l3.6 3.6M10.5 8.1l-3.6 3.6M13.5 8.1l3.6 3.6M17.1 8.1l-3.6 3.6" fill="none" stroke="' + INK + '" stroke-width="1.7" stroke-linecap="round"/>' +
+            '<path d="M12 13.3l-1.1 1.9h2.2z" fill="' + INK + '"/>' +
+            '<path d="M9.8 19.7v-2.3M12 19.7v-2.3M14.2 19.7v-2.3" fill="none" stroke="' + INK + '" stroke-width="1.1"/>',
             '0 0 24 24', px || 18),
         flame: px => svgIcon('<path d="M12 22c-5 0-7-4-6-8 1-3 4-5 4-9 3 2 4 5 4 7 1-1 2-2 2-4 3 3 4 7 2 10-1 2-3 4-6 4z" fill="#ff7a2a" stroke="' +
             INK + '" stroke-width="1.3"/><path d="M12 20c-2 0-3-2-2-4 1-1 2-2 2-4 2 2 3 4 2 6 0 1-1 2-2 2z" fill="#ffd04a"/>',
@@ -3960,7 +4137,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     // Where the castle and the Merchant's stall are, on the 1200 x 700
     // board, for the buttons laid over them.
     const ARENA_BOX = { x: 622, y: 204, w: 256, h: 268 };
-    const MERCHANT_BOX = { x: 944, y: 432, w: 146, h: 108 };
+    const MERCHANT_BOX = { x: 944, y: 454, w: 146, h: 108 };
 
     function cellCentre(sq) {
         const rs = sq.rowSpan || 1, cs = sq.colSpan || 1;
@@ -3973,16 +4150,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function wallRun(x, y0, y1) {
-        let s = '<rect x="' + (x - 7) + '" y="' + y0 + '" width="14" height="' + (y1 - y0) + '" fill="#6e665c" stroke="' + INK + '" stroke-width="3"/>';
+        let s = '<rect x="' + (x - 7) + '" y="' + y0 + '" width="14" height="' + (y1 - y0) + '" fill="' + STONE + '" stroke="' + INK + '" stroke-width="3"/>';
         for (let y = y0 + 6; y < y1 - 6; y += 16) {
-            s += '<rect x="' + (x - 11) + '" y="' + y + '" width="22" height="8" fill="#857c70" stroke="' + INK + '" stroke-width="2"/>';
+            s += '<rect x="' + (x - 11) + '" y="' + y + '" width="22" height="8" fill="' + STONE_LIT + '" stroke="' + INK + '" stroke-width="2"/>';
         }
         s += tower(x, y0) + tower(x, y1);
         return s;
     }
     function tower(x, y) {
         return '<g transform="translate(' + x + ' ' + y + ')">' +
-            grp('#7a7268', P('M-16-14h32v28h-32z')) + grp('#8e8578', P('M-19-20h38v8h-38z')) +
+            grp(STONE, P('M-16-14h32v28h-32z')) + grp(STONE_LIT, P('M-19-20h38v8h-38z')) +
             line('M-19-20v-5h7v5M-4-20v-5h8v5M12-20v-5h7v5', INK, 2.4) +
             grp(CRIMSON, P('M-2-40h14l-4 5 4 5H-2z')) + line('M-2-40v20', INK, 2.4) + '</g>';
     }
@@ -3995,24 +4172,31 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // carries on past it, and the same range shows between the squares
         // all the way up that side of the board.
         const DARK = '#45403c', ROCK = '#5b5550', LIT = '#6d665f', SNOW = '#e8e4dc', CREASE = '#38332f';
+        // The spur stands from its summit (y 166) down to a foot drawn in
+        // to about y 436: every point below the summit is pulled up in
+        // proportion, so the peak stays exactly where it was.
+        const TOP = 166, SHRINK = (436 - TOP) / (478 - TOP);
+        const fit = d => d.replace(/([ML])(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (m, c, x, y) =>
+            c + x + ' ' + (+y > TOP ? (TOP + (y - TOP) * SHRINK).toFixed(1) : y));
+        const grpF = (fill, d) => grp(fill, P(fit(d)));
         return '<g>' +
             // the range itself, running on up the edge of the board
             grp(DARK, P('M-40-30 L16 14 L8 52 L26 98 L12 146 L30 196 L-40 230z')) +
             grp(DARK, P('M-40 470 L24 486 L14 530 L30 578 L-40 600z')) +
             // the spur's far side, in shadow, higher than the near side
-            grp(DARK, P('M-40 120 L26 182 L46 166 L84 240 L114 226 L158 300 L188 292 L226 376 L242 436 L-40 470z')) +
+            grpF(DARK, 'M-40 120 L26 182 L46 166 L84 240 L114 226 L158 300 L188 292 L226 376 L242 436 L-40 470z') +
             // the near side of the spur
-            grp(ROCK, P('M-40 176 L16 222 L36 206 L74 292 L106 276 L148 346 L174 334 L212 414 L222 466 L-40 478z')) +
+            grpF(ROCK, 'M-40 176 L16 222 L36 206 L74 292 L106 276 L148 346 L174 334 L212 414 L222 466 L-40 478z') +
             // its faces turned to the light
-            grp(LIT, P('M36 206 L54 272 L42 344 L66 476 H128 L118 380 L106 276 L74 292z')) +
-            grp(LIT, P('M174 334 L190 386 L178 468 H222 L212 414z')) +
+            grpF(LIT, 'M36 206 L54 272 L42 344 L66 476 L128 476 L118 380 L106 276 L74 292z') +
+            grpF(LIT, 'M174 334 L190 386 L178 468 L222 468 L212 414z') +
             // snow on the heights, cut off where the board ends
-            grp(SNOW, P('M-40 176 L16 222 L6 238 L-40 214z')) +
-            grp(SNOW, P('M36 206 L50 238 L40 246 L28 222z')) +
-            grp(SNOW, P('M106 276 L120 304 L108 310 L96 290z')) +
-            grp(SNOW, P('M46 166 L60 194 L50 200 L38 180z')) +
+            grpF(SNOW, 'M-40 176 L16 222 L6 238 L-40 214z') +
+            grpF(SNOW, 'M36 206 L50 238 L40 246 L28 222z') +
+            grpF(SNOW, 'M106 276 L120 304 L108 310 L96 290z') +
+            grpF(SNOW, 'M46 166 L60 194 L50 200 L38 180z') +
             // the gullies down its sides
-            line('M16 222 L24 300 L14 390 M106 276 L118 380 M148 346 L156 420', CREASE, 3) +
+            line(fit('M16 222 L24 300 L14 390 M106 276 L118 380 M148 346 L156 420'), CREASE, 3) +
             '</g>';
     }
 
@@ -4061,10 +4245,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     // Stone laid in courses: the stone's own colour, then the joints between
     // the blocks over it (every other block a shade lighter, so a wall is
     // never one flat colour), then the hard outline round the lot.
+    const STONE = '#6a6b66', STONE_SHADE = '#5f605b', STONE_LIT = '#777872';
     const BRICKS_ID = 'lof-castle-bricks';
     const BRICKS = '<defs><pattern id="' + BRICKS_ID + '" width="44" height="20" patternUnits="userSpaceOnUse">' +
         '<path d="M23.5 1.6h20v8.4h-20zM12.5 11.6h20v8.4h-20z" fill="#ffffff" fill-opacity=".06"/>' +
-        '<path d="M0 .75H44M0 10.75H44M.75 0v10.75M22.75 0v10.75M11.75 10.75V20M33.75 10.75V20" fill="none" stroke="#110c0f" stroke-width="1.5"/>' +
+        '<path d="M0 .75H44M0 10.75H44M.75 0v10.75M22.75 0v10.75M11.75 10.75V20M33.75 10.75V20" fill="none" stroke="#2c2c29" stroke-width="1.5"/>' +
         '<path d="M1.6 2.3h20M23.6 2.3h20M12.6 12.3h20M34.6 12.3H44M0 12.3h10.8" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="1"/>' +
         '</pattern></defs>';
     function stone(d, fill, sw) {
@@ -4073,7 +4258,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function castle() {
-        // Fenrirak's Arena: the kingdom's castle, taken. Dark stone blocks,
+        // Fenrirak's Arena: the kingdom's castle, taken. Grey stone blocks,
         // red banners, fire in the windows and the purple shield on the
         // east gate.
         let s = '<g class="castle">' + BRICKS;
@@ -4081,18 +4266,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += '<path d="M10 268c40-16 240-16 280 0l-6 18c-40-12-228-12-268 0z" fill="#8a1c12" stroke="' + INK + '" stroke-width="3"/>';
         s += '<path class="lava" d="M24 272c40-10 212-10 252 0" fill="none" stroke="#ff8a2a" stroke-width="4" stroke-dasharray="14 10"/>';
         // back towers, their battlements and the merlons along the top
-        s += stone('M40 70h50v190H40zM210 70h50v190h-50z', '#2e272c');
-        s += stone('M34 42h12v12H34zM58 42h14v12H58zM84 42h12v12H84zM204 42h12v12h-12zM228 42h14v12h-14zM254 42h12v12h-12z', '#3d3439', 2.6);
-        s += stone('M34 54h62v20H34zM204 54h62v20h-62z', '#3d3439');
+        s += stone('M40 70h50v190H40zM210 70h50v190h-50z', STONE_SHADE);
+        s += stone('M34 42h12v12H34zM58 42h14v12H58zM84 42h12v12H84zM204 42h12v12h-12zM228 42h14v12h-14zM254 42h12v12h-12z', STONE_LIT, 2.6);
+        s += stone('M34 54h62v20H34zM204 54h62v20h-62z', STONE_LIT);
         s += grp('#1b1418', P('M58 0 65 28M58 0 51 28z'));
         s += grp(CRIMSON, P('M65 20 65-12 95-4 65 4zM235 20V-12l30 8-30 8z'), 'stroke-width="2.6"');
         s += line('M65 42V-14M235 42V-14', INK, 3);
         // the keep
-        s += stone('M80 100h140v170H80z', '#352d33');
+        s += stone('M80 100h140v170H80z', STONE);
         let merlons = '';
         for (let x = 72; x < 228; x += 26) merlons += 'M' + x + ' 72h13v12h-13z';
-        s += stone(merlons, '#463c42', 2.6);
-        s += stone('M72 84h156v22H72z', '#463c42');
+        s += stone(merlons, STONE_LIT, 2.6);
+        s += stone('M72 84h156v22H72z', STONE_LIT);
         // windows with fire behind them
         [[100, 130], [190, 130], [145, 120]].forEach(w => {
             s += '<path d="M' + (w[0] - 7) + ' ' + (w[1] + 22) + 'V' + w[1] + 'c0-9 14-9 14 0v22z" fill="#ff7a1a" stroke="' + INK + '" stroke-width="2.6"/>';
@@ -4137,8 +4322,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         let s = defs;
         s += '<rect width="1200" height="700" fill="url(#ground)"/>';
         s += '<rect width="1200" height="700" fill="url(#grass)"/>';
-        // scorched earth round the castle
-        s += '<ellipse cx="750" cy="362" rx="236" ry="196" fill="#1a1210" opacity=".45"/>';
+        // cracks of fire in the ground round the castle
         s += line('M622 508l28-24 20 14 24-28M884 218l-24 24 10 18M626 238l20 18-6 20M872 492l-18-20-22 10', '#ff6a1a', 2.6);
 
         // the roads, square to square
@@ -4170,7 +4354,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += brazier(606, 300, 1.2) + brazier(606, 462, 1.2) + brazier(930, 470, 1) + brazier(930, 260, 1);
 
         // the Merchant's humble stall, near the Start
-        s += '<g transform="translate(940 432) scale(.95)">' + merchantHut() + '</g>';
+        s += '<g transform="translate(940 454) scale(.95)">' + merchantHut() + '</g>';
 
         // thorn bushes dotted about Thornwick
         [[640, 150, 1.5], [860, 160, 1.3], [1040, 250, 1.4], [700, 580, 1.4], [850, 600, 1.2],
@@ -4215,8 +4399,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     <script>
 /* ==== game-oblivion/engine.js ==== */
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
-   engine.js — the rules.
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   engine.js: the rules.
 
    Every function here takes the shared game state and changes it in place.
    net.js runs them inside a Firestore transaction and solo.js runs them
@@ -4328,7 +4512,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const paid = loseGold(p, n);
         const short = n - paid;
         log(state, from + ' takes ' + paid + ' Gold from ' + p.name +
-            (short ? ' — ' + short + ' short, paid in health instead' : '') + '.', 'death');
+            (short ? ' (' + short + ' short, paid in health instead)' : '') + '.', 'death');
         const hurt = (damage || 0) + short;
         if (hurt > 0) squareDamage(state, p, hurt, from);
         return paid;
@@ -5039,7 +5223,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             state.zapSeq = (state.zapSeq | 0) + 1;
             state.lastZap = { who: p.name, playerId: p.id, n: state.zapSeq };
             log(state, 'The Oblivion Mage’s shield refuses ' + p.name +
-                ' — without all the Pendant Fragments it casts them back to the Start.', 'death');
+                '. Without all the Pendant Fragments it casts them back to the Start.', 'death');
             sendToStart(state, p);
             return ok();
         }
@@ -5047,13 +5231,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         p.pos = w.pos;
 
         if (w.outcome === 'arena') {
-            log(state, p.name + ' holds the Pendant Fragments to the shield — it parts!', 'system');
+            log(state, p.name + ' holds the Pendant Fragments to the shield, and it parts!', 'system');
             return enterArena(state, p);
         }
         if (w.outcome === 'split') {
             state.pending = {
                 type: 'route', playerId: p.id, remaining: w.remaining,
-                prompt: 'Route Split — STOP. Choose a route and carry on with your remaining ' +
+                prompt: 'Route Split: STOP. Choose a route and carry on with your remaining ' +
                         plural(w.remaining, 'space') + '.'
             };
             return ok();
@@ -5123,7 +5307,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             case 'battle':
                 if (sq.enemy === 'barbarian' && state.barbarian && state.barbarian.ownerId) {
                     const owner = player(state, state.barbarian.ownerId);
-                    log(state, 'The Adventurers’ Inn is quiet — the Barbarian is off following ' +
+                    log(state, 'The Adventurers’ Inn is quiet. The Barbarian is off following ' +
                         (owner ? owner.name : 'somebody') + '.', 'muted');
                     return ok();
                 }
@@ -5193,17 +5377,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 return ok();
 
             case 'nobles_district': {
-                // Short of 40 Gold, paying means all you have plus the rest
-                // in health.
-                const short = Math.max(0, sq.gold - p.gold);
-                const opts = [{ key: 'gold', label: 'Lose 40 Gold' + (short ? ' (you have ' + p.gold + ': take ' + short + ' damage for the rest)' : '') }];
+                // The 40 Gold can only be chosen by somebody who has it.
+                // With nothing equipped to give up instead, the nobles take
+                // whatever Gold there is and the rest in health.
+                const opts = [];
                 [weaponOf(p), armourOf(p)].forEach(inst => {
                     if (inst) opts.push({ key: inst.uid, label: 'Lose your ' + itemDef(inst).name });
                 });
-                if (opts.length === 1) {
+                if (!opts.length) {
                     forfeitGold(state, p, sq.gold, sq.name);
                     return ok();
                 }
+                const canPay = p.gold >= sq.gold;
+                opts.unshift(canPay ? { key: 'gold', label: 'Lose 40 Gold' }
+                    : { key: 'gold', label: 'Lose 40 Gold', disabled: true, why: 'You only have ' + p.gold + ' Gold.' });
                 state.pending = { type: 'choose', playerId: p.id, squareId: sq.id, options: opts, prompt: sq.text };
                 return ok();
             }
@@ -5349,6 +5536,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             case 'choose': {
                 const opt = (pend.options || []).find(o => o.key === choice);
                 if (!opt) return fail('That is not one of the choices.');
+                if (opt.disabled) return fail(opt.why || 'You cannot choose that.');
                 state.pending = null;
                 if (sq.action === 'nobles_secret') {
                     if (choice === 'gold') gainGold(state, p, sq.gold, sq.name);
@@ -5395,10 +5583,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 state.pending = null;
                 const roll = throwDie(state, p.name, 'Fate’s Roll');
                 if (roll % 2 === 0) {
-                    log(state, 'Fate’s Roll: ' + roll + ' — even. The loot is ' + p.name + '’s.', 'roll');
+                    log(state, 'Fate’s Roll: ' + roll + ': even. The loot is ' + p.name + '’s.', 'roll');
                     return grantLoot(state, p, pend.enemyId, false);
                 }
-                log(state, 'Fate’s Roll: ' + roll + ' — odd. All the loot is lost.', 'death');
+                log(state, 'Fate’s Roll: ' + roll + ': odd. All the loot is lost.', 'death');
                 return grantLoot(state, p, pend.enemyId, true);
             }
 
@@ -5420,12 +5608,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 state.pending = null;
                 const roll = throwDie(state, p.name, 'Raw Oblivion Shield');
                 if (roll === 6) {
-                    log(state, 'Raw Oblivion Shield: a 6 — the fragments hold.', 'roll');
+                    log(state, 'Raw Oblivion Shield: a 6. The fragments hold.', 'roll');
                 } else {
                     const i = p.fragments.indexOf(roll);
                     if (i >= 0) {
                         p.fragments.splice(i, 1);
-                        log(state, 'Raw Oblivion Shield: a ' + roll + ' — Pendant Fragment #' + roll +
+                        log(state, 'Raw Oblivion Shield: a ' + roll + '. Pendant Fragment #' + roll +
                             ' crumbles to dust.', 'death');
                     } else {
                         log(state, 'Raw Oblivion Shield: a ' + roll + ', but ' + p.name +
@@ -5553,7 +5741,6 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             phase: 'act', ask: null,
             pot: { heal: 0, other: 0, astrix: false },
             tranq: { A: false, B: false },
-            flip: 0,                    // which of you a monster strikes next
             fenLast: null,              // Fenrirak's last attack
             fenDown: false,
             obmSince: 0,                // the Oblivion Mage's turns since Fenrirak fell
@@ -5637,7 +5824,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const ids = Object.keys(b.orderRolls);
         if (ids.some(id => b.orderRolls[id] === null)) return ok();
         if (b.orderRolls[ids[0]] === b.orderRolls[ids[1]]) {
-            log(state, 'A tie — both roll again.', 'muted');
+            log(state, 'A tie. Both roll again.', 'muted');
             ids.forEach(id => { b.orderRolls[id] = null; });
             return ok();
         }
@@ -5946,6 +6133,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 log(state, 'Loyal Servant: the blow meant for Oblivion Mage Helen is turned onto Fenrirak.', 'enemy');
             }
         }
+        const guard = guardOf(b, tgt);
+        if (guard) {
+            hit = guard;
+            log(state, 'The Barbarian steps in front of ' + unitName(state, tgt) + ' and takes the blow.', 'muted');
+        }
         const calc = computeHit(state, b, att, hit, move);
         hurt(state, hit, calc.net);
 
@@ -6020,13 +6212,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                         if (bar.armour) opts.push({ key: 'a', label: itemDef(bar.armour).name });
                     }
                     if (!opts.length) {
-                        log(state, 'The smoke clears — there was nothing equipped to take.', 'muted');
+                        log(state, 'The smoke clears. There was nothing equipped to take.', 'muted');
                         break;
                     }
                     b.ask = {
                         type: 'lose_item', pid: controllerOf(state, tgt), unitKey: tgt.key, options: opts,
-                        prompt: 'Smoke Bomb! ' + unitName(state, tgt, true) + ' loses an equipped item — ' +
-                                'choose which.'
+                        prompt: 'Smoke Bomb! ' + unitName(state, tgt, true) + ' loses an equipped item. ' +
+                                'Choose which.'
                     };
                     break;
                 }
@@ -6114,14 +6306,19 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return usable.slice().sort((x, y) => (y.energy - x.energy) || (y.damage - x.damage))[0];
     }
 
-    // Who a monster strikes. With your Barbarian beside you it takes turns:
-    // you, then him, then you again.
+    // The Barbarian (Ally) stands in front of his player: every blow aimed
+    // at them lands on him until he is struck down, and only then do they
+    // start taking damage themselves.
+    function guardOf(b, u) {
+        if (!u || u.kind !== 'player') return null;
+        return b.units.find(x => x.kind === 'ally' && x.side === u.side && !x.down) || null;
+    }
+
+    // Who a monster strikes: the Barbarian while he stands, then you.
     function enemyTarget(b, u) {
         const opp = opponents(b, u).filter(x => x.kind !== 'enemy');
         if (!opp.length) return null;
-        const players = opp.filter(x => x.kind === 'player');
-        const ordered = players.concat(opp.filter(x => x.kind === 'ally'));
-        return ordered[b.flip % ordered.length];
+        return opp.find(x => x.kind === 'ally') || opp.find(x => x.kind === 'player') || opp[0];
     }
 
     function defaultTarget(state, b, u) {
@@ -6131,7 +6328,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const fen = opp.find(x => x.enemyId === 'fenrirak');
             return fen || opp[0];
         }
-        return opp.find(x => x.kind !== 'ally') || opp[0];
+        return opp.find(x => x.kind === 'ally') || opp[0];
     }
 
     /* ---- acting ---------------------------------------------------------- */
@@ -6175,7 +6372,6 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (m.damage > 0) {
             const tgt = enemyTarget(b, u);
             if (!tgt) { endStep(state); return ok(); }
-            b.flip += 1;
             strike(state, b, u, tgt, m);
         } else {
             log(state, unitName(state, u, true) + ' ' + vb(u, 'casts', 'cast') + ' ' + m.name + '.', 'enemy');
@@ -6220,6 +6416,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function settleDeaths(state) {
         const b = state.battle;
         if (!b) return true;
+        // Everybody's health as the blow left it, before anybody is sent
+        // back to the Start or the Barbarian back to his inn: the screen
+        // shows the last blow land before it says who won.
+        b.lastHp = {};
+        b.units.forEach(u => {
+            const o = body(state, u);
+            b.lastHp[u.key] = { hp: Math.max(0, o.hp), maxHp: o.maxHp, bonusHp: o.bonusHp || 0 };
+        });
         b.units.forEach(u => {
             if (u.down || hpOf(state, u) > 0) return;
             u.down = true;
@@ -6252,7 +6456,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     function noteBattleEnd(state, b, winner, loser) {
         state.battleSeq = (state.battleSeq | 0) + 1;
-        state.lastBattle = { n: state.battleSeq, kind: b.kind, winner: winner, loser: loser };
+        // The fight as it stood at the last blow, for the screen to show
+        // the loser hit 0 before the banner goes up.
+        const final = JSON.parse(JSON.stringify(b));
+        final.phase = 'over';
+        final.idx = -1;
+        state.lastBattle = { n: state.battleSeq, kind: b.kind, winner: winner, loser: loser, final: final };
     }
     function asPlayer(p) { return { name: p.name, cls: p.cls, enemyId: null }; }
     function asEnemy(enemyId) { return { name: D.foeName(D.ENEMIES[enemyId], true), cls: null, enemyId: enemyId }; }
@@ -6335,7 +6544,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const p = player(state, b.moverId);
         const foe = b.units.find(u => u.kind === 'enemy');
         log(state, p.name + ' has been defeated' + (b.kind === 'boss' ? ' in the arena' : '') +
-            '. Back to the Start — they keep everything they carry.', 'death');
+            '. Back to the Start, keeping everything they carry.', 'death');
         noteBattleEnd(state, b, asEnemy(foe.enemyId), asPlayer(p));
         state.battle = null;
         cleanUpAfter(state, p);
@@ -6410,12 +6619,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         p.abilityTriedAt = p.turnsTaken;
         const roll = throwDie(state, p.name, ab.name);
         if (roll % 2 !== 0) {
-            log(state, p.name + ' tries ' + ab.name + ' and rolls a ' + roll + ' — odd, it fails. ' +
+            log(state, p.name + ' tries ' + ab.name + ' and rolls a ' + roll + ': odd, so it fails. ' +
                 'They can try again next turn.', 'muted');
             return ok();
         }
         p.abilityUsedAt = p.turnsTaken;
-        log(state, p.name + ' rolls a ' + roll + ' — ' + ab.name + '!', 'roll');
+        log(state, p.name + ' rolls a ' + roll + ': ' + ab.name + '!', 'roll');
         if (ab.id === 'runed_relic') {
             p.buffs.push({ kind: 'dmg', value: 10, uses: 2, from: 'Runed Relic', keep: true });
             log(state, p.name + ' will deal +10 DMG on their next 2 attacks.', 'item');
@@ -6755,7 +6964,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             // online, and the offer would sit there unanswerable.
             t.status = 'void';
             log(state, 'The trade between ' + a.name + ' and ' + b.name +
-                ' falls through — what was offered has changed.', 'muted');
+                ' falls through: what was offered has changed.', 'muted');
             return ok();
         }
         moveBundle(a, b, t.give);
@@ -6822,7 +7031,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             case 'route': state.pending = null; return null;
             case 'optional': state.pending = null; return null;
             case 'offer': return resolvePending(state, pid, 'no');
-            case 'choose': return resolvePending(state, pid, pend.options[0].key);
+            case 'choose': return resolvePending(state, pid, (pend.options.find(o => !o.disabled) || pend.options[0]).key);
             case 'chest': return resolvePending(state, pid, 'leave');
             case 'astrix': return resolvePending(state, pid, 'done');
             default: return resolvePending(state, pid, null);
@@ -6846,7 +7055,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (waited < limit) return false;
             if (who && !who.away) {
                 who.away = true;
-                log(state, who.name + ' is away — the clock fights for them until they are back.', 'muted');
+                log(state, who.name + ' is away. The clock fights for them until they are back.', 'muted');
             }
             if (b.phase === 'order') return !!battleOrderRoll(state, pid).ok;
             if (b.phase === 'ask') return !!battleAnswer(state, '__clock__', b.ask.options[0].key).ok;
@@ -6862,10 +7071,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         cur.away = true;
         for (let guard = 0; guard < 6 && state.pending && !state.battle; guard++) autoAnswerPending(state);
         if (state.battle) {
-            log(state, cur.name + ' was away — the clock takes over their fight.', 'muted');
+            log(state, cur.name + ' was away, so the clock takes over their fight.', 'muted');
             return true;
         }
-        log(state, cur.name + ' was away too long — turn skipped.', 'muted');
+        log(state, cur.name + ' was away too long. Turn skipped.', 'muted');
         advanceTurn(state);
         return true;
     }
@@ -6996,7 +7205,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         makeRoomCode, createGame, addPlayer, removePlayer, chooseClass, setMods, startGame,
         rollForOrder, currentPlayer, isMyTurn, advanceTurn, checkTimeout, turnLimit,
         player, square, previewWalk, moveOffer, isOptionalStop, fragmentsNeeded, hasFragments,
-        weaponOf, armourOf, itemDef, ownedItem, suits, hasBarbarian, hasFought,
+        weaponOf, armourOf, itemDef, ownedItem, suits, hasBarbarian, hasFought, guardOf,
         availableMoves, computeHit, battleActorId, inBattle, curUnit, unit, unitName,
         controllerOf, opponents, defaultTarget, movesOf, chooseEnemyMove, enemyTarget, isPlural,
         attackParts, defenceParts, body, buffsOf, oblivionControlOn, tranquil,
@@ -7010,8 +7219,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     <script>
 /* ==== game-oblivion/bot.js ==== */
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
-   bot.js — how the computer players decide what to do.
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   bot.js: how the computer players decide what to do.
 
    decide(state, pid) looks at the game from one computer player's seat and
    answers with the single next thing it wants to do -- { action, args } out
@@ -7078,23 +7287,27 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         let hp = (opts.hp !== undefined ? opts.hp : totalHp(p)) + (opts.extraHp || 0);
         let myE = 1, foeE = 1;
         const after = (enemyId === 'soldier_garrison') ? 5 : 0;
-        const ally = opts.ally ? 1 : 0;
+        // The Barbarian takes every blow until he falls, and hits back
+        // while he stands.
+        const bar = opts.ally ? state.barbarian : null;
+        let barHp = bar ? bar.hp + (bar.bonusHp || 0) : 0;
+        const barDef = bar ? D.BARBARIAN.defence + (E.itemDef(bar.armour) ? E.itemDef(bar.armour).defence : 0) : 0;
         for (let round = 0; round < 40; round++) {
             const mv = myE >= heavy.energy ? heavy : light;
             let dmg = Math.max(0, mv.damage + atk - foeDef - after);
             if (enemyId === 'royal_guards' && foeHp <= 50) dmg = Math.max(0, dmg - 25);
             myE = myE - mv.cost + 1;
-            foeHp -= dmg + ally * 30;
+            foeHp -= dmg + (barHp > 0 ? 30 : 0);
             if (foeHp <= 0) return { win: true, hpLeft: hp, rounds: round + 1 };
             if (enemyId === 'orc_warriors') foeHp += 10;
             const fm = foe.moves.filter(m => m.energy <= foeE).sort((x, y) => y.energy - x.energy)[0];
             let fd = enemyDmg(state, fm);
             if (enemyId === 'royal_soldiers' && foeHp <= 50) fd += 20;
             if (enemyId === 'royal_guards' && foeHp <= 50) fd += 10;
-            let taken = Math.max(R.enemyMinDamage, fd - myDef);
-            if (ally) taken = Math.round(taken * 0.55);
-            if (enemyId === 'thieves' && p.gold < 5 * (round + 1)) taken += 15;
             foeE = foeE - fm.cost + 1;
+            if (barHp > 0) { barHp -= Math.max(R.enemyMinDamage, fd - barDef); continue; }
+            let taken = Math.max(R.enemyMinDamage, fd - myDef);
+            if (enemyId === 'thieves' && p.gold < 5 * (round + 1)) taken += 15;
             hp -= taken;
             if (hp <= 0) return { win: false, hpLeft: 0, rounds: round + 1 };
         }
@@ -7449,6 +7662,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function redirect(b, tgt) {
+        const guard = E.guardOf(b, tgt);
+        if (guard) return guard;
         if (tgt.enemyId === 'oblivion_mage') {
             const fen = b.units.find(x => x.enemyId === 'fenrirak');
             if (fen && !fen.down) return fen;
@@ -7538,6 +7753,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             // Lose whatever matters least.
             let best = null;
             pend.options.forEach(o => {
+                if (o.disabled) return;
                 let cost;
                 if (o.key === 'gold') cost = 40;
                 else {
@@ -7647,8 +7863,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     <script>
 /* ==== game-oblivion/solo.js ==== */
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
-   solo.js — the single-player game.
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   solo.js: the single-player game.
 
    This wears exactly the same face as net.js: PID, createRoom, subscribe,
    act, closeRoom. Online the state sits in Firestore and every action runs
@@ -8000,8 +8216,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     <script>
 /* ==== game-oblivion/ui.js ==== */
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
-   ui.js — everything you see and click.
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   ui.js: everything you see and click.
 
    The screen is laid out as "UI Layout.jpeg" draws it. The board only says
    each square's name and shows its picture; clicking a square opens its
@@ -8087,7 +8303,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function portrait(p) {
         return p && p.cls ? '<img src="' + artFor(p.cls) + '" alt="' + esc(D.CLASSES[p.cls].name) + '">' : '';
     }
-    function className(cls) { return cls === 'barbarian' ? 'Barbarian' : (D.CLASSES[cls] ? D.CLASSES[cls].name : '—'); }
+    function className(cls) { return cls === 'barbarian' ? 'Barbarian' : (D.CLASSES[cls] ? D.CLASSES[cls].name : 'No class yet'); }
 
     function nameRe() {
         const names = (S && S.players || []).filter(p => p.name)
@@ -8184,7 +8400,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             dieEl.style.top = y + 'px';
             labelEl.style.left = x + 'px';
             labelEl.style.top = y + 'px';
-            labelEl.textContent = (die.who || '') + (die.why ? ' · ' + whyLabel(die.why) : '') + ' — ' + die.roll;
+            labelEl.textContent = (die.who || '') + (die.why ? ' · ' + whyLabel(die.why) : '') + ': ' + die.roll;
             dieEl.style.setProperty('--tx', Math.round((fromLeft ? -150 : w + 150) - x) + 'px');
             dieEl.style.setProperty('--ty', Math.round(-(170 + Math.random() * 180)) + 'px');
             spinY = fromLeft ? 720 : -720;
@@ -8401,7 +8617,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 else if (lost) {
                     big = 'DEFEATED';
                     small = duel ? nm(lb.winner, true) + ' wins the duel and takes your Gold. Back to the Start.'
-                        : nm(lb.winner, true) + ' won. Back to the Start \u2014 you keep everything.';
+                        : nm(lb.winner, true) + ' won. Back to the Start, and you keep everything.';
                 }
                 else {
                     watch = true;
@@ -8410,6 +8626,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 }
                 const cls = 'bend' + (lost || (watch && lb.winner.enemyId) ? ' lose' : '') + (watch ? ' watch' : '');
                 const html = '<b>' + big + '</b><span>' + esc(small) + '</span>';
+                // Watching the fight: the last blow lands first, and the loser
+                // is seen to hit 0, before the banner goes up.
+                if (lb.final && /^battle:/.test(modalSig)) {
+                    BANNERS.add('blow', done => { showLastBlow(lb); setTimeout(done, LAST_BLOW_MS); });
+                }
                 BANNERS.add('bend', done => {
                     if (!el) { el = document.createElement('div'); document.body.appendChild(el); }
                     el.className = cls;
@@ -8767,7 +8988,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (!S) return '';
         if (S.phase === 'order') {
             const left = S.players.filter(p => p.orderRoll === null).map(p => p.name);
-            return left.length ? 'Rolling for turn order — waiting on ' + left.join(', ') : 'Turn order settled.';
+            return left.length ? 'Rolling for turn order. Waiting on ' + left.join(', ') : 'Turn order settled.';
         }
         if (S.paused) return 'The host has paused the game.';
         const cur = E.currentPlayer(S);
@@ -8787,7 +9008,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 const u = E.curUnit(b);
                 if (u) step = u.kind === 'enemy' ? E.unitName(S, u, true) + (E.isPlural(u) ? ' attack' : ' attacks') : E.unitName(S, u, true) + ' chooses an attack';
             }
-            return where + (step ? ' — ' + step : '') + '.';
+            return where + (step ? ': ' + step : '') + '.';
         }
         const pend = S.pending;
         if (pend) {
@@ -8808,7 +9029,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             }
         }
         return cur.hasMoved
-            ? 'Finishing their turn — shopping, trading or changing gear before ending it.'
+            ? 'Finishing their turn: shopping, trading or changing gear before ending it.'
             : 'About to roll and move.';
     }
 
@@ -8858,7 +9079,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const track = '<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" style="stroke:var(--btn2-top)" stroke-width="7"/></svg>';
         if (t.untimed) {
             el.classList.add('untimed');
-            el.innerHTML = '<div class="ring">' + track + '<b>Off</b></div><div class="tlabel">Untimed — single player</div>';
+            el.innerHTML = '<div class="ring">' + track + '<b>Off</b></div><div class="tlabel">Untimed in single player</div>';
             return;
         }
         if (t.enemy) {
@@ -8915,7 +9136,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             h += btn('a-close', 'End game', 'small danger', false);
         } else if (isSolo()) {
             h += btn('a-pause', S.paused ? 'Resume' : 'Pause', 'small', false);
-            h += btn('a-quit', 'Save &amp; quit', 'small', false, 'Your game is saved — carry it on from the front page');
+            h += btn('a-quit', 'Save &amp; quit', 'small', false, 'Your game is saved. Carry it on from the front page');
         } else {
             h += btn('a-leave', 'Leave game', 'small danger', false);
         }
@@ -8972,9 +9193,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return D.CLASSES[p.cls].defence + (a ? a.defence : 0) + (w ? w.defence : 0);
     }
 
-    function eqCardHtml(inst, kind, owner) {
+    function eqCardHtml(inst, kind, owner, barb) {
         const d = E.itemDef(inst);
         if (!d) {
+            if (barb) return '<div class="eq-card empty">The Barbarian has no ' + kind + ' on' +
+                '<br><small>Give him Barbarian gear from your pack.</small></div>';
             return '<div class="eq-card empty">No ' + kind + ' equipped' +
                 (kind === 'armour' ? '<br><small>Only your class defence protects you.</small>' : '<br><small>Your attacks get no weapon bonus.</small>') + '</div>';
         }
@@ -8993,20 +9216,30 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             we.innerHTML = '<h3>Equipped Weapon</h3><div class="eq-card empty">Watching</div>';
             return;
         }
+        // With the Barbarian following you his gear gets cards of its own
+        // under yours: your card stops level with the dashed line in the
+        // middle card, and his take the rest of the column.
         const bar = E.hasBarbarian(S, p) ? S.barbarian : null;
-        ar.innerHTML = '<h3>Equipped Armour</h3>' + eqCardHtml(E.armourOf(p), 'armour', p) +
-            (bar ? '<div class="barb-line">Barbarian wears: ' + esc(bar.armour ? E.itemDef(bar.armour).name : 'nothing') + '</div>' : '');
-        we.innerHTML = '<h3>Equipped Weapon</h3>' + eqCardHtml(E.weaponOf(p), 'weapon', p) +
-            (bar ? '<div class="barb-line">Barbarian wields: ' + esc(bar.weapon ? E.itemDef(bar.weapon).name : 'nothing') + '</div>' : '');
+        const part = (title, card, cls) => '<div class="eq-part' + (cls ? ' ' + cls : '') + '"><h3>' + title + '</h3>' + card + '</div>';
+        ar.innerHTML = part('Equipped Armour', eqCardHtml(E.armourOf(p), 'armour', p)) +
+            (bar ? part('Barbarian\u2019s Armour', eqCardHtml(bar.armour, 'armour', null, true), 'barb') : '');
+        we.innerHTML = part('Equipped Weapon', eqCardHtml(E.weaponOf(p), 'weapon', p)) +
+            (bar ? part('Barbarian\u2019s Weapon', eqCardHtml(bar.weapon, 'weapon', null, true), 'barb') : '');
+        const row = ar.parentNode;
+        if (row) row.classList.toggle('with-barb', !!bar && profileTab === 'me');
     }
 
-    function hpBarHtml(o, cls) {
+    // `from`: the health it had a moment ago. The bar is drawn there and
+    // runs down to where it is now once it is on the screen.
+    function hpBarHtml(o, cls, from) {
         const max = Math.max(1, o.maxHp || 1);
         const bonus = o.bonusHp || 0;
         const total = max + bonus;
         const w = Math.max(0, Math.min(100, o.hp / total * 100));
         const bw = bonus / total * 100;
-        return '<div class="hp-bar ' + (cls || '') + '"><div class="fill" style="width:' + w.toFixed(1) + '%"></div>' +
+        const was = typeof from === 'number' && from !== o.hp + bonus ? Math.max(0, Math.min(100, from / total * 100)) : null;
+        return '<div class="hp-bar ' + (cls || '') + '"><div class="fill" style="width:' + (was === null ? w : was).toFixed(1) + '%"' +
+            (was === null ? '' : ' data-to="' + w.toFixed(1) + '"') + '></div>' +
             (bonus ? '<div class="bonus" style="left:' + w.toFixed(1) + '%;width:' + bw.toFixed(1) + '%"></div>' : '') +
             '<div class="txt">' + o.hp + ' / ' + max + (bonus ? ' +' + bonus : '') + ' HP</div></div>';
     }
@@ -9034,7 +9267,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return D.FRAGMENTS.map(n => {
             const have = p.fragments.indexOf(n) >= 0;
             const cls = 'slot' + (have ? ' have' : '') + (need.indexOf(n) < 0 ? ' notneeded' : '');
-            return '<span class="' + cls + '" title="Pendant Fragment #' + n + (have ? ' — held' : '') + '">' +
+            return '<span class="' + cls + '" title="Pendant Fragment #' + n + (have ? ' (held)' : '') + '">' +
                 (have ? A.ICONS.fragment(n, 22) : '#' + n) + '</span>';
         }).join('');
     }
@@ -9059,13 +9292,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 '<div class="stat">' + A.ICONS.key(20) + '<div><b>' + p.keys + '</b><small>Chest Keys</small></div></div>' +
                 '<div class="stat">' + A.ICONS.shield(20) + '<div><b>' + defenceTotal(p) + '</b><small>Defence</small></div></div>' +
                 '<div class="stat">' + A.ICONS.sword(20) + '<div><b>+' + attackBonus(p) + '</b><small>Attack bonus</small></div></div>' +
-                '<div class="stat">' + A.ICONS.skull(20) + '<div><b>' + (p.deaths | 0) + '</b><small>Deaths</small></div></div>' +
+                '<div class="stat">' + A.ICONS.dead(20) + '<div><b>' + (p.deaths | 0) + '</b><small>Deaths</small></div></div>' +
                 '</div>';
             h += '<div class="frag-row">' + A.ICONS.pendant(p.fragments, 30) + '<div><div style="font-size:12px" class="muted">Pendant Fragments</div>' +
                 '<div class="frags">' + fragSlots(p) + '</div></div></div>';
             const st = abilityState(p);
             h += '<div class="ability-box"><span class="state' + (st.ready ? ' ready' : '') + '">' + esc(st.text) + '</span>' +
-                '<b>' + esc(cls.ability.name) + '</b> — ' + esc(cls.ability.text) +
+                '<b>' + esc(cls.ability.name) + ':</b> ' + esc(cls.ability.text) +
                 ' <span class="muted">Roll even to use it; once every 3 of your turns.</span></div>';
             const chips = [];
             if (p.skipNext) chips.push('<span class="chip bad">Skips next turn</span>');
@@ -9078,14 +9311,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (p.away) chips.push('<span class="chip bad">Away</span>');
             const bc = buffChips(p.buffs);
             if (chips.length || bc) h += '<div class="status-chips">' + chips.join('') + bc + '</div>';
+            h = '<div class="prof-main">' + h + '</div>';
             if (E.hasBarbarian(S, p)) {
                 const bar = S.barbarian;
                 h += '<div class="ally-box"><img src="' + A.CHARACTER_URI.barbarian + '" alt="Barbarian">' +
-                    '<div><b>Barbarian (Ally)</b> <span class="muted" style="font-size:12px">fights beside you</span>' +
-                    hpBarHtml(bar, 'ally') + '<div class="gear">Weapon: ' + esc(bar.weapon ? E.itemDef(bar.weapon).name : 'none') +
-                    (bar.weapon && bar.weapon.uses ? ' (' + bar.weapon.uses + ')' : '') + ' · Armour: ' +
-                    esc(bar.armour ? E.itemDef(bar.armour).name : 'none') + (bar.armour && bar.armour.uses ? ' (' + bar.armour.uses + ')' : '') +
-                    '</div>' + (bar.buffs && bar.buffs.length ? '<div class="status-chips">' + buffChips(bar.buffs) + '</div>' : '') + '</div></div>';
+                    '<div><b>Barbarian (Ally)</b> <span class="muted" style="font-size:12px">takes the blows for you</span>' +
+                    hpBarHtml(bar, 'ally') + '<div class="gear">Defence ' + D.BARBARIAN.defence +
+                    (E.itemDef(bar.armour) ? ' + ' + E.itemDef(bar.armour).defence + ' from his armour' : '') + '</div>' +
+                    (bar.buffs && bar.buffs.length ? '<div class="status-chips">' + buffChips(bar.buffs) + '</div>' : '') + '</div></div>';
             }
         } else {
             const list = profileTab === 'me' ? S.players.filter(x => x.cls) : others;
@@ -9158,8 +9391,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 const why = block || (used ? 'The Barbarian has already changed his ' + kind + ' this turn.' : '');
                 buttons += '<button class="btn small" data-barb="' + inst.uid + '"' + (why ? ' disabled title="' + esc(why) + '"' : '') + '>Give to Barbarian</button>';
             }
-            const note = !mine && !forBar ? 'For a ' + className(d.cls) + ' — trade it away.' :
-                (forBar && !hasBar ? 'Barbarian gear — for when he follows you.' : '');
+            const note = !mine && !forBar ? 'For a ' + className(d.cls) + '. Trade it away.' :
+                (forBar && !hasBar ? 'Barbarian gear, for when he follows you.' : '');
             return '<div class="row-item' + (equipped ? ' equipped' : '') + (!mine && !(forBar && hasBar) ? ' other-cls' : '') + '">' +
                 '<div><div class="nm">' + esc(d.name) + (row.n > 1 ? ' \u00d7' + row.n : '') + ' ' +
                 (equipped ? '<span class="badge">Equipped</span>' : '') +
@@ -9189,7 +9422,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 const cb = E.canUsePotion(S, p.id, uid, 'barbarian');
                 buttons += '<button class="btn small" data-potion-barb="' + uid + '"' + (cb.ok ? '' : ' disabled title="' + esc(cb.why) + '"') + '>On Barbarian</button>';
             }
-            const tag = d.speed ? '<span class="badge speed">Speed</span>' : (d.group === 'astrix' ? '<span class="badge">Astrix</span>' : '');
+            const tag = d.group === 'astrix' ? '<span class="badge">Astrix</span>' : '';
             return '<div class="row-item"><div><div class="nm">' + esc(d.name) +
                 (groups[id].length > 1 ? ' ×' + groups[id].length : '') + tag + '</div>' +
                 '<div class="tx">' + esc(d.text) + '</div><div class="bt">' + buttons + '</div></div></div>';
@@ -9210,7 +9443,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const countKind = k => p.inventory.filter(it => E.itemDef(it) && E.itemDef(it).kind === k).length;
         la.innerHTML = '<h3>All Armours <small>' + countKind('armour') + ' · best on top</small></h3><div class="rows">' + gearRows(p, 'armour') + '</div>';
         lw.innerHTML = '<h3>All Weapons <small>' + countKind('weapon') + ' · best on top</small></h3><div class="rows">' + gearRows(p, 'weapon') + '</div>';
-        lp.innerHTML = '<h3>Potions <small>' + p.potions.length + ' · speed, then best</small></h3><div class="rows">' + potionRows(p) + '</div>';
+        lp.innerHTML = '<h3>Potions <small>' + p.potions.length + ' · movement first, then best</small></h3><div class="rows">' + potionRows(p) + '</div>';
         la.querySelector('.rows').scrollTop = sa;
         lw.querySelector('.rows').scrollTop = sw;
         lp.querySelector('.rows').scrollTop = sp;
@@ -9271,6 +9504,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         m.scrollTop = keep;
         return true;
     }
+    // The little round buttons' marks, drawn rather than typed: a typed
+    // cross or dash sits wherever its font puts it, never quite centred.
+    const X_ICONS = {
+        close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>',
+        min: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 12h11"/></svg>'
+    };
+
     function closeModal() {
         $('#modal-back').classList.remove('show', 'mini', 'dock');
         $('#modal').innerHTML = '';
@@ -9298,13 +9538,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     /* ---- a fight ------------------------------------------------------- */
 
+    // Each fighter's health the last time the fight was drawn, to show what
+    // a blow did. Kept for one fight only: a new fight starts clean, or a
+    // duel would open with a heal for whatever you got back since your last.
     let prevHp = {};
+    let prevHpFight = null;
     let enemyKey = '';
     const ENEMY_PAUSE_MS = 1700;
 
-    function fighterHtml(b, u) {
+    // `fin` is a fighter's health as the last blow of a fight left it.
+    function fighterHtml(b, u, fin) {
         const cur = E.curUnit(b);
-        const o = E.body(S, u);
+        const o = fin || E.body(S, u);
         let pic, role;
         if (u.kind === 'player') {
             const pl = E.player(S, u.pid);
@@ -9320,11 +9565,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const hpNow = o.hp + (o.bonusHp || 0);
         const before = prevHp[u.key];
         let pop = '';
-        if (before !== undefined && before !== hpNow && !u.down) {
+        if (before !== undefined && before !== hpNow && (!u.down || fin)) {
             const d = hpNow - before;
             pop = '<span class="dmg-pop' + (d > 0 ? ' heal' : '') + '">' + (d > 0 ? '+' : '') + d + '</span>';
         }
-        prevHp[u.key] = hpNow;
+        if (!fin) prevHp[u.key] = hpNow;
         const big = u.kind === 'enemy' && D.ENEMIES[u.enemyId].boss;
         const pips = [];
         const shown = Math.max(5, u.energy);
@@ -9338,10 +9583,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     esc(x.name) + '</div>').join('');
             }
         }
-        return '<div class="fighter' + (big ? ' big' : '') + (cur === u && !u.down ? ' turn' : '') + (u.down ? ' down' : '') +
+        return '<div class="fighter' + (big ? ' big' : '') + (cur === u && !u.down ? ' turn' : '') + (u.down ? (fin && before > 0 ? ' falling' : ' down') : '') +
             (pop && hpNow < before ? ' hit' : '') + '" data-unit="' + esc(u.key) + '">' + pic +
             '<div style="min-width:0"><div class="fn">' + esc(E.unitName(S, u, true).replace(/^The /, '')) + '</div><div class="fr">' + esc(role) + '</div>' +
-            hpBarHtml({ hp: o.hp, maxHp: o.maxHp, bonusHp: o.bonusHp }, u.kind === 'ally' ? 'ally' : '') +
+            hpBarHtml({ hp: o.hp, maxHp: o.maxHp, bonusHp: o.bonusHp }, u.kind === 'ally' ? 'ally' : '', fin ? before : undefined) +
             '<div class="energy-row">' + pips.join('') + '<span class="en">' + u.energy + ' energy</span></div>' +
             '<div class="chips">' + buffChips(E.buffsOf(S, u)) + '</div>' + passives + '</div>' + pop + '</div>';
     }
@@ -9377,11 +9622,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const fen = b.units.find(x => x.enemyId === 'fenrirak');
             if (fen && !fen.down) hit = fen;
         }
+        if (tgt && E.guardOf(b, tgt)) hit = E.guardOf(b, tgt);
         if (!hit) return '';
         const c = E.computeHit(S, b, u, hit, m);
         let s = '<b>' + c.attack + '</b> attack − <b>' + c.defence + '</b> defence';
         if (c.after.length) s += ' − ' + c.after.map(x => x.value + ' (' + x.label + ')').join(' − ');
-        s += ' = <b>' + c.net + '</b> damage' + (hit !== tgt ? ' to Fenrirak' : '');
+        s += ' = <b>' + c.net + '</b> damage' + (hit !== tgt ? (hit.kind === 'ally' ? ' to the Barbarian' : ' to Fenrirak') : '');
         if (c.wasted) s += ' (potion wasted)';
         return '<div class="sum" title="' + esc(c.attackParts.map(x => x.label + ' ' + (x.value >= 0 ? '+' : '') + x.value).join(', ')) + '">' + s + '</div>';
     }
@@ -9410,29 +9656,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             return;
         }
 
+        if (prevHpFight !== b.logFrom) { prevHp = {}; prevHpFight = b.logFrom; }
         const sig = 'battle:' + b.logFrom + '|' + JSON.stringify(b) + '|' + S.logSeq + '|' + selTarget + '|' + (p ? p.potions.length + ':' + p.hp + ':' + p.bonusHp : '') +
             '|' + JSON.stringify(S.barbarian);
-        let title;
-        if (b.kind === 'boss') title = 'The Final Battle';
-        else if (b.kind === 'pvp') title = 'Duel on ' + D.SQUARES[b.squareId].name;
-        else title = 'Battle — ' + enemyName(b.units.find(u => u.kind === 'enemy').enemyId, true).replace(/^The /, '');
 
         let h = '<div class="battle">';
-        if (!involved) h += '<button class="x-btn" id="b-hide" title="Watch from the board">–</button>';
-        h += '<h2>' + A.ICONS.flame(24) + esc(title) + '</h2><div class="round">Round ' + b.round +
-            (b.kind === 'boss' ? ' · Fenrirak, then you, then Oblivion Mage Helen' : '') + '</div>';
-        const sideA = b.units.filter(u => u.side === 'A');
-        const sideB = b.units.filter(u => u.side === 'B');
-        // Every fighter with its stat card straight under it, as The Thunder
-        // Dragon has them: your class, your Barbarian, the monster.
-        const column = list => list.map(u => '<div class="fighter-wrap">' + fighterHtml(b, u) + unitCardHtml(b, u) + '</div>').join('');
-        h += '<div class="battle-field"><div class="side">' + column(sideA) + '</div>' +
-            '<div class="vs">VS</div><div class="side">' + column(sideB) + '</div></div>';
+        if (!involved) h += '<button class="x-btn" id="b-hide" title="Watch from the board" aria-label="Watch from the board">' + X_ICONS.min + '</button>';
+        h += battleHead(b) + battleField(b);
 
         // Whose blow it is.
         let status, mineNow = false;
         if (b.phase === 'order') {
-            const rolls = Object.keys(b.orderRolls).map(id => E.player(S, id).name + ': ' + (b.orderRolls[id] === null ? '—' : b.orderRolls[id]));
+            const rolls = Object.keys(b.orderRolls).map(id => E.player(S, id).name + ': ' + (b.orderRolls[id] === null ? 'not yet' : b.orderRolls[id]));
             status = 'Roll for who strikes first. ' + rolls.join(' · ');
             mineNow = p && b.orderRolls.hasOwnProperty(p.id) && b.orderRolls[p.id] === null;
         } else if (b.phase === 'ask') {
@@ -9441,11 +9676,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         } else if (cur && cur.kind === 'enemy') {
             status = E.unitName(S, cur, true) + (E.isPlural(cur) ? ' are' : ' is') + ' attacking…';
         } else if (cur) {
-            status = myStep ? (cur.kind === 'ally' ? 'Choose the Barbarian’s attack' : 'Your turn — choose an attack') :
+            status = myStep ? (cur.kind === 'ally' ? 'Choose the Barbarian’s attack' : 'Your turn: choose an attack') :
                 'Waiting for ' + E.unitName(S, cur) + '…';
             mineNow = myStep;
         }
-        h += '<div class="battle-status' + (mineNow ? ' me' : '') + '">' + colourNames(status) + '</div>';
+        h += '<div class="battle-status' + (mineNow ? ' me' : '') + '"><span>' + colourNames(status) + '</span></div>';
 
         if (b.phase === 'order' && mineNow) {
             h += '<div class="modal-actions" style="justify-content:center"><button class="btn primary" id="b-order">Roll the die</button></div>';
@@ -9456,11 +9691,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         }
         if (myStep) h += battleControls(b, cur, p);
 
-        // The fight's own log, newest on top.
-        const lines = S.log.filter(l => l.n > b.logFrom);
-        h += '<div class="battle-log" id="battle-log">' + (lines.length ? logLines(lines) :
-            '<div class="t-muted">The fight begins.</div>') + '</div>';
-        h += '</div>';
+        h += battleLogHtml(b) + '</div>';
 
         if (showModal(h, 'wide', sig)) {
             const bl = $('#battle-log');
@@ -9477,6 +9708,61 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             bind('b-ability', () => act('useAbility'));
         }
         driveEnemy();
+    }
+
+    function battleTitle(b) {
+        if (b.kind === 'boss') return 'The Final Battle';
+        if (b.kind === 'pvp') return 'Duel on ' + D.SQUARES[b.squareId].name;
+        return 'Battle: ' + enemyName(b.units.find(u => u.kind === 'enemy').enemyId, true).replace(/^The /, '');
+    }
+    function battleHead(b) {
+        return '<h2>' + esc(battleTitle(b)) + '</h2><div class="round">Round ' + b.round +
+            (b.kind === 'boss' ? ' · Fenrirak, then you, then Oblivion Mage Helen' : '') + '</div>';
+    }
+    // Every fighter with its stat card straight under it, as The Thunder
+    // Dragon has them: your class, your Barbarian, the monster.
+    function battleField(b, fin) {
+        const column = list => list.map(u => '<div class="fighter-wrap">' + fighterHtml(b, u, fin ? fin[u.key] : null) +
+            unitCardHtml(b, u) + '</div>').join('');
+        return '<div class="battle-field"><div class="side">' + column(b.units.filter(u => u.side === 'A')) + '</div>' +
+            '<div class="vs">VS</div><div class="side">' + column(b.units.filter(u => u.side === 'B')) + '</div></div>';
+    }
+    // The fight's own log, newest on top.
+    function battleLogHtml(b) {
+        const lines = S.log.filter(l => l.n > b.logFrom);
+        return '<div class="battle-log" id="battle-log">' + (lines.length ? logLines(lines) :
+            '<div class="t-muted">The fight begins.</div>') + '</div>';
+    }
+
+    /* The last blow of a fight, held on the screen: whoever it finished
+       runs down to 0 before the banner says who won. Drawn from the fight
+       as the engine left it at that blow, since by now the loser may be
+       back at the Start on full health. */
+    const LAST_BLOW_MS = 1700;
+    function showLastBlow(lb) {
+        const b = lb.final;
+        const fin = b.lastHp || {};
+        const loser = lb.loser || {};
+        let fell;
+        if (lb.kind === 'boss' && !loser.enemyId) fell = loser.name + ' is defeated!';
+        else if (lb.kind === 'boss') fell = 'Fenrirak and Oblivion Mage Helen are defeated!';
+        else if (loser.enemyId) fell = D.foeName(D.ENEMIES[loser.enemyId], true) + (D.ENEMIES[loser.enemyId].plural ? ' are' : ' is') + ' defeated!';
+        else fell = loser.name + ' is defeated!';
+        const h = '<div class="battle">' + battleHead(b) + battleField(b, fin) +
+            '<div class="battle-status"><span>' + colourNames(fell) + '</span></div>' + battleLogHtml(b) + '</div>';
+        const m = $('#modal');
+        const keep = m.scrollTop;
+        showModal(h, 'wide', 'battle:' + b.logFrom + '|last');
+        m.scrollTop = keep;
+        prevHp = {};
+        // Drawn where they were, then let run down to where the blow left
+        // them; whoever it finished is stamped DEFEATED once they hit 0.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            $$('#modal .hp-bar .fill[data-to]').forEach(f => { f.style.width = f.getAttribute('data-to') + '%'; });
+        }));
+        setTimeout(() => {
+            $$('#modal .fighter.falling').forEach(f => { f.classList.remove('falling'); f.classList.add('down'); });
+        }, 900);
     }
 
     function currentTarget(b, u) {
@@ -9504,31 +9790,34 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<div class="me">Needs ' + m.energy + ' energy' + (m.cost ? ' · costs ' + m.cost : '') + '</div>' +
             moveSumHtml(b, u, tgt, m) + (m.text ? '<div class="fx">' + esc(m.text) + '</div>' : '') + '</button>').join('') + '</div>';
 
-        // Potions you could drink right now.
-        const usable = [];
+        // Every potion you carry, with what it does written on it: the ones
+        // you can drink now first, the rest greyed out with the reason.
+        const usable = [], later = [];
         const seen = {};
         p.potions.forEach(x => {
             if (seen[x.id]) return;
-            const can = E.canUsePotion(S, p.id, x.uid);
-            if (!can.ok) return;
             seen[x.id] = true;
+            const d = D.POTIONS[x.id];
+            const can = E.canUsePotion(S, p.id, x.uid);
             const n = p.potions.filter(y => y.id === x.id).length;
-            usable.push('<button class="btn small" data-bpotion="' + x.uid + '" title="' + esc(D.POTIONS[x.id].text) + '">' +
-                esc(D.POTIONS[x.id].name) + (n > 1 ? ' ×' + n : '') + '</button>');
+            const card = '<button class="bpot"' + (can.ok ? ' data-bpotion="' + x.uid + '"' : ' disabled') + '>' +
+                '<b>' + esc(d.name) + (n > 1 ? ' ×' + n : '') + '</b><span>' + esc(d.text) + '</span>' +
+                (can.ok ? '' : '<i>' + esc(can.why || 'Not right now.') + '</i>') + '</button>';
+            (can.ok ? usable : later).push(card);
         });
         const R = D.RULES;
         let lim = 'Healing ' + b.pot.heal + '/' + R.potionsHealingPerTurn + ' · Other ' + b.pot.other + '/' + R.potionsOtherPerTurn +
             (b.pot.astrix ? ' · Astrix used' : '');
         if (E.oblivionControlOn(b)) lim = 'Oblivion Control: no potions after Annihilation Void.';
         h += '<h4>Potions' + (u.kind === 'ally' ? ' (the Barbarian drinks them)' : '') + ' <span class="limits">' + esc(lim) + '</span></h4><div class="bpotions">' +
-            (usable.length ? usable.join('') : '<span class="muted" style="font-size:12.5px">None you can drink right now.</span>') + '</div>';
+            (usable.length || later.length ? usable.concat(later).join('') : '<span class="muted" style="font-size:12.5px">You are not carrying any potions.</span>') + '</div>';
 
         if (u.kind === 'player') {
             const ab = D.CLASSES[p.cls].ability;
             if (ab.inBattle) {
                 const can = E.canUseAbility(S, p.id);
                 h += '<h4>Ability</h4><button class="btn small" id="b-ability"' + (can.ok ? '' : ' disabled title="' + esc(can.why) + '"') + '>' +
-                    esc(ab.name) + ' — ' + esc(can.ok ? 'roll even to use it' : can.why) + '</button>';
+                    esc(ab.name) + ': ' + esc(can.ok ? 'roll even to use it' : can.why) + '</button>';
             }
         }
         return h + '</div>';
@@ -9568,17 +9857,17 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function walkLabel(w, p) {
         const sq = D.SQUARES[w.pos];
         switch (w.outcome) {
-            case 'stop': return walkLabel(Object.assign({}, w, { outcome: 'landed' }), p) + ' — a STOP: your move ends there';
+            case 'stop': return walkLabel(Object.assign({}, w, { outcome: 'landed' }), p) + ' (a STOP: your move ends there)';
             case 'split': {
-                if (!p || !w.remaining) return 'Route Split \u2014 then choose a route';
+                if (!p || !w.remaining) return 'Route Split, then choose a route';
                 const at = Object.assign({}, p, { pos: w.pos, route: null });
                 const main = E.previewWalk(S, at, w.remaining, 'main');
                 const long = E.previewWalk(S, at, w.remaining, 'long');
                 return 'Route Split, then ' + w.remaining + ' more: ' + walkLabel(main) + ' (main) or ' + walkLabel(long) + ' (long)';
             }
             case 'optional': return 'Optional stop: ' + sq.name;
-            case 'shield': return 'The shield — without the fragments it sends you to the Start!';
-            case 'arena': return 'Fenrirak’s Arena — the final battle';
+            case 'shield': return 'The shield! Without the fragments it sends you to the Start.';
+            case 'arena': return 'Fenrirak’s Arena: the final battle';
             default: {
                 const rival = S.players.find(x => x.id !== NET.PID && x.cls && x.pos === w.pos && w.pos !== D.START);
                 return sq.name + (rival ? ' (duel with ' + rival.name + '!)' : '');
@@ -9604,7 +9893,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 // Kept small: the board it is asking about has to stay in view.
                 // Each choice names where it lands; the whole story is in its
                 // tooltip and lit up on the board.
-                h += '<div class="move-ask"><h2>You rolled a ' + pend.raw + ' — how far?</h2>' +
+                h += '<div class="move-ask"><h2>You rolled a ' + pend.raw + '. How far?</h2>' +
                     (pend.sources.length ? '<div class="sub">' + esc(pend.sources.join(' · ')) + '</div>' : '') +
                     '<div class="move-grid">';
                 for (let t = pend.min; t <= pend.max; t++) {
@@ -9655,6 +9944,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                                 esc(item.text) + (item.cls === 'barbarian' ? ' (for your Barbarian)' : '') + '</span></button>';
                         }
                         const inst = p.inventory.find(x => x.uid === o.key);
+                        if (o.disabled) return '<button class="choice-btn" disabled><b>' + esc(o.label) + '</b><span>' + esc(o.why || '') + '</span></button>';
                         return '<button class="choice-btn" data-choose="' + esc(o.key) + '"><b>' + esc(o.label) + '</b>' +
                             (inst ? '<span>' + esc(E.itemDef(inst).text) + '</span>' : '') + '</button>';
                     }).join('') + '</div>';
@@ -9764,7 +10054,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const keep = panel && panel.key === panelKey ? el.scrollTop : 0;
         panelKey = panel ? panel.key : '';
         el.className = 'modal' + (wide ? ' ' + wide : '');
-        el.innerHTML = '<button class="x-btn" id="panel-x" aria-label="Close">\u00d7</button>' + html;
+        el.innerHTML = '<button class="x-btn" id="panel-x" aria-label="Close">' + X_ICONS.close + '</button>' + html;
         el.scrollTop = keep;
         bind('panel-x', closePanel);
     }
@@ -9913,7 +10203,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const them = E.player(S, partner);
             const openNow = (S.trades || []).find(t => t.fromId === mine.id && t.status === 'open');
             let h = '<h2>Propose a trade</h2><div class="sub">Gold, Pendant Fragments, Potions, Gemstones, Weapons and Armour can be ' +
-                'traded — nothing else. Both sides have to agree.</div>';
+                'traded, and nothing else. Both sides have to agree.</div>';
             if (openNow) {
                 const to = E.player(S, openNow.toId);
                 h += '<div class="offer-lines"><p>Your offer to <b>' + esc(to.name) + '</b> is waiting for an answer.</p>' +
@@ -10083,7 +10373,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const on = D.MODIFIERS.filter(x => S.mods && S.mods[x.id]);
         $('#mods-summary').innerHTML = on.length ? '<span class="muted">Modifiers: </span>' + on.map(x =>
             '<span class="mtag ' + x.side + '">' + esc(x.name) + '</span>').join('') :
-            (isHost() ? '<span class="muted">No modifiers — press the gear to toggle some.</span>' : '');
+            (isHost() ? '<span class="muted">No modifiers. Press the gear to toggle some.</span>' : '');
 
         const ready = S.players.length >= D.RULES.minPlayers && S.players.every(x => x.cls);
         let hint;
@@ -10147,7 +10437,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             setPanel('<div class="guide-pick"><h2 style="justify-content:center">How to play</h2><div class="sub">Two ways to learn the game.</div>' +
                 '<div class="guide-pick-grid">' +
                 '<button class="guide-pick-card" id="gp-walk"' + (blocked ? ' disabled' : '') + '>' + A.ICONS.flame(26) +
-                '<b>Walk me through it</b><span>The real screen on your real turn, lit up one thing at a time — including how to click ' +
+                '<b>Walk me through it</b><span>The real screen on your real turn, lit up one thing at a time, including how to click ' +
                 'a square to read what it does.</span><i>' + (blocked ? esc(blockedLabel(blocked)) : 'Live · press each button for real') + '</i></button>' +
                 '<button class="guide-pick-card" id="gp-rules">' + A.ICONS.pendant([1, 2, 3, 4, 5], 26) +
                 '<b>Read the rules</b><span>The whole rulebook on one page: moving, fighting, potions, the Pendant Fragments, ' +
@@ -10173,10 +10463,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 c.moves.map(m => esc(m.name) + ' ' + m.damage + ' (' + m.energy + 'E' + (m.cost ? ', −' + m.cost : '') + ')').join('<br>') +
                 '</td><td>' + esc(c.ability.name) + ': ' + esc(c.ability.text) + '</td></tr>';
         }).join('');
-        return '<div class="rules"><h2>' + A.ICONS.flame(26) + 'The Oblivion Dragon — the rules</h2>' +
+        return '<div class="rules"><h2>' + A.ICONS.flame(26) + 'The Oblivion Dragon: the rules</h2>' +
             '<p class="lore">Fenrirak has been controlled by Oblivion Mage Helen in Thornwick, the secret kingdom. The players are competing to stop ' +
             'her and Fenrirak and take all the glory for themselves. Every enemy is a soldier of the kingdom, loyal to its new ruler, trying to stop ' +
-            'you reaching the castle. The final battle is against Fenrirak and Helen at the same time — and you need all five Pendant Fragments to ' +
+            'you reaching the castle. The final battle is against Fenrirak and Helen at the same time, and you need all five Pendant Fragments to ' +
             'push through her magic shield.</p>' +
             '<h3>Objective</h3><p>Defeat the final bosses, Fenrirak and Oblivion Mage Helen, before anybody else does. Whoever defeats them wins.</p>' +
             '<h3>Set-up and turn order</h3><p>Everybody starts on the Start square with their class’s starter weapon and armour, no gold, and a ' +
@@ -10196,7 +10486,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             'gear breaks after 10 uses. Item cards are locked to your class.</p>' +
             '<h3>Abilities</h3><p>On your own turn (also during a battle on your turn), roll a die: even and it works; odd and it fails. A success can ' +
             'only happen once every 3 of your turns; a failure costs nothing but you can only try once a turn.</p>' +
-            '<h3>Battles</h3><p>Everybody starts a battle on 1 energy and gains 1 after each of their turns. Every attack lands — there is no ' +
+            '<h3>Battles</h3><p>Everybody starts a battle on 1 energy and gains 1 after each of their turns. Every attack lands: there is no ' +
             'roll to hit. Choose an attack you have the energy for; “minus N energy” is taken off when you use it. Each blow goes: choose ' +
             'an attack, pay its energy, deal the damage, then the next fighter. You always attack first, except in the final battle (Fenrirak, then you, then Helen). ' +
             'A battle is played to the finish before your turn moves on, and your energy goes back to 1 afterwards. Enemies always use the highest ' +
@@ -10205,12 +10495,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             'Never below 0. Every enemy deals at least 5. x2 multipliers double the very base only (the attack’s own damage, or your class’s ' +
             'own defence), then everything else is added.</p>' +
             '<h3>Death</h3><p>At 0 HP you go back to the Start with everything you own and full health. Every time you land on Start you get a ' +
-            'Special Potion (+10 HP) — only one at a time — and every monster you beat comes back to life.</p>' +
+            'Special Potion (+10 HP), only one at a time, and every monster you beat comes back to life.</p>' +
             '<h3>Monsters</h3><p>Land on a monster’s square to fight it. Monsters start every battle on full health and 1 energy and their ' +
             'abilities are on from the start. A monster’s health, defence and attacks stay hidden until you have fought it yourself; ' +
             'after that its square shows its whole stat card. Some leave a Monster Chest: 1 Chest Key opens it for 1 Gemstone.</p>' +
             '<h3>The Barbarian</h3><p>Beat the Barbarian at the Adventurers’ Inn and he follows you as your Barbarian (Ally): he fights at your ' +
-            'side in every battle, you choose his attacks, and you can give him Barbarian gear. Monsters take turns striking you and him. There is ' +
+            'side in every battle, you choose his attacks, and you can give him Barbarian gear. He stands in front of you: every blow aimed at ' +
+            'you, from a monster or from another player, lands on him until he is struck down, and only then do you start taking damage. There is ' +
             'only one: while he follows somebody, nobody else can fight him for Pendant Fragment #2. If his player dies (or he is struck down) he ' +
             'goes back to his inn; if his player loses a PvP fight he follows the winner, who gets Fragment #2.</p>' +
             '<h3>PvP</h3><p>Land on another player’s square (not the Start) and you fight. Both roll for who strikes first. All defence is ' +
@@ -10256,7 +10547,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 { id: 'board', title: 'The board', body: 'Every square shows only its name and picture. Your piece is ringed in gold. The main route goes ' +
                     'up beside the wall; the long route winds round the mountain. The castle in the middle is Fenrirak’s Arena, behind the ' +
                     'Oblivion Mage’s purple shield.' },
-                { id: 'board', title: 'Click a square', square: true, body: '<b>Click any square on the board now</b> to see what it does — ' +
+                { id: 'board', title: 'Click a square', square: true, body: '<b>Click any square on the board now</b> to see what it does: ' +
                     'its full description, and what a monster leaves behind. A monster’s own numbers stay hidden until you have fought it. ' +
                     'Close the card when you have read it and the tour carries on.' },
                 { id: 'a-roll', title: 'Roll & move', live: true, body: 'Press it for real. One die decides how far you walk; if anything adds to ' +
@@ -10266,12 +10557,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     'affecting you. The other tab shows everybody else.' },
                 { id: 'eq-armour', title: 'Equipped armour', body: 'What you are wearing, and how many uses it has left if it can break.' },
                 { id: 'eq-weapon', title: 'Equipped weapon', body: 'What you are fighting with. Its bonus is added to every attack.' },
-                { id: 'list-armour', title: 'All your armour', body: 'Everything you own, best on top. Equip a piece on your turn — one change a turn.' },
+                { id: 'list-armour', title: 'All your armour', body: 'Everything you own, best on top. Equip a piece on your turn, one change a turn.' },
                 { id: 'list-weapons', title: 'All your weapons', body: 'Best on top, the same way.' },
                 { id: 'list-potions', title: 'Potions', body: 'Speed potions (movement) on top, then best. Drink movement potions before you roll, ' +
                     'battle potions during a fight.' },
                 { id: 'log-card', title: 'The game log', body: 'Everything that has happened, the newest at the top.' },
-                { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles — or click his stall on the board.' },
+                { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles, or click his stall on the board.' },
                 { id: 'a-trade', title: 'Trade', live: true, body: 'Offer another player Gold, Fragments, Potions, Gemstones, Weapons or Armour.' },
                 { id: 'a-end', title: 'End turn', live: true, body: 'Press it when you are done. This is the last stop of the tour.' }
             ].filter(s => document.getElementById(s.id));
@@ -10319,7 +10610,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             card.innerHTML = '<div class="spot-head"><span>Step ' + (at + 1) + ' of ' + steps.length + '</span>' +
                 '<button class="spot-exit" id="spot-exit" title="End the tour">×</button></div>' +
                 '<h3>' + esc(step.title) + '</h3><div class="spot-body">' + step.body + '</div>' +
-                (step.live ? '<div class="spot-hint">A real button — press it for real. The tour carries on once it has settled.</div>' : '') +
+                (step.live ? '<div class="spot-hint">A real button: press it for real. The tour carries on once it has settled.</div>' : '') +
                 (step.square ? '<div class="spot-hint">Waiting for you to click a square…</div>' : '') +
                 '<div class="spot-dots">' + steps.map((_, i) => '<i class="' + (i === at ? 'on' : (i < at ? 'done' : '')) + '"></i>').join('') + '</div>' +
                 '<div class="spot-actions">' + (at ? '<button class="btn small" id="spot-prev">Back</button>' : '') + '<span class="spacer"></span>' +
@@ -10361,8 +10652,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (!waitBadge) {
                 waitBadge = document.createElement('div');
                 waitBadge.className = 'spot-wait';
-                waitBadge.innerHTML = '<span>' + (kind === 'square' ? 'Read the square’s card, then close it — the tour carries on.' :
-                    'Go ahead — the tour carries on once that has settled.') + '</span><button class="btn small" id="spot-wait-x">End tour</button>';
+                waitBadge.innerHTML = '<span>' + (kind === 'square' ? 'Read the square’s card, then close it, and the tour carries on.' :
+                    'Go ahead. The tour carries on once that has settled.') + '</span><button class="btn small" id="spot-wait-x">End tour</button>';
                 document.body.appendChild(waitBadge);
                 bind('spot-wait-x', close);
             }
@@ -10432,7 +10723,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         try { localStorage.setItem(GUIDE_SEEN_KEY, '1'); } catch (e) { }
         openPanel('guide-ask', () => {
             setPanel('<h2>First time here?</h2><div class="sub">There is a short walkthrough that lights up what everything on the screen ' +
-                'does, one thing at a time, using your own turn — including how to click a square to read what it does. You can open it ' +
+                'does, one thing at a time, using your own turn, including how to click a square to read what it does. You can open it ' +
                 'again any time from <b>How to play</b>.</div><div class="modal-actions"><button class="btn" id="ga-no">I’ll work it out</button>' +
                 '<button class="btn primary" id="ga-yes">Show me how to play</button></div>');
             bind('ga-no', closePanel);
@@ -10478,7 +10769,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 backHome('The host ended the game and closed the room.');
                 return;
             }
-            notice('Connection trouble — trying again…');
+            notice('Connection trouble. Trying again…');
             setTimeout(() => { if (ROOM === code) enterRoom(code); }, 3000);
         });
 
@@ -10529,7 +10820,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             showScreen('screen-lobby');
             renderLobby();
         } else if (state.phase === 'over') {
-            closeModal();
+            // The last blow and its banner may still be playing over the fight.
+            if (!BANNERS.busy()) closeModal();
             if (panel) closePanel();
             SPOT.close();
             // Let the last blow and the banner play before the curtain.
@@ -10575,7 +10867,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         $('#btn-create').addEventListener('click', async () => {
             const name = $('#inp-name').value.trim();
             if (!name) return notice('Please enter a name first.');
-            if (!ONLINE) return notice('Still connecting — try again in a moment.');
+            if (!ONLINE) return notice('Still connecting. Try again in a moment.');
             NET = ONLINE;
             $('#btn-create').disabled = true;
             try { enterRoom(await NET.createRoom(name)); }
@@ -10613,7 +10905,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const code = $('#inp-code').value.trim().toUpperCase();
         if (!name) return notice('Please enter a name first.');
         if (code.length !== 5) return notice('Room codes are 5 letters, like ABCDE.');
-        if (!ONLINE) return notice('Still connecting — try again in a moment.');
+        if (!ONLINE) return notice('Still connecting. Try again in a moment.');
         NET = ONLINE;
         $('#btn-join').disabled = true;
         try { await NET.joinRoom(code, name); enterRoom(code); }
@@ -10626,7 +10918,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function onlineError(err, fallback) {
         const msg = (err && err.message) || '';
         if ((err && err.code === 'permission-denied') || /insufficient permissions/i.test(msg)) {
-            return 'Online rooms are not switched on yet \u2014 the site\u2019s Firestore rules for The Oblivion Dragon ' +
+            return 'Online rooms are not switched on yet: the site\u2019s Firestore rules for The Oblivion Dragon ' +
                 'still need publishing. Single player works now.';
         }
         return msg || fallback;
@@ -10672,7 +10964,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (window.LOF_NET) onlineReady();
         else {
             window.addEventListener('lof-net-ready', onlineReady);
-            window.addEventListener('lof-net-failed', () => { $('#online-note').textContent = 'Online play is unavailable right now — single player still works.'; });
+            window.addEventListener('lof-net-failed', () => { $('#online-note').textContent = 'Online play is unavailable right now. Single player still works.'; });
             setTimeout(() => {
                 if (!ONLINE) $('#online-note').textContent = 'Still connecting… single player works without it.';
             }, 8000);
@@ -10689,8 +10981,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     <script type="module">
 /* ==== game-oblivion/net.js ==== */
 /* =========================================================================
-   Legend of Fenrirak™, The Oblivion Dragon — Online Version
-   net.js — Firestore multiplayer.
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   net.js: Firestore multiplayer.
 
    One document per room: games_oblivion/{ROOMCODE}, its own collection in
    the same Firebase project The Thunder Dragon and The Ice Dragon use, so
@@ -11462,7 +11754,7 @@ ready.then((uid) => {
                 <a href="Contact.html">Contact</a>
                 <a href="Privacy.html">Privacy Policy</a>
             </nav>
-            <p class="footer-copy">&copy; 2026 Legend of Fenrirak &mdash; made by friends in New Zealand.</p>
+            <p class="footer-copy">&copy; 2026 Legend of Fenrirak. Made by friends in New Zealand.</p>
         </div>
     </footer>
 
