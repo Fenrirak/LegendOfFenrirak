@@ -2337,11 +2337,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* chest (a Monster Chest: 1 Chest Key opens it for 1 Gemstone),        */
     /* joins (the Barbarian follows you afterwards).                       */
     /*                                                                     */
-    /* The user's changes to the planning doc's numbers: every monster but */
-    /* Fenrirak and Helen has 20 more HP and 15 more damage on each attack */
-    /* (2026-10-04); then every attack that does damage, Fenrirak's and    */
-    /* Helen's too, 5 more, and the Soldier Garrison's 5 more again        */
-    /* (2026-10-05).                                                       */
+    /* The user's changes to the planning doc's numbers, none of them to  */
+    /* Fenrirak or Helen ("all enemies" never means the final bosses):     */
+    /* every other monster has 20 more HP and 20 more damage on each       */
+    /* attack, and the Soldier Garrison 5 more again (2026-10-04/05).      */
     /* ------------------------------------------------------------------ */
 
     const ENEMIES = {
@@ -2476,9 +2475,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                       '(unaffected by defence).'
             }],
             moves: [
-                move('oblivion_discharge', 'Oblivion Discharge', 70, 1),
-                move('annihilation_void', 'Annihilation Void', 85, 3),
-                move('reality_shatter', 'Reality Shatter', 115, 5, 4)
+                move('oblivion_discharge', 'Oblivion Discharge', 65, 1),
+                move('annihilation_void', 'Annihilation Void', 80, 3),
+                move('reality_shatter', 'Reality Shatter', 110, 5, 4)
             ]
         },
         oblivion_mage: {
@@ -2509,10 +2508,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                       { t: 'bossEmpower', value: 5 }],
                      'Fenrirak heals 10 HP. Fenrirak has +10 defence for the opponent’s ' +
                      'next attack. Fenrirak deals +5 DMG for his next attack.'),
-                move('raw_oblivion', 'Raw Oblivion', 55, 5, 0, [],
+                move('raw_oblivion', 'Raw Oblivion', 50, 5, 0, [],
                      'This attack may only be used after Fenrirak’s defeat.',
                      'fenrirak_down'),
-                move('obliviate', 'Obliviate', 205, 5, 0, [],
+                move('obliviate', 'Obliviate', 200, 5, 0, [],
                      'This attack may only be used 1 turn after Fenrirak’s defeat.',
                      'fenrirak_down_a_turn')
             ]
@@ -4879,8 +4878,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
        but his own Spiked Bat and Flax Straps stay with him and are new again
        the next time he is beaten.
 
-       If his player loses a PvP fight, he follows the winner instead, with
-       whatever he is wearing, and the winner gets Pendant Fragment #2.
+       Struck down in a PvP fight that his player goes on to lose, the
+       winner gets Pendant Fragment #2 as well as the Gold (the loser keeps
+       theirs). He stands in front of his player, so in a duel he always
+       falls first; should his player ever lose with him still standing, he
+       follows the winner instead, with whatever he is wearing.
        ---------------------------------------------------------------- */
 
     function freshBarbarian(state) {
@@ -6714,6 +6716,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (u.enemyId === 'fenrirak') { b.fenDown = true; b.obmSince = 0; }
             } else if (u.kind === 'ally') {
                 log(state, 'The Barbarian is struck down!', 'death');
+                // Whose he was, for the end of a duel (winPvp).
+                if (b.kind === 'pvp' && state.barbarian) b.barbFell = state.barbarian.ownerId;
                 barbarianReturns(state, 'limps back');
             }
         });
@@ -6843,14 +6847,24 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         cleanUpAfter(state, winner);
         cleanUpAfter(state, loser);
 
-        // The Barbarian changes sides.
+        // The loser's Barbarian: struck down in this fight, the winner gets
+        // Pendant Fragment #2 for it and the loser keeps theirs; still on his
+        // feet, he changes sides and the fragment comes with him.
+        let barbWon = '';
         if (hasBarbarian(state, loser)) {
             state.barbarian.ownerId = winner.id;
             log(state, 'The Barbarian follows the victor, ' + winner.name + '.', 'system');
+            barbWon = ' with him';
+        } else if (b.barbFell && b.barbFell === loser.id) {
+            barbWon = ' for striking down ' + loser.name + '’s Barbarian';
+        }
+        if (barbWon) {
             if (giveFragment(winner, 2)) {
-                log(state, winner.name + ' gains Pendant Fragment #2 with him.', 'item');
+                log(state, winner.name + ' gains Pendant Fragment #2' + barbWon + '.', 'item');
                 state.dropSeq = (state.dropSeq | 0) + 1;
                 state.lastDrop = { playerId: winner.id, n: state.dropSeq, kind: 'fragment', which: 2 };
+            } else {
+                log(state, winner.name + ' already holds Pendant Fragment #2.', 'muted');
             }
         }
         sendToStart(state, loser);
@@ -10884,8 +10898,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<h3>The Barbarian</h3><p>Beat the Barbarian at the Adventurers’ Inn and he follows you as your Barbarian (Ally): he fights at your ' +
             'side in every battle, you choose his attacks, and you can give him Barbarian gear. He stands in front of you: every blow aimed at ' +
             'you, from a monster or from another player, lands on him until he is struck down, and only then do you start taking damage. There is ' +
-            'only one: while he follows somebody, nobody else can fight him for Pendant Fragment #2. If his player dies (or he is struck down) he ' +
-            'goes back to his inn; if his player loses a PvP fight he follows the winner, who gets Fragment #2.</p>' +
+            'only one: while he follows somebody, nobody else can fight him for Pendant Fragment #2. If his player dies, or he is struck down, he ' +
+            'goes back to his inn. If he is struck down in a PvP fight and his player then loses it, the winner gets Pendant Fragment #2 as well ' +
+            'as the Gold; his player keeps theirs.</p>' +
             '<h3>PvP</h3><p>Land on another player’s square (not the Start) and you fight. Both roll for who strikes first. All defence is ' +
             'reduced to the class base (Mage 10, Archer 15, Knight 20, Barbarian 10); potions work as normal. The winner takes all of the loser’s ' +
             'Gold and the loser goes back to the Start. Afterwards the moving player’s turn is over.</p>' +
