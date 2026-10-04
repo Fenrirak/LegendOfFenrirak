@@ -1418,6 +1418,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .blow-line .bl-icon svg { width: 20px; height: 20px; }
 .blow-line .bl-text { flex: 1; min-width: 0; }
 .blow-line .bl-text small { display: block; font-size: 12px; color: var(--oblivion-soft); margin-top: 1px; }
+.blow-line .bl-text small.bl-note { color: #ff9e8a; margin: 0 0 2px; }
+.blow-line .bl-text small.bl-note.heal { color: #9be09f; }
 .blow-line .mv { color: var(--gold-bright); }
 .blow-line .why { font-size: 13px; color: var(--muted); }
 .blow-line .bl-dmg { flex: none; text-align: center; line-height: 1; min-width: 56px; }
@@ -2310,7 +2312,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     // Not a class anybody picks. He is beaten at the Adventurers' Inn and
     // follows whoever beat him -- see engine.js, "The Barbarian".
     const BARBARIAN = {
-        id: 'barbarian', name: 'Barbarian (Ally)', hp: 80, defence: 10,
+        id: 'barbarian', name: 'Barbarian (Ally)', hp: 70, defence: 10,     // 80 in the doc; 70 by the user's change
         starterWeapon: 'spiked_bat', starterArmour: 'flax_straps',
         moves: [
             move('battle_roar', 'Battle Roar', 15, 1),
@@ -2335,17 +2337,19 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* chest (a Monster Chest: 1 Chest Key opens it for 1 Gemstone),        */
     /* joins (the Barbarian follows you afterwards).                       */
     /*                                                                     */
-    /* Every monster but Fenrirak and Helen has 20 more HP and 15 more     */
-    /* damage on each attack than the planning doc gives (the user's      */
-    /* change, 2026-10-04).                                                */
+    /* The user's changes to the planning doc's numbers: every monster but */
+    /* Fenrirak and Helen has 20 more HP and 15 more damage on each attack */
+    /* (2026-10-04); then every attack that does damage, Fenrirak's and    */
+    /* Helen's too, 5 more, and the Soldier Garrison's 5 more again        */
+    /* (2026-10-05).                                                       */
     /* ------------------------------------------------------------------ */
 
     const ENEMIES = {
         sentry_soldiers: {
             id: 'sentry_soldiers', plural: true, name: 'Sentry Soldiers', hp: 100, defence: 5,
             moves: [
-                move('halberd_strike', 'Halberd Strike', 40, 1),
-                move('reinforcement_call', 'Reinforcement Call', 60, 5, 3,
+                move('halberd_strike', 'Halberd Strike', 45, 1),
+                move('reinforcement_call', 'Reinforcement Call', 65, 5, 3,
                      [{ t: 'heal', value: 25 }, { t: 'empower', value: 20, uses: 1 }],
                      'Heal 25 HP and +20 DMG for your next attack.')
             ],
@@ -2354,8 +2358,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         bandits: {
             id: 'bandits', plural: true, name: 'Bandits', hp: 95, defence: 5,
             moves: [
-                move('frenzy', 'Frenzy', 35, 1),
-                move('dagger_rampage', 'Dagger Rampage', 90, 5, 3)
+                move('frenzy', 'Frenzy', 40, 1),
+                move('dagger_rampage', 'Dagger Rampage', 95, 5, 3)
             ],
             loot: { gold: 20, chest: true }
         },
@@ -2367,10 +2371,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                       'if they do not have enough gold, they take 15 damage instead.'
             }],
             moves: [
-                move('shadow_strike', 'Shadow Strike', 60, 1, 0,
+                move('shadow_strike', 'Shadow Strike', 65, 1, 0,
                      [{ t: 'weaken', value: 5, uses: 1 }],
                      'The opponent does 5 less damage on their next turn.'),
-                move('smoke_bomb', 'Smoke Bomb', 30, 5, 3,
+                move('smoke_bomb', 'Smoke Bomb', 35, 5, 3,
                      [{ t: 'steal' }],
                      'The opponent loses an equipped item of their choice.')
             ],
@@ -2383,8 +2387,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 text: 'Orc Warriors heal 10 HP at every start of their turn.'
             }],
             moves: [
-                move('charge', 'Charge', 55, 1),
-                move('wreak_havoc', 'Wreak Havoc', 115, 5, 3,
+                move('charge', 'Charge', 60, 1),
+                move('wreak_havoc', 'Wreak Havoc', 120, 5, 3,
                      [{ t: 'weaken', value: 10, uses: 1 }],
                      'The opponent does 10 less damage on their next turn.')
             ],
@@ -2393,8 +2397,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         orc_scouts: {
             id: 'orc_scouts', plural: true, name: 'Orc Scouts', hp: 120, defence: 5,
             moves: [
-                move('ruin', 'Ruin', 55, 1),
-                move('mayhem', 'Mayhem', 105, 5, 3,
+                move('ruin', 'Ruin', 60, 1),
+                move('mayhem', 'Mayhem', 110, 5, 3,
                      [{ t: 'weaken', value: 5, uses: 1 }],
                      'The opponent does 5 less damage on their next turn.')
             ],
@@ -2403,19 +2407,19 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         veteran_soldiers: {
             id: 'veteran_soldiers', plural: true, name: 'Veteran Soldiers', hp: 155, defence: 15,
             moves: [
-                move('guarding_strike', 'Guarding Strike', 50, 1, 0,
+                move('guarding_strike', 'Guarding Strike', 55, 1, 0,
                      [{ t: 'guard', value: 10 }],
                      '+10 Defence during your opponent’s next attack.'),
-                move('crossbow_volley', 'Crossbow Volley', 135, 5, 3)
+                move('crossbow_volley', 'Crossbow Volley', 140, 5, 3)
             ],
             loot: { gold: 45, keys: 1 }
         },
         barbarian: {
             id: 'barbarian', name: 'Barbarian', hp: 120, defence: 10, proper: false,
             moves: [
-                move('battle_roar', 'Battle Roar', 45, 1),
-                move('tackle', 'Tackle', 60, 3),
-                move('rampage', 'Rampage', 125, 5, 4,
+                move('battle_roar', 'Battle Roar', 50, 1),
+                move('tackle', 'Tackle', 65, 3),
+                move('rampage', 'Rampage', 130, 5, 4,
                      [{ t: 'weaken', value: 5, uses: 3 }],
                      'The opponent does 5 less damage for their next 3 attacks.')
             ],
@@ -2428,8 +2432,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 text: 'All opponent attacks deal 5 less damage.'
             }],
             moves: [
-                move('spear_charge', 'Spear Charge', 55, 1),
-                move('spear_barrage', 'Spear Barrage', 110, 5, 3)
+                move('spear_charge', 'Spear Charge', 65, 1),
+                move('spear_barrage', 'Spear Barrage', 120, 5, 3)
             ],
             loot: { gold: 45, fragment: 3 }
         },
@@ -2440,8 +2444,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 text: 'When health is at 50 or lower, deal 20 more DMG with each attack.'
             }],
             moves: [
-                move('halberd_charge', 'Halberd Charge', 60, 1),
-                move('royal_assault', 'Royal Assault', 115, 5, 3)
+                move('halberd_charge', 'Halberd Charge', 65, 1),
+                move('royal_assault', 'Royal Assault', 120, 5, 3)
             ],
             loot: { gold: 30, fragment: 4 }
         },
@@ -2453,10 +2457,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                       'attack, and deal +10 DMG.'
             }],
             moves: [
-                move('formation_strike', 'Formation Strike', 60, 1, 0,
+                move('formation_strike', 'Formation Strike', 65, 1, 0,
                      [{ t: 'guard', value: 5 }],
                      '+5 Defence during your opponent’s next attack.'),
-                move('royal_retribution', 'Royal Retribution', 165, 5, 4)
+                move('royal_retribution', 'Royal Retribution', 170, 5, 4)
             ],
             loot: { gold: 50, fragment: 5 }
         },
@@ -2472,9 +2476,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                       '(unaffected by defence).'
             }],
             moves: [
-                move('oblivion_discharge', 'Oblivion Discharge', 65, 1),
-                move('annihilation_void', 'Annihilation Void', 80, 3),
-                move('reality_shatter', 'Reality Shatter', 110, 5, 4)
+                move('oblivion_discharge', 'Oblivion Discharge', 70, 1),
+                move('annihilation_void', 'Annihilation Void', 85, 3),
+                move('reality_shatter', 'Reality Shatter', 115, 5, 4)
             ]
         },
         oblivion_mage: {
@@ -2505,10 +2509,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                       { t: 'bossEmpower', value: 5 }],
                      'Fenrirak heals 10 HP. Fenrirak has +10 defence for the opponent’s ' +
                      'next attack. Fenrirak deals +5 DMG for his next attack.'),
-                move('raw_oblivion', 'Raw Oblivion', 50, 5, 0, [],
+                move('raw_oblivion', 'Raw Oblivion', 55, 5, 0, [],
                      'This attack may only be used after Fenrirak’s defeat.',
                      'fenrirak_down'),
-                move('obliviate', 'Obliviate', 200, 5, 0, [],
+                move('obliviate', 'Obliviate', 205, 5, 0, [],
                      'This attack may only be used 1 turn after Fenrirak’s defeat.',
                      'fenrirak_down_a_turn')
             ]
@@ -3365,11 +3369,21 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M-5-4-2-2M5-4 2-2M-5 4-2 2M5 4 2 2', col || INK, 1.2) + '</g>';
     }
 
-    function halberd(x, top) {
-        return line('M' + x + ' ' + top + 'V' + (top + 88), INK, 4.6) +
-            line('M' + x + ' ' + top + 'V' + (top + 88), '#7a5232', 2.4) +
-            grp(STEEL_L, P('M' + x + ' ' + (top + 5) + 'l11 3v12l-11-3z')) +
-            grp(STEEL, P('M' + x + ' ' + (top - 6) + 'l2.4 8h-4.8zM' + x + ' ' + (top + 8) + 'l-6-2 1 6z'));
+    // A halberd: a long spear point on top, a broad axe blade with a curved
+    // edge on one side, a hooked spike behind it, and the iron socket that
+    // holds the head on the shaft. `top` is where the blade starts; the
+    // point stands 12 above it.
+    function halberd(x, top, len) {
+        const T = n => (top + n).toFixed(1), X = n => (x + n).toFixed(1);
+        return line('M' + x + ' ' + T(2) + 'V' + T(len || 84), INK, 4.6) +
+            line('M' + x + ' ' + T(2) + 'V' + T(len || 84), '#7a5232', 2.4) +
+            grpW(STEEL, 1.3, P('M' + X(-1) + ' ' + T(7) + 'L' + X(-8.4) + ' ' + T(12.8) + 'L' + X(-1) + ' ' + T(10.6) + 'z')) +
+            grpW(STEEL_L, 1.5, P('M' + X(1) + ' ' + T(3.4) + 'L' + X(8) + ' ' + T(.8) + 'C' + X(12.6) + ' ' + T(5) + ' ' + X(12.6) + ' ' +
+                T(13.2) + ' ' + X(8) + ' ' + T(17.2) + 'L' + X(1) + ' ' + T(13.8) + 'z')) +
+            line('M' + X(7.8) + ' ' + T(2.8) + 'C' + X(10.8) + ' ' + T(6.4) + ' ' + X(10.8) + ' ' + T(11.8) + ' ' + X(7.8) + ' ' + T(15.2), '#eef1f5', 1) +
+            grpW(STEEL_L, 1.3, P('M' + x + ' ' + T(-12) + 'L' + X(2.2) + ' ' + T(-2.6) + 'L' + X(1.3) + ' ' + T(3.6) + 'H' + X(-1.3) + 'L' + X(-2.2) + ' ' + T(-2.6) + 'z')) +
+            line('M' + x + ' ' + T(-9) + 'V' + T(1.6), STEEL, .8) +
+            grpW('#5a5f66', 1.1, P('M' + X(-1.9) + ' ' + T(14.6) + 'h3.8v3.6h-3.8z'));
     }
     function spear(x, top, len) {
         return line('M' + x + ' ' + top + 'V' + (top + len), INK, 4.2) +
@@ -3398,8 +3412,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const trim = o.trim || INK;
         const arm = o.mail || '#8d939b';
         let s = '';
-        // Low enough that the spike on top stays inside the picture.
-        if (o.weapon === 'halberd') s += halberd(34, 4);
+        // Low enough that the point on top stays inside the picture.
+        if (o.weapon === 'halberd') s += halberd(34, 10, 82);
         if (o.weapon === 'spear') s += spear(34, -4, 86);
         // legs, boots
         s += grp(o.legs || '#3b3a42', P('M12 58h7v18h-7zM21 58h7v18h-7z'));
@@ -3433,9 +3447,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             s += grp(GOLD, P('M9 17h22c-1-8-5-11-11-11S10 9 9 17z')) +
                 grp(o.plume || CRIMSON, P('M20 6c-2-6 6-9 10-6-4 0-6 2-7 6z'));
         } else if (o.helm === 'great') {
-            s += grp(STEEL_L, P('M12 7h16v22c0 3-4 4-8 4s-8-1-8-4z')) +
-                line('M14 17h12M20 12v14', INK, 2.2) + line('M12 7h16', GOLD, 2) +
-                grp(o.plume || CRIMSON, P('M20 7c-1-7 7-10 12-7-5 0-8 3-9 7z'));
+            // the Royal Guards' close helm: a rounded steel shell with a
+            // gold comb along the top, the visor down with its eye slit and
+            // breaths, gold at the brow, and a plume at the back
+            s += grpW(o.plume || CRIMSON, 1.4, P('M21.6 7c1.4-5.8 8.2-7.6 12.2-3.4-4.2-.2-7.6 1.6-9.4 5.6z')) +
+                grpW(STEEL_L, 2, P('M11.2 19.4c0-8.4 3.8-13 8.8-13s8.8 4.6 8.8 13v8.2c0 3.6-3.8 5.8-8.8 5.8s-8.8-2.2-8.8-5.8z')) +
+                line('M14 10.6c1.6-2 3.4-2.8 5-3', '#eef1f5', 1.2) +
+                grpW(GOLD, 1.2, P('M18.7 7.2c0-4.2 2.6-4.2 2.6 0v9.6h-2.6z')) +
+                grpW(STEEL, 1.5, P('M11.4 17.2h17.2v6.4c0 1.2-1 2-2.2 2H13.6c-1.2 0-2.2-.8-2.2-2z')) +
+                line('M13.8 20.6h12.4', INK, 1.9) +
+                line('M11.4 17.2h17.2', GOLD, 1.5) +
+                dot(23.4, 28.4, .75) + dot(25.6, 28, .75) + dot(23.4, 30.4, .75) + dot(25.6, 30, .75) +
+                line('M11.6 31.4c2.4 1.6 5.2 2.2 8.4 2.2s6-.6 8.4-2.2', GOLD, 1.4);
         } else if (o.helm === 'hood') {
             s += grp(o.hood || '#4b3f33', P('M10 22c-1-14 21-14 20 0l2 8H8z'));
         }
@@ -3451,7 +3474,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             s += line('M-4 37 6 46-4 55', INK, 1.2);
         }
         if (o.weapon === 'sword') {
-            s += grp(STEEL_L, P('M31 22l3 0 1 32-4 0z')) + grp(GOLD, P('M28 52h10v3H28z'));
+            // an arming sword, point up: a straight double-edged blade with
+            // its fuller, a plain cross guard, the grip in the fist and a
+            // round pommel under it
+            s += grpW('#5a3a22', 1, P('M31.9 50.4h2.2v8.4h-2.2z')) +
+                grp(SKIN, '<circle cx="33" cy="54" r="3.6"/>') +
+                grpW(STEEL_L, 1.4, P('M31.2 49.4V19.6L33 14.4l1.8 5.2v29.8z')) +
+                line('M33 46.8V20.6', '#8d939b', .9) +
+                grpW(GOLD, 1.3, P('M25.6 48.4h14.8c1 0 1 2.2 0 2.2H25.6c-1 0-1-2.2 0-2.2z')) +
+                '<circle cx="33" cy="60" r="2.1" fill="' + GOLD + '" stroke="' + INK + '" stroke-width="1.2"/>';
         }
         return '<g transform="translate(' + o.x + ' ' + o.y + ') scale(' + (o.s || 1) + ')">' + s + '</g>';
     }
@@ -3725,6 +3756,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#4a8a3a', .9, P('M0 0c-2.6-1-3.6-3.6-2-5.6.6 1 1.4 1.4 2 1.2.2-1.6 1.4-2.6 2.2-2.6 0 1.4.6 2.4 1.8 2.6.8 2.6-1.4 4.6-4 4.4z')) + '</g>';
     }
 
+    // The teeth round an open jaw-trap, standing up from the jaws: the ones
+    // along the back drawn before the jaws, the front ones after them.
+    function trapTeeth(front) {
+        let t = '';
+        const N = 16, w = Math.PI / N * .7;
+        const pt = (a, lift) => (21 + 13 * Math.cos(a)).toFixed(2) + ' ' + (34.8 + 5 * Math.sin(a) - (lift || 0)).toFixed(2);
+        for (let i = 0; i < N; i++) {
+            const a = (i + .5) / N * Math.PI * 2;
+            if ((Math.sin(a) > 0) !== front) continue;
+            t += 'M' + pt(a - w) + 'L' + pt(a, 5.2) + 'L' + pt(a + w) + 'z';
+        }
+        return grpW(STEEL_L, .8, P(t));
+    }
+
     const SQUARE_ART = {
         // The Start: a stone gateway with the road running out through it,
         // a red banner flying over the arch and a torch burning either side.
@@ -3790,12 +3835,37 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#f4f0e2', P('M8 18c0-6 5-8 8-6 2-4 8-4 10 0 3-2 8 0 7 6z')) +
             grp('#c8862a', P('M42 30c0-8 16-8 16 0v14H42z')) + line('M42 34h16M42 40h16', '#8a5a22', 1.4),
 
+        // Smuggler's Alley: a narrow lane at night between two timber-
+        // framed houses whose upper floors lean in over it, a cloaked
+        // smuggler slipping down it with a sack on his back, crates and a
+        // barrel by the walls and a candle lantern hung out on a bracket.
         smugglers:
-            grp('#3a3438', P('M2 4h20v42H2zM42 4h20v42H42z')) +
-            grp('#1b1418', P('M8 18h8v28H8z')) + dot(10.5, 26, 1.1, '#f4d23c') + dot(13.5, 26, 1.1, '#f4d23c') +
-            grp('#9a6a3a', P('M24 30h14v14H24zM28 18h12v12H28z')) +
-            line('M24 30l14 14M38 30 24 44M28 18l12 12', '#6a4a2a', 1.2) +
-            line('M50 10v6', INK, 1.6) + grp('#f4c84a', P('M47 16h6v8h-6z')),
+            grp('#24304a', P('M14 0h36v20H14z')) +
+            '<path d="M33.4 5a3.4 3.4 0 1 0 2.6 5.8 2.7 2.7 0 1 1-2.6-5.8z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".9"/>' +
+            dot(27, 6, .6, '#f4e38a') + dot(38.4, 14.6, .5, '#f4e38a') + dot(25.6, 14, .5, '#f4e38a') +
+            grpW('#4a4038', 1.4, P('M22 20h20v22H22z')) +
+            grpW('#1b1418', 1.4, P('M27.4 42V31.6c0-5 9.2-5 9.2 0V42z')) +
+            grpW('#6a5a48', 1.4, P('M16 48l6-6h20l6 6z')) +
+            line('M24.6 44h3M30.4 43.4h3.2M36.6 44h2.8M21.4 46.6h4M30 46.2h4.4M39.2 46.6h4', '#4a4038', .9) +
+            grpW('#d8c8a0', 1.8, P('M0 22h17v26H0z')) +
+            line('M0 22h17M0 34h17M8.4 22v26M0 22l8.4 12M17 22 8.4 34', '#4a3220', 1.5) +
+            grpW('#3a2a20', 1.4, P('M2.6 37.6h4v6h-4z')) + grpW('#f4c84a', 1.2, P('M11 25.4h3.6v4.6H11z')) +
+            grpW('#d8c8a0', 1.8, P('M0 4h22v18H0z')) +
+            line('M0 4h22M0 22h22M7.4 4v18M15 4v18M0 13h7.4M15 13h7', '#4a3220', 1.5) +
+            grpW('#3a3238', 1.6, P('M0 0h24l-2 4H0z')) +
+            grpW('#d8c8a0', 1.8, P('M47 22h17v26H47z')) +
+            line('M47 22h17M47 34h17M55.6 22v26M47 22l8.6 12M64 22l-8.4 12', '#4a3220', 1.5) +
+            grpW('#d8c8a0', 1.8, P('M42 4h22v18H42z')) +
+            line('M42 4h22M42 22h22M49 4v18M56.6 4v18M42 13h7M56.6 13H64', '#4a3220', 1.5) +
+            grpW('#f4c84a', 1.2, P('M58 7h3.6v4.4H58z')) +
+            grpW('#3a3238', 1.6, P('M40 0h24v4H42z')) +
+            line('M47 26.4h-5.4v3', INK, 1.3) + grpW('#3a3238', 1, P('M40.2 29.4h2.8l.6 1.4h-4z')) +
+            grpW('#f4c84a', 1, P('M40.2 30.8h2.8v3.6h-2.8z')) + grpW('#3a3238', 1, P('M40 34.4h3.2v1h-3.2z')) +
+            grpW('#2e2a36', 1.4, P('M28.6 46c.2-6 .6-10.4 1.8-13.4 1-2.6 4.4-2.6 5.4 0 1.2 3 1.6 7.4 1.8 13.4z')) +
+            grpW('#2e2a36', 1.4, P('M30.4 33.6c-.6-4.8 5.8-4.8 5.4 0z')) +
+            grpW('#a0805a', 1.4, P('M33.6 31.4c2.6-2.4 6.8-1 6.6 2.4-.2 2.6-2.6 4-5.2 3.4z')) + line('M34.4 31.2l-1-1.4', INK, 1) +
+            grpW('#9a6a3a', 1.4, P('M3.4 38h10.4v10H3.4z')) + line('M3.4 38l10.4 10M13.8 38 3.4 48', '#6a4a2a', 1) +
+            grpW('#8a5a32', 1.4, P('M50.6 38.4h8.8c.8 3.2.8 6.4 0 9.6h-8.8c-.8-3.2-.8-6.4 0-9.6z')) + line('M50.2 41h9.6M50.2 45.4h9.6', '#4a4e55', 1.1),
 
         commoners: house(6, 44, 20, 16, '#8a4a2a') + house(36, 44, 22, 20, '#6a5a3a', '#d8c8a0'),
 
@@ -3809,22 +3879,77 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             pine(14, 34, .95, '#1c3226') + pine(48, 34, .9, '#1c3226') + pine(31, 38, 1.15, '#22392b') +
             dot(28, 30, 1.2, '#f4d23c') + dot(33, 30, 1.2, '#f4d23c'),
 
+        // The Thieves' Guild: a crooked dark house, a lamp in the window
+        // and eyes in the doorway, crossed daggers over the door, and the
+        // takings piled round it: sacks of coin, a chest spilling gold, a
+        // gilt goblet, a necklace and coins across the ground.
         guild:
-            grp('#7a5a2e', P('M18 22c-8 4-10 22 4 22h16c14 0 12-18 4-22z')) +
-            grp('#5a3f20', P('M22 16h16l-4 7H26z')) + line('M24 22h12', GOLD, 2) +
-            coin(46, 40, 4) + coin(52, 36, 3.4) +
-            '<g transform="rotate(-35 32 24)">' + grp(STEEL_L, P('M31 2l2-4 2 4v24h-4z')) +
-            grp(GOLD, P('M27 26h12v3H27z')) + grp(INK, P('M31.5 29h3v8h-3z')) + '</g>',
+            grp('#4a3a2a', P('M0 44h64v4H0z')) +
+            grpW('#5a5058', 1.4, P('M30 6.6h4.6v8h-4.6z')) +
+            grpW('#4a3c34', 1.8, P('M12 44V20.6l2-.4 23.6-.6V44z')) +
+            line('M17 21v23M22.4 20.8V44M28 20.6V44M33 20.4V44', '#3a2e28', 1) +
+            grpW('#3a3238', 1.8, P('M8.4 22.4 23.2 7 41.4 21.2c-2-.8-31-.4-33 1.2z')) +
+            line('M14 17.4 31.4 16.8M18.6 12.8l13 .2', '#2a2428', 1) +
+            '<circle cx="31.6" cy="27.6" r="2.8" fill="#f4c84a" stroke="' + INK + '" stroke-width="1.3"/>' + line('M31.6 24.8v5.6M28.8 27.6h5.6', '#5a3a22', .8) +
+            grpW('#1b1418', 1.6, P('M16.4 44V33c0-4.2 8.8-4.2 8.8 0v11z')) +
+            dot(19.4, 36.4, .9, '#f4d23c') + dot(22.2, 36.4, .9, '#f4d23c') +
+            '<g transform="translate(20.8 25.6)">' + line('M-4.4-3.4 4.4 3.4M4.4-3.4-4.4 3.4', STEEL_L, 1.4) + line('M-4.4-3.4-2.6-2M4.4-3.4 2.6-2', INK, 1.4) + '</g>' +
+            grpW('#8a6a3a', 1.4, P('M1.6 44c-1-6 1.6-9.4 5-9.6l-1.2-2.4h5.6l-1.2 2.4c3.4.2 6 3.6 5 9.6z')) + line('M5.4 32.4h5.6', '#5a3a22', 1.2) +
+            '<circle cx="8.2" cy="39.4" r="2" fill="none" stroke="' + GOLD + '" stroke-width="1.2"/>' +
+            grpW('#7a3a2a', 1.6, P('M40 33.6h20V44H40z')) + line('M40 37h20M50 33.6V44', GOLD, 1.3) +
+            grpW('#f0c33c', 1.2, P('M40.6 33.6c1-3 3.4-4.2 5-3.4 1.4-2.4 5-2.4 6.4 0 1.8-1 4.4 0 5.4 3.4z')) +
+            grpW('#8a3a2a', 1.4, P('M39.4 33.4l1-5.6h19.2l1 5.6z')) +
+            dot(44.4, 30.2, .8, '#b8862a') + dot(49.6, 29.6, .8, '#b8862a') + dot(54.4, 30.6, .8, '#b8862a') +
+            '<path d="M41.6 36.2c2.4 3.2 6 3.6 8.4 1" fill="none" stroke="#f4f0e2" stroke-width="1" stroke-dasharray="1 1"/>' +
+            gemShape(46, 39.4, .32, '#d6365c') +
+            grpW(GOLD, 1.2, P('M57.8 28.6h5.4c0 2.6-1.2 3.8-2.7 3.8s-2.7-1.2-2.7-3.8zM60 32.4h.9v2.6H60zM58.4 35h4.2v1.2h-4.2z')) +
+            coin(28.6, 45.4, 1.9) + coin(33.8, 46.2, 1.6) + coin(37.2, 44.6, 1.4) + coin(62, 44.6, 1.6),
 
+        // Breson's Bakery: the domed brick oven with the fire in its mouth
+        // and smoke from its chimney, a table of fresh loaves beside it,
+        // and the baker's sign, a gold pretzel, hung out over them.
         bakery:
-            grp('#d39a4a', P('M8 34c0-14 40-14 40 0v4H8z')) +
-            line('M18 26l4-4M26 24l4-4M34 24l4-4', '#9a6a2a', 2) +
-            grp('#c98a3a', P('M44 40c0-8 14-8 14 0z')) + grp('#a07a52', P('M4 38h56v4H4z')),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            grpW('#c9c2b4', 1.2, P('M17.6 8.6c-2.4-1.6-.6-4.6 1.8-3.6.6-2.4 4.4-2.4 4.8 0 2.2-.6 3.4 2 1.6 3.4z')) +
+            grpW('#8a4a2a', 1.6, P('M16.4 11h5.2v10h-5.2z')) +
+            grpW('#a39b8f', 1.6, P('M1.6 35.4h34v8.6h-34z')) + line('M1.6 39.6h34M10 35.4v4.2M20 35.4v4.2M28 35.4v4.2M6 39.6V44M15 39.6V44M24 39.6V44M32 39.6V44', '#7c746a', .9) +
+            grpW('#b5653a', 1.8, P('M3.6 35.4C3.6 16.4 34 16.4 34 35.4z')) +
+            line('M6.6 29.6c4-7.4 20.4-7.4 24.4 0M10.6 23.8c4.6-3.4 11.8-3.4 16.4 0', '#8a4a2a', 1.1) +
+            line('M12.6 29.6l-1.2-5.4M24.8 29.6l1.2-5.4M18.8 22.4v-2.4', '#8a4a2a', 1) +
+            grpW('#2a1206', 1.6, P('M11.6 35.4v-3.6c0-6.2 14.4-6.2 14.4 0v3.6z')) +
+            grpW('#ff8c2a', .9, P('M13.4 35.4c-.6-2.4 1.2-3.2 1.8-5 1 1.4 1.6 2.2 2 3.4.6-1.6 1.8-2.6 2.6-3.8.8 1.8 2.2 2.6 2 4.2 1-.8 1.6-1.6 1.8-2.6 1.2 1.6 1.4 2.8.6 3.8z')) +
+            grp('#ffd04a', P('M16.4 35.4c0-1.4.8-2 1.2-3 .6 1 1.4 1.6 1.2 3zM20.6 35.4c0-1.2.8-1.8 1.2-2.6.6.8 1.2 1.4 1 2.6z')) +
+            grpW('#8a5a32', 1.4, P('M36 33.4h27v3H36z')) + line('M38.6 36.4V44M60.4 36.4V44', INK, 2.6) + line('M38.6 36.4V44M60.4 36.4V44', '#8a5a32', 1.2) +
+            grpW('#c98a3a', 1.4, P('M37.6 33.4c0-6.4 10.6-6.4 10.6 0z')) + line('M40.4 29.8l5 2.4M45.4 29.8l-5 2.4', '#8a5a22', 1) +
+            grpW('#e0a85a', 1.4, P('M48.4 33.4c-.6-2.4 1-4 3.4-4.4l7.6-1.4c2.6-.4 3.8 1.4 3 3.6-.6 1.6-2 2.2-3.6 2.2z')) +
+            line('M51.4 31.2l1.6-1.8M54.6 30.6l1.6-1.8M57.8 30l1.6-1.8', '#a8702e', 1) +
+            line('M63.4 4H46.6', INK, 1.6) + line('M53.4 4v5.8', INK, 1.2) +
+            '<g transform="translate(53.4 15.4) scale(1.15)">' +
+            '<path d="M0-2C-2-6.4-7.6-6.4-7.6-1-7.6 4-3.4 5.4 0 5.4S7.6 4 7.6-1C7.6-6.4 2-6.4 0-2M0-2C-1.2 0 1.6 1.6 3.4 5.2M0-2C1.2 0-1.6 1.6-3.4 5.2" fill="none" stroke="' + INK + '" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<path d="M0-2C-2-6.4-7.6-6.4-7.6-1-7.6 4-3.4 5.4 0 5.4S7.6 4 7.6-1C7.6-6.4 2-6.4 0-2M0-2C-1.2 0 1.6 1.6 3.4 5.2M0-2C1.2 0-1.6 1.6-3.4 5.2" fill="none" stroke="#c98a3a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
+            dot(-4.4, -3.4, .45, '#f4f0e2') + dot(4.6, -3.2, .45, '#f4f0e2') + dot(-5.6, 2, .45, '#f4f0e2') + dot(5.8, 1.6, .45, '#f4f0e2') + '</g>',
 
+        // The Lost Flame Forge: a stone hearth under its hood and chimney,
+        // the fire roaring on the coals, and an anvil on its stump in front
+        // with a blade laid on it, still glowing, the hammer beside it.
         forge:
-            grp('#4a4a50', P('M14 30h36l-6 5v5h4v4H16v-4h4v-5z')) + grp('#6a6a72', P('M10 26h40v4H10z')) +
-            grp('#ff8c2a', P('M28 22c-6-6 0-14 2-18 0 6 8 8 6 14 4-2 4-6 4-8 4 6 2 12-4 12z')) +
-            grp('#ffd04a', P('M31 21c-2-3 0-7 1-9 1 3 4 4 3 7z')),
+            grp('#5a4a3a', P('M0 44h64v4H0z')) +
+            grpW('#7a746a', 1.6, P('M13.4 2h9.2v12h-9.2z')) +
+            grpW('#8a8278', 1.8, P('M4.6 22 11 13.4h14L31.4 22z')) +
+            grpW('#8a8278', 1.8, P('M2.6 22h31v22h-31z')) +
+            line('M2.6 28.6h4.4M29.2 28.6h4.4M2.6 36.4h4.4M29.2 36.4h4.4M7 22v6.6M29.2 22v6.6M15.4 2v12M20.6 8v6', '#6a645c', 1) +
+            grpW('#2a1206', 1.6, P('M7 40.4V30.6c0-5.6 22.2-5.6 22.2 0v9.8z')) +
+            grpW('#ff6a1a', 1, P('M8.6 40.4c-.6-3.6 1.8-4.6 2.6-7.4 1.2 2 2 3.2 2.4 5 .8-2.8 2.6-4.6 3.8-6.6 1.2 2.8 3 4.4 2.6 7.2 1.2-1.2 2-2.6 2.2-4.2 1.8 2.4 2.2 4.4 1 6 1-.6 1.6-1.4 1.8-2.4 1.2 1.6 1.4 2.4.6 2.4z')) +
+            grp('#ffd04a', P('M12.8 40.4c0-1.8 1-2.6 1.6-4 .8 1.4 1.8 2.2 1.6 4zM18.4 40.4c-.2-2.4 1.4-3.6 2.2-5.4 1 2 2 3 1.6 5.4z')) +
+            grpW('#3a3238', 1.2, P('M6.4 40.4h23.4v3.6H6.4z')) + dot(10, 42.2, 1, '#ff8c2a') + dot(15.4, 42.2, 1, '#ff6a1a') + dot(21, 42.2, 1, '#ff8c2a') + dot(26.4, 42.2, 1, '#ff6a1a') +
+            grpW('#7a5232', 1.6, P('M42 35.6h14V44H42z')) + line('M45 37.6v6M49 36.6v7.4M53 37.6v6', '#5a3a22', 1) +
+            grpW('#4a4e55', 1.8, P('M36.4 26.6h23.2v3.6h-3.8l-1.8 2.6h-9.6l-1.6-2.6h-2c-3.6 0-4.8-1.6-4.4-3.6z')) +
+            grpW('#4a4e55', 1.6, P('M44.8 32.8h8l1.6 2.8H43.2z')) +
+            line('M38.4 27.6h20.6', '#7a808a', 1) +
+            line('M39 25.6h17', INK, 2.8) + line('M39 25.6h11.4', STEEL_L, 1.4) + line('M50.4 25.6H56', '#ff8c2a', 1.4) +
+            line('M57.8 44 61.8 32.4', INK, 2.6) + line('M57.8 44 61.8 32.4', '#8a5a32', 1.2) +
+            grpW('#5a5f66', 1.2, P('M58.6 31.4l6 2-1.2 3-6-2z')) +
+            dot(47, 21.6, .8, '#ffd04a') + dot(52.4, 20.4, .7, '#ff8c2a') + dot(55.6, 22.6, .8, '#ffd04a') + dot(44, 19.4, .6, '#ff8c2a'),
 
         orc_camp:
             grp('#8a6a44', P('M6 44 24 14l18 30z')) + grp('#5a4028', P('M20 44l4-14 4 14z')) +
@@ -3838,12 +3963,30 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<g fill="none" stroke="#b77cff" stroke-width="1.8" stroke-linecap="round">' +
             '<path d="M24 26c-4-6 4-8 2-14M52 20c4-4 0-8 4-12"/></g>',
 
+        // The Vault of Comets: a round steel vault door in a stone wall,
+        // its locking wheel at the middle and a comet on the keystone, and
+        // two comets streaking over it with their tails behind them.
         vault:
-            grp('#7a808a', '<circle cx="30" cy="30" r="15"/>') +
-            grp('#a3aab4', '<circle cx="30" cy="30" r="10"/>') +
-            line('M30 22v16M22 30h16', '#4a4e55', 2.2) + dot(30, 30, 2.4, '#4a4e55') +
-            grp('#f4e38a', P('M50 8l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z')) +
-            line('M48 12 38 18M46 8 40 10', '#f4e38a', 1.6),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            grpW('#9a948a', 1.8, P('M5 17h54v27H5z')) +
+            line('M5 23.6h8.6M50.4 23.6H59M5 30.6h7M52 30.6h7M5 37.4h7.4M51.6 37.4H59M9 17v6.6M55 17v6.6M8 30.6v6.8M56 30.6v6.8', '#7c746a', 1) +
+            '<circle cx="32" cy="31.4" r="15.2" fill="#a39b8f" stroke="' + INK + '" stroke-width="1.8"/>' +
+            line('M32 16.2v3M43 20.6l-2.2 2.2M47.2 31.4h-3M21 20.6l2.2 2.2M16.8 31.4h3', '#7c746a', 1.1) +
+            '<circle cx="32" cy="31.4" r="12.2" fill="#7a808a" stroke="' + INK + '" stroke-width="1.8"/>' +
+            '<circle cx="32" cy="31.4" r="9.6" fill="none" stroke="#5a5f66" stroke-width="1"/>' +
+            [0, 45, 90, 135, 180, 225, 270, 315].map(a => dot((32 + 10.9 * Math.cos(a * Math.PI / 180)).toFixed(2),
+                (31.4 + 10.9 * Math.sin(a * Math.PI / 180)).toFixed(2), .8, '#c3c9d1')).join('') +
+            '<circle cx="32" cy="31.4" r="5.4" fill="none" stroke="' + INK + '" stroke-width="2.8"/>' +
+            '<circle cx="32" cy="31.4" r="5.4" fill="none" stroke="' + GOLD + '" stroke-width="1.4"/>' +
+            line('M32 26v10.8M26.6 31.4h10.8M28.2 27.6l7.6 7.6M35.8 27.6l-7.6 7.6', INK, 1.5) +
+            dot(32, 31.4, 1.6, GOLD) +
+            grpW('#b8b0a2', 1.4, P('M28 16.6h8l-1.2 3.2h-5.6z')) +
+            dot(33, 18, .9, GOLD) + line('M32.4 18.4l-2.4.6', GOLD, .8) +
+            '<path d="M39 9.6 56.4 2.8M40.6 12.2 57.4 6.4M42 7.6 52 2.4" fill="none" stroke="#f4e38a" stroke-width="1.3" stroke-linecap="round"/>' +
+            '<path d="M7 12.4 19.6 7.6M8.2 14.4 20 10.4" fill="none" stroke="#bfe6ff" stroke-width="1.1" stroke-linecap="round"/>' +
+            grpW('#ffe27a', 1.2, P('M38.4 7.6l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z')) +
+            '<circle cx="6" cy="13.6" r="2.2" fill="#dff2ff" stroke="' + INK + '" stroke-width="1.1"/>' +
+            '<path d="M25.4 3.6l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5zM61 12.6l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>',
 
         cliff:
             grp('#7a6a5a', P('M0 18h30l4 6-2 8 4 14H0z')) + line('M0 18h30', '#5a6a3a', 3) +
@@ -3883,19 +4026,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             [[10, 45, -20, '#8a6a2a'], [39, 45.4, 25, '#6a7a2a'], [3.6, 40.6, 10, '#9a5a22'], [30, 46.6, -35, '#7a6a2a']].map(l =>
                 '<g transform="translate(' + l[0] + ' ' + l[1] + ') rotate(' + l[2] + ')">' +
                 grpW(l[3], .7, P('M-2.6 0c1.2-1.4 3.8-1.4 5.2 0-1.4 1.4-4 1.4-5.2 0z')) + line('M-2.6 0h4.6', '#4a3220', .5) + '</g>').join('') +
-            grpW('#4a4e55', 1.4, P('M1 33.2h6.4v3.4H1zM35 33.2h6.4v3.4H35z')) +
-            '<ellipse cx="21" cy="35" rx="15" ry="6.4" fill="#4a4e55" stroke="' + INK + '" stroke-width="2"/>' +
-            '<ellipse cx="21" cy="35" rx="11" ry="4.2" fill="#5a4630" stroke="' + INK + '" stroke-width="1.2"/>' +
-            (function () {
-                let t = '';
-                for (let i = 0; i < 14; i++) {
-                    const a = i / 14 * Math.PI * 2, w = Math.PI / 14 * .8;
-                    const pt = (rx, ry, ang, lift) => (21 + rx * Math.cos(ang)).toFixed(2) + ' ' + (35 + ry * Math.sin(ang) - (lift || 0)).toFixed(2);
-                    t += 'M' + pt(11.6, 4.6, a - w) + 'L' + pt(6.6, 2, a, 2.8) + 'L' + pt(11.6, 4.6, a + w) + 'z';
-                }
-                return grpW(STEEL_L, .8, P(t));
-            })() +
-            '<ellipse cx="21" cy="35.4" rx="3.6" ry="1.5" fill="#9aa1aa" stroke="' + INK + '" stroke-width="1"/>' +
+            '<ellipse cx="21" cy="39.4" rx="18" ry="4.2" fill="#4a3a28" opacity=".5"/>' +
+            // the springs: a flat steel bow out to either side, looped at the end
+            grpW('#5a5f66', 1.2, P('M8.6 36.4H2.8c-1.8 0-1.8-3.6 0-3.6h5.8zM33.4 36.4h5.8c1.8 0 1.8-3.6 0-3.6h-5.8z')) +
+            trapTeeth(false) +
+            '<ellipse cx="21" cy="34.8" rx="13" ry="5" fill="none" stroke="' + INK + '" stroke-width="4.6"/>' +
+            '<ellipse cx="21" cy="34.8" rx="13" ry="5" fill="none" stroke="' + STEEL + '" stroke-width="2.4"/>' +
+            '<ellipse cx="21" cy="35.4" rx="5.2" ry="1.9" fill="#6d737b" stroke="' + INK + '" stroke-width="1.2"/>' +
+            dot(21, 35.2, .9, INK) +
+            trapTeeth(true) +
             line('M47 44V24M61 44V24', INK, 3.4) + line('M47 44V24M61 44V24', '#8a6a44', 1.8) +
             grpW('#8a6a44', 1.2, P('M45.3 24l1.7-3.4 1.7 3.4zM59.3 24l1.7-3.4 1.7 3.4z')) +
             line('M47 30.6c4.6.6 9.4.6 14 0', '#d9cdb0', 1.1) +
@@ -3914,11 +4053,34 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M26 20v6M36 20v6M31 30v6', INK, 2) +
             line('M46 10V0', INK, 1.6) + grp(CRIMSON, P('M46 0h10l-3 3 3 3H46z')),
 
+        // Astrix's Alchemy: a shelf of bottles, the cauldron bubbling green
+        // over its fire, a spell book open on the left and a retort of
+        // something violet on the right.
         alchemy:
-            grp('#3a3a40', P('M14 24h36c0 16-8 20-18 20s-18-4-18-20z')) +
-            grp('#5adc6a', P('M14 24h36l-2 4H16z')) +
-            dot(24, 18, 3, '#7aec8a') + dot(34, 14, 2.4, '#7aec8a') + dot(42, 19, 2, '#7aec8a') +
-            flask(8, 34, .45, '#9b5cff') + flask(56, 34, .45, '#d23a3a'),
+            grp('#4a3a48', P('M0 44h64v4H0z')) +
+            grpW('#8a5a32', 1.4, P('M2 13.6h60v2.6H2z')) + line('M6 16.2l2 3.4M58 16.2l-2 3.4', INK, 1.4) +
+            grpW('#3a7fd2', 1.2, P('M5.6 13.6V7.4l1.2-1.6V3.4h2v2.4L10 7.4v6.2z')) + grpW('#8a5a32', .8, P('M6.6 2.4h2.4v1.4H6.6z')) +
+            grpW('#d23a3a', 1.2, P('M14.8 13.6c-2.8 0-4-1.6-4-3.6s1.6-3.6 3-4V3.8h2V6c1.4.4 3 2 3 4s-1.2 3.6-4 3.6z')) +
+            grpW('#5adc6a', 1.1, P('M20.6 13.6V8.4h3.4v5.2z')) + grpW('#8a5a32', .8, P('M20.8 7.2h3v1.4h-3z')) +
+            grpW('#e0a030', 1.2, P('M41.6 13.6v-5c0-1 .8-1.6 1.6-1.6h4.8c.8 0 1.6.6 1.6 1.6v5z')) + grpW('#8a5a32', .8, P('M42.8 5.6h4.8V7h-4.8z')) +
+            grpW('#9b5cff', 1.2, P('M52 13.6V7.2c0-1.4 1-2 1.4-2.6V2.8h2v1.8c.4.6 1.4 1.2 1.4 2.6v6.4z')) +
+            grpW('#4ac0b0', 1.1, P('M59.6 13.6c-1.8 0-2.6-1-2.6-2.4s1-2.4 2.6-2.4 2.6 1 2.6 2.4-.8 2.4-2.6 2.4z')) +
+            '<path d="M24.6 22.4c-2.6-2.6 1.6-4.4-.6-7.2M32 21c2.6-3.2-1.8-5 1-8.4M39.2 22.4c2-2.4-1.4-4 .8-6.8" fill="none" stroke="#7aec8a" stroke-width="1.4" stroke-linecap="round"/>' +
+            grpW('#ff8c2a', 1, P('M25 44c-.8-2.6 1.2-3.4 1.8-5.2 1 1.6 1.8 2.4 2 3.8.8-1.6 1.8-2.8 2.6-4 1 2 2.4 3 2.2 4.6 1-.8 1.6-1.8 1.8-2.8 1.4 1.8 1.6 3 .8 3.6z')) +
+            line('M22.6 38.4 21 44M41.4 38.4 43 44', INK, 2) +
+            grpW('#2e2a30', 1.8, P('M18.4 25.4h27.2c0 9.4-5.8 14.2-13.6 14.2s-13.6-4.8-13.6-14.2z')) +
+            grpW('#3a3640', 1.6, P('M16.6 23h30.8v3.2H16.6z')) +
+            grpW('#5adc6a', 1.2, P('M18.6 23c1.8-2 4.4-2 6.2 0 1.8-2 4.4-2 6.4 0 1.8-2 4.4-2 6.2 0 1.8-2 4.4-2 6 0z')) +
+            dot(24, 19.6, 1.6, '#7aec8a') + dot(37.4, 18.6, 1.3, '#7aec8a') + dot(31, 17.4, 1, '#7aec8a') +
+            grpW('#6a4a2e', 1.2, P('M3 44l2.6-6.6h10.2L18.4 44z')) +
+            grpW('#efe2c0', 1.2, P('M3.6 37.6c2-1.4 4.2-1.4 6.6 0 2.4-1.4 4.6-1.4 6.6 0l-1.4-6.8c-2-1-3.8-1-5.2.4-1.4-1.4-3.2-1.4-5.2-.4z')) +
+            line('M10.2 31.2v6.4', '#9a8a6a', .9) + line('M5.8 33h2.8M5.6 35h2.8M11.8 33h2.8M12 35h2.8', '#9a8a6a', .7) +
+            '<path d="M53 32.4c1-4 3-6.6 7.4-8" fill="none" stroke="' + INK + '" stroke-width="3"/>' +
+            '<path d="M53 32.4c1-4 3-6.6 7.4-8" fill="none" stroke="#dfe9ee" stroke-width="1.4"/>' +
+            '<circle cx="51" cy="37.4" r="5.4" fill="#dfe9ee" stroke="' + INK + '" stroke-width="1.6"/>' +
+            '<path d="M45.8 38.6a5.4 5.4 0 0 0 10.4 0z" fill="#9b5cff" stroke="' + INK + '" stroke-width="1.2"/>' +
+            line('M47.4 44l1.6-2.4M54.6 44 53 41.6', INK, 1.4) +
+            '<ellipse cx="49.2" cy="35.6" rx="1.1" ry="1.8" fill="#ffffff" opacity=".8"/>',
 
         // Noble's District: a grand townhouse behind gilded railings, its
         // pillared porch, a crest over the door, tall lit windows under a
@@ -3964,10 +4126,27 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#a07a50', P('M39 28h23l-2 7H41z')) + line('M41 31.5h20', '#6a4a2e', 1) +
             line('M39 30 34 25', INK, 2.2),
 
+        // The Adventurers' Inn: a stout lodge, stone below and timber above
+        // under a thatched roof, the board of jobs by its door, a barrel of
+        // ale, and its sign hung out: a shield with two swords crossed on it.
         adv_inn:
-            house(10, 44, 30, 20, '#6a4a2e', '#d8c49a') +
-            line('M46 14h12M52 14v6', INK, 2) + grp('#b07a44', P('M44 20h16v14H44z')) +
-            line('M47 23l10 8M57 23l-10 8', INK, 1.8),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            grpW('#7a746a', 1.4, P('M30.4 5h4.8v9h-4.8z')) +
+            grpW('#efe2c0', 1.8, P('M5 18.6h34V30H5z')) +
+            line('M5 18.6h34M5 30h34M13 18.6V30M22 18.6V30M31 18.6V30M5 18.6l8 11.4M39 18.6l-8 11.4', '#5a3a22', 1.4) +
+            grpW('#f4d23c', 1.3, P('M15.4 21.4h4.4v5.2h-4.4zM24.2 21.4h4.4v5.2h-4.4z')) + line('M17.6 21.4v5.2M26.4 21.4v5.2', '#5a3a22', .9) +
+            grpW('#c9a04a', 1.8, P('M1.6 20 22 3.4 42.4 20c-6.4-1.4-34.4-1.4-40.8 0z')) +
+            line('M8.6 15.4l4-3.4M14.6 11.6l3.6-3.2M27 8.4l3.4 3.2M31.6 12l4 3.4M21 6.6l-1.4 3M23.4 6.6l1.4 3', '#9a7a2e', 1) +
+            grpW('#9a948a', 1.8, P('M4 30h36v14H4z')) +
+            line('M4 34.6h7M33 34.6h7M4 39.2h7M33 39.2h7M8 30v4.6M36 30v4.6M6 34.6v4.6M38 34.6v4.6', '#7c746a', .9) +
+            grpW('#6a4a2e', 1.6, P('M16.6 44v-7.6c0-4.4 10.8-4.4 10.8 0V44z')) + line('M22 32.4V44', '#4a3220', 1) + dot(25.4, 39.4, .8, GOLD) +
+            grpW('#a07a50', 1.2, P('M5.6 32.2h9v8h-9z')) +
+            grpW('#f4f0e2', .7, P('M6.6 33.2h3.4v3.4H6.6zM10.6 33.6h3v2.8h-3zM7.4 37.2h3.2v2.4H7.4zM11 36.8h2.6v2.8H11z')) + dot(8.3, 33.6, .5, CRIMSON) + dot(12.1, 34, .5, CRIMSON) +
+            line('M39 12.4h17M42 12.4l3-3.4', INK, 1.8) + line('M47.4 12.4v2.6M54.4 12.4v2.6', INK, 1) +
+            grpW('#8a5a32', 1.6, P('M45.6 15h11v8.4c0 4.4-5.5 6.6-5.5 6.6s-5.5-2.2-5.5-6.6z')) +
+            line('M47.6 16.8l7 9M54.6 16.8l-7 9', STEEL_L, 1.5) + line('M46.8 19.4l2.4-1.2M55.4 19.4 53 18.2', GOLD, 1.3) +
+            grpW('#8a5a32', 1.6, P('M49.6 33.6h10.6c1 3.4 1 7 0 10.4H49.6c-1-3.4-1-7 0-10.4z')) +
+            line('M49.2 36.6h11.4M49.2 41h11.4', '#4a4e55', 1.3),
 
         // Ametin's Inn: two storeys of timber and white plaster, the upper
         // one jutting out over the street, warm light in every window, smoke
@@ -4036,17 +4215,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
         royal_patrol:
             line('M22 46V4', INK, 3) + grp(ROYAL_RED, P('M23 6h26v24l-13-5-13 5z')) + line('M23 6h26', GOLD, 2) +
-            crown(36, 16, .75) + line('M46 46V10', INK, 3.6) + line('M46 46V10', '#7a5232', 1.8) +
-            grp(STEEL_L, P('M46 12l9 3v9l-9-3z')),
+            crown(36, 16, .75) + at(54, 0, .62, halberd(0, 14, 74)),
 
         gates:
             grp('#8a8278', P('M4 44V10h14v34zM46 44V10h14v34z')) + grp('#9e968a', P('M18 18h28v6H18z')) +
             line('M22 24v20M28 24v20M34 24v20M40 24v20M18 32h28M18 40h28', '#4a4e55', 1.8) +
             line('M4 10v-4h4v4M14 10v-4h4v4M46 10v-4h4v4M56 10v-4h4v4', INK, 1.6),
 
-        // King's Square: the old king in gold on his column above the
-        // fountain, water falling from the bowl at his feet into the basin,
-        // and the royal banners at either side of the square.
+        // King's Square: a fountain of three tiers, water falling from bowl
+        // to bowl into the basin, and the royal banners either side of it.
         kings_square:
             grp('#a39b8f', P('M0 42h64v6H0z')) + line('M5 45h6M19 44.6h6M37 45.4h6M52 44.6h6', '#7c746a', 1.1) +
             line('M6 42V6M58 42V6', INK, 1.8) +
@@ -4056,10 +4233,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#a39b8f', P('M29 35V25h6v10z')) +
             grp('#a39b8f', P('M23 23h18c0 3.6-4.4 5.6-9 5.6S23 26.6 23 23z')) +
             line('M23.6 25c-2.4 3-3.2 6-3.2 10M40.4 25c2.4 3 3.2 6 3.2 10', '#7ad4ff', 1.5) +
-            grp(GOLD, P('M28.5 22.6 30 13.4h4l1.5 9.2z'), 'stroke-width="1.6"') +
-            '<circle cx="32" cy="11.2" r="2.5" fill="' + GOLD + '" stroke="' + INK + '" stroke-width="1.4"/>' +
-            line('M34.6 14.2 37.4 6.6', GOLD, 1.4) + dot(37.6, 6.2, 1, GOLD) +
-            crown(32, 8, .3),
+            grp('#7ad4ff', P('M24 23h16l-1.2 1.6H25.2z'), 'stroke-width="1"') +
+            grp('#a39b8f', P('M30.4 23V15.6h3.2V23z')) +
+            grp('#a39b8f', P('M26 14.6h12c0 2.6-2.8 4.2-6 4.2s-6-1.6-6-4.2z')) +
+            grp('#7ad4ff', P('M26.6 14.6h10.8l-.9 1.2h-9z'), 'stroke-width=".9"') +
+            line('M26.6 16c-1.6 2-2.2 4.2-2.2 7M37.4 16c1.6 2 2.2 4.2 2.2 7', '#7ad4ff', 1.3) +
+            grp('#a39b8f', P('M30.8 14.6v-3.4h2.4v3.4z')) +
+            '<circle cx="32" cy="10" r="1.9" fill="#a39b8f" stroke="' + INK + '" stroke-width="1.4"/>' +
+            line('M32 8.1V4.4', '#7ad4ff', 1.4) + line('M32 4.6c-1.6.2-2.8 1.8-3.2 4M32 4.6c1.6.2 2.8 1.8 3.2 4', '#7ad4ff', 1),
 
         watchtower:
             grp('#8a8278', P('M22 46V14h20v32z')) + grp('#9e968a', P('M18 8h28v8H18z')) +
@@ -5990,27 +6171,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     // What happens at the very start of a unit's turn.
     function startOfTurn(state, b, u) {
-        if (u.kind === 'enemy') {
-            if (hasPassive(b, u, 'silent_hands')) {
-                const victim = b.units.find(x => x.kind === 'player' && x.side !== u.side && !x.down);
-                if (victim) {
-                    const p = player(state, victim.pid);
-                    if (p.gold >= 5) {
-                        p.gold -= 5;
-                        log(state, 'Silent Hands: the Thieves lift 5 Gold from ' + p.name + '.', 'enemy');
-                    } else {
-                        loseHp(p, 15);
-                        log(state, 'Silent Hands: ' + p.name + ' has no Gold to lose and takes 15 damage.', 'enemy');
-                    }
-                }
-            }
-            if (hasPassive(b, u, 'mountain_magic') && u.hp < u.maxHp) {
-                const before = u.hp;
-                u.hp = Math.min(u.maxHp, u.hp + 10);
-                log(state, 'Mountain Magic: the Orc Warriors heal ' + (u.hp - before) + ' HP.', 'heal');
-            }
-            return;
-        }
+        // A monster's own start of turn is played by enemyAct, when it moves.
+        if (u.kind === 'enemy') return;
         // Corrupted Arena: 5 damage at the start of every turn, while
         // Fenrirak stands.
         if (b.kind === 'boss') {
@@ -6438,6 +6600,39 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return ok();
     }
 
+    /* What a monster does as its turn begins: Silent Hands, Mountain Magic.
+       Played as it acts rather than as the blow before it lands, or a
+       10-damage blow on the Orc Warriors and their 10 HP back would show as
+       one picture with nothing changed: the blow, then the heal, each seen.
+       Returns the lines to show with its attack. */
+    function enemyTurnStart(state, b, u) {
+        const notes = [];
+        if (hasPassive(b, u, 'silent_hands')) {
+            const victim = b.units.find(x => x.kind === 'player' && x.side !== u.side && !x.down);
+            if (victim) {
+                const p = player(state, victim.pid);
+                let line;
+                if (p.gold >= 5) {
+                    p.gold -= 5;
+                    line = 'Silent Hands: the Thieves lift 5 Gold from ' + p.name + '.';
+                } else {
+                    loseHp(p, 15);
+                    line = 'Silent Hands: ' + p.name + ' has no Gold to lose and takes 15 damage.';
+                }
+                log(state, line, 'enemy');
+                notes.push(line);
+            }
+        }
+        if (hasPassive(b, u, 'mountain_magic') && u.hp < u.maxHp) {
+            const before = u.hp;
+            u.hp = Math.min(u.maxHp, u.hp + 10);
+            const line = 'Mountain Magic: the Orc Warriors heal ' + (u.hp - before) + ' HP.';
+            log(state, line, 'heal');
+            notes.push(line);
+        }
+        return notes;
+    }
+
     // The monster's turn. Driven by the client of whoever is fighting it,
     // after a pause, so it can be watched.
     function enemyAct(state, pid) {
@@ -6446,6 +6641,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (b.phase !== 'enemy') return { ok: false, error: 'It is not the enemy’s turn.', silent: true };
         if (pid !== b.moverId && pid !== '__clock__') return fail('This is not your fight.');
         const u = curUnit(b);
+        const notes = enemyTurnStart(state, b, u);
+        if (settleDeaths(state)) return ok();
         const m = chooseEnemyMove(b, u);
         u.energy -= m.cost;
         u.lastMove = m.id;
@@ -6460,6 +6657,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             noteBlow(b, { by: u.key, move: m.name, moveId: m.id, spell: true });
             applyMoveFx(state, b, u, null, m);
         }
+        if (notes.length && b.lastBlow && b.lastBlow.by === u.key) b.lastBlow.notes = notes;
         if (settleDeaths(state)) return ok();
         if (b.ask) { b.phase = 'ask'; state.turnStartedAt = Date.now(); return ok(); }
         endStep(state);
@@ -9886,8 +10084,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             h += ' <span class="why">(' + (on.kind === 'ally' ? 'guarding ' : 'meant for ') + colourNames(whoIs(aimed)) + ')</span>';
         }
         const m = E.movesOf(S, by).find(x => x.id === lb.moveId);
+        const notes = (lb.notes || []).map(t => '<small class="bl-note' + (/ heal /.test(t) ? ' heal' : '') + '">' + colourNames(t) + '</small>').join('');
         return '<div class="blow-line' + (fresh ? ' fresh' : '') + '"><span class="bl-icon">' + A.ICONS.sword(18) + '</span>' +
-            '<div class="bl-text"><div>' + h + '</div>' + (m && m.text ? '<small>' + esc(m.text) + '</small>' : '') + '</div>' +
+            '<div class="bl-text">' + notes + '<div>' + h + '</div>' + (m && m.text ? '<small>' + esc(m.text) + '</small>' : '') + '</div>' +
             (lb.spell ? '' : '<div class="bl-dmg"><b>' + (lb.dmg ? '\u2212' + lb.dmg : '0') + '</b><small>damage</small></div>') + '</div>';
     }
     // Every fighter with its stat card straight under it, as The Thunder
