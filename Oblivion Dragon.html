@@ -714,6 +714,21 @@
     --good: #6fbf73;
     --bad: #e0574a;
     --energy: #7ad4ff;
+    /* the shield throwing somebody back (shieldfx.js): the dark laid over
+       the screen, then the energy from its darkest to its brightest, and
+       the colour of the word that comes up */
+    --zap-purple-veil: #07030c;
+    --zap-purple-deep: #330d4a;
+    --zap-purple-mid: #6a2fc0;
+    --zap-purple-bright: #9b5cff;
+    --zap-purple-core: #eadcff;
+    --zap-purple-text: #c79bff;
+    --zap-crimson-veil: #0b0204;
+    --zap-crimson-deep: #3d0711;
+    --zap-crimson-mid: #6b0a1b;
+    --zap-crimson-bright: #a8102b;
+    --zap-crimson-core: #f25a70;
+    --zap-crimson-text: #e0475e;
     --paper: #f1e6cf;
     --paper-ink: #2a1c14;
     --radius: 14px;
@@ -1855,6 +1870,45 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 @keyframes deal { from { transform: translateY(40px) rotate(8deg); opacity: 0; } to { transform: none; opacity: 1; } }
 .draw-toast { transition: opacity .4s ease, transform .4s ease; }
 .draw-toast.going { opacity: 0; transform: translateY(-16px); }
+
+/* the shield throwing somebody back: shieldfx.js draws it all on the
+   canvas; the word underneath is ordinary text */
+.zap-fx { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 3550; pointer-events: none; display: none; }
+.zap-fx.on { display: block; }
+.zap-caption {
+    position: fixed; left: 50%; top: 62%;
+    transform: translateX(-50%);
+    z-index: 3560; pointer-events: none; text-align: center;
+    width: max-content; max-width: calc(100vw - 32px);
+    opacity: 0; transition: opacity .35s ease;
+}
+.zap-caption.show { opacity: 1; }
+.zap-caption b {
+    display: block;
+    font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 56px;
+    letter-spacing: 8px;
+    color: var(--zap-text, var(--oblivion-soft));
+    text-shadow: 0 4px 8px #000;
+}
+.zap-caption.show b { animation: zap-word .55s cubic-bezier(.2, 1.3, .4, 1) both; }
+.zap-caption span {
+    display: inline-block; margin-top: 4px; font-size: 15px;
+    background: rgba(0, 0, 0, .72); padding: 6px 14px; border-radius: 12px; color: var(--cream);
+}
+@keyframes zap-word {
+    from { transform: scale(1.8); opacity: 0; letter-spacing: 28px; }
+    to { transform: scale(1); opacity: 1; letter-spacing: 8px; }
+}
+.tok.zap-away { visibility: hidden; transition: none; }
+.tok.zap-land { animation: zap-land .45s cubic-bezier(.2, 1.5, .4, 1); }
+@keyframes zap-land {
+    from { transform: translate(-50%, -50%) scale(1.6); }
+    to { transform: translate(-50%, -50%) scale(1); }
+}
+@media (max-width: 700px) {
+    .zap-caption b { font-size: 36px; letter-spacing: 4px; }
+    .zap-caption span { font-size: 13px; }
+}
 
 .paused-veil {
     position: fixed; inset: 0; z-index: 870; pointer-events: none;
@@ -3406,6 +3460,138 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M3 33v2.6M5.6 33v2.6M8.2 33v2.6M10.8 33v2.6M29.2 33v2.6M31.8 33v2.6M34.4 33v2.6M37 33v2.6', GOLD, .9);
     }
 
+    /* The Royal Guards' helmet, in the designs the user chose between
+       (2026-10-05): they picked the barbute. Each draws over the bare head
+       (x 13 to 27, chin at 32) and gives the face whatever of it shows.
+       GUARD_HELM is the one used. */
+    const GUARD_HELM = 'barbute';
+    function star(x, y, R, r, n) {
+        let d = '';
+        for (let i = 0; i < n * 2; i++) {
+            const a = -Math.PI / 2 + i * Math.PI / n, k = i % 2 ? r : R;
+            d += (i ? 'L' : 'M') + (x + Math.cos(a) * k).toFixed(2) + ' ' + (y + Math.sin(a) * k).toFixed(2);
+        }
+        return d + 'z';
+    }
+    function faceAt(y) { return dot(17, y, 1.4) + dot(23, y, 1.4) + line('M17.6 ' + (y + 4.6) + 'h4.8', INK, 1.4); }
+    // Bearskin: rows of little hooked tufts, staggered.
+    function furTufts() {
+        let d = '';
+        [[-2.4, [16.4, 20.4]], [1.4, [13.4, 17.4, 21.4, 25]], [5.4, [12.4, 16.4, 20.4, 24.4]], [9.4, [12.2, 15.8, 19.8, 23.8, 26.6]],
+         [13.4, [13.4, 17.4, 21.4, 25.2]], [16.8, [15.4, 19.4, 23.4]]].forEach(r => {
+            r[1].forEach(x => { d += 'M' + x + ' ' + r[0] + 'q.9 1.6 2.2 1.2'; });
+        });
+        return d;
+    }
+    // One feather of a plume: rounded at the tip, narrowing into the socket
+    // at (20, 3.4), turned `deg` from upright.
+    function plumeFeather(deg, k, fill) {
+        return '<g transform="rotate(' + deg + ' 20 3.4) translate(20 3.4) scale(' + k + ') translate(-20 -3.4)">' +
+            grpW(fill, 1.3, P('M20 3.4C17.2 1.2 17-2.8 19.6-5.6c.4-.4.8-.4 1.2 0 2.4 2.8 2 6.8-.8 9z')) +
+            line('M20 2.4c.2-2.6.4-4.8.2-6.6', '#5e1214', .8) +
+            line('M18.6-1.6c.2-1.2.6-2.2 1.2-3', '#c8463a', .8) + '</g>';
+    }
+    function chinChain(d) {
+        return line(d, INK, 2) + '<path d="' + d + '" fill="none" stroke="' + GOLD + '" stroke-width="1.1" stroke-dasharray="1.3 .7"/>';
+    }
+    const GUARD_HELMS = {
+        // As it was: a rounded close helm, visor down, gold comb, plume.
+        close: {
+            name: 'Close helm (as it is now)',
+            draw: o =>
+                grpW(o.plume || CRIMSON, 1.4, P('M21.6 7c1.4-5.8 8.2-7.6 12.2-3.4-4.2-.2-7.6 1.6-9.4 5.6z')) +
+                grpW(STEEL_L, 2, P('M11.2 19.4c0-8.4 3.8-13 8.8-13s8.8 4.6 8.8 13v8.2c0 3.6-3.8 5.8-8.8 5.8s-8.8-2.2-8.8-5.8z')) +
+                line('M14 10.6c1.6-2 3.4-2.8 5-3', '#eef1f5', 1.2) +
+                grpW(GOLD, 1.2, P('M18.7 7.2c0-4.2 2.6-4.2 2.6 0v9.6h-2.6z')) +
+                grpW(STEEL, 1.5, P('M11.4 17.2h17.2v6.4c0 1.2-1 2-2.2 2H13.6c-1.2 0-2.2-.8-2.2-2z')) +
+                line('M13.8 20.6h12.4', INK, 1.9) +
+                line('M11.4 17.2h17.2', GOLD, 1.5) +
+                dot(23.4, 28.4, .75) + dot(25.6, 28, .75) + dot(23.4, 30.4, .75) + dot(25.6, 30, .75) +
+                line('M11.6 31.4c2.4 1.6 5.2 2.2 8.4 2.2s6-.6 8.4-2.2', GOLD, 1.4)
+        },
+        // A barbute: one smooth steel shell down to the jaw, with a T cut out
+        // for the eyes, nose and mouth, edged in gold, and a fan of three
+        // feathers standing in a gold socket on top.
+        barbute: {
+            name: 'Barbute',
+            draw: o =>
+                plumeFeather(-40, .9, '#7a1719') + plumeFeather(40, .9, '#7a1719') + plumeFeather(4, 1.08, o.plume || CRIMSON) +
+                grpW(STEEL_L, 2, P('M10.8 20.4C10.8 10.8 14.6 5.4 20 5.4s9.2 5.4 9.2 15v9.4c0 2.4-2.6 4-5.4 4H16.2c-2.8 0-5.4-1.6-5.4-4z')) +
+                line('M13.2 13.4c1.2-3.4 3.4-5.6 5.8-6.2', '#eef1f5', 1.3) +
+                line('M20 6v9.4', STEEL, 1.3) +
+                grpW(GOLD, 1.2, P('M13 15.6h14v8h-3.2v10.6h-7.6V23.6H13z')) +
+                grpW(SKIN, 1.3, P('M14.6 17.2h10.8v5h-3.2v12h-4.4v-12h-3.2z')) +
+                dot(17.6, 19.6, 1.25) + dot(22.4, 19.6, 1.25) + line('M18.9 29.4h2.2', INK, 1.2) +
+                grpW(GOLD, 1, P('M18.5 2.4h3l-.5 3.6h-2z')) +
+                dot(12.8, 27.6, .8, GOLD) + dot(27.2, 27.6, .8, GOLD) + dot(12.8, 31, .8, GOLD) + dot(27.2, 31, .8, GOLD)
+        },
+        // A crested morion, as the palace guards of old wore: a tall comb,
+        // a brim that sweeps up at both ends, gold etched along it, and a
+        // red and a white feather.
+        morion: {
+            name: 'Crested morion',
+            draw: o =>
+                grpW(o.plume || CRIMSON, 1.2, P('M13.4 11.2c-4.2-1-7-4.2-7.4-8.6 2 2.4 4.6 3.6 7.6 3.8z')) +
+                grpW('#f4f0e2', 1.1, P('M13.8 8.4c-2.4-1.6-3.4-4-3-6.8 1.2 1.8 2.6 2.8 4.4 3.2z')) +
+                grpW(STEEL_L, 1.7, P('M12.6 12.2C12.6 2.6 27.4 2.6 27.4 12.2z')) +
+                line('M13.6 11.4C13.8 4.2 26.2 4.2 26.4 11.4', GOLD, 1.2) +
+                grpW(STEEL_L, 1.8, P('M11.6 16.6C11.6 11.2 15.4 8.8 20 8.8s8.4 2.4 8.4 7.8z')) +
+                line('M14 13.2c1-1.8 2.6-2.8 4.4-3.2', '#eef1f5', 1.1) +
+                grpW(STEEL_L, 1.8, P('M5.4 10.4c2 4.4 6.8 5.6 14.6 5.6s12.6-1.2 14.6-5.6c.8 4.4-1.2 7.8-5.2 9-3 .9-6.2 1.2-9.4 1.2s-6.4-.3-9.4-1.2c-4-1.2-6-4.6-5.2-9z')) +
+                line('M8.2 16.8c3.2 1.8 7.2 2.4 11.8 2.4s8.6-.6 11.8-2.4', GOLD, 1.2) +
+                dot(20, 18.2, 1, GOLD) +
+                faceAt(23.6)
+        },
+        // The household cavalry's helmet: polished steel with a gold star on
+        // the front, a peak, gold chin scales, and a long horsehair plume
+        // falling from a spike on top.
+        cavalry: {
+            name: 'Plumed household helmet',
+            draw: o =>
+                grpW(o.plume || CRIMSON, 1.3, P('M20.4 2.6C16.4-.6 9.8.2 7.2 5.4 5 9.8 4.8 17.4 5.4 26.6l1.6-3 1.2 3.4 1.2-3.8 1.4 2.8 1-2.4c-1-6.6-1.2-13 .2-16.8 1.4-3.6 4.4-5.6 8.4-6z')) +
+                line('M8.4 7.8C7 12 6.8 17.6 7.2 23M11 6.2c-1.4 3.6-1.8 9.4-1.2 16', '#6e1416', .9) +
+                faceAt(23.2) +
+                chinChain('M12.8 19.4c.4 5.4 3 9.8 7.2 11.6 4.2-1.8 6.8-6.2 7.2-11.6') +
+                grpW(STEEL_L, 1.8, P('M11.4 17.2C11.4 9.6 15.2 5.4 20 5.4s8.6 4.2 8.6 11.8z')) +
+                line('M13.8 11.2c1.2-2.6 3-4 5-4.4', '#eef1f5', 1.3) +
+                grpW(GOLD, 1.1, P('M11.4 15.2h17.2v2.4H11.4z')) +
+                grpW(STEEL, 1.4, P('M10.6 17.4h18.8c-.4 1.8-1.8 3-3.8 3.2H14.4c-2-.2-3.4-1.4-3.8-3.2z')) +
+                line('M11.6 19c.8 1 1.8 1.5 3 1.6h10.8c1.2-.1 2.2-.6 3-1.6', GOLD, 1) +
+                grpW(GOLD, 1, P(star(20, 11.2, 3.2, 1.4, 8))) + dot(20, 11.2, .9, ROYAL_RED) +
+                grpW(GOLD, 1, P('M18.2 5.6c0-1.6 3.6-1.6 3.6 0v.6h-3.6zM19.2 4.4l.8-3.2.8 3.2z')) +
+                '<circle cx="12.6" cy="19.4" r="1.3" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".9"/>' +
+                '<circle cx="27.4" cy="19.4" r="1.3" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".9"/>'
+        },
+        // A crowned great helm: the flat-topped helm that hides the whole
+        // face, a gold cross on its front through the eye slits, breaths cut
+        // in crosses, and a gold crown round its top.
+        crowned: {
+            name: 'Crowned great helm',
+            draw: () =>
+                grpW(STEEL_L, 2, P('M11 9.8c0-2 4-3.2 9-3.2s9 1.2 9 3.2v21.4c0 1.6-1.4 2.6-3.2 2.6H14.2c-1.8 0-3.2-1-3.2-2.6z')) +
+                line('M13 13.4v14.8', '#eef1f5', 1.2) +
+                grpW(GOLD, 1.2, P('M11.6 9.6 10.4 2.8l4 3.2 2.8-5.2L20 6.2l2.8-5.4 2.8 5.2 4-3.2-1.2 6.8c-2.4 1.4-5.4 2-8.4 2s-6-.6-8.4-2z')) +
+                dot(20, 7.8, 1, ROYAL_RED) + dot(14.8, 8.4, .8, '#3a6fd8') + dot(25.2, 8.4, .8, '#3a6fd8') +
+                grpW(GOLD, 1.1, P('M11 14.6h18v2.6H11zM18.5 17.2h3v16.6h-3z')) +
+                grpW('#120c08', 1, P('M13 19.4h4.2v1.7H13zM22.8 19.4H27v1.7h-4.2z')) +
+                line('M15 24.6v4.4M12.8 26.8h4.4M25 24.6v4.4M22.8 26.8h4.4', INK, 1.2) +
+                line('M11.4 31.4c.6 1.4 1.6 2.2 2.8 2.2h11.6c1.2 0 2.2-.8 2.8-2.2', GOLD, 1.3)
+        },
+        // Not a helmet: the tall black fur cap of a palace foot guard, worn
+        // with a coat like theirs, a red plume at the side and a gold chin
+        // chain.
+        bearskin: {
+            name: 'Bearskin cap',
+            draw: o =>
+                faceAt(23.4) +
+                chinChain('M11.6 19.8c.8 5 3.8 9.6 8.4 11 4.6-1.4 7.6-6 8.4-11') +
+                grpW('#18151b', 1.7, P('M10.6 19.6C9.6 12.2 9.8 4.8 11.8.2 13.4-3.6 16.6-5.4 20-5.4s6.6 1.8 8.2 5.6c2 4.6 2.2 12 1.2 19.4-3 1.2-6.2 1.6-9.4 1.6s-6.4-.4-9.4-1.6z')) +
+                line(furTufts(), '#36313d', 1.1) +
+                line('M12.4 16.6c-.8-6-.4-11.6 1.4-15 1-1.8 2.4-3.2 4-3.8', '#4a4553', 1.1) +
+                grpW(o.plume || CRIMSON, 1.2, P('M28.6 13.4c1.8-3.6 1.8-8 .2-11.4-.8 3.4-1.6 6.6-2.6 10.2z'))
+        }
+    };
+
     function soldier(o) {
         const tab = o.tabard || CRIMSON;
         const trim = o.trim || INK;
@@ -3433,7 +3619,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += grp(SKIN, '<circle cx="7" cy="54" r="3.6"/><circle cx="33" cy="54" r="3.6"/>');
         // the head
         s += grp(SKIN, P('M13 14h14v13c0 3-3 5-7 5s-7-2-7-5z'));
-        if (o.helm !== 'great') {
+        if (o.helm !== 'guard') {
             s += dot(17, 21, 1.5) + dot(23, 21, 1.5);
             s += line(o.scar ? 'M16 25h8M22 15l-3 6' : 'M17 26h6', INK, 1.4);
         }
@@ -3445,19 +3631,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         } else if (o.helm === 'royal') {
             s += grp(GOLD, P('M9 17h22c-1-8-5-11-11-11S10 9 9 17z')) +
                 grp(o.plume || CRIMSON, P('M20 6c-2-6 6-9 10-6-4 0-6 2-7 6z'));
-        } else if (o.helm === 'great') {
-            // the Royal Guards' close helm: a rounded steel shell with a
-            // gold comb along the top, the visor down with its eye slit and
-            // breaths, gold at the brow, and a plume at the back
-            s += grpW(o.plume || CRIMSON, 1.4, P('M21.6 7c1.4-5.8 8.2-7.6 12.2-3.4-4.2-.2-7.6 1.6-9.4 5.6z')) +
-                grpW(STEEL_L, 2, P('M11.2 19.4c0-8.4 3.8-13 8.8-13s8.8 4.6 8.8 13v8.2c0 3.6-3.8 5.8-8.8 5.8s-8.8-2.2-8.8-5.8z')) +
-                line('M14 10.6c1.6-2 3.4-2.8 5-3', '#eef1f5', 1.2) +
-                grpW(GOLD, 1.2, P('M18.7 7.2c0-4.2 2.6-4.2 2.6 0v9.6h-2.6z')) +
-                grpW(STEEL, 1.5, P('M11.4 17.2h17.2v6.4c0 1.2-1 2-2.2 2H13.6c-1.2 0-2.2-.8-2.2-2z')) +
-                line('M13.8 20.6h12.4', INK, 1.9) +
-                line('M11.4 17.2h17.2', GOLD, 1.5) +
-                dot(23.4, 28.4, .75) + dot(25.6, 28, .75) + dot(23.4, 30.4, .75) + dot(25.6, 30, .75) +
-                line('M11.6 31.4c2.4 1.6 5.2 2.2 8.4 2.2s6-.6 8.4-2.2', GOLD, 1.4);
+        } else if (o.helm === 'guard') {
+            // the Royal Guards' (GUARD_HELMS)
+            s += (GUARD_HELMS[o.guardHelm] || GUARD_HELMS[GUARD_HELM]).draw(o);
         } else if (o.helm === 'hood') {
             s += grp(o.hood || '#4b3f33', P('M10 22c-1-14 21-14 20 0l2 8H8z'));
         }
@@ -3635,12 +3811,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             soldier({ x: 52, y: 6, s: .96, helm: 'royal', weapon: 'halberd', coat: ROYAL_RED, plume: '#f4f0e2', legs: '#2b2326', gold: true }) +
             soldier({ x: 10, y: 14, s: 1.04, helm: 'royal', weapon: 'halberd', coat: ROYAL_RED, plume: '#f4f0e2', legs: '#2b2326', gold: true }),
 
-        royal_guards:
-            soldier({ x: 56, y: 6, s: .92, helm: 'great', weapon: 'sword', coat: ROYAL_NAVY, legs: '#1b1f2e', gold: true,
-                      shield: true, shieldFill: ROYAL_NAVY, crown: true }) +
-            soldier({ x: 14, y: 12, s: 1.06, helm: 'great', weapon: 'sword', coat: ROYAL_NAVY, legs: '#1b1f2e', gold: true,
-                      shield: true, shieldFill: ROYAL_NAVY, crown: true })
+        royal_guards: royalGuards()
     };
+
+    // `helm`: one of GUARD_HELMS, for comparing them; GUARD_HELM otherwise.
+    function royalGuards(helm) {
+        const o = { helm: 'guard', guardHelm: helm, weapon: 'sword', coat: ROYAL_NAVY, legs: '#1b1f2e', gold: true,
+            shield: true, shieldFill: ROYAL_NAVY, crown: true };
+        return soldier(Object.assign({ x: 56, y: 6, s: .92 }, o)) + soldier(Object.assign({ x: 14, y: 12, s: 1.06 }, o));
+    }
 
     /* ---- the two bosses: placeholders --------------------------------
        Fenrirak and Oblivion Mage Helen show a plain placeholder until their
@@ -3905,8 +4084,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             coin(28.6, 45.4, 1.9) + coin(33.8, 46.2, 1.6) + coin(37.2, 44.6, 1.4) + coin(62, 44.6, 1.6),
 
         // Breson's Bakery: the domed brick oven with the fire in its mouth
-        // and smoke from its chimney, a table of fresh loaves beside it,
-        // and the baker's sign, a gold pretzel, hung out over them.
+        // and smoke from its chimney, and a table of fresh loaves beside it.
         bakery:
             grp('#6a5238', P('M0 44h64v4H0z')) +
             grpW('#c9c2b4', 1.2, P('M17.6 8.6c-2.4-1.6-.6-4.6 1.8-3.6.6-2.4 4.4-2.4 4.8 0 2.2-.6 3.4 2 1.6 3.4z')) +
@@ -3921,12 +4099,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#8a5a32', 1.4, P('M36 33.4h27v3H36z')) + line('M38.6 36.4V44M60.4 36.4V44', INK, 2.6) + line('M38.6 36.4V44M60.4 36.4V44', '#8a5a32', 1.2) +
             grpW('#c98a3a', 1.4, P('M37.6 33.4c0-6.4 10.6-6.4 10.6 0z')) + line('M40.4 29.8l5 2.4M45.4 29.8l-5 2.4', '#8a5a22', 1) +
             grpW('#e0a85a', 1.4, P('M48.4 33.4c-.6-2.4 1-4 3.4-4.4l7.6-1.4c2.6-.4 3.8 1.4 3 3.6-.6 1.6-2 2.2-3.6 2.2z')) +
-            line('M51.4 31.2l1.6-1.8M54.6 30.6l1.6-1.8M57.8 30l1.6-1.8', '#a8702e', 1) +
-            line('M63.4 4H46.6', INK, 1.6) + line('M53.4 4v5.8', INK, 1.2) +
-            '<g transform="translate(53.4 15.4) scale(1.15)">' +
-            '<path d="M0-2C-2-6.4-7.6-6.4-7.6-1-7.6 4-3.4 5.4 0 5.4S7.6 4 7.6-1C7.6-6.4 2-6.4 0-2M0-2C-1.2 0 1.6 1.6 3.4 5.2M0-2C1.2 0-1.6 1.6-3.4 5.2" fill="none" stroke="' + INK + '" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>' +
-            '<path d="M0-2C-2-6.4-7.6-6.4-7.6-1-7.6 4-3.4 5.4 0 5.4S7.6 4 7.6-1C7.6-6.4 2-6.4 0-2M0-2C-1.2 0 1.6 1.6 3.4 5.2M0-2C1.2 0-1.6 1.6-3.4 5.2" fill="none" stroke="#c98a3a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
-            dot(-4.4, -3.4, .45, '#f4f0e2') + dot(4.6, -3.2, .45, '#f4f0e2') + dot(-5.6, 2, .45, '#f4f0e2') + dot(5.8, 1.6, .45, '#f4f0e2') + '</g>',
+            line('M51.4 31.2l1.6-1.8M54.6 30.6l1.6-1.8M57.8 30l1.6-1.8', '#a8702e', 1),
 
         // The Lost Flame Forge: a stone hearth under its hood and chimney,
         // the fire roaring on the coals, and an anvil on its stump in front
@@ -4639,6 +4812,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         castleSvg: () => wrap(castle(), '0 -40 300 330'),
         merchantSvg: () => wrap(merchantHut(), '0 0 160 112'),
         enemySvg: id => ENEMY_ART[id] ? wrap(ENEMY_ART[id]) : '',
+        // The Royal Guards in each helmet on offer (GUARD_HELMS), to choose from.
+        GUARD_HELMS: Object.keys(GUARD_HELMS).map(k => ({ id: k, name: GUARD_HELMS[k].name })),
+        guardsIn: helm => wrap(royalGuards(helm)),
         squareSvg: key => SQUARE_ART[key] ? wrap(SQUARE_ART[key], '0 0 64 48') : '',
         bossPlaceholder: id => BOSS_PLACEHOLDER[id] || '',
         uri: uri, wrap: wrap
@@ -8514,6 +8690,1343 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     </script>
     <script>
+/* ==== game-oblivion/shieldfx.js ==== */
+/* =========================================================================
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   shieldfx.js: the Oblivion Mage's shield throwing a player back.
+
+   Played over the whole screen when somebody walks into the shield without
+   all five Pendant Fragments. The piece is lifted off the board into the
+   middle of the screen, the shield's energy races in on it from every side,
+   gathers, goes off, and the piece is thrown across the board back to the
+   Start.
+
+   It is all drawn on one canvas in flat colours and crisp lines: no blur,
+   no glow. The colours are the --zap-* ones in style.css.
+
+   There are four looks (STYLES) in two colours (COLOURS); `choice` is the
+   one the game plays. ui.js calls play() and is told when the piece is
+   released from the shield (so it can be put on the Start, hidden), when it
+   lands (so it can be shown again), and when it is all over.
+   ========================================================================= */
+
+(function (global) {
+    'use strict';
+
+    const STYLES = [
+        { id: 'singularity', name: 'Singularity',
+          blurb: 'Speed lines rush in from every edge while a ring with the five empty fragment sockets closes round the piece.' },
+        { id: 'storm', name: 'Storm',
+          blurb: 'Forks of lightning crawl in from the edges and cage the piece, then blow out across the screen.' },
+        { id: 'barrier', name: 'Barrier',
+          blurb: 'The shield’s wall of hexagons closes in with energy running along its seams, then shatters outward.' },
+        { id: 'vortex', name: 'Vortex',
+          blurb: 'The energy spirals in like a whirlpool, tighter and faster, and blows back out the way it came.' }
+    ];
+    const COLOURS = [
+        { id: 'purple', name: 'Purple' },
+        { id: 'crimson', name: 'Dark crimson' }
+    ];
+
+    // The timeline, in ms from the start.
+    const LIFT = 450;      // the piece rises off the board into the middle
+    const CHARGE = 2250;   // the energy gathers until here...
+    const BOOM = 2450;     // ...is pulled in tight, and goes off
+    const FLING = 2580;    // a beat later the piece is thrown...
+    const LAND = 3450;     // ...and comes down on the Start
+    const END = 3900;
+
+    const TAU = Math.PI * 2;
+    const SQ3 = Math.sqrt(3);
+    const clamp = (v, a, b) => (v < a ? a : (v > b ? b : v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+    const inQuad = t => t * t;
+    const outQuad = t => 1 - (1 - t) * (1 - t);
+    const inCubic = t => t * t * t;
+    const outCubic = t => 1 - Math.pow(1 - t, 3);
+    const inOutCubic = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const outBack = t => { const k = 1.70158; return 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2); };
+
+    // A small seeded generator, so a frame can be found again (seek).
+    function seeded(seed) {
+        let a = seed >>> 0;
+        return function () {
+            a = (a + 0x6D2B79F5) >>> 0;
+            let t = a;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+
+    function hexRgb(hex) {
+        const h = String(hex || '').trim().replace('#', '');
+        if (h.length !== 6) return [255, 255, 255];
+        return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+    }
+    function palette(colour) {
+        const css = getComputedStyle(document.documentElement);
+        const p = { text: css.getPropertyValue('--zap-' + colour + '-text').trim() };
+        ['veil', 'deep', 'mid', 'bright', 'core'].forEach(k => { p[k] = hexRgb(css.getPropertyValue('--zap-' + colour + '-' + k)); });
+        return p;
+    }
+    function rgba(c, a) {
+        return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + clamp(a, 0, 1).toFixed(3) + ')';
+    }
+
+    /* ---- shapes, added to the current path ---------------------------- */
+
+    // A strip from (x1, y1), w1 wide, to (x2, y2), w2 wide.
+    function wedge(c, x1, y1, x2, y2, w1, w2) {
+        const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy) || 1;
+        const nx = -dy / l, ny = dx / l;
+        c.moveTo(x1 + nx * w1 / 2, y1 + ny * w1 / 2);
+        c.lineTo(x2 + nx * w2 / 2, y2 + ny * w2 / 2);
+        c.lineTo(x2 - nx * w2 / 2, y2 - ny * w2 / 2);
+        c.lineTo(x1 - nx * w1 / 2, y1 - ny * w1 / 2);
+        c.closePath();
+    }
+    function hexPath(c, x, y, r, rot) {
+        for (let i = 0; i < 6; i++) {
+            const a = rot + i * Math.PI / 3;
+            if (i) c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+            else c.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+        }
+        c.closePath();
+    }
+    // A line that thins to nothing at its tail: pts[0] is the head.
+    function taper(c, pts, w) {
+        const n = pts.length;
+        if (n < 2) return;
+        const L = [], Rt = [];
+        for (let i = 0; i < n; i++) {
+            const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
+            const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+            const hw = w * (1 - i / (n - 1)) / 2;
+            L.push([pts[i][0] - dy / l * hw, pts[i][1] + dx / l * hw]);
+            Rt.push([pts[i][0] + dy / l * hw, pts[i][1] - dx / l * hw]);
+        }
+        c.moveTo(L[0][0], L[0][1]);
+        for (let i = 1; i < n; i++) c.lineTo(L[i][0], L[i][1]);
+        for (let i = n - 1; i >= 0; i--) c.lineTo(Rt[i][0], Rt[i][1]);
+        c.closePath();
+    }
+    // Lightning from a to b: the line is split and its middles pushed
+    // sideways, less each time round.
+    function bolt(rnd, x1, y1, x2, y2, rough, depth) {
+        let pts = [[x1, y1], [x2, y2]];
+        let off = Math.hypot(x2 - x1, y2 - y1) * rough;
+        for (let d = 0; d < depth; d++) {
+            const out = [pts[0]];
+            for (let i = 0; i < pts.length - 1; i++) {
+                const p = pts[i], q = pts[i + 1];
+                const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1;
+                const o = (rnd() * 2 - 1) * off;
+                out.push([(p[0] + q[0]) / 2 - dy / l * o, (p[1] + q[1]) / 2 + dx / l * o], q);
+            }
+            pts = out;
+            off *= 0.5;
+        }
+        return pts;
+    }
+    // The first `frac` of a polyline.
+    function partial(c, pts, frac) {
+        const m = (pts.length - 1) * clamp(frac, 0, 1);
+        const whole = Math.floor(m);
+        c.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i <= whole; i++) c.lineTo(pts[i][0], pts[i][1]);
+        if (whole < pts.length - 1 && m > whole) {
+            const p = pts[whole], q = pts[whole + 1], f = m - whole;
+            c.lineTo(p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f);
+        }
+    }
+    function pickCol(rnd, core, bright) {
+        const r = rnd();
+        return r < core ? 'core' : (r < core + bright ? 'bright' : 'mid');
+    }
+
+    /* ================================================================== */
+    /* The four looks                                                      */
+    /*                                                                    */
+    /* Each has init (its own state, in fx.s), step (move it on), back     */
+    /* (drawn under the piece), front (over it), boom (the moment it goes  */
+    /* off) and impact (the two flash frames of the boom, in one flat      */
+    /* colour: `ink`).                                                     */
+    /* ================================================================== */
+
+    /* ---- Singularity: speed lines and a closing sigil ------------------ */
+    const singularity = {
+        init(fx) {
+            fx.s = { lines: [], ripples: [], nextRipple: 320, rot: 0, cracks: [], crackKey: -1, bits: [] };
+        },
+        sigilR(fx) {
+            const imp = seg(fx.t, CHARGE, BOOM);
+            const rs = lerp(fx.R * 2.7, fx.R * 1.42, outCubic(fx.c));
+            return lerp(rs, fx.R * 1.08, inCubic(imp));
+        },
+        step(fx, dt) {
+            const s = fx.s, t = fx.t, c = fx.c, edge = fx.piece.r * 1.04, rnd = fx.rnd;
+            const imp = seg(t, CHARGE, BOOM);
+            if (t > 120 && t < BOOM) {
+                const want = Math.round(fx.k * (30 + 300 * Math.pow(c, 1.2)));
+                while (s.lines.length < want) {
+                    s.lines.push({
+                        th: rnd() * TAU, r: fx.Rmax * (1 + rnd() * 0.3),
+                        len: (50 + rnd() * 220) * (0.6 + 0.9 * c), w: (1 + rnd() * 2.8) * (0.7 + 1.1 * c),
+                        v: 0.7 + rnd() * 0.6, col: pickCol(rnd, 0.22, 0.45)
+                    });
+                }
+            }
+            for (let i = s.lines.length - 1; i >= 0; i--) {
+                const l = s.lines[i];
+                // faster as it nears the middle, and faster still as it all draws in
+                l.r -= l.v * (1 + 2.6 * c + 5 * imp) * (1 + 1.4 * (1 - clamp(l.r / fx.Rmax, 0, 1))) * dt;
+                if (l.r + l.len <= edge || t >= BOOM) s.lines.splice(i, 1);
+            }
+            if (t < CHARGE && t >= s.nextRipple) {
+                s.ripples.push({ born: t });
+                s.nextRipple = t + lerp(460, 150, c);
+            }
+            s.ripples = s.ripples.filter(r => t - r.born < 700);
+            s.rot += dt * (0.0004 + 0.0045 * c * c + 0.012 * imp);
+            // little cracks of energy round the piece, once it is nearly full
+            const key = Math.floor(t / 60);
+            if (key !== s.crackKey) {
+                s.crackKey = key;
+                s.cracks = [];
+                const n = t >= BOOM ? 0 : Math.floor(c > 0.55 ? 3 + 8 * (c - 0.55) / 0.45 : 0) + (imp > 0 ? 4 : 0);
+                for (let i = 0; i < n; i++) {
+                    const a = rnd() * TAU, pts = [];
+                    for (let j = 0; j < 5; j++) pts.push([a + j * 0.09, 1.04 + rnd() * 0.14]);
+                    s.cracks.push(pts);
+                }
+            }
+            s.bits.forEach(b => { b.age += dt; b.r += b.vr * dt; b.vr *= Math.exp(-dt / 520); b.tilt += b.spin * dt; });
+            s.bits = s.bits.filter(b => b.age < b.life);
+        },
+        back(fx, ctx) {
+            const s = fx.s, t = fx.t, c = fx.c, pal = fx.pal, cx = fx.cx, cy = fx.cy;
+            const edge = fx.piece.r * 1.04;
+            // pressure rings closing in
+            s.ripples.forEach(r => {
+                const p = (t - r.born) / 700;
+                ctx.beginPath();
+                ctx.arc(cx, cy, lerp(fx.Rmax * 0.9, edge * 1.35, inCubic(p)), 0, TAU);
+                ctx.lineWidth = 1.2 + 2 * p;
+                ctx.strokeStyle = rgba(pal.mid, (0.16 + 0.3 * c) * Math.sin(Math.PI * p));
+                ctx.stroke();
+            });
+            // the speed lines, a colour at a time
+            ['mid', 'bright', 'core'].forEach(col => {
+                ctx.beginPath();
+                s.lines.forEach(l => {
+                    if (l.col !== col) return;
+                    const rin = Math.max(l.r, edge), rout = l.r + l.len;
+                    if (rout <= rin) return;
+                    const ca = Math.cos(l.th), sa = Math.sin(l.th);
+                    wedge(ctx, cx + ca * rin, cy + sa * rin, cx + ca * rout, cy + sa * rout, 0, l.w);
+                });
+                ctx.fillStyle = rgba(pal[col], 0.95);
+                ctx.fill();
+            });
+            if (t < BOOM) this.sigil(fx, ctx);
+            // the sigil in pieces
+            ctx.lineCap = 'round';
+            s.bits.forEach(b => {
+                const a = 1 - inQuad(b.age / b.life);
+                const x = cx + Math.cos(b.a) * b.r, y = cy + Math.sin(b.a) * b.r;
+                if (b.socket) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, b.size, 0, TAU);
+                    ctx.fillStyle = rgba(pal.veil, a);
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = rgba(pal.core, a);
+                    ctx.stroke();
+                    return;
+                }
+                const tang = b.a + Math.PI / 2 + b.tilt, hl = b.len / 2;
+                ctx.beginPath();
+                ctx.moveTo(x - Math.cos(tang) * hl, y - Math.sin(tang) * hl);
+                ctx.lineTo(x + Math.cos(tang) * hl, y + Math.sin(tang) * hl);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = rgba(pal[b.col], a);
+                ctx.stroke();
+            });
+            ctx.lineCap = 'butt';
+        },
+        sigil(fx, ctx) {
+            const s = fx.s, t = fx.t, c = fx.c, pal = fx.pal, R = fx.R;
+            const vis = outCubic(seg(t, 250, 800));
+            if (!vis) return;
+            const imp = seg(t, CHARGE, BOOM);
+            const rs = this.sigilR(fx);
+            const draw = outCubic(seg(t, 260, 1150));
+            ctx.save();
+            ctx.translate(fx.cx, fx.cy);
+            // the outer ring, drawn round as it appears
+            ctx.beginPath();
+            ctx.arc(0, 0, rs, s.rot, s.rot + TAU * draw);
+            ctx.lineWidth = 2.4;
+            ctx.strokeStyle = rgba(imp ? pal.core : pal.bright, vis);
+            ctx.stroke();
+            // its ticks
+            ctx.beginPath();
+            const n = 48;
+            for (let i = 0; i < n * draw; i++) {
+                const a = s.rot + i / n * TAU, r1 = rs * (i % 4 === 0 ? 0.8 : 0.9), r2 = rs * 0.97;
+                ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+                ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+            }
+            ctx.lineWidth = 1.3;
+            ctx.strokeStyle = rgba(pal.core, 0.75 * vis);
+            ctx.stroke();
+            // a broken ring outside it, turning the other way
+            ctx.save();
+            ctx.rotate(-s.rot * 1.6);
+            ctx.setLineDash([rs * 0.09, rs * 0.05]);
+            ctx.beginPath();
+            ctx.arc(0, 0, rs * 1.13, 0, TAU);
+            ctx.lineWidth = 1.6;
+            ctx.strokeStyle = rgba(pal.mid, vis * (0.6 + 0.4 * c));
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+            // the pendant: five sockets, all of them empty
+            const pr = rs * 0.86, pa = -Math.PI / 2 - s.rot * 0.5;
+            ctx.beginPath();
+            for (let i = 0; i <= 5; i++) {
+                const a = pa + i * TAU / 5;
+                if (i) ctx.lineTo(Math.cos(a) * pr, Math.sin(a) * pr);
+                else ctx.moveTo(Math.cos(a) * pr, Math.sin(a) * pr);
+            }
+            ctx.lineWidth = 1.8;
+            ctx.strokeStyle = rgba(pal.bright, 0.85 * vis);
+            ctx.stroke();
+            const blink = (c > 0.45 && Math.floor(t / 110) % 2 === 0) || imp > 0;
+            const sr = Math.max(5, R * 0.13) * Math.sqrt(rs / (R * 1.42));
+            for (let i = 0; i < 5; i++) {
+                const a = pa + i * TAU / 5;
+                ctx.beginPath();
+                ctx.arc(Math.cos(a) * pr, Math.sin(a) * pr, sr, 0, TAU);
+                ctx.fillStyle = rgba(pal.veil, vis);
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = rgba(blink ? pal.core : pal.bright, vis);
+                ctx.stroke();
+            }
+            ctx.restore();
+        },
+        front(fx, ctx) {
+            const s = fx.s, P = fx.piece;
+            if (!s.cracks.length) return;
+            ctx.beginPath();
+            s.cracks.forEach(pts => pts.forEach((p, j) => {
+                const x = P.x + Math.cos(p[0]) * P.r * p[1], y = P.y + Math.sin(p[0]) * P.r * p[1];
+                if (j) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+            }));
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = rgba(fx.pal.core, 0.95);
+            ctx.stroke();
+        },
+        boom(fx) {
+            const s = fx.s, rnd = fx.rnd, n = Math.round(110 * fx.k), edge = fx.piece.r;
+            for (let i = 0; i < n; i++) {
+                fx.rays.push({
+                    th: rnd() * TAU, r: edge, v: 2.2 + rnd() * 3, len: 90 + rnd() * 300, w: 2 + rnd() * 6,
+                    col: pickCol(rnd, 0.3, 0.45), life: 480 + rnd() * 320, age: 0
+                });
+            }
+            // the sigil breaks up: bits of its ring, and the five sockets
+            const rs = fx.R * 1.08;
+            for (let i = 0; i < 16; i++) {
+                s.bits.push({ a: i / 16 * TAU + s.rot, r: rs, vr: 0.9 + rnd() * 1.1, len: rs * TAU / 16 * 0.75,
+                    tilt: 0, spin: (rnd() - 0.5) * 0.014, col: i % 2 ? 'core' : 'bright', age: 0, life: 650 + rnd() * 300 });
+            }
+            // the focus lines of the two flash frames
+            s.spikes = [];
+            for (let i = 0; i < 64; i++) {
+                s.spikes.push({ th: i / 64 * TAU + (rnd() - 0.5) * 0.07, r0: fx.R * (1.25 + rnd() * 0.9), w: 3 + rnd() * rnd() * 30 });
+            }
+            const pa = -Math.PI / 2 - s.rot * 0.5;
+            for (let i = 0; i < 5; i++) {
+                s.bits.push({ socket: true, a: pa + i * TAU / 5, r: rs * 0.86, vr: 1.7 + rnd() * 0.6,
+                    size: Math.max(5, fx.R * 0.11), tilt: 0, spin: 0, age: 0, life: 760 });
+            }
+        },
+        impact(fx, ctx, ink) {
+            const far = fx.Rmax * 1.1;
+            ctx.beginPath();
+            (fx.s.spikes || []).forEach(k => {
+                const ca = Math.cos(k.th), sa = Math.sin(k.th);
+                wedge(ctx, fx.cx + ca * k.r0, fx.cy + sa * k.r0, fx.cx + ca * far, fx.cy + sa * far, 0, k.w);
+            });
+            ctx.fillStyle = ink;
+            ctx.fill();
+        }
+    };
+
+    /* ---- Storm: lightning ---------------------------------------------- */
+    const storm = {
+        init(fx) {
+            fx.s = { bolts: [], next: 240, cage: [], cageKey: -1, sparks: [], acc: 0 };
+        },
+        add(fx, th, inward, o) {
+            const rnd = fx.rnd;
+            fx.s.bolts.push(Object.assign({
+                th: th, th2: th + (rnd() - 0.5) * (inward ? 0.5 : 0.35), inward: inward,
+                grow: 180, hold: 120, fade: 140, age: 0, w: 1, seed: (rnd() * 1e9) | 0, key: -1, pts: null, br: null
+            }, o));
+        },
+        ends(fx, b) {
+            const P = fx.piece, far = fx.Rmax * 1.04, near = P.r * 1.03;
+            const fa = b.inward ? b.th : b.th2, na = b.inward ? b.th2 : b.th;
+            const F = [fx.cx + Math.cos(fa) * far, fx.cy + Math.sin(fa) * far];
+            const N = [P.x + Math.cos(na) * near, P.y + Math.sin(na) * near];
+            return b.inward ? [F, N] : [N, F];
+        },
+        shape(fx, b) {
+            const key = Math.floor(b.age / 45);
+            if (key === b.key && b.pts) return;
+            b.key = key;
+            const rnd = seeded(b.seed + key * 7919);
+            const e = this.ends(fx, b);
+            b.pts = bolt(rnd, e[0][0], e[0][1], e[1][0], e[1][1], 0.2, 5);
+            b.br = [];
+            const L = Math.hypot(e[1][0] - e[0][0], e[1][1] - e[0][1]);
+            const dir = Math.atan2(e[1][1] - e[0][1], e[1][0] - e[0][0]);
+            const nb = b.inward ? 2 : 3;
+            for (let i = 0; i < nb; i++) {
+                const at = 0.22 + rnd() * 0.5, idx = Math.floor(at * (b.pts.length - 1));
+                const p = b.pts[idx], a = dir + (rnd() < 0.5 ? -1 : 1) * (0.35 + rnd() * 0.5), l = L * (0.1 + rnd() * 0.18);
+                b.br.push({ at: at, pts: bolt(rnd, p[0], p[1], p[0] + Math.cos(a) * l, p[1] + Math.sin(a) * l, 0.3, 3) });
+            }
+        },
+        step(fx, dt) {
+            const s = fx.s, t = fx.t, c = fx.c, rnd = fx.rnd;
+            if (t > 200 && t < CHARGE && t >= s.next) {
+                this.add(fx, rnd() * TAU, true, { grow: lerp(240, 120, c), hold: 120 + rnd() * 220, w: lerp(0.7, 1.3, c) });
+                s.next = t + lerp(200, 22, Math.pow(c, 1.1)) * (0.6 + rnd() * 0.8) / fx.k;
+            }
+            if (t >= CHARGE && !s.closing) {
+                // the last of it: lightning from every side at once
+                s.closing = true;
+                for (let i = 0; i < 10; i++) this.add(fx, i / 10 * TAU + rnd() * 0.25, true, { grow: 110, hold: BOOM - t, w: 1.5 });
+            }
+            s.bolts.forEach(b => {
+                b.age += dt;
+                if (b.inward && !b.hit && b.age >= b.grow) { b.hit = true; fx.piece.flash = Math.max(fx.piece.flash, 0.35); }
+            });
+            s.bolts = s.bolts.filter(b => b.age < b.grow + b.hold + b.fade && !(t >= BOOM && b.inward));
+            // the cage round the piece
+            const key = Math.floor(t / 50);
+            if (key !== s.cageKey) {
+                s.cageKey = key;
+                s.cage = [];
+                const n = t >= BOOM ? 0 : (c > 0.15 ? Math.floor(2 + 9 * c) : 0) + (t >= CHARGE ? 4 : 0);
+                for (let i = 0; i < n; i++) {
+                    const a0 = rnd() * TAU, span = 0.5 + rnd() * 0.9, pts = [];
+                    for (let j = 0; j < 9; j++) pts.push([a0 + span * j / 8, 1.08 + rnd() * 0.1 + (rnd() - 0.5) * 0.14]);
+                    s.cage.push(pts);
+                }
+            }
+            // sparks drifting in across the screen
+            if (t > 200 && t < BOOM) {
+                s.acc += dt * fx.k * lerp(0.012, 0.1, c);
+                while (s.acc >= 1) {
+                    s.acc -= 1;
+                    const th = rnd() * TAU, r = lerp(0.35, 1, rnd()) * fx.Rmax;
+                    s.sparks.push({ th: th, r: r, v: (0.4 + rnd() * 0.8) * (1 + 2 * c), len: 14 + rnd() * 12, age: 0, life: 320, flip: rnd() < 0.5 ? 1 : -1 });
+                }
+            }
+            s.sparks.forEach(p => { p.age += dt; p.r -= p.v * dt; });
+            s.sparks = s.sparks.filter(p => p.age < p.life && p.r > fx.piece.r && t < BOOM);
+        },
+        strokeBolt(ctx, pts, frac, w, pal, a) {
+            const layers = [['mid', 5 * w], ['bright', 2.4 * w], ['core', 1.1 * w]];
+            layers.forEach(L => {
+                ctx.beginPath();
+                partial(ctx, pts, frac);
+                ctx.lineWidth = L[1];
+                ctx.strokeStyle = rgba(pal[L[0]], a);
+                ctx.stroke();
+            });
+        },
+        back(fx, ctx) {
+            const s = fx.s, pal = fx.pal;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            // sparks
+            ctx.beginPath();
+            s.sparks.forEach(p => {
+                const ca = Math.cos(p.th), sa = Math.sin(p.th), nx = -sa * 4 * p.flip, ny = ca * 4 * p.flip;
+                const hx = fx.cx + ca * p.r, hy = fx.cy + sa * p.r;
+                ctx.moveTo(hx, hy);
+                ctx.lineTo(hx + ca * p.len / 3 + nx, hy + sa * p.len / 3 + ny);
+                ctx.lineTo(hx + ca * p.len * 2 / 3 - nx, hy + sa * p.len * 2 / 3 - ny);
+                ctx.lineTo(hx + ca * p.len, hy + sa * p.len);
+            });
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = rgba(pal.bright, 0.9);
+            ctx.stroke();
+            // the bolts
+            s.bolts.forEach(b => {
+                this.shape(fx, b);
+                const g = outQuad(clamp(b.age / b.grow, 0, 1));
+                const a = 1 - seg(b.age, b.grow + b.hold, b.grow + b.hold + b.fade);
+                this.strokeBolt(ctx, b.pts, g, b.w, pal, a);
+                b.br.forEach(br => {
+                    if (g <= br.at) return;
+                    this.strokeBolt(ctx, br.pts, (g - br.at) / (1 - br.at), b.w * 0.55, pal, a);
+                });
+            });
+            ctx.lineJoin = 'miter';
+            ctx.lineCap = 'butt';
+        },
+        front(fx, ctx) {
+            const s = fx.s, P = fx.piece, pal = fx.pal;
+            if (!s.cage.length) return;
+            ctx.lineJoin = 'round';
+            [['bright', 2.2], ['core', 1]].forEach(L => {
+                ctx.beginPath();
+                s.cage.forEach(pts => pts.forEach((p, j) => {
+                    const x = P.x + Math.cos(p[0]) * P.r * p[1], y = P.y + Math.sin(p[0]) * P.r * p[1];
+                    if (j) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+                }));
+                ctx.lineWidth = L[1];
+                ctx.strokeStyle = rgba(pal[L[0]], 1);
+                ctx.stroke();
+            });
+            ctx.lineJoin = 'miter';
+        },
+        boom(fx) {
+            const rnd = fx.rnd;
+            for (let i = 0; i < 16; i++) {
+                this.add(fx, i / 16 * TAU + (rnd() - 0.5) * 0.3, false, { grow: 90, hold: 170, fade: 170, w: 1.5 });
+            }
+        },
+        impact(fx, ctx, ink) {
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            fx.s.bolts.forEach(b => {
+                if (b.inward) return;
+                this.shape(fx, b);
+                const g = outQuad(clamp(b.age / b.grow, 0, 1));
+                ctx.beginPath();
+                partial(ctx, b.pts, g);
+                b.br.forEach(br => { if (g > br.at) partial(ctx, br.pts, (g - br.at) / (1 - br.at)); });
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = ink;
+                ctx.stroke();
+            });
+            ctx.lineJoin = 'miter';
+            ctx.lineCap = 'butt';
+        }
+    };
+
+    /* ---- Barrier: the shield's hexagons -------------------------------- */
+    const barrier = {
+        init(fx) {
+            const s = fx.s = { cells: [], pulses: [], next: 300, shards: [] };
+            const h = s.h = clamp(fx.R * 0.62, 24, 48);
+            const W = fx.vw / 2 + h * 2, H = fx.vh / 2 + h * 2;
+            const qn = Math.ceil(W / (1.5 * h)) + 1;
+            const rn = Math.ceil(H / (SQ3 * h)) + qn;
+            const verts = {};
+            const vkey = (x, y) => Math.round(x * 2) + ',' + Math.round(y * 2);
+            const vert = (x, y) => { const k = vkey(x, y); return verts[k] || (verts[k] = { x: x, y: y, n: [], d: Math.hypot(x, y) }); };
+            let dmax = 1;
+            for (let q = -qn; q <= qn; q++) {
+                for (let r = -rn; r <= rn; r++) {
+                    const x = 1.5 * h * q, y = SQ3 * h * (r + q / 2);
+                    if (Math.abs(x) > W || Math.abs(y) > H) continue;
+                    const d = (Math.abs(q) + Math.abs(r) + Math.abs(q + r)) / 2;
+                    const corners = [];
+                    for (let i = 0; i < 6; i++) corners.push(vert(x + Math.cos(i * Math.PI / 3) * h, y + Math.sin(i * Math.PI / 3) * h));
+                    for (let i = 0; i < 6; i++) {
+                        const a = corners[i], b = corners[(i + 1) % 6];
+                        if (a.n.indexOf(b) < 0) a.n.push(b);
+                        if (b.n.indexOf(a) < 0) b.n.push(a);
+                    }
+                    if (d === 0) continue;   // under the piece
+                    dmax = Math.max(dmax, d);
+                    s.cells.push({ x: x, y: y, d: d, hit: 0 });
+                }
+            }
+            s.dmax = dmax;
+            s.cells.forEach(cl => { cl.appear = 200 + (1 - cl.d / dmax) * 950 + fx.rnd() * 80; });
+            const vl = Object.keys(verts).map(k => verts[k]);
+            const far = Math.max.apply(null, vl.map(v => v.d));
+            s.outer = vl.filter(v => v.d > far * 0.6);
+        },
+        scale(fx) { return 1 - 0.03 * fx.c - 0.1 * inCubic(seg(fx.t, CHARGE, BOOM)); },
+        newPulse(fx) {
+            const s = fx.s, rnd = fx.rnd;
+            let v = s.outer[Math.floor(rnd() * s.outer.length)];
+            const pts = [[v.x, v.y]];
+            for (let guard = 0; guard < 60 && v.d > fx.R * 1.18; guard++) {
+                const closer = v.n.filter(u => u.d < v.d - 0.5);
+                if (!closer.length) break;
+                closer.sort((a, b) => a.d - b.d);
+                v = rnd() < 0.6 ? closer[0] : closer[Math.floor(rnd() * closer.length)];
+                pts.push([v.x, v.y]);
+            }
+            const cum = [0];
+            for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+            return { pts: pts, cum: cum, total: cum[cum.length - 1], head: 0, speed: 0.8 + rnd() * 0.4, arrived: false };
+        },
+        step(fx, dt) {
+            const s = fx.s, t = fx.t, c = fx.c, rnd = fx.rnd;
+            const imp = seg(t, CHARGE, BOOM);
+            if (t > 380 && t < BOOM && t >= s.next) {
+                const n = 1 + (rnd() < c ? 1 : 0);
+                for (let i = 0; i < n; i++) s.pulses.push(this.newPulse(fx));
+                s.next = t + lerp(150, 18, c) / fx.k;
+            }
+            // waves of light crossing the wall from its edge to the middle,
+            // closer together as it charges
+            if (t > 500) s.phase = (s.phase || 0) + dt / lerp(1000, 330, c);
+            s.pulses.forEach(p => {
+                p.head += p.speed * lerp(0.6, 2.2, c) * (1 + 2 * imp) * dt;
+                if (!p.arrived && p.head >= p.total) {
+                    p.arrived = true;
+                    const end = p.pts[p.pts.length - 1];
+                    let best = null, bd = 1e9;
+                    s.cells.forEach(cl => { if (cl.d > 2) return; const d = Math.hypot(cl.x - end[0], cl.y - end[1]); if (d < bd) { bd = d; best = cl; } });
+                    if (best) best.hit = 1;
+                }
+            });
+            const tail = s.h * 3.2;
+            s.pulses = s.pulses.filter(p => p.head < p.total + tail && t < BOOM);
+            s.cells.forEach(cl => { cl.hit = Math.max(0, cl.hit - dt / 220); });
+            s.shards.forEach(p => {
+                p.age += dt;
+                const f = Math.exp(-dt / 450);
+                p.vx *= f; p.vy *= f;
+                p.x += p.vx * dt; p.y += p.vy * dt;
+                p.rot += p.vr * dt;
+            });
+            s.shards = s.shards.filter(p => p.age < p.life);
+        },
+        back(fx, ctx) {
+            const s = fx.s, t = fx.t, c = fx.c, pal = fx.pal, h = s.h, cx = fx.cx, cy = fx.cy;
+            if (t < BOOM) {
+                const sc = this.scale(fx), imp = seg(t, CHARGE, BOOM);
+                const plain = [];
+                const fronts = s.phase ? [1 - (s.phase % 1), 1 - ((s.phase + 0.5) % 1)].map(f => f * (s.dmax + 1.5) - 0.5) : [];
+                // how much each ring nearest the piece has filled, and with what
+                const FILL = [null, ['bright', 0.62], ['mid', 0.66], ['mid', 0.45], ['mid', 0.28]];
+                s.cells.forEach(cl => {
+                    const a = outCubic(seg(t, cl.appear, cl.appear + 220));
+                    if (!a) return;
+                    const pop = 0.55 + 0.45 * outBack(seg(t, cl.appear, cl.appear + 260));
+                    const heat = cl.d <= 4 ? clamp((c - 0.2 - (cl.d - 1) * 0.16) / 0.3, 0, 1) : 0;
+                    let wave = 0;
+                    fronts.forEach(f => { wave = Math.max(wave, 1 - Math.abs(cl.d - f) / 1.1); });
+                    wave *= seg(t, 500, 900);
+                    const x = cx + cl.x * sc, y = cy + cl.y * sc, r = h * 0.9 * pop * sc;
+                    if (a === 1 && !heat && !cl.hit && !imp && wave <= 0) { plain.push([x, y, r]); return; }
+                    ctx.beginPath();
+                    hexPath(ctx, x, y, r, 0);
+                    ctx.fillStyle = rgba(pal.deep, 0.42 * a);
+                    ctx.fill();
+                    if (heat) { ctx.fillStyle = rgba(pal[FILL[cl.d][0]], FILL[cl.d][1] * heat * a); ctx.fill(); }
+                    if (wave > 0) { ctx.fillStyle = rgba(pal.mid, 0.5 * wave * a); ctx.fill(); }
+                    if (cl.hit) { ctx.fillStyle = rgba(pal.bright, 0.75 * cl.hit); ctx.fill(); }
+                    ctx.lineWidth = heat || imp || wave > 0.5 ? 1.8 : 1.3;
+                    ctx.strokeStyle = imp || wave > 0.5 ? rgba(pal.core, a * (imp ? 1 : wave))
+                        : rgba(heat ? pal.bright : pal.mid, (0.7 + 0.3 * heat) * a);
+                    ctx.stroke();
+                });
+                if (plain.length) {
+                    ctx.beginPath();
+                    plain.forEach(p => hexPath(ctx, p[0], p[1], p[2], 0));
+                    ctx.fillStyle = rgba(pal.deep, 0.42);
+                    ctx.fill();
+                    ctx.lineWidth = 1.3;
+                    ctx.strokeStyle = rgba(pal.mid, 0.7);
+                    ctx.stroke();
+                }
+                // energy running in along the seams
+                const tail = h * 3.2;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                [['bright', 3.4, 1], ['core', 1.8, 0.4]].forEach(L => {
+                    ctx.beginPath();
+                    s.pulses.forEach(p => {
+                        const b = Math.min(p.total, p.head), a = Math.max(0, p.head - tail * L[2]);
+                        if (b <= a) return;
+                        let started = false;
+                        for (let i = 0; i < p.pts.length - 1; i++) {
+                            const s0 = p.cum[i], s1 = p.cum[i + 1];
+                            if (s1 < a || s0 > b) continue;
+                            const f0 = clamp((a - s0) / (s1 - s0), 0, 1), f1 = clamp((b - s0) / (s1 - s0), 0, 1);
+                            const P0 = p.pts[i], P1 = p.pts[i + 1];
+                            const x0 = cx + (P0[0] + (P1[0] - P0[0]) * f0) * sc, y0 = cy + (P0[1] + (P1[1] - P0[1]) * f0) * sc;
+                            const x1 = cx + (P0[0] + (P1[0] - P0[0]) * f1) * sc, y1 = cy + (P0[1] + (P1[1] - P0[1]) * f1) * sc;
+                            if (!started) { ctx.moveTo(x0, y0); started = true; }
+                            ctx.lineTo(x1, y1);
+                        }
+                    });
+                    ctx.lineWidth = L[1];
+                    ctx.strokeStyle = rgba(pal[L[0]], 1);
+                    ctx.stroke();
+                });
+                ctx.lineJoin = 'miter';
+                ctx.lineCap = 'butt';
+                // the cage of the ring nearest the piece, once it is charged
+                if (c > 0.6 || imp) {
+                    ctx.beginPath();
+                    s.cells.forEach(cl => { if (cl.d === 1) hexPath(ctx, cx + cl.x * sc, cy + cl.y * sc, h * 0.9 * sc, 0); });
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = rgba(Math.floor(t / 70) % 2 || imp ? pal.core : pal.bright, seg(c, 0.6, 0.8) || imp);
+                    ctx.stroke();
+                }
+            }
+            // the wall in pieces
+            s.shards.forEach(p => {
+                const k = p.age / p.life, a = 1 - inQuad(k);
+                ctx.beginPath();
+                hexPath(ctx, p.x, p.y, p.size * (1 - 0.45 * k), p.rot);
+                ctx.fillStyle = rgba(pal.mid, 0.55 * a);
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = rgba(pal.bright, a);
+                ctx.stroke();
+            });
+        },
+        front() { },
+        boom(fx) {
+            const s = fx.s, rnd = fx.rnd, sc = 1 - 0.03 - 0.1;
+            s.cells.forEach(cl => {
+                if (fx.t < cl.appear) return;
+                const x = cl.x * sc, y = cl.y * sc, l = Math.hypot(x, y) || 1;
+                const a = Math.atan2(y, x) + (rnd() - 0.5) * 0.3;
+                const v = Math.max(0.35, 2.8 - cl.d * 0.22) * (0.8 + rnd() * 0.4);
+                s.shards.push({ x: fx.cx + x, y: fx.cy + y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, rot: 0,
+                    vr: (rnd() - 0.5) * 0.012, size: s.h * 0.88, life: 600 + rnd() * 450, age: 0 });
+            });
+            s.pulses = [];
+        },
+        impact(fx, ctx, ink) {
+            ctx.beginPath();
+            fx.s.shards.forEach(p => hexPath(ctx, p.x, p.y, p.size, p.rot));
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = ink;
+            ctx.stroke();
+        }
+    };
+
+    /* ---- Vortex: a whirlpool ------------------------------------------- */
+    const vortex = {
+        init(fx) {
+            fx.s = { motes: [], rot: 0, out: [], dir: 1 };
+        },
+        field(fx, m) {
+            const r0 = Math.max(m.r, fx.R * 0.5), imp = seg(fx.t, CHARGE, BOOM), c = fx.c;
+            const k = fx.Rmax / r0;
+            return {
+                dr: -m.v * (0.55 + 2.4 * c + 4 * imp) * Math.pow(k, 0.35) * 0.9,
+                dth: fx.s.dir * Math.min(0.016, (0.0006 + 0.0026 * c + 0.006 * imp) * Math.pow(k, 0.9))
+            };
+        },
+        step(fx, dt) {
+            const s = fx.s, t = fx.t, c = fx.c, rnd = fx.rnd;
+            const imp = seg(t, CHARGE, BOOM);
+            if (t > 150 && t < BOOM) {
+                const want = Math.round(fx.k * (40 + 260 * Math.pow(c, 1.1)));
+                while (s.motes.length < want) {
+                    s.motes.push({ r: fx.Rmax * (0.8 + rnd() * 0.35), th: rnd() * TAU, v: 0.6 + rnd() * 0.8,
+                        w: 1.5 + rnd() * 3.4 * (0.6 + 0.7 * c), col: pickCol(rnd, 0.22, 0.45) });
+                }
+            }
+            s.motes.forEach(m => { const f = this.field(fx, m); m.r += f.dr * dt; m.th += f.dth * dt; });
+            s.motes = s.motes.filter(m => m.r > fx.piece.r * 0.45 && t < BOOM);
+            s.rot += s.dir * (0.0008 + 0.004 * c + 0.012 * imp) * dt;
+            s.out.forEach(o => { o.age += dt; });
+            s.out = s.out.filter(o => o.age < o.life);
+        },
+        arms(fx, ctx, grow, alpha, ink) {
+            const s = fx.s, imp = seg(fx.t, CHARGE, BOOM);
+            const b = lerp(0.3, 0.55, imp), r0 = fx.piece.r * 1.1 * grow;
+            const phiMax = Math.log(fx.Rmax * 0.95 / r0) / b;
+            if (!(phiMax > 0)) return;
+            const spine = [];
+            ctx.beginPath();
+            for (let k = 0; k < 4; k++) {
+                const L = [], Rt = [], mid = [];
+                for (let i = 0; i <= 48; i++) {
+                    const phi = phiMax * i / 48, r = r0 * Math.exp(b * phi);
+                    const th = s.rot + k * TAU / 4 - s.dir * phi;
+                    const hw = r * (ink ? 0.08 : 0.045) * Math.pow(Math.sin(Math.PI * i / 48), 0.6);
+                    L.push([fx.cx + Math.cos(th) * (r - hw), fx.cy + Math.sin(th) * (r - hw)]);
+                    Rt.push([fx.cx + Math.cos(th) * (r + hw), fx.cy + Math.sin(th) * (r + hw)]);
+                    mid.push([fx.cx + Math.cos(th) * r, fx.cy + Math.sin(th) * r]);
+                }
+                ctx.moveTo(L[0][0], L[0][1]);
+                L.forEach(p => ctx.lineTo(p[0], p[1]));
+                for (let i = Rt.length - 1; i >= 0; i--) ctx.lineTo(Rt[i][0], Rt[i][1]);
+                ctx.closePath();
+                spine.push(mid);
+            }
+            ctx.fillStyle = ink || rgba(fx.pal.mid, alpha);
+            ctx.fill();
+            if (ink) return;
+            // a bright thread down the middle of each arm
+            ctx.beginPath();
+            spine.forEach(mid => mid.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))));
+            ctx.lineWidth = 1.3;
+            ctx.strokeStyle = rgba(fx.pal.bright, Math.min(1, alpha * 1.6));
+            ctx.stroke();
+        },
+        back(fx, ctx) {
+            const s = fx.s, t = fx.t, c = fx.c, pal = fx.pal;
+            const imp = seg(t, CHARGE, BOOM);
+            if (t < BOOM) {
+                const vis = seg(t, 300, 900);
+                if (vis) this.arms(fx, ctx, 1, (0.12 + 0.3 * c) * vis);
+                // rings turning round the piece
+                [[1.3, 'core', 2, 0.2], [1.6, 'bright', 1.6, 0.45], [1.95, 'mid', 1.2, 0.7]].forEach((rg, i) => {
+                    const a = seg(c, rg[3] - 0.2, rg[3]) || (imp ? 1 : 0);
+                    if (!a) return;
+                    const r = fx.R * lerp(rg[0], 1.06, inCubic(imp));
+                    ctx.setLineDash([r * 0.22, r * 0.13]);
+                    ctx.lineDashOffset = -t * (0.05 + 0.03 * i) * s.dir * (1 + 3 * c);
+                    ctx.beginPath();
+                    ctx.arc(fx.cx, fx.cy, r, 0, TAU);
+                    ctx.lineWidth = rg[2];
+                    ctx.strokeStyle = rgba(pal[rg[1]], a);
+                    ctx.stroke();
+                });
+                ctx.setLineDash([]);
+                // the motes, with their tails curling behind them
+                ['mid', 'bright', 'core'].forEach(col => {
+                    ctx.beginPath();
+                    s.motes.forEach(m => {
+                        if (m.col !== col) return;
+                        const f = this.field(fx, m), pts = [];
+                        for (let j = 0; j < 8; j++) {
+                            const r = m.r - f.dr * 16 * j, th = m.th - f.dth * 16 * j;
+                            pts.push([fx.cx + Math.cos(th) * r, fx.cy + Math.sin(th) * r]);
+                        }
+                        taper(ctx, pts, m.w);
+                    });
+                    ctx.fillStyle = rgba(pal[col], 0.95);
+                    ctx.fill();
+                });
+            } else {
+                // the arms flung out by the blast
+                const tb = t - BOOM, k = seg(tb, 0, 380);
+                if (k < 1) this.arms(fx, ctx, 1 + 7 * outCubic(k), 0.5 * (1 - k));
+            }
+            this.drawOut(fx, ctx, null);
+        },
+        drawOut(fx, ctx, ink) {
+            const s = fx.s, pal = fx.pal;
+            ['mid', 'bright', 'core'].forEach(col => {
+                ctx.beginPath();
+                s.out.forEach(o => {
+                    if (!ink && o.col !== col) return;
+                    const pts = [];
+                    for (let j = 0; j < 7; j++) {
+                        const tt = Math.max(0, o.age - 18 * j);
+                        const r = o.r0 + o.v * 260 * (1 - Math.exp(-tt / 260));
+                        const th = o.th0 + o.w0 * 300 * (1 - Math.exp(-tt / 300));
+                        pts.push([fx.cx + Math.cos(th) * r, fx.cy + Math.sin(th) * r]);
+                    }
+                    taper(ctx, pts, o.w * (ink ? 1.4 : 1 - 0.5 * o.age / o.life));
+                });
+                if (ink) { ctx.fillStyle = ink; ctx.fill(); return; }
+                ctx.fillStyle = rgba(pal[col], 1);
+                ctx.globalAlpha = 1;
+                ctx.fill();
+            });
+        },
+        front() { },
+        boom(fx) {
+            const s = fx.s, rnd = fx.rnd, n = Math.round(150 * fx.k);
+            for (let i = 0; i < n; i++) {
+                s.out.push({ th0: rnd() * TAU, r0: fx.piece.r, v: 2.2 + rnd() * 3.4, w0: s.dir * (0.002 + rnd() * 0.004),
+                    w: 2 + rnd() * 4, col: pickCol(rnd, 0.3, 0.45), age: 0, life: 520 + rnd() * 380 });
+            }
+        },
+        impact(fx, ctx, ink) {
+            this.arms(fx, ctx, 1.4, 1, ink);
+            this.drawOut(fx, ctx, ink);
+        }
+    };
+
+    const LOOKS = { singularity: singularity, storm: storm, barrier: barrier, vortex: vortex };
+
+    /* ================================================================== */
+    /* Playing it                                                          */
+    /* ================================================================== */
+
+    let canvas = null, ctx = null, cap = null, dpr = 1;
+    let fx = null, raf = 0, watchdog = 0;
+    let last = null;        // the last play's options and seed, for seek()
+    // The user's pick (2026-10-05). The other looks stay, to be swapped in
+    // later if wanted (see "Shield Animation Picker.html").
+    const choice = { style: 'barrier', colour: 'purple' };
+
+    function ensure() {
+        if (canvas) return;
+        canvas = document.createElement('canvas');
+        canvas.className = 'zap-fx';
+        canvas.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(canvas);
+        ctx = canvas.getContext('2d');
+        cap = document.createElement('div');
+        cap.className = 'zap-caption';
+        cap.setAttribute('role', 'status');
+        document.body.appendChild(cap);
+    }
+
+    // The piece's own picture, drawn at a size the canvas can scale down
+    // cleanly (the board's has no size of its own).
+    const pictures = {};
+    function picture(img) {
+        if (!img || !img.src) return null;
+        const src = img.src;
+        if (pictures[src]) return pictures[src];
+        const big = new Image();
+        big.src = src.indexOf('data:image/svg+xml,') === 0
+            ? src.replace('%3Csvg%20', '%3Csvg%20width%3D%22256%22%20height%3D%22256%22%20') : src;
+        pictures[src] = big;
+        return big;
+    }
+
+    function play(o, done, seekTo) {
+        stop();
+        ensure();
+        const vw = window.innerWidth || 800, vh = window.innerHeight || 600;
+        const reduced = !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const style = o.style || choice.style, colour = o.colour || choice.colour;
+        const seed = o.seed || ((Math.random() * 1e9) | 0);
+        last = { o: o, seed: seed };
+        dpr = Math.min(2, global.devicePixelRatio || 1);
+        canvas.width = Math.round(vw * dpr);
+        canvas.height = Math.round(vh * dpr);
+        canvas.classList.add('on');
+        const R = clamp(Math.min(vw, vh) * 0.085, 34, 78);
+        const from = o.from || { x: vw / 2, y: vh / 2, r: 16 };
+        fx = {
+            o: o, done: done || null, t: 0, c: 0, last: 0, vw: vw, vh: vh, cx: vw / 2, cy: vh / 2,
+            R: R, Rmax: Math.hypot(vw, vh) / 2 + 30, k: clamp(vw * vh / (1500 * 850), 0.4, 1.3),
+            rnd: seeded(seed), pal: palette(colour), look: LOOKS[style] || singularity, reduced: reduced,
+            piece: { x: from.x, y: from.y, r: from.r, rot: 0, flash: 0, jit: 0 },
+            from: from, to: null, spin: 1, pic: picture(o.img), oldPic: o.img || null,
+            rays: [], rings: [], sparks: [], fired: {}
+        };
+        fx.look.init(fx);
+        cap.style.setProperty('--zap-text', fx.pal.text || '');
+        cap.style.top = Math.round(fx.cy + R * 1.3 + 26) + 'px';
+        cap.innerHTML = '';
+        cap.className = 'zap-caption';
+        if (o.caption) {
+            const b = document.createElement('b'), sp = document.createElement('span');
+            b.textContent = o.caption.big || '';
+            sp.textContent = o.caption.small || '';
+            cap.appendChild(b);
+            if (o.caption.small) cap.appendChild(sp);
+        }
+        // Nobody is watching: no show, just the outcome.
+        if (document.hidden && seekTo == null) { finish(); return; }
+        if (seekTo != null) {
+            while (fx.t < seekTo) advance(Math.min(16, seekTo - fx.t));
+            draw();
+            fx.frozen = true;
+            return;
+        }
+        fx.last = performance.now();
+        next();
+        watchdog = setTimeout(finish, END + 2500);
+    }
+
+    // The next frame: an animation frame, or a timer if the browser is
+    // holding those back (a page it is not drawing), so it never stalls.
+    let tick = 0;
+    function next() {
+        raf = requestAnimationFrame(frame);
+        tick = setTimeout(frame, 45);
+    }
+    function frame() {
+        cancelAnimationFrame(raf);
+        clearTimeout(tick);
+        if (!fx || fx.frozen) return;
+        const now = performance.now();
+        const dt = clamp(now - fx.last, 0, 100);   // a hiccup is caught up, a long stall is not
+        fx.last = now;
+        advance(dt);
+        if (!fx) return;
+        draw();
+        if (fx.t >= END) finish();
+        else next();
+    }
+
+    function chargeAt(t) {
+        if (t >= CHARGE) return 1;
+        return inQuad(seg(t, 200, CHARGE));
+    }
+
+    function advance(dt) {
+        fx.t += dt;
+        const t = fx.t;
+        fx.c = chargeAt(t);
+        if (!fx.fired.boom && t >= BOOM) { fx.fired.boom = true; boom(); }
+        if (!fx.fired.cap && t >= BOOM + 80) { fx.fired.cap = true; cap.classList.add('show'); }
+        if (!fx.fired.land && t >= LAND) { fx.fired.land = true; land(); }
+        if (!fx.fired.capOff && t >= LAND + 200) { fx.fired.capOff = true; cap.classList.remove('show'); }
+        movePiece(dt);
+        if (!fx.reduced) fx.look.step(fx, dt);
+        stepCommon(dt);
+    }
+
+    // The flight back to the Start: a lob from the middle of the screen.
+    function flightAt(u) {
+        const a = { x: fx.cx, y: fx.cy }, b = fx.to;
+        const d = Math.hypot(b.x - a.x, b.y - a.y);
+        const cxp = (a.x + b.x) / 2, cyp = Math.max(Math.min(a.y, b.y) - Math.max(110, d * 0.32), -fx.vh * 0.08);
+        const v = 1 - u;
+        return { x: v * v * a.x + 2 * v * u * cxp + u * u * b.x, y: v * v * a.y + 2 * v * u * cyp + u * u * b.y };
+    }
+    function flightU(t) { return 1 - Math.pow(1 - seg(t, FLING, LAND), 1.7); }
+
+    function movePiece(dt) {
+        const t = fx.t, P = fx.piece, f = fx.from, R = fx.R;
+        if (t < LIFT) {
+            const s = seg(t, 0, LIFT), e = inOutCubic(s);
+            const mx = (f.x + fx.cx) / 2, my = Math.min(f.y, fx.cy) - Math.abs(f.x - fx.cx) * 0.12 - 30;
+            const v = 1 - e;
+            P.x = v * v * f.x + 2 * v * e * mx + e * e * fx.cx;
+            P.y = v * v * f.y + 2 * v * e * my + e * e * fx.cy;
+            P.r = lerp(f.r, R, outBack(s));
+            P.rot = 0;
+            P.jit = 0;
+        } else if (t < BOOM) {
+            const c = fx.c;
+            P.x = fx.cx; P.y = fx.cy;
+            P.r = t < CHARGE ? R * (1 + 0.035 * c * Math.sin(t * 0.045)) : R * lerp(1, 0.84, inCubic(seg(t, CHARGE, BOOM)));
+            P.rot = 0.06 * c * Math.sin(t * 0.03);
+            P.jit = t >= CHARGE ? 5 : 0.5 + 4.5 * c * c;
+        } else if (t < FLING) {
+            P.x = fx.cx; P.y = fx.cy;
+            P.r = R * (0.84 + 0.34 * outBack(seg(t, BOOM, BOOM + 110)));
+            P.rot = 0;
+            P.jit = 9 * (1 - seg(t, BOOM, FLING));
+        } else if (t < LAND) {
+            const s = seg(t, FLING, LAND), p = flightAt(flightU(t));
+            P.x = p.x; P.y = p.y;
+            P.r = lerp(R * 1.18, fx.to.r, outCubic(s));
+            P.rot = fx.spin * TAU * 2.25 * outCubic(s);
+            P.jit = 0;
+        }
+        if (fx.reduced) P.jit = 0;
+        P.flash = Math.max(0, P.flash - dt / 260);
+    }
+
+    function boom() {
+        const o = fx.o, rnd = fx.rnd, P = fx.piece;
+        // The piece is let go of: ui.js puts it on the Start, hidden, and
+        // says where that is.
+        let to = null;
+        try { to = o.release ? o.release() : null; } catch (e) { console.error(e); }
+        fx.to = to && isFinite(to.x) ? to : { x: fx.from.x, y: fx.from.y, r: fx.from.r };
+        fx.spin = fx.to.x >= fx.cx ? 1 : -1;
+        P.flash = 1;
+        if (fx.reduced) {
+            fx.rings.push({ at: 0, dur: 600, r0: P.r, r1: fx.R * 4, w0: 4, w1: 1, col: 'bright' });
+            return;
+        }
+        const hex = fx.look === barrier;
+        fx.rings.push({ at: 0, dur: 640, r0: P.r, r1: fx.Rmax * 1.05, w0: 20, w1: 2, col: 'bright', hex: hex });
+        fx.rings.push({ at: 70, dur: 820, r0: P.r, r1: fx.Rmax * 0.78, w0: 7, w1: 1, col: 'core', hex: hex });
+        fx.rings.push({ at: 20, dur: 520, r0: P.r * 0.8, r1: fx.Rmax * 0.45, w0: 3, w1: 1, col: 'mid', hex: hex });
+        const ns = Math.round(40 * fx.k);
+        for (let i = 0; i < ns; i++) {
+            const a = rnd() * TAU, v = 0.8 + rnd() * 1.8;
+            fx.sparks.push({ x: P.x + Math.cos(a) * P.r, y: P.y + Math.sin(a) * P.r, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+                age: 0, life: 500 + rnd() * 400, col: rnd() < 0.5 ? 'core' : 'bright' });
+        }
+        // a cone of force the way the piece is about to go
+        const aim = Math.atan2(fx.to.y - P.y, fx.to.x - P.x);
+        for (let i = 0; i < 18; i++) {
+            fx.rays.push({ th: aim + (rnd() - 0.5) * 0.8, r: P.r, v: 3 + rnd() * 2.2, len: 200 + rnd() * 300, w: 4 + rnd() * 6,
+                col: rnd() < 0.5 ? 'core' : 'bright', life: 520 + rnd() * 200, age: 0 });
+        }
+        fx.look.boom(fx);
+    }
+
+    function land() {
+        try { if (fx.o.land) fx.o.land(); } catch (e) { console.error(e); }
+    }
+
+    function stepCommon(dt) {
+        fx.rays.forEach(r => { r.age += dt; r.r += r.v * dt; r.v *= Math.exp(-dt / 380); });
+        fx.rays = fx.rays.filter(r => r.age < r.life);
+        fx.sparks.forEach(p => {
+            const f = Math.exp(-dt / 350);
+            p.vx *= f; p.vy = p.vy * f + 0.0006 * dt;
+            p.x += p.vx * dt; p.y += p.vy * dt;
+            p.age += dt;
+        });
+        fx.sparks = fx.sparks.filter(p => p.age < p.life);
+    }
+
+    function veilAt(t) {
+        if (t < LIFT) return 0.6 * outCubic(t / LIFT);
+        if (t < CHARGE) return lerp(0.6, 0.82, seg(t, LIFT, CHARGE));
+        if (t < BOOM) return lerp(0.82, 0.9, seg(t, CHARGE, BOOM));
+        return 0.9 * (1 - inOutCubic(seg(t, FLING + 80, LAND - 100)));
+    }
+    function shakeAt(t) {
+        if (fx.reduced || t < LIFT) return 0;
+        if (t < CHARGE) return 2.2 * Math.pow(fx.c, 2.2);
+        if (t < BOOM) return 3.2;
+        return 15 * Math.exp(-(t - BOOM) / 170);
+    }
+
+    function draw() {
+        const t = fx.t, pal = fx.pal, c = ctx, P = fx.piece;
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        c.clearRect(0, 0, fx.vw, fx.vh);
+        const sh = shakeAt(t);
+        const sx = sh ? (Math.random() * 2 - 1) * sh : 0, sy = sh ? (Math.random() * 2 - 1) * sh : 0;
+        if (fx.o.shake) fx.o.shake.style.transform = sh > 0.3 ? 'translate(' + (sx * 0.7).toFixed(1) + 'px,' + (sy * 0.7).toFixed(1) + 'px)' : '';
+        const tb = t - BOOM;
+        // The boom's two flash frames: everything in one flat colour on
+        // another, then the other way round.
+        if (!fx.reduced && tb >= 0 && tb < 120) {
+            const first = tb < 60;
+            const bg = first ? pal.core : pal.veil, ink = rgba(first ? pal.deep : pal.core, 1);
+            c.fillStyle = rgba(bg, 1);
+            c.fillRect(0, 0, fx.vw, fx.vh);
+            c.translate(sx, sy);
+            drawRays(c, ink);
+            fx.look.impact(fx, c, ink);
+            c.beginPath();
+            c.arc(P.x, P.y, P.r * 1.02, 0, TAU);
+            if (first) { c.fillStyle = ink; c.fill(); }
+            else { c.lineWidth = 3; c.strokeStyle = ink; c.stroke(); }
+            return;
+        }
+        c.translate(sx, sy);
+        c.fillStyle = rgba(pal.veil, veilAt(t));
+        c.fillRect(-30, -30, fx.vw + 60, fx.vh + 60);
+        if (!fx.reduced) fx.look.back(fx, c);
+        drawRings(c);
+        drawRays(c, null);
+        drawSparks(c);
+        if (t < LAND) {
+            if (t >= FLING) drawTrail(c);
+            drawPiece(c);
+            if (!fx.reduced && t < BOOM) fx.look.front(fx, c);
+        }
+        // the flash that follows the two frames
+        if (!fx.reduced && tb >= 120 && tb < 330) {
+            c.fillStyle = rgba(pal.core, 0.5 * (1 - outCubic(seg(tb, 120, 330))));
+            c.fillRect(-30, -30, fx.vw + 60, fx.vh + 60);
+        }
+        if (t >= LAND) drawLanding(c);
+    }
+
+    function drawRays(c, ink) {
+        if (!fx.rays.length) return;
+        ['mid', 'bright', 'core'].forEach(col => {
+            if (ink && col !== 'mid') return;
+            c.beginPath();
+            fx.rays.forEach(r => {
+                if (!ink && r.col !== col) return;
+                const k = r.age / r.life, len = r.len * (1 - inQuad(k));
+                const ca = Math.cos(r.th), sa = Math.sin(r.th);
+                const x = fx.cx + ca * r.r, y = fx.cy + sa * r.r;
+                // the tail end is the thick one; it points the way it goes
+                wedge(c, x - ca * len, y - sa * len, x, y, r.w * (1 - 0.5 * k), 0);
+            });
+            if (ink) { c.fillStyle = ink; c.fill(); return; }
+            // they fade by thinning, so where they cross they stay flat
+            c.fillStyle = rgba(fx.pal[col], 1);
+            c.fill();
+        });
+    }
+
+    function drawRings(c) {
+        const tb = fx.t - BOOM;
+        fx.rings.forEach(g => {
+            const p = seg(tb - g.at, 0, g.dur);
+            if (p <= 0 || p >= 1) return;
+            const r = lerp(g.r0, g.r1, outCubic(p));
+            c.beginPath();
+            if (g.hex) hexPath(c, fx.cx, fx.cy, r, 0);
+            else c.arc(fx.cx, fx.cy, r, 0, TAU);
+            c.lineWidth = lerp(g.w0, g.w1, outQuad(p));
+            c.strokeStyle = rgba(fx.pal[g.col], 1 - inQuad(p));
+            c.stroke();
+        });
+    }
+
+    function drawSparks(c) {
+        if (!fx.sparks.length) return;
+        c.lineCap = 'round';
+        ['core', 'bright'].forEach(col => {
+            c.beginPath();
+            fx.sparks.forEach(p => {
+                if (p.col !== col) return;
+                c.moveTo(p.x - p.vx * 20, p.y - p.vy * 20);
+                c.lineTo(p.x, p.y);
+            });
+            c.lineWidth = 1.8;
+            c.strokeStyle = rgba(fx.pal[col], 1);
+            c.stroke();
+        });
+        c.lineCap = 'butt';
+    }
+
+    // Behind the piece as it flies: a streak, and lines either side of it.
+    function drawTrail(c) {
+        const t = fx.t, P = fx.piece;
+        const pts = [];
+        for (let j = 0; j < 10; j++) {
+            const p = flightAt(flightU(Math.max(FLING, t - 26 * j)));
+            pts.push([p.x, p.y]);
+        }
+        const fade = 1 - seg(t, LAND - 250, LAND);
+        c.beginPath();
+        taper(c, pts, P.r * 1.7);
+        c.fillStyle = rgba(fx.pal.bright, 0.55 * fade);
+        c.fill();
+        c.beginPath();
+        taper(c, pts, P.r * 0.5);
+        c.fillStyle = rgba(fx.pal.core, 0.9 * fade);
+        c.fill();
+        // speed lines alongside
+        const h = pts[0], tl = pts[pts.length - 1];
+        const dx = h[0] - tl[0], dy = h[1] - tl[1], l = Math.hypot(dx, dy) || 1;
+        const nx = -dy / l, ny = dx / l;
+        c.beginPath();
+        [-1.15, -0.7, 0.7, 1.15].forEach((o, i) => {
+            const k = 0.35 + 0.2 * (i % 2);
+            const ox = nx * o * P.r, oy = ny * o * P.r;
+            wedge(c, h[0] + ox - dx * 0.15, h[1] + oy - dy * 0.15, h[0] + ox - dx * (0.15 + k), h[1] + oy - dy * (0.15 + k), 2, 0);
+        });
+        c.fillStyle = rgba(fx.pal.core, 0.85 * fade);
+        c.fill();
+    }
+
+    function drawPiece(c) {
+        const P = fx.piece;
+        const x = P.x + (P.jit ? (Math.random() * 2 - 1) * P.jit : 0), y = P.y + (P.jit ? (Math.random() * 2 - 1) * P.jit : 0);
+        const r = P.r;
+        c.save();
+        c.translate(x, y);
+        c.rotate(P.rot);
+        c.beginPath();
+        c.arc(0, 0, r, 0, TAU);
+        c.fillStyle = '#f3ead8';
+        c.fill();
+        const img = fx.pic && fx.pic.complete && fx.pic.naturalWidth ? fx.pic : fx.oldPic;
+        if (img) {
+            c.save();
+            c.beginPath();
+            c.arc(0, 0, r * 0.92, 0, TAU);
+            c.clip();
+            try { c.drawImage(img, -r, -r, r * 2, r * 2); } catch (e) { /* not ready */ }
+            c.restore();
+        }
+        const ring = Math.max(2, r * 0.1);
+        c.beginPath();
+        c.arc(0, 0, r - ring / 2, 0, TAU);
+        c.lineWidth = ring;
+        c.strokeStyle = fx.o.seat || '#e2b13c';
+        c.stroke();
+        c.beginPath();
+        c.arc(0, 0, r, 0, TAU);
+        c.lineWidth = 1.5;
+        c.strokeStyle = '#120b0a';
+        c.stroke();
+        if (P.flash > 0) {
+            c.beginPath();
+            c.arc(0, 0, r + 0.5, 0, TAU);
+            c.fillStyle = rgba(fx.pal.core, P.flash * 0.9);
+            c.fill();
+        }
+        c.restore();
+    }
+
+    function drawLanding(c) {
+        const to = fx.to;
+        if (!to) return;
+        const p = seg(fx.t, LAND, LAND + 400);
+        if (p >= 1) return;
+        c.beginPath();
+        c.arc(to.x, to.y, lerp(to.r * 1.05, to.r * 3.4, outCubic(p)), 0, TAU);
+        c.lineWidth = lerp(3.5, 1, p);
+        c.strokeStyle = rgba(fx.pal.bright, 1 - p);
+        c.stroke();
+        c.beginPath();
+        for (let i = 0; i < 8; i++) {
+            const a = i / 8 * TAU + 0.2;
+            const r1 = to.r * (1.35 + 1.3 * outCubic(p)), r2 = to.r * (1.95 + 1.7 * outCubic(p));
+            c.moveTo(to.x + Math.cos(a) * r1, to.y + Math.sin(a) * r1);
+            c.lineTo(to.x + Math.cos(a) * r2, to.y + Math.sin(a) * r2);
+        }
+        c.lineWidth = 2;
+        c.strokeStyle = rgba(fx.pal.core, 1 - p);
+        c.stroke();
+    }
+
+    function cleanUp() {
+        cancelAnimationFrame(raf);
+        clearTimeout(tick);
+        clearTimeout(watchdog);
+        raf = 0; tick = 0; watchdog = 0;
+        if (ctx) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+        if (canvas) canvas.classList.remove('on');
+        if (cap) cap.classList.remove('show');
+        if (fx && fx.o.shake) fx.o.shake.style.transform = '';
+    }
+
+    // The end, however it came: the piece is always released and shown on
+    // the Start, and whoever was waiting is told.
+    function finish() {
+        if (!fx) return;
+        const f = fx;
+        cleanUp();
+        fx = null;
+        if (!f.fired.boom) { try { if (f.o.release) f.o.release(); } catch (e) { console.error(e); } }
+        if (!f.fired.land) { try { if (f.o.land) f.o.land(); } catch (e) { console.error(e); } }
+        if (f.done) f.done();
+    }
+
+    // Stopped part-way (the game was left): tidied away, nobody told.
+    function stop() {
+        if (!fx) return;
+        fx.done = null;
+        finish();
+    }
+
+    global.LOF_SHIELDFX = {
+        STYLES: STYLES,
+        COLOURS: COLOURS,
+        DURATION: END,
+        choice: choice,
+        play: function (o, done) { play(o || {}, done); },
+        stop: stop,
+        playing: function () { return !!fx; },
+        // For looking at one frame: plays the last show again up to `ms`
+        // and holds it there.
+        seek: function (ms, opts) {
+            if (!last) return;
+            play(Object.assign({}, last.o, { seed: last.seed }, opts || {}), null, ms);
+        },
+        resume: function () { if (fx && fx.frozen) { fx.frozen = false; fx.last = performance.now(); next(); } }
+    };
+
+})(typeof window !== 'undefined' ? window : globalThis);
+
+    </script>
+    <script>
 /* ==== game-oblivion/ui.js ==== */
 /* =========================================================================
    Legend of Fenrirak™, The Oblivion Dragon: Online Version
@@ -8947,9 +10460,77 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         };
     })();
 
-    // The shield throwing somebody back.
+    // The shield throwing somebody back. Their piece walks up to the shield
+    // and waits there (WALK), then shieldfx.js lifts it into the middle of
+    // the screen, blows it up and throws it back to the Start.
     const ZAP = (function () {
-        let el = null, seen = 0, primed = false;
+        let seen = 0, primed = false, hidden = null;
+        const due = {};          // playerId: their throw is still to come
+        const waiting = [];      // held back until it has been (the potion from the Start)
+
+        function tokEl(pid) { return document.querySelector('#tokens [data-tok="p_' + pid + '"]'); }
+        function spot(el) {
+            const r = el.getBoundingClientRect();
+            return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 };
+        }
+        function flush() {
+            if (Object.keys(due).length) return;
+            waiting.splice(0).forEach(fn => { try { fn(); } catch (e) { console.error(e); } });
+        }
+
+        function play(z, done) {
+            const pid = z.playerId;
+            const FX = window.LOF_SHIELDFX;
+            const el = tokEl(pid);
+            const end = () => {
+                delete due[pid];
+                hidden = null;
+                WALK.release(pid);
+                const t = tokEl(pid);
+                if (t) t.classList.remove('zap-away');
+                flush();
+                done();
+            };
+            if (!FX || !el || !$('#screen-game.active') || document.hidden) {
+                notice(z.who + ' is thrown back by the Oblivion Mage’s shield!');
+                end();
+                return;
+            }
+            // From the piece standing at the shield, or from the shield itself.
+            let from = spot(el);
+            if (WALK.shown(pid) !== D.ARENA) {
+                const a = sqEl(D.ARENA);
+                if (a) { const r = a.getBoundingClientRect(); from = { x: r.left + r.width / 2, y: r.top + r.height / 2, r: from.r }; }
+            }
+            hidden = pid;
+            el.classList.add('zap-away');
+            const mine = pid === NET.PID;
+            FX.play({
+                from: from,
+                img: el.querySelector('img'),
+                seat: seatColour(pid),
+                shake: $('#board'),
+                caption: {
+                    big: 'REFUSED',
+                    small: 'Without all 5 Pendant Fragments the shield casts ' + (mine ? 'you' : z.who) + ' back to the Start.'
+                },
+                // Let go of at the boom: put on the Start, still hidden.
+                release() {
+                    WALK.release(pid);
+                    const t = tokEl(pid);
+                    return t ? spot(t) : null;
+                },
+                land() {
+                    hidden = null;
+                    const t = tokEl(pid);
+                    if (!t) return;
+                    t.classList.remove('zap-away');
+                    t.classList.add('zap-land');
+                    setTimeout(() => t.classList.remove('zap-land'), 480);
+                }
+            }, end);
+        }
+
         return {
             saw(state) {
                 const z = state.lastZap;
@@ -8957,9 +10538,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!primed) { primed = true; seen = n; return; }
                 if (!z || n === seen) return;
                 seen = n;
-                afterTheDie(() => notice(z.who + ' is thrown back by the Oblivion Mage’s shield!'));
+                due[z.playerId] = true;
+                BANNERS.add('zap', done => play(z, done));
             },
-            reset(state) { primed = false; if (state) this.saw(state); }
+            // Is this player's piece to stop at the shield and wait?
+            wants: pid => !!due[pid],
+            hides: pid => hidden === pid,
+            // Run `fn` once nobody is still to be thrown back.
+            after(fn) { if (Object.keys(due).length) waiting.push(fn); else fn(); },
+            reset(state) {
+                primed = false;
+                hidden = null;
+                Object.keys(due).forEach(k => delete due[k]);
+                waiting.length = 0;
+                if (window.LOF_SHIELDFX) window.LOF_SHIELDFX.stop();
+                if (state) this.saw(state);
+            }
         };
     })();
 
@@ -8974,7 +10568,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!d || n === seen) return;
                 seen = n;
                 if (d.playerId !== NET.PID) return;
-                afterTheDie(() => {
+                // The potion from the Start waits for the shield to have
+                // thrown you there.
+                afterTheDie(() => ZAP.after(() => {
                     if (!el) { el = document.createElement('div'); el.className = 'draw-toast'; document.body.appendChild(el); }
                     el.classList.remove('going');
                     el.innerHTML = d.names.map((nm, i) => {
@@ -8984,7 +10580,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     }).join('');
                     clearTimeout(t);
                     t = setTimeout(() => el.classList.add('going'), 2800);
-                });
+                }));
             },
             reset(state) { primed = false; if (state) this.saw(state); }
         };
@@ -9109,6 +10705,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     const WALK = (function () {
         const shown = {};
         const walking = {};
+        const held = {};         // stopped at the shield, waiting to be thrown back
         let roomOf = null;
         const STEP_MS = 270;
 
@@ -9117,7 +10714,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             S.players.forEach(p => {
                 if (!p.cls) return;
                 if (shown[p.id] === undefined) { shown[p.id] = p.pos; return; }
-                if (walking[p.id]) return;
+                if (walking[p.id] || held[p.id]) return;
                 if (shown[p.id] === p.pos) return;
                 const path = (p.path || []).slice();
                 let i = path.lastIndexOf(shown[p.id]);
@@ -9127,6 +10724,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 const go = () => {
                     const w = walking[p.id];
                     if (!w) return;
+                    // Walked into the shield: the piece stops there, and the
+                    // shield throws it back (ZAP) once nothing else is moving.
+                    if (shown[p.id] === D.ARENA && w.steps.length && ZAP.wants(p.id)) {
+                        delete walking[p.id];
+                        held[p.id] = true;
+                        placeTokens();
+                        renderBoardHighlight();
+                        afterSettle();
+                        return;
+                    }
                     if (!w.steps.length) {
                         delete walking[p.id];
                         // The piece may have been sent somewhere else while it walked.
@@ -9150,7 +10757,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             update: update,
             shown: pid => shown[pid],
             busy: () => Object.keys(walking).length > 0,
-            reset: () => { Object.keys(shown).forEach(k => delete shown[k]); Object.keys(walking).forEach(k => { clearTimeout(walking[k].t); delete walking[k]; }); }
+            // Thrown back from the shield: the piece is where the game says.
+            release(pid) {
+                delete held[pid];
+                if (!S) return;
+                const p = S && E.player(S, pid);
+                if (p && !walking[pid]) shown[pid] = p.pos;
+                placeTokens();
+                renderBoardHighlight();
+            },
+            reset: () => {
+                Object.keys(shown).forEach(k => delete shown[k]);
+                Object.keys(held).forEach(k => delete held[k]);
+                Object.keys(walking).forEach(k => { clearTimeout(walking[k].t); delete walking[k]; });
+            }
         };
     })();
 
@@ -9219,7 +10839,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 layer.appendChild(el);
             }
             if (w.p) {
-                el.className = 'tok' + (cur && cur.id === w.p.id ? ' current' : '');
+                el.className = 'tok' + (cur && cur.id === w.p.id ? ' current' : '') + (ZAP.hides(w.p.id) ? ' zap-away' : '');
                 el.style.setProperty('--seat', seatColour(w.p.id));
                 el.title = w.p.name + ' (' + className(w.p.cls) + ')';
                 const src = artFor(w.p.cls);
@@ -11369,7 +12989,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     // A few things for testing from the console; nothing in the game uses them.
-    window.LOF_UI = { state: () => S, act: act, openSquare: openSquare };
+    window.LOF_UI = { state: () => S, act: act, openSquare: openSquare, busy: () => tableBusy() };
 
     boot();
 })();
