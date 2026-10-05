@@ -1211,7 +1211,34 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .act-row .btn { flex: 1; }
 
 .log-card { flex: 1 1 0; min-height: 190px; display: flex; flex-direction: column; }
-.log-card h3 { margin-bottom: 8px; }
+.log-card h3 { margin-bottom: 0; }
+.log-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.log-filter { display: inline-flex; border: 1px solid var(--panel-edge); border-radius: 999px; overflow: hidden; }
+.log-filter button {
+    font-family: inherit; font-size: 12px; color: var(--muted); cursor: pointer;
+    background: transparent; border: 0; padding: 3px 10px;
+}
+.log-filter button.on { color: var(--cream); background: color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* The short card beside a square under the mouse. */
+.sq-tip {
+    position: fixed; z-index: 860; pointer-events: none; max-width: 260px;
+    background: rgba(14, 8, 16, .96); border: 1px solid var(--panel-edge); border-radius: 12px;
+    padding: 9px 12px; color: var(--cream); font-size: 13px; line-height: 1.4;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .5);
+    opacity: 0; transition: opacity .12s ease;
+}
+.sq-tip.show { opacity: 1; }
+.sq-tip .num { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.sq-tip > b { display: block; font-size: 15px; color: var(--gold-bright); }
+.sq-tip .tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0 2px; }
+.sq-tip .tags .chip { font-size: 10.5px; padding: 1px 7px; }
+.sq-tip p { margin: 5px 0 0; }
+.sq-tip p.here { font-size: 12px; color: var(--muted); }
+.sq-tip i { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); font-style: normal; }
+
+/* The phone's bar of main buttons (shown on narrow screens only). */
+.phone-bar { display: none; }
 .log { flex: 1 1 0; min-height: 0; overflow-y: auto; font-size: 13px; line-height: 1.45; padding-right: 4px; }
 .log div { padding: 3px 0 3px 8px; border-left: 2px solid transparent; }
 .log .t-roll { border-color: #c79bff; }
@@ -1763,7 +1790,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .dice-cube { position: absolute; inset: 0; transform-style: preserve-3d; }
 .dice-side {
     position: absolute; inset: 0; border-radius: 12px;
-    background: linear-gradient(180deg, #f9f1da, #e0d3b6);
+    background: #f3e9d0;
     border: 3px solid var(--die-edge, #8a6a20);
     display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
     place-items: center; padding: 10px;
@@ -1772,7 +1799,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 }
 .dice-die.seat .dice-side { background: var(--die-face); }
 .dice-side i { width: 12px; height: 12px; border-radius: 50%; background: transparent; }
-.dice-side i.on { background: radial-gradient(circle at 34% 30%, #4a423a, #16110c 70%); box-shadow: inset 0 1px 2px rgba(255, 255, 255, .28), 0 1px 1px rgba(255, 255, 255, .5); }
+.dice-side i.on { background: #1d1712; }
 .dice-side.s1 { transform: translateZ(39px); }
 .dice-side.s6 { transform: rotateY(180deg) translateZ(39px); }
 .dice-side.s2 { transform: rotateY(90deg) translateZ(39px); }
@@ -1828,6 +1855,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     transition: opacity .25s ease;
 }
 .dice-stage.landed .dice-label { opacity: 1; }
+.dice-label b { display: block; text-align: center; font-size: 15px; color: var(--gold-bright); margin-top: 1px; }
 
 /* ---- cards that come and go ---- */
 
@@ -1998,6 +2026,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     .enemy-card { grid-template-columns: 90px 1fr; }
     .enemy-card .art { width: 90px; height: 90px; }
     .spot-card { left: 12px !important; right: 12px; bottom: 12px; top: auto !important; width: auto; }
+    .phone-bar {
+        display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px;
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 850;
+        padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(10, 6, 12, .96); border-top: 1px solid var(--panel-edge);
+    }
+    .phone-bar.empty { display: none; }
+    .phone-bar .btn { padding: 10px 6px; font-size: 14px; }
+    #screen-game .game-layout { padding-bottom: 76px; }
     .bend b { font-size: 40px; }
 }
 
@@ -2263,7 +2300,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     <div class="card actions" id="actions"></div>
                 </div>
                 <div class="card log-card" id="log-card">
-                    <h3>Game Log</h3>
+                    <div class="log-head"><h3>Game Log</h3>
+                        <div class="log-filter" role="group" aria-label="Which lines to show">
+                            <button id="log-all" class="on" aria-pressed="true">All</button><button id="log-mine" aria-pressed="false">Just mine</button>
+                        </div>
+                    </div>
                     <div class="log" id="log"></div>
                 </div>
             </aside>
@@ -2282,6 +2323,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             </section>
             </div>
         </div>
+        <div class="phone-bar" id="phone-bar"></div>
     </section>
 
     <!-- ================= GAME OVER ================= -->
@@ -2414,6 +2456,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* Fenrirak or Helen ("all enemies" never means the final bosses):     */
     /* every other monster has 20 more HP and 25 more damage on each       */
     /* attack, and the Soldier Garrison 5 more again (2026-10-04/05).      */
+    /* Then (2026-10-05): the long route's four monsters 10 more HP, 10   */
+    /* more damage and 10 more Gold; Royal Soldiers 5 more damage;        */
+    /* Fenrirak 320 HP (his only change).                                 */
     /* ------------------------------------------------------------------ */
 
     const ENEMIES = {
@@ -2436,55 +2481,55 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             loot: { gold: 20, chest: true }
         },
         thieves: {
-            id: 'thieves', plural: true, name: 'Thieves', hp: 120, defence: 5,
+            id: 'thieves', plural: true, name: 'Thieves', hp: 130, defence: 5,
             passives: [{
                 id: 'silent_hands', name: 'Silent Hands',
                 text: 'The opponent loses 5 Gold at the start of every Thieves’ turn, ' +
                       'if they do not have enough gold, they take 15 damage instead.'
             }],
             moves: [
-                move('shadow_strike', 'Shadow Strike', 70, 1, 0,
+                move('shadow_strike', 'Shadow Strike', 80, 1, 0,
                      [{ t: 'weaken', value: 5, uses: 1 }],
                      'The opponent does 5 less damage on their next turn.'),
-                move('smoke_bomb', 'Smoke Bomb', 40, 5, 3,
+                move('smoke_bomb', 'Smoke Bomb', 50, 5, 3,
                      [{ t: 'steal' }],
                      'The opponent loses an equipped item of their choice.')
             ],
-            loot: { gold: 50, keys: 1 }
+            loot: { gold: 60, keys: 1 }
         },
         orc_warriors: {
-            id: 'orc_warriors', plural: true, name: 'Orc Warriors', hp: 145, defence: 15,
+            id: 'orc_warriors', plural: true, name: 'Orc Warriors', hp: 155, defence: 15,
             passives: [{
                 id: 'mountain_magic', name: 'Mountain Magic',
                 text: 'Orc Warriors heal 10 HP at every start of their turn.'
             }],
             moves: [
-                move('charge', 'Charge', 65, 1),
-                move('wreak_havoc', 'Wreak Havoc', 125, 5, 3,
+                move('charge', 'Charge', 75, 1),
+                move('wreak_havoc', 'Wreak Havoc', 135, 5, 3,
                      [{ t: 'weaken', value: 10, uses: 1 }],
                      'The opponent does 10 less damage on their next turn.')
             ],
-            loot: { gold: 35, chest: true }
+            loot: { gold: 45, chest: true }
         },
         orc_scouts: {
-            id: 'orc_scouts', plural: true, name: 'Orc Scouts', hp: 120, defence: 5,
+            id: 'orc_scouts', plural: true, name: 'Orc Scouts', hp: 130, defence: 5,
             moves: [
-                move('ruin', 'Ruin', 65, 1),
-                move('mayhem', 'Mayhem', 115, 5, 3,
+                move('ruin', 'Ruin', 75, 1),
+                move('mayhem', 'Mayhem', 125, 5, 3,
                      [{ t: 'weaken', value: 5, uses: 1 }],
                      'The opponent does 5 less damage on their next turn.')
             ],
-            loot: { gold: 10, chest: true }
+            loot: { gold: 20, chest: true }
         },
         veteran_soldiers: {
-            id: 'veteran_soldiers', plural: true, name: 'Veteran Soldiers', hp: 155, defence: 15,
+            id: 'veteran_soldiers', plural: true, name: 'Veteran Soldiers', hp: 165, defence: 15,
             moves: [
-                move('guarding_strike', 'Guarding Strike', 60, 1, 0,
+                move('guarding_strike', 'Guarding Strike', 70, 1, 0,
                      [{ t: 'guard', value: 10 }],
                      '+10 Defence during your opponent’s next attack.'),
-                move('crossbow_volley', 'Crossbow Volley', 145, 5, 3)
+                move('crossbow_volley', 'Crossbow Volley', 155, 5, 3)
             ],
-            loot: { gold: 45, keys: 1 }
+            loot: { gold: 55, keys: 1 }
         },
         barbarian: {
             id: 'barbarian', name: 'Barbarian', hp: 120, defence: 10, proper: false,
@@ -2516,8 +2561,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 text: 'When health is at 50 or lower, deal 20 more DMG with each attack.'
             }],
             moves: [
-                move('halberd_charge', 'Halberd Charge', 70, 1),
-                move('royal_assault', 'Royal Assault', 125, 5, 3)
+                move('halberd_charge', 'Halberd Charge', 75, 1),
+                move('royal_assault', 'Royal Assault', 130, 5, 3)
             ],
             loot: { gold: 30, fragment: 4 }
         },
@@ -2537,7 +2582,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             loot: { gold: 50, fragment: 5 }
         },
         fenrirak: {
-            id: 'fenrirak', name: 'Fenrirak', hp: 300, defence: 15, proper: true, boss: true,
+            id: 'fenrirak', name: 'Fenrirak', hp: 320, defence: 15, proper: true, boss: true,
             // A picture file beside "Oblivion Dragon.html" (e.g. 'Oblivion Fenrirak.png').
             // Until one is set, a placeholder is shown.
             image: null,
@@ -2976,8 +3021,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
           route: 'long', action: 'astrix',
           text: 'Buy the best potions, expensive but deadly. (Only while you stand here.)' },
         { id: '24', name: 'Noble’s District', row: 0, col: 3, next: ['25'], pic: 'district',
-          route: 'long', action: 'nobles_district', gold: 40,
-          text: 'Lose 40 Gold or 1 equipped item.' },
+          route: 'long', action: 'nobles_district', gold: 50,
+          text: 'Lose 50 Gold or 1 equipped item.' },
 
         // ---- the two routes meet ----
         // The Inn comes first and the Market after it (swapped 2026-10-05).
@@ -5181,6 +5226,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         state.lastDie = { roll: roll, who: who, why: why, n: state.dieSeq };
         return roll;
     }
+    // What the throw just did, in a few words, shown under the die once it
+    // has landed ("+20 Gold", "Runed Relic works!").
+    function dieSays(state, text) { if (state.lastDie) state.lastDie.says = text; }
 
     function shuffle(arr) {
         const a = arr.slice();
@@ -5869,6 +5917,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             log(state, (o.fixed > 0 ? '+' : '') + o.fixed + ' to the roll (' +
                 o.sources.filter(s => /\(-/.test(s)).join(', ') + ').', 'muted');
         }
+        dieSays(state, min === max ? (min ? 'Move ' + plural(min, 'space') : 'No move this turn')
+            : 'Move ' + min + ' to ' + max + ' spaces, your choice');
         if (min === max) return walkTotal(state, p, min);
 
         state.pending = {
@@ -6109,7 +6159,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 return ok();
 
             case 'nobles_district': {
-                // The 40 Gold can only be chosen by somebody who has it.
+                // The Gold can only be chosen by somebody who has it.
                 // With nothing equipped to give up instead, the nobles take
                 // whatever Gold there is and the rest in health.
                 const opts = [];
@@ -6121,8 +6171,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     return ok();
                 }
                 const canPay = p.gold >= sq.gold;
-                opts.unshift(canPay ? { key: 'gold', label: 'Lose 40 Gold' }
-                    : { key: 'gold', label: 'Lose 40 Gold', disabled: true, why: 'You only have ' + p.gold + ' Gold.' });
+                opts.unshift(canPay ? { key: 'gold', label: 'Lose ' + sq.gold + ' Gold' }
+                    : { key: 'gold', label: 'Lose ' + sq.gold + ' Gold', disabled: true, why: 'You only have ' + p.gold + ' Gold.' });
                 state.pending = { type: 'choose', playerId: p.id, squareId: sq.id, options: opts, prompt: sq.text };
                 return ok();
             }
@@ -6172,20 +6222,24 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         log(state, p.name + ' rolled a ' + roll + ' at ' + sq.name + '.', 'roll');
         switch (sq.roll) {
             case 'cursed_ruins':
+                dieSays(state, even ? 'Even: take 10 DMG' : 'Odd: lose 20 Gold');
                 if (even) squareDamage(state, p, 10, sq.name);
                 else forfeitGold(state, p, 20, sq.name);
                 break;
             case 'cliff_of_doom':
+                dieSays(state, even ? 'Even: take 20 DMG' : 'Odd: take 50 DMG');
                 squareDamage(state, p, even ? 20 : 50, sq.name);
                 break;
             case 'trip_traps':
+                dieSays(state, roll <= 4 ? '1 to 4: take 40 DMG' : '5 or 6: take 10 DMG');
                 squareDamage(state, p, roll <= 4 ? 40 : 10, sq.name);
                 break;
             case 'golden_dice':
-                if (even) gainGold(state, p, 20, 'The Golden Dice');
-                else forfeitGold(state, p, 20, sq.name);
+                if (even) dieSays(state, 'Even: +' + gainGold(state, p, 20, 'The Golden Dice') + ' Gold');
+                else { dieSays(state, 'Odd: lose 20 Gold'); forfeitGold(state, p, 20, sq.name); }
                 break;
             case 'palace_gates':
+                dieSays(state, even ? 'Even: safe passage' : 'Odd: take 20 DMG');
                 if (even) log(state, 'The guards at the Palace Gates let ' + p.name + ' pass.', 'muted');
                 else squareDamage(state, p, 20, sq.name);
                 break;
@@ -6314,6 +6368,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             case 'fate': {
                 state.pending = null;
                 const roll = throwDie(state, p.name, 'Fate’s Roll');
+                dieSays(state, roll % 2 === 0 ? 'Even: the loot is yours' : 'Odd: all the loot is lost');
                 if (roll % 2 === 0) {
                     log(state, 'Fate’s Roll: ' + roll + ': even. The loot is ' + p.name + '’s.', 'roll');
                     return grantLoot(state, p, pend.enemyId, false);
@@ -6340,9 +6395,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 state.pending = null;
                 const roll = throwDie(state, p.name, 'Raw Oblivion Shield');
                 if (roll === 6) {
+                    dieSays(state, 'The fragments hold');
                     log(state, 'Raw Oblivion Shield: a 6. The fragments hold.', 'roll');
                 } else {
                     const i = p.fragments.indexOf(roll);
+                    dieSays(state, i >= 0 ? 'Pendant Fragment #' + roll + ' crumbles' : 'No Fragment #' + roll + ' to lose');
                     if (i >= 0) {
                         p.fragments.splice(i, 1);
                         log(state, 'Raw Oblivion Shield: a ' + roll + '. Pendant Fragment #' + roll +
@@ -6556,6 +6613,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const ids = Object.keys(b.orderRolls);
         if (ids.some(id => b.orderRolls[id] === null)) return ok();
         if (b.orderRolls[ids[0]] === b.orderRolls[ids[1]]) {
+            dieSays(state, 'A tie: both roll again');
             log(state, 'A tie. Both roll again.', 'muted');
             ids.forEach(id => { b.orderRolls[id] = null; });
             return ok();
@@ -6568,6 +6626,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             b.units.filter(u => u.side === side && u.kind === 'player').forEach(u => b.order.push(u.key));
             b.units.filter(u => u.side === side && u.kind === 'ally').forEach(u => b.order.push(u.key));
         });
+        dieSays(state, player(state, first).name + ' strikes first');
         log(state, player(state, first).name + ' strikes first.', 'battle');
         b.idx = 0;
         startStep(state);
@@ -7397,6 +7456,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const ab = classOf(p).ability;
         p.abilityTriedAt = p.turnsTaken;
         const roll = throwDie(state, p.name, ab.name);
+        dieSays(state, roll % 2 !== 0 ? 'Odd: ' + ab.name + ' fails' :
+            'Even: ' + ({ runed_relic: '+10 DMG for 2 attacks', iron_body: 'no minimum damage for 2 attacks',
+                agile_footwork: 'add up to 2 to your move' }[ab.id] || ab.name + ' works'));
         if (roll % 2 !== 0) {
             log(state, p.name + ' tries ' + ab.name + ' and rolls a ' + roll + ': odd, so it fails. ' +
                 'They can try again next turn.', 'muted');
@@ -8555,7 +8617,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             pend.options.forEach(o => {
                 if (o.disabled) return;
                 let cost;
-                if (o.key === 'gold') cost = 40;
+                if (o.key === 'gold') cost = sq.gold;
                 else {
                     const inst = E.ownedItem(p, o.key);
                     const d = inst && E.itemDef(inst);
@@ -9786,6 +9848,474 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     </script>
     <script>
+/* ==== game-oblivion/pendantfx.js ==== */
+/* =========================================================================
+   Legend of Fenrirak™, The Oblivion Dragon: Online Version
+   pendantfx.js: the five Pendant Fragments becoming the Oblivion Pendant.
+
+   Played over the whole screen when somebody holds all five fragments.
+   The five gold wedges circle the middle in a tightening, quickening
+   spiral, trailing gold, until they meet with force; the whole pendant (its
+   dark plate, its red gem) bursts into being in rings of light, then sits a
+   moment in a slowly turning ring of gold beads under the words before it
+   all fades.
+
+   One canvas, flat colours and crisp lines only: no blur, no glow. The
+   violet is the --zap-* set in style.css, the gold and the gem are the
+   pendant icon's own (art.js pendant()).
+
+   Orbit was the user's pick of four looks (2026-10-05); the ring of beads
+   replaced rotating bars behind the pendant, which the user did not like.
+   ui.js calls play() through BANNERS.
+   ========================================================================= */
+
+(function (global) {
+    'use strict';
+
+    const IMP = 2000;      // the pieces meet: the kablam
+    const CAP = 2250;      // the words come up
+    const END = 5800;      // and it is all gone
+
+    const TAU = Math.PI * 2;
+    const clamp = (v, a, b) => (v < a ? a : (v > b ? b : v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+    const inQuad = t => t * t;
+    const inCubic = t => t * t * t;
+    const outQuad = t => 1 - (1 - t) * (1 - t);
+    const outCubic = t => 1 - Math.pow(1 - t, 3);
+    const outBack = (t, k) => { k = k || 1.70158; return 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2); };
+
+    function seeded(seed) {
+        let a = seed >>> 0;
+        return function () {
+            a = (a + 0x6D2B79F5) >>> 0;
+            let t = a;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+    function hexRgb(hex) {
+        const h = String(hex || '').trim().replace('#', '');
+        if (h.length !== 6) return [255, 255, 255];
+        return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+    }
+    function palette() {
+        const css = getComputedStyle(document.documentElement);
+        const p = {};
+        ['veil', 'deep', 'mid', 'bright', 'core'].forEach(k => { p[k] = hexRgb(css.getPropertyValue('--zap-' + k) || '#000000'); });
+        return p;
+    }
+    const rgba = (c, a) => 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + clamp(a, 0, 1).toFixed(3) + ')';
+
+    // The pendant's own colours (as the icon in art.js).
+    const INK = '#1a1014';
+    const GOLD = '#e2b13c', GOLD_LIT = '#f3d27a', GOLD_DIM = '#c08a25', GOLD_EDGE = '#7a4a12';
+    const PLATE = '#2a2024', PLATE_RIM = '#3d3238';
+    const GEM = '#c8342b', GEM_DARK = '#8e1f1a', GEM_LIT = '#ef7a6a';
+    const CREAM = [255, 244, 214];
+    const GOLD_RGB = hexRgb(GOLD);
+
+    /* ---- the pendant's shapes ------------------------------------------ */
+
+    function pentPt(r, i) {
+        const a = (-90 + i * 72) * Math.PI / 180;
+        return [r * Math.cos(a), r * Math.sin(a)];
+    }
+    function poly(c, pts) {
+        c.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+        c.closePath();
+    }
+    // Fragment i (0 to 4) is the wedge from the middle to corners i and i+1.
+    // Each is drawn about its own centroid.
+    function wedgeGeom(R) {
+        const out = [];
+        for (let i = 0; i < 5; i++) {
+            const a = [0, 0], b = pentPt(R, i), d = pentPt(R, i + 1);
+            const cx = (a[0] + b[0] + d[0]) / 3, cy = (a[1] + b[1] + d[1]) / 3;
+            const l = Math.hypot(cx, cy);
+            out.push({ c: [cx, cy], dir: [cx / l, cy / l], ang: Math.atan2(cy, cx),
+                pts: [[-cx, -cy], [b[0] - cx, b[1] - cy], [d[0] - cx, d[1] - cy]] });
+        }
+        return out;
+    }
+    // One wedge, faceted in two flat golds with an engraved line near its
+    // outer edge.
+    function drawWedge(c, w, R, alpha) {
+        const [A, B, C] = w.pts;
+        const M = [(B[0] + C[0]) / 2, (B[1] + C[1]) / 2];
+        c.globalAlpha = alpha;
+        c.beginPath(); poly(c, [A, B, M]); c.fillStyle = GOLD_LIT; c.fill();
+        c.beginPath(); poly(c, [A, M, C]); c.fillStyle = GOLD; c.fill();
+        // the engraved line, three quarters of the way out
+        const k = 0.76;
+        const p1 = [lerp(A[0], B[0], k), lerp(A[1], B[1], k)], p2 = [lerp(A[0], C[0], k), lerp(A[1], C[1], k)];
+        c.beginPath(); c.moveTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]);
+        c.lineWidth = Math.max(1, R * 0.018); c.strokeStyle = GOLD_EDGE; c.stroke();
+        c.beginPath(); poly(c, [A, B, C]);
+        c.lineJoin = 'round';
+        c.lineWidth = Math.max(1.5, R * 0.03); c.strokeStyle = INK; c.stroke();
+        c.globalAlpha = 1;
+    }
+    function drawPlate(c, R, a) {
+        if (a <= 0) return;
+        c.globalAlpha = a;
+        // the bail the chain runs through
+        const top = pentPt(R * 1.1, 0);
+        c.beginPath(); c.arc(top[0], top[1] - R * 0.13, R * 0.12, 0, TAU);
+        c.lineWidth = R * 0.07; c.strokeStyle = INK; c.stroke();
+        c.lineWidth = R * 0.04; c.strokeStyle = GOLD_DIM; c.stroke();
+        c.beginPath(); poly(c, [0, 1, 2, 3, 4].map(i => pentPt(R * 1.1, i)));
+        c.fillStyle = PLATE; c.fill();
+        c.lineJoin = 'round'; c.lineWidth = Math.max(2, R * 0.035); c.strokeStyle = INK; c.stroke();
+        c.beginPath(); poly(c, [0, 1, 2, 3, 4].map(i => pentPt(R * 1.03, i)));
+        c.lineWidth = Math.max(1, R * 0.02); c.strokeStyle = PLATE_RIM; c.stroke();
+        c.globalAlpha = 1;
+    }
+    function drawGem(c, R, a, s) {
+        if (a <= 0) return;
+        const r = R * 0.27 * s;
+        c.globalAlpha = a;
+        for (let i = 0; i < 5; i++) {
+            c.beginPath(); poly(c, [[0, 0], pentPt(r, i), pentPt(r, i + 1)]);
+            c.fillStyle = i === 4 ? GEM_LIT : (i % 2 ? GEM_DARK : GEM); c.fill();
+        }
+        c.beginPath(); poly(c, [0, 1, 2, 3, 4].map(i => pentPt(r * 0.45, i)));
+        c.fillStyle = GEM; c.fill();
+        c.beginPath(); poly(c, [0, 1, 2, 3, 4].map(i => pentPt(r, i)));
+        c.lineJoin = 'round'; c.lineWidth = Math.max(1.5, R * 0.03); c.strokeStyle = INK; c.stroke();
+        c.globalAlpha = 1;
+    }
+
+    /* ---- other shapes ---------------------------------------------------- */
+
+    // A line that thins to nothing at its tail: pts[0] is the head.
+    function taper(c, pts, w) {
+        const n = pts.length;
+        if (n < 2) return;
+        const L = [], Rt = [];
+        for (let i = 0; i < n; i++) {
+            const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
+            const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+            const hw = w * (1 - i / (n - 1)) / 2;
+            L.push([pts[i][0] - dy / l * hw, pts[i][1] + dx / l * hw]);
+            Rt.push([pts[i][0] + dy / l * hw, pts[i][1] - dx / l * hw]);
+        }
+        c.moveTo(L[0][0], L[0][1]);
+        for (let i = 1; i < n; i++) c.lineTo(L[i][0], L[i][1]);
+        for (let i = n - 1; i >= 0; i--) c.lineTo(Rt[i][0], Rt[i][1]);
+        c.closePath();
+    }
+    /* ================================================================== */
+    /* The pieces coming in                                                */
+    /*                                                                    */
+    /* Fragment i circles the middle, faster and closer, in a tightening   */
+    /* spiral. Its turning comes to a whole number of turns as it arrives, */
+    /* so it lands in its own place.                                       */
+    /* ================================================================== */
+
+    function place(fx, i, t) {
+        const P = fx.parts[i], w = fx.geo[i];
+        const t0 = 100 + i * 70;
+        const appear = seg(t, t0, t0 + 350);
+        const u = seg(t, 250, IMP);
+        const turn = 3 * TAU * inCubic(u) + 0.6 * TAU * u;
+        const spin = turn - 3.6 * TAU;                               // 0 at the end
+        const d = fx.far * 1.05 * (1 - inQuad(u));
+        const ox = w.c[0] + w.dir[0] * d, oy = w.c[1] + w.dir[1] * d;
+        const cs = Math.cos(spin), sn = Math.sin(spin);
+        P.x = ox * cs - oy * sn;
+        P.y = ox * sn + oy * cs;
+        P.rot = spin;
+        P.s = outBack(appear, 2);
+        P.a = Math.min(1, appear * 3);
+        P.trail = u > 0.25;
+    }
+
+    // The kablam: rings of light going out, shards swirling away.
+    function hit(fx) {
+        fx.rings = [0, 70, 150, 240, 340].map((d, k) => ({ at: IMP + d, w: 7 - k, reach: 1 + k * 0.25 }));
+        spray(fx, 80, 0.85);
+    }
+
+    /* ---- shards --------------------------------------------------------- */
+
+    // Gold shards flung out from the middle, swirling as they go.
+    function spray(fx, n, power) {
+        if (fx.reduced) return;
+        const R = fx.R;
+        for (let i = 0; i < n; i++) {
+            const a = fx.rnd() * TAU;
+            const sp = (0.35 + fx.rnd() * 0.9) * power * R * 0.022;
+            fx.shards.push({
+                x: Math.cos(a) * R * 0.5, y: Math.sin(a) * R * 0.5,
+                vx: Math.cos(a) * sp - Math.sin(a) * sp * 0.6, vy: Math.sin(a) * sp + Math.cos(a) * sp * 0.6,
+                rot: fx.rnd() * TAU, vr: (fx.rnd() - 0.5) * 0.02, size: R * (0.035 + fx.rnd() * 0.06),
+                col: fx.rnd() < 0.7 ? 'gold' : (fx.rnd() < 0.5 ? 'cream' : 'violet'),
+                g: 0.0004, life: 0, max: 900 + fx.rnd() * 900
+            });
+        }
+    }
+
+    /* ================================================================== */
+    /* Playing it                                                          */
+    /* ================================================================== */
+
+    let canvas = null, ctx = null, cap = null, dpr = 1;
+    let fx = null, raf = 0, tick = 0, watchdog = 0, last = null;
+
+    function ensure() {
+        if (canvas) return;
+        canvas = document.createElement('canvas');
+        canvas.className = 'zap-fx pend-fx';
+        canvas.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(canvas);
+        ctx = canvas.getContext('2d');
+        cap = document.createElement('div');
+        cap.className = 'zap-caption pend-caption';
+        cap.setAttribute('role', 'status');
+        document.body.appendChild(cap);
+    }
+
+    function play(o, done, seekTo) {
+        stop();
+        ensure();
+        const vw = window.innerWidth || 800, vh = window.innerHeight || 600;
+        const reduced = !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const seed = o.seed || ((Math.random() * 1e9) | 0);
+        last = { o: o, seed: seed };
+        dpr = Math.min(2, global.devicePixelRatio || 1);
+        canvas.width = Math.round(vw * dpr);
+        canvas.height = Math.round(vh * dpr);
+        canvas.classList.add('on');
+        const R = clamp(Math.min(vw, vh) * 0.15, 56, 130);
+        fx = {
+            o: o, done: done || null, t: 0, last: 0, vw: vw, vh: vh, cx: vw / 2, cy: vh * 0.42,
+            R: R, far: Math.min(vw * 0.32, vh * 0.27, R * 3.2), rnd: seeded(seed), pal: palette(),
+            reduced: reduced, geo: wedgeGeom(R),
+            parts: [0, 1, 2, 3, 4].map(() => ({ x: 0, y: 0, rot: 0, s: 1, a: 0, trail: false, hist: [] })),
+            shards: [], rings: [], kick: 0, fired: {}
+        };
+        cap.style.top = Math.round(fx.cy + R * 1.45 + 18) + 'px';
+        cap.innerHTML = '';
+        cap.className = 'zap-caption pend-caption';
+        if (o.caption) {
+            const sp = document.createElement('span');
+            sp.textContent = o.caption;
+            cap.appendChild(sp);
+        }
+        if (document.hidden && seekTo == null) { finish(); return; }
+        if (seekTo != null) {
+            while (fx.t < seekTo) advance(Math.min(16, seekTo - fx.t));
+            draw();
+            fx.frozen = true;
+            return;
+        }
+        fx.last = performance.now();
+        next();
+        watchdog = setTimeout(finish, END + 2500);
+    }
+
+    function next() {
+        raf = requestAnimationFrame(frame);
+        tick = setTimeout(frame, 45);
+    }
+    function frame() {
+        cancelAnimationFrame(raf);
+        clearTimeout(tick);
+        if (!fx || fx.frozen) return;
+        const now = performance.now();
+        const dt = clamp(now - fx.last, 0, 100);
+        fx.last = now;
+        advance(dt);
+        if (!fx) return;
+        draw();
+        if (fx.t >= END) finish();
+        else next();
+    }
+
+    function advance(dt) {
+        fx.t += dt;
+        const t = fx.t;
+        if (t < IMP) {
+            for (let i = 0; i < 5; i++) {
+                place(fx, i, t);
+                const P = fx.parts[i];
+                if (P.trail) { P.hist.unshift([P.x, P.y]); if (P.hist.length > 9) P.hist.pop(); }
+                else P.hist.length = 0;
+            }
+        } else if (!fx.fired.hit) {
+            fx.fired.hit = true;
+            fx.parts.forEach((P, i) => { P.x = fx.geo[i].c[0]; P.y = fx.geo[i].c[1]; P.rot = 0; P.s = 1; P.a = 1; P.hist.length = 0; });
+            hit(fx);
+            fx.kick = 16;
+        }
+        if (!fx.fired.cap && t >= CAP) { fx.fired.cap = true; cap.classList.add('show'); }
+        if (!fx.fired.capOff && t >= END - 450) { fx.fired.capOff = true; cap.classList.remove('show'); }
+        // shards
+        fx.shards.forEach(s => {
+            s.life += dt;
+            s.vy += s.g * dt;
+            s.x += s.vx * dt; s.y += s.vy * dt;
+            s.vx *= Math.pow(0.9985, dt); s.vy *= Math.pow(0.9985, dt);
+            s.rot += s.vr * dt;
+        });
+        fx.shards = fx.shards.filter(s => s.life < s.max);
+        // the shake
+        fx.kick *= Math.pow(0.991, dt);
+        if (fx.reduced) fx.kick = 0;
+        const sh = fx.o.shake;
+        if (sh) sh.style.transform = fx.kick > 0.4 ? 'translate(' + ((fx.rnd() - 0.5) * fx.kick).toFixed(1) + 'px,' + ((fx.rnd() - 0.5) * fx.kick).toFixed(1) + 'px)' : '';
+    }
+
+    function draw() {
+        const c = ctx, t = fx.t, R = fx.R, pal = fx.pal;
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        c.clearRect(0, 0, fx.vw, fx.vh);
+        const out = 1 - seg(t, END - 600, END);
+        // the veil
+        c.fillStyle = rgba(pal.veil, 0.8 * outQuad(seg(t, 0, 380)) * out);
+        c.fillRect(0, 0, fx.vw, fx.vh);
+        // the two flash frames of the kablam, each one flat colour
+        if (t >= IMP && t < IMP + 55) { c.fillStyle = rgba(CREAM, 0.92); c.fillRect(0, 0, fx.vw, fx.vh); }
+        else if (t >= IMP + 55 && t < IMP + 115) { c.fillStyle = rgba(pal.deep, 0.92); c.fillRect(0, 0, fx.vw, fx.vh); }
+
+        const jx = fx.kick > 0.4 ? (fx.rnd() - 0.5) * fx.kick * 0.5 : 0, jy = fx.kick > 0.4 ? (fx.rnd() - 0.5) * fx.kick * 0.5 : 0;
+        c.save();
+        c.translate(fx.cx + jx, fx.cy + jy);
+        c.globalAlpha = 1;
+        if (out < 1) c.globalAlpha = out;
+        const A = c.globalAlpha;
+
+        if (t >= IMP) drawAfter(c, t, A);
+
+        // the pieces' trails, then the pieces
+        if (t < IMP) {
+            fx.parts.forEach(P => {
+                if (P.hist.length < 3) return;
+                c.beginPath(); taper(c, P.hist, R * 0.34);
+                c.fillStyle = rgba(GOLD_RGB, 0.32 * A); c.fill();
+                c.beginPath(); taper(c, P.hist, R * 0.12);
+                c.fillStyle = rgba(CREAM, 0.6 * A); c.fill();
+            });
+        }
+        const pop = t >= IMP ? 1 + 0.22 * Math.sin(seg(t, IMP, IMP + 420) * Math.PI) * (1 - seg(t, IMP, IMP + 420)) +
+            0.012 * Math.sin((t - IMP) * 0.006) * seg(t, IMP + 400, IMP + 900) : 1;
+        c.save();
+        c.scale(pop, pop);
+        if (t >= IMP) drawPlate(c, R, A * Math.min(1, seg(t, IMP, IMP + 90) * 2));
+        fx.parts.forEach((P, i) => {
+            if (P.a <= 0) return;
+            c.save();
+            c.translate(P.x, P.y);
+            c.rotate(P.rot);
+            c.scale(P.s, P.s);
+            drawWedge(c, fx.geo[i], R, P.a * A);
+            c.restore();
+        });
+        if (t >= IMP) drawGem(c, R, A, outBack(seg(t, IMP + 60, IMP + 360), 3));
+        c.restore();
+
+        drawShards(c, A);
+        c.restore();
+    }
+
+    // Everything the kablam leaves behind it: the rings going out, then a
+    // ring of gold beads turning slowly round the pendant, and every so
+    // often a faint pentagon breathing out from it.
+    function drawAfter(c, t, A) {
+        const R = fx.R, pal = fx.pal, dt = t - IMP;
+        fx.rings.forEach(s => {
+            const p = seg(t, s.at, s.at + 650);
+            if (p <= 0 || p >= 1) return;
+            c.beginPath(); c.arc(0, 0, R * lerp(1.0, 3.4 * s.reach, outCubic(p)), 0, TAU);
+            c.lineWidth = lerp(s.w, 0.6, p); c.strokeStyle = rgba(s.w % 2 ? GOLD_RGB : pal.bright, (1 - p) * A); c.stroke();
+        });
+        for (let at = IMP + 700; at < END - 900; at += 950) {
+            const p = seg(t, at, at + 1500);
+            if (p <= 0 || p >= 1) continue;
+            c.beginPath(); poly(c, [0, 1, 2, 3, 4].map(i => pentPt(R * lerp(1.2, 2.3, outQuad(p)), i)));
+            c.lineJoin = 'round';
+            c.lineWidth = lerp(2.2, 0.6, p); c.strokeStyle = rgba(GOLD_RGB, 0.55 * (1 - p) * A); c.stroke();
+        }
+        const k = outBack(seg(t, IMP + 180, IMP + 650), 1.6) * A;
+        if (k <= 0) return;
+        const r = R * 1.62 * Math.max(0.4, k);
+        c.beginPath(); c.arc(0, 0, r, 0, TAU);
+        c.lineWidth = 1.5; c.strokeStyle = rgba(pal.bright, 0.55 * Math.min(1, k)); c.stroke();
+        const n = 10, turn = dt * 0.00035, b = R * 0.065;
+        c.beginPath();
+        for (let i = 0; i < n; i++) {
+            const a = turn + i / n * TAU, x = Math.cos(a) * r, y = Math.sin(a) * r;
+            const big = i % 2 ? 0.7 : 1;
+            c.moveTo(x + Math.cos(a) * b * 1.4 * big, y + Math.sin(a) * b * 1.4 * big);
+            c.lineTo(x - Math.sin(a) * b * big, y + Math.cos(a) * b * big);
+            c.lineTo(x - Math.cos(a) * b * 1.4 * big, y - Math.sin(a) * b * 1.4 * big);
+            c.lineTo(x + Math.sin(a) * b * big, y - Math.cos(a) * b * big);
+            c.closePath();
+        }
+        c.globalAlpha = Math.min(1, k);
+        c.fillStyle = GOLD; c.fill();
+        c.lineWidth = 1.2; c.strokeStyle = INK; c.stroke();
+        c.globalAlpha = A;
+    }
+
+    function drawShards(c, A) {
+        const cols = { gold: GOLD_RGB, cream: CREAM, violet: fx.pal.bright };
+        fx.shards.forEach(s => {
+            const f = 1 - seg(s.life, s.max * 0.6, s.max);
+            c.save();
+            c.translate(s.x, s.y);
+            c.rotate(s.rot);
+            c.beginPath();
+            c.moveTo(0, -s.size); c.lineTo(s.size * 0.8, s.size * 0.7); c.lineTo(-s.size * 0.8, s.size * 0.7); c.closePath();
+            c.fillStyle = rgba(cols[s.col], f * A); c.fill();
+            if (s.size > fx.R * 0.05) { c.lineWidth = 1; c.strokeStyle = rgba([26, 16, 20], f * A); c.stroke(); }
+            c.restore();
+        });
+    }
+
+    function cleanUp() {
+        cancelAnimationFrame(raf);
+        clearTimeout(tick);
+        clearTimeout(watchdog);
+        raf = 0; tick = 0; watchdog = 0;
+        if (ctx) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+        if (canvas) canvas.classList.remove('on');
+        if (cap) cap.classList.remove('show');
+        if (fx && fx.o.shake) fx.o.shake.style.transform = '';
+    }
+    function finish() {
+        if (!fx) return;
+        const f = fx;
+        cleanUp();
+        fx = null;
+        if (f.done) f.done();
+    }
+    function stop() {
+        if (!fx) return;
+        fx.done = null;
+        finish();
+    }
+
+    global.LOF_PENDANTFX = {
+        DURATION: END,
+        play: function (o, done) { play(o || {}, done); },
+        stop: stop,
+        playing: function () { return !!fx; },
+        seek: function (ms, opts) {
+            if (!last) return;
+            play(Object.assign({}, last.o, { seed: last.seed }, opts || {}), null, ms);
+        },
+        resume: function () { if (fx && fx.frozen) { fx.frozen = false; fx.last = performance.now(); next(); } }
+    };
+
+})(typeof window !== 'undefined' ? window : globalThis);
+
+    </script>
+    <script>
 /* ==== game-oblivion/ui.js ==== */
 /* =========================================================================
    Legend of Fenrirak™, The Oblivion Dragon: Online Version
@@ -9926,7 +10456,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // HOLD_MS: how long a landed die lies on the table when nothing is
         // waiting for it; READ_MS: the least it stays, to be read, when a
         // question or a card is waiting to go up.
-        const THROW_MS = 1200, SPIN_MS = 700, HOLD_MS = 2400, READ_MS = 900, FADE_MS = 450;
+        const THROW_MS = 1200, SPIN_MS = 700, HOLD_MS = 2400, READ_MS = 1400, FADE_MS = 450;
         let landedAt = 0, hurried = false;
         const FACE_ROT = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
         let spinX = 360, spinY = 720, thrownAt = 0;
@@ -9960,7 +10490,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const colour = thrower ? seatColour(thrower.id) : '#8a6a20';
             dieEl.classList.toggle('seat', !!thrower);
             stage.style.setProperty('--die-edge', colour);
-            stage.style.setProperty('--die-face', thrower ? 'linear-gradient(180deg, #fbf3df, ' + mix(colour) + ')' : '');
+            stage.style.setProperty('--die-face', thrower ? mix(colour) : '');
 
             const edge = 110;
             const w = Math.max(window.innerWidth || 0, 320), h = Math.max(window.innerHeight || 0, 320);
@@ -9972,7 +10502,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             dieEl.style.top = y + 'px';
             labelEl.style.left = x + 'px';
             labelEl.style.top = y + 'px';
-            labelEl.textContent = (die.who || '') + (die.why ? ' · ' + whyLabel(die.why) : '') + ': ' + die.roll;
+            // What it was for, and once it lands, what it did.
+            labelEl.innerHTML = esc((die.who || '') + (die.why ? ' · ' + whyLabel(die.why) : '') + ': ' + die.roll) +
+                (die.says ? '<b>' + esc(die.says) + '</b>' : '');
             dieEl.style.setProperty('--tx', Math.round((fromLeft ? -150 : w + 150) - x) + 'px');
             dieEl.style.setProperty('--ty', Math.round(-(170 + Math.random() * 180)) + 'px');
             spinY = fromLeft ? 720 : -720;
@@ -10076,10 +10608,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         })[why] || why;
     }
     function mix(hex) {
-        // A pale tint of a seat colour for the face of its die.
+        // A pale tint of a seat colour for the face of its die, one flat
+        // colour (no gradient).
         const h = hex.replace('#', '');
         const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
-        const t = c => Math.round(c * 0.45 + 255 * 0.55);
+        const t = c => Math.round(c * 0.32 + 250 * 0.68);
         return 'rgb(' + t(r) + ',' + t(g) + ',' + t(b) + ')';
     }
 
@@ -10316,6 +10849,43 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         };
     })();
 
+    // Somebody holds all five Pendant Fragments: pendantfx.js slams them
+    // together into the Oblivion Pendant, for everybody at the table. Seen
+    // by counting each player's fragments, so it plays however the fifth
+    // came (a fight, a duel, a trade), and again if the shield's Raw
+    // Oblivion modifier ever breaks one and it is won back.
+    const PENDANT = (function () {
+        let had = null;
+        function count(state) {
+            const out = {};
+            (state.players || []).forEach(p => { out[p.id] = (p.fragments || []).length; });
+            return out;
+        }
+        function play(p, done) {
+            const FX = window.LOF_PENDANTFX;
+            const mine = p.id === NET.PID;
+            const words = mine ? 'Your five fragments become the Oblivion Pendant. The shield will let you through.'
+                : p.name + '’s five fragments become the Oblivion Pendant. The shield will let them through.';
+            if (!FX || !$('#screen-game.active') || document.hidden) { notice(words); done(); return; }
+            FX.play({ caption: words, shake: $('#board') }, done);
+        }
+        return {
+            saw(state) {
+                const now = count(state);
+                if (!had || state.phase !== 'playing') { had = now; return; }
+                (state.players || []).forEach(p => {
+                    if (now[p.id] >= 5 && (had[p.id] || 0) < 5) BANNERS.add('pendant', done => play(p, done));
+                });
+                had = now;
+            },
+            reset(state) {
+                had = null;
+                if (window.LOF_PENDANTFX) window.LOF_PENDANTFX.stop();
+                if (state) this.saw(state);
+            }
+        };
+    })();
+
     // Cards you have just drawn, dealt to the corner of the screen.
     const DRAW = (function () {
         let el = null, seen = 0, primed = false, t = null;
@@ -10432,7 +11002,48 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         boardFor = ROOM;
     }
 
-    function hoverSquare() { /* reserved for a future hint; the card is a click away */ }
+    // Hovering a square (with a mouse) shows what it does in a small card
+    // beside it, so you need not click to find out. The full card with the
+    // monster's numbers is still a click away.
+    const HOVER_OK = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+    let tipEl = null;
+    function hoverSquare(id, on) {
+        if (!HOVER_OK) return;
+        if (!tipEl) {
+            tipEl = document.createElement('div');
+            tipEl.className = 'sq-tip';
+            tipEl.setAttribute('role', 'tooltip');
+            document.body.appendChild(tipEl);
+            window.addEventListener('scroll', () => tipEl.classList.remove('show'), { passive: true });
+        }
+        const el = sqEl(id);
+        const sq = D.SQUARES[id];
+        if (!on || !el || !sq || panel) { tipEl.classList.remove('show'); return; }
+        const tags = [];
+        if (sq.stop) tags.push('<span class="chip bad">STOP</span>');
+        if (S && E.isOptionalStop(S, sq)) tags.push('<span class="chip">Optional stop</span>');
+        if (sq.route === 'long') tags.push('<span class="chip purple">Long route</span>');
+        if (sq.arena && S) {
+            const need = E.fragmentsNeeded(S);
+            tags.push('<span class="chip purple">Needs fragments: ' + (need.length ? need.map(n => '#' + n).join(' ') : 'none') + '</span>');
+        }
+        let h = '<div class="num">' + (sq.id === '0' ? 'The Start' : 'Square ' + esc(sq.id)) + '</div><b>' + esc(sq.name) + '</b>' +
+            (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '<p>' + esc(sq.text) + '</p>';
+        const here = S ? S.players.filter(p => p.cls && p.pos === id) : [];
+        if (here.length) h += '<p class="here">Here: ' + here.map(p => '<b style="color:' + seatColour(p.id) + '">' + esc(p.name) + '</b>').join(', ') + '</p>';
+        h += '<i>Click for the full card</i>';
+        tipEl.innerHTML = h;
+        const r = el.getBoundingClientRect();
+        tipEl.style.left = '0px'; tipEl.style.top = '0px';
+        tipEl.classList.add('show');
+        const w = tipEl.offsetWidth, t = tipEl.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
+        let x = r.left + r.width / 2 - w / 2;
+        x = Math.max(8, Math.min(vw - w - 8, x));
+        let y = r.top - t - 8;
+        if (y < 8) y = Math.min(vh - t - 8, r.bottom + 8);
+        tipEl.style.left = Math.round(x) + 'px';
+        tipEl.style.top = Math.round(y) + 'px';
+    }
 
     // Where the Barbarian waits when nobody has him.
     const INN_SQ = D.BOARD.find(q => q.enemy === 'barbarian').id;
@@ -10808,15 +11419,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         } else if (p) {
             const mine = myTurn();
             const free = mine && !S.battle && !S.pending && !S.paused;
-            h += btn('a-roll', 'Roll &amp; move', 'primary span2', !(free && !p.hasMoved && p.pos !== D.ARENA));
+            h += btn('a-roll', 'Roll &amp; move', 'primary span2', !(free && !p.hasMoved && p.pos !== D.ARENA), 'Shortcut: R');
             const ab = D.CLASSES[p.cls].ability;
             const st = abilityState(p);
             const can = E.canUseAbility(S, p.id);
             h += btn('a-ability', esc(ab.name), '', !can.ok, can.ok ? ab.text : can.why, st.text);
-            h += btn('a-merchant', 'Merchant', '', E.inBattle(S, p.id), 'Buy potions and gear, or sell gear', 'any time');
+            h += btn('a-merchant', 'Merchant', '', E.inBattle(S, p.id), 'Buy potions and gear, or sell gear (shortcut: M)', 'any time');
             h += btn('a-trade', 'Trade', '', !(free), 'Offer another player a trade', 'your turn');
             h += btn('a-guide', 'How to play', 'ghost', false);
-            h += btn('a-end', 'End turn', 'primary span2', !(free && p.hasMoved), p.hasMoved ? '' : 'Roll to move first');
+            h += btn('a-end', 'End turn', 'primary span2', !(free && p.hasMoved), p.hasMoved ? 'Shortcut: Backspace' : 'Roll to move first');
         } else h += btn('a-guide', 'How to play', 'ghost', false);
         h += '</div><div class="act-row">';
         if (isHost() && !isSolo()) {
@@ -10830,6 +11441,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         }
         h += '</div>';
         el.innerHTML = h;
+        renderPhoneBar();
         bind('a-order', () => act('rollForOrder'));
         bind('a-roll', () => act('rollMove'));
         bind('a-ability', () => act('useAbility'));
@@ -10859,13 +11471,35 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     let logSeen = 0;
+    // The log's "Just mine" switch: only the lines that name you.
+    let logMine = false;
+    function mineOnly(lines) {
+        const p = me();
+        if (!p || !p.name) return lines;
+        const re = new RegExp('(^|[^A-Za-z0-9])' + p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^A-Za-z0-9])');
+        return lines.filter(l => re.test(String(l.t)));
+    }
+    function setLogMine(on) {
+        logMine = on;
+        $('#log-all').classList.toggle('on', !on);
+        $('#log-mine').classList.toggle('on', on);
+        $('#log-all').setAttribute('aria-pressed', String(!on));
+        $('#log-mine').setAttribute('aria-pressed', String(on));
+        logSeen = -1;
+        $('#log').scrollTop = 0;
+        if (S) renderLog();
+    }
+    $('#log-all').addEventListener('click', () => setLogMine(false));
+    $('#log-mine').addEventListener('click', () => setLogMine(true));
+
     function renderLog() {
         const el = $('#log');
         const last = S.log.length ? S.log[S.log.length - 1].n : 0;
         if (last === logSeen && el.childElementCount) return;
         const before = logSeen, from = el.scrollTop;
         logSeen = last;
-        el.innerHTML = logLines(S.log);
+        const lines = logMine ? mineOnly(S.log) : S.log;
+        el.innerHTML = lines.length ? logLines(lines) : '<div class="t-muted">Nothing about you yet.</div>';
         if (from < 30) { el.scrollTop = 0; return; }
         let added = 0;
         for (const row of el.children) {
@@ -11838,7 +12472,46 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         bind('panel-x', closePanel);
     }
     $('#panel-back').addEventListener('click', e => { if (e.target.id === 'panel-back') closePanel(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && panel && !SPOT.isOpen()) closePanel(); });
+    // Keys: R rolls (for turn order, or to move), Backspace ends your turn,
+    // M opens the Merchant, Escape closes the window that is open. They
+    // press the real buttons, so they do nothing a button would not. Not
+    // while you are typing, nor during the walk-through, which asks you to
+    // press the buttons yourself.
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.key === 'Escape') { if (panel && !SPOT.isOpen()) closePanel(); return; }
+        const t = e.target || {};
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || '') || t.isContentEditable) return;
+        if (!$('#screen-game.active') || panel || SPOT.isOpen() || e.repeat) return;
+        const press = id => {
+            const b = document.getElementById(id);
+            if (!b || b.disabled) return false;
+            b.click();
+            return true;
+        };
+        const k = (e.key || '').toLowerCase();
+        if (k === 'r') { if (press('a-roll') || press('a-order')) e.preventDefault(); }
+        else if (e.key === 'Backspace') { e.preventDefault(); press('a-end'); }
+        else if (k === 'm') { if (press('a-merchant')) e.preventDefault(); }
+    });
+
+    // On a phone the main buttons are also on a bar along the bottom of the
+    // screen, so they are always to hand however far down you have
+    // scrolled. Each presses its twin in the Actions card.
+    function renderPhoneBar() {
+        const bar = $('#phone-bar');
+        if (!bar) return;
+        const twin = id => document.getElementById(id);
+        const roll = twin('a-roll') || twin('a-order');
+        const items = [[roll, roll && roll.id === 'a-order' ? 'Roll for order' : 'Roll &amp; move', 'primary'],
+            [twin('a-merchant'), 'Merchant', ''], [twin('a-end'), 'End turn', 'primary']].filter(x => x[0]);
+        bar.innerHTML = items.map(x => '<button class="btn ' + x[2] + '" data-twin="' + x[0].id + '"' + (x[0].disabled ? ' disabled' : '') + '>' + x[1] + '</button>').join('');
+        bar.classList.toggle('empty', !items.length);
+        bar.querySelectorAll('[data-twin]').forEach(b => b.addEventListener('click', () => {
+            const t = document.getElementById(b.getAttribute('data-twin'));
+            if (t && !t.disabled) t.click();
+        }));
+    }
 
     /* ---- a square ------------------------------------------------------ */
 
@@ -12340,7 +13013,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<h3>Movement</h3><p>Roll a die and move the full number of spaces. Potions and abilities that change a movement roll must be used ' +
             '<b>before</b> you roll. Once the die lands you choose how much of any “add up to” bonus to take; a minus on your armour, and ' +
             'Forsaken Road’s −3, always apply. A roll can never go below 0.</p>' +
-            '<p><b>Click any square on the board to read exactly what it does.</b> The board only shows each square’s name and picture.</p>' +
+            '<p><b>Click any square on the board to read exactly what it does.</b> The board only shows each square’s name and picture; ' +
+            'with a mouse, resting the pointer on a square shows a short card of what it does.</p>' +
             '<h3>Squares and stops</h3><p>Land on a square and do what it says. Damage done directly by a square cannot be reduced by defence or ' +
             'potions. <b>STOP</b>: you must stop there, however far you rolled. At the Route Split you choose a route, then carry on with ' +
             'the rest of your roll; at Orc’s Outpost your move ends and you fight the Orc Scouts. <b>Optional ' +
@@ -12382,6 +13056,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<h3>Trading and the Merchant</h3><p>Only Gold, Pendant Fragments, Potions, Gemstones, Weapons and Armour can be traded, and both sides ' +
             'must agree. The Merchant is open any time except during your battles (click his stall on the board), and he buys any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold a piece. Astrix’s Alchemy only sells ' +
             'to whoever is standing on it.</p>' +
+            '<h3>Keyboard shortcuts</h3><p><b>R</b> rolls the die (for turn order, or to move). <b>Backspace</b> ends your turn. ' +
+            '<b>M</b> opens the Merchant. <b>Escape</b> closes the window that is open. They do just what the buttons do, so a key does ' +
+            'nothing while its button is greyed out.</p>' +
             '<h3>Characters</h3><table><tr><th>Class</th><th>HP</th><th>DEF</th><th>Moves</th><th>Ability</th></tr>' + clsRows + '</table></div>';
     }
 
@@ -12416,9 +13093,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     'Oblivion Mage’s purple shield.' },
                 { id: 'board', title: 'Click a square', square: true, body: '<b>Click any square on the board now</b> to see what it does: ' +
                     'its full description, and what a monster leaves behind. A monster’s own numbers stay hidden until you have fought it. ' +
-                    'Close the card when you have read it and the tour carries on.' },
+                    'Close the card when you have read it (or press <b>Escape</b>) and the tour carries on. With a mouse, just resting ' +
+                    'on a square shows a short card too.' },
                 { id: 'a-roll', title: 'Roll & move', live: true, body: 'Press it for real. One die decides how far you walk; if anything adds to ' +
-                    'or takes from it, you choose how far once it lands, with the squares you could reach marked on the board.' },
+                    'or takes from it, you choose how far once it lands, with the squares you could reach marked on the board. ' +
+                    'Shortcut: <b>R</b>.' },
                 { id: 'a-ability', title: ab ? ab.name : 'Your ability', live: true, body: ab ? esc(ab.text) + ' Roll even to use it; once every 3 of your turns.' : '' },
                 { id: 'profile', title: 'You', body: 'Health, gold, gemstones, chest keys, your five Pendant Fragments, your ability and anything ' +
                     'affecting you. The other tab shows everybody else.' },
@@ -12428,10 +13107,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 { id: 'list-weapons', title: 'All your weapons', body: 'Best on top, the same way.' },
                 { id: 'list-potions', title: 'Potions', body: 'Every potion you carry. Drink movement potions before you roll, ' +
                     'battle potions during a fight.' },
-                { id: 'log-card', title: 'The game log', body: 'Everything that has happened, the newest at the top.' },
-                { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles, or click his stall on the board. Buy potions and gear, or sell him any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold.' },
+                { id: 'log-card', title: 'The game log', body: 'Everything that has happened, the newest at the top. ' +
+                    '<b>Just mine</b> shows only the lines about you.' },
+                { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles, or click his stall on the board. Buy potions and gear, or sell him any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold. Shortcut: <b>M</b>.' },
                 { id: 'a-trade', title: 'Trade', live: true, body: 'Offer another player Gold, Fragments, Potions, Gemstones, Weapons or Armour.' },
-                { id: 'a-end', title: 'End turn', live: true, body: 'Press it when you are done. This is the last stop of the tour.' }
+                { id: 'a-end', title: 'End turn', live: true, body: 'Press it when you are done. Shortcut: <b>Backspace</b>. ' +
+                    'All the keys: <b>R</b> roll, <b>M</b> Merchant, <b>Backspace</b> end turn, <b>Escape</b> close a window. ' +
+                    'This is the last stop of the tour.' }
             ].filter(s => document.getElementById(s.id));
         }
 
@@ -12610,6 +13292,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         TURN.reset();
         BEND.reset(state);
         ZAP.reset(state);
+        PENDANT.reset(state);
         DRAW.reset(state);
         WALK.reset();
         prevHp = {};
@@ -12681,6 +13364,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         ZAP.saw(state);
         DRAW.saw(state);
         BEND.saw(state);
+        PENDANT.saw(state);
         TURN.saw(state);
         if (state.phase === 'lobby') {
             closeModal();
