@@ -1053,12 +1053,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 @keyframes flicker { from { transform: scaleY(.9) skewX(-3deg); } to { transform: scaleY(1.08) skewX(3deg); } }
 .board-scene .lava { animation: lava 3s linear infinite; }
 @keyframes lava { to { stroke-dashoffset: -48; } }
-/* the rings round the shield's dome, drifting slowly round it */
-.board-scene .dome-flow { animation: dome-flow 6s linear infinite; }
-.board-scene .dome-flow.slow { animation-duration: 9s; animation-direction: reverse; }
-@keyframes dome-flow { to { stroke-dashoffset: -52; } }
+/* The shield's dome (art.js domeFront): a few of its panels light up in
+   turn, and energy runs in along its seams from the rim, as in the
+   Barrier that throws a refused player back. Each seam is 100 long
+   (pathLength) and carries one short dash in across it. */
+.dome-lit.more { display: none; }
+.board-scene .dome-lit.more { display: inline; }
+.board-scene .dome-lit { animation: dome-lit 7.5s ease-in-out infinite; opacity: 0; }
+@keyframes dome-lit { 0%, 100% { opacity: 0; } 12% { opacity: 1; } 30% { opacity: 0; } }
+.board-scene .dome-pulse { animation: dome-pulse 6.3s linear infinite; stroke-dashoffset: 22; }
+@keyframes dome-pulse { 0% { stroke-dashoffset: 22; } 34%, 100% { stroke-dashoffset: -100; } }
 @media (prefers-reduced-motion: reduce) {
-    .board-scene .dome-flow { animation: none; }
+    .board-scene .dome-lit { animation: none; opacity: 1; }
+    .board-scene .dome-lit.more { display: none; }
+    .board-scene .dome-pulse { animation: none; stroke-dashoffset: -40; }
 }
 
 .sq {
@@ -1147,10 +1155,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 }
 .hot:hover { box-shadow: 0 0 0 .25cqw var(--marker); }
 .hot.merchant .hot-label { font-size: .85cqw; bottom: -2%; }
-.hot.arena.here { box-shadow: 0 0 0 .35cqw var(--marker); }
-/* The arena's button is the shield's dome: its top rounded to the dome
-   (art.js DOME: 344 of its 360 high), its foot to the ring on the ground. */
-.hot.arena { border-radius: 50% 50% 50% 50% / 95.6% 95.6% 4.4% 4.4%; }
+/* The arena's button is the shield's dome: rounded to about its shape, so
+   only the dome takes the click, and ringed by the dome's own outline
+   (art.js arenaRing) when pointed at or when a piece stands in it. */
+.hot.arena { border-radius: 50% / 50% 50% 5% 5%; }
+.hot.arena:hover, .hot.arena.here { box-shadow: none; }
+.hot.arena .dome-ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.hot.arena .dome-ring path { fill: none; stroke: var(--marker); stroke-width: 5; opacity: 0; transition: opacity .12s ease; }
+.hot.arena:hover .dome-ring path, .hot.arena.here .dome-ring path { opacity: 1; }
 
 /* the pieces */
 .tokens { position: absolute; inset: 0; pointer-events: none; z-index: 6; }
@@ -4567,22 +4579,23 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     // three-by-three cells, standing on the floor of the shield's dome. Its
     // east gate is at (271, 152) in its own drawing, where the road from the
     // Royal Cleric's Temple runs in under the dome.
-    const CASTLE_AT = { x: 750, y: 358, scale: 0.82 };
+    const CASTLE_AT = { x: 750, y: 336, scale: 0.82 };
     const GATE_AT = { x: CASTLE_AT.x + (271 - 150) * CASTLE_AT.scale, y: 350 };
     // The Oblivion Mage's shield: a dome over the whole castle. Its foot is
     // an ellipse round (x, base), `a` across either way and `ry` deep, and
-    // its crown `b` above that. `k` is how full its shoulders are (.55 would
-    // be half an ellipse; fuller clears the towers). Its right-hand side
-    // stays just clear of the temple's square.
-    const DOME = { x: 750, base: 482, a: 150, b: 344, ry: 16, k: .66 };
+    // its crown `b` above that. Its sides are a superellipse of power `n`
+    // (2 would be half an ellipse; fuller clears the towers). `hex` is the
+    // size of its panels where they face you. Its right-hand side stays
+    // just clear of the temple's square.
+    const DOME = { x: 750, base: 452, a: 150, b: 306, ry: 16, n: 3, hex: 22 };
     // Where the castle and the Merchant's stall are, on the 1200 x 700
     // board, for the buttons laid over them (the arena's is the dome's own
-    // box; style.css rounds it to the dome's shape).
+    // box, with the dome's outline drawn in it: arenaRing).
     const ARENA_BOX = { x: DOME.x - DOME.a, y: DOME.base - DOME.b, w: DOME.a * 2, h: DOME.b + DOME.ry };
     const MERCHANT_BOX = { x: 944, y: 454, w: 146, h: 108 };
     // Where a piece stands when the shield stops it: on the road, against
     // the dome's east side.
-    const SHIELD_EDGE = { x: 888, y: 350 };
+    const SHIELD_EDGE = { x: 890, y: 350 };
 
     function cellCentre(sq) {
         const rs = sq.rowSpan || 1, cs = sq.colSpan || 1;
@@ -5181,96 +5194,166 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     const castleOf = id => CASTLES[id] || CASTLES[CASTLE];
     function castle(id) { return castleOf(id).draw(); }
 
-    /* The Oblivion Mage's shield: a dome of purple glass over the castle.  */
-    /* Flat colour and crisp lines only, no glow: a clear purple tint over  */
-    /* everything under it, the bright rim, the ring where it meets the     */
-    /* ground, rings and ribs across it so it reads as round, a hard white  */
-    /* sheen down its upper left and a glint or two. It comes in two parts: */
-    /* the floor and the far side of the ring go under the castle, the rest */
-    /* over it. The rings drift slowly round (style.css, .dome-flow).       */
-    const SHIELD = { line: '#9b5cff', deep: '#6a2fc0', pale: '#c79bff', core: '#eadcff' };
-    // The dome's outline: the left side up from the foot to the crown and
-    // down the right. hw scales it across, so the ribs are the same curve
-    // narrowed; lift raises the foot (a rib meets the ring in front).
-    function domeArc(hw, lift) {
-        const d = DOME, l = n2(d.x - d.a * hw), r = n2(d.x + d.a * hw), y0 = n2(d.base + (lift || 0)), top = d.base - d.b;
-        return 'M' + l + ' ' + y0 + 'C' + l + ' ' + n2(d.base - d.k * d.b) + ' ' + n2(d.x - d.k * d.a * hw) + ' ' + top + ' ' + d.x + ' ' + top +
-            'C' + n2(d.x + d.k * d.a * hw) + ' ' + top + ' ' + r + ' ' + n2(d.base - d.k * d.b) + ' ' + r + ' ' + y0;
+    /* The Oblivion Mage's shield: a dome of the same hexagons that throw a  */
+    /* refused player back (shieldfx.js, Barrier), in the same purples      */
+    /* (style.css --zap-purple-*). The panels are laid out flat round the   */
+    /* point that faces you, the foot of the dome, and wrapped over it as   */
+    /* over a ball, so they narrow towards its edges and its crown. Each    */
+    /* is dark violet glass edged in violet, a little apart from the next;  */
+    /* the upper left catches the light, a few panels light up in turn and  */
+    /* energy runs in along the seams from the rim (style.css .dome-lit,    */
+    /* .dome-pulse). No glow. It comes in two parts: the floor and the far  */
+    /* side of the ring go under the castle, the rest over it.              */
+    const SHIELD = { deep: '#330d4a', mid: '#6a2fc0', bright: '#9b5cff', core: '#eadcff' };
+    const DOME_CLIP = 'lof-dome-clip';
+    // A point on the outline: t is 0 at the right foot, PI/2 at the crown
+    // and PI at the left foot.
+    function domeAt(t) {
+        const d = DOME, c = Math.cos(t), s = Math.sin(t), e = 2 / d.n;
+        return [d.x + Math.sign(c) * Math.pow(Math.abs(c), e) * d.a, d.base - Math.pow(Math.abs(s), e) * d.b];
     }
-    // A point on the left half of the outline, t from the foot (0) to the
-    // crown (1), drawn in by `inset`.
-    function domePoint(t, inset) {
-        const d = DOME, u = 1 - t, a = d.a - (inset || 0), b = d.b - (inset || 0);
-        const x = u * u * u * -a + 3 * u * u * t * -a + 3 * u * t * t * -d.k * a;
-        const y = 3 * u * u * t * d.k * b + 3 * u * t * t * b + t * t * t * b;
-        return [d.x + x, d.base - y];
+    // The outline from the left foot over the crown to the right foot; the
+    // ring in front (DOME_FRONT) takes it back to where it began.
+    function domeOutline() {
+        let p = '';
+        for (let i = 0; i <= 90; i++) { const q = domeAt(Math.PI * (1 - i / 90)); p += (i ? 'L' : 'M') + n2(q[0]) + ' ' + n2(q[1]); }
+        return p;
     }
-    // The t of the outline at height y, and how far across the dome is there.
-    function domeT(y) {
-        let lo = 0, hi = 1;
-        for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (domePoint(m)[1] > y) lo = m; else hi = m; }
-        return lo;
+    const DOME_FRONT = 'A' + DOME.a + ' ' + DOME.ry + ' 0 0 1 ' + (DOME.x - DOME.a) + ' ' + DOME.base;
+    // How far it is from the foot of the dome to its outline, heading th.
+    function domeReach(th) {
+        const d = DOME, c = Math.abs(Math.cos(th)) / d.a, s = Math.abs(Math.sin(th)) / d.b;
+        return 1 / Math.pow(Math.pow(c, d.n) + Math.pow(s, d.n), 1 / d.n);
     }
-    function domeHalf(y) { return DOME.x - domePoint(domeT(y))[0]; }
-    function sparkle(x, y, r) {
-        return '<path d="M' + x + ' ' + (y - r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + r) +
-            'Q' + x + ' ' + y + ' ' + (x - r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - r) + 'z" fill="' + SHIELD.core + '"/>';
+    // A point of the flat layout (fx across, fy up, from the foot of the
+    // dome) wrapped onto it: as far round as it was out, so nothing goes
+    // past the outline, and what is near the outline is pressed flat to it.
+    function domeWrap(fx, fy) {
+        const d = DOME, q = Math.PI / 2;
+        if (fy <= 0) return [d.x + Math.sign(fx) * d.a * Math.sin(Math.min(Math.abs(fx) / d.a, q)), d.base - fy];
+        const th = Math.atan2(fy, fx), R = domeReach(th), rho = R * Math.sin(Math.min(Math.hypot(fx, fy) / R, q));
+        return [d.x + rho * Math.cos(th), d.base - rho * Math.sin(th)];
     }
+    // The same few panels light up every time.
+    function seeded(seed) {
+        let a = seed >>> 0;
+        return () => {
+            a = (a + 0x6D2B79F5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+    // The panels, flat-topped like the Barrier's, and the seams between them.
+    const DOME_PANELS = (function () {
+        const d = DOME, h = d.hex, S3 = Math.sqrt(3), Q = Math.PI / 2;
+        const round = (x, y) => Math.hypot(x, Math.max(y, 0)) / domeReach(Math.atan2(Math.max(y, 0), x));
+        const cells = [], verts = {};
+        const vert = (x, y) => {
+            const k = Math.round(x * 4) + ',' + Math.round(y * 4);
+            return verts[k] || (verts[k] = { x: x, y: y, n: [], al: round(x, y) });
+        };
+        const qn = Math.ceil(d.a * Q / (1.5 * h)) + 2, rn = Math.ceil(d.b * Q / (S3 * h)) + qn;
+        for (let q = -qn; q <= qn; q++) {
+            for (let r = -rn; r <= rn; r++) {
+                const x = 1.5 * h * q, y = S3 * h * (r + q / 2);
+                if (y < -h * 1.2) continue;
+                const al = round(x, y);
+                if (al > Q + .14) continue;
+                const corners = [];
+                for (let i = 0; i < 6; i++) corners.push(vert(x + Math.cos(i * Math.PI / 3) * h, y + Math.sin(i * Math.PI / 3) * h));
+                for (let i = 0; i < 6; i++) {
+                    const a = corners[i], b = corners[(i + 1) % 6];
+                    if (a.n.indexOf(b) < 0) a.n.push(b);
+                    if (b.n.indexOf(a) < 0) b.n.push(a);
+                }
+                cells.push({ x: x, y: y, al: al, th: Math.atan2(Math.max(y, 0), x) });
+            }
+        }
+        // each panel's outline: its corners drawn in a little, then wrapped
+        cells.forEach(c => {
+            let p = '';
+            for (let i = 0; i < 6; i++) {
+                const w = domeWrap(c.x + Math.cos(i * Math.PI / 3) * h * .86, c.y + Math.sin(i * Math.PI / 3) * h * .86);
+                p += (i ? 'L' : 'M') + n2(w[0]) + ' ' + n2(w[1]);
+            }
+            c.d = p + 'z';
+        });
+        // Energy running in along the seams, as in the Barrier: from a
+        // corner near the rim, corner to corner, always nearer the middle
+        // of the flat layout.
+        const rnd = seeded(38), list = Object.keys(verts).map(k => verts[k]);
+        const starts = list.filter(v => v.al > 1.22 && v.al < 1.5 && v.y > h * 2);
+        const seams = [];
+        for (let i = 0; i < 7 && starts.length; i++) {
+            let v = starts.splice(Math.floor(rnd() * starts.length), 1)[0];
+            const pts = [v];
+            for (let g = 0; g < 9 && v.al > .5; g++) {
+                const closer = v.n.filter(u => Math.hypot(u.x, u.y) < Math.hypot(v.x, v.y) - .5);
+                if (!closer.length) break;
+                closer.sort((a, b) => Math.hypot(a.x, a.y) - Math.hypot(b.x, b.y));
+                v = rnd() < .6 ? closer[0] : closer[Math.floor(rnd() * closer.length)];
+                pts.push(v);
+            }
+            if (pts.length > 3) seams.push(pts.map((u, j) => { const w = domeWrap(u.x, u.y); return (j ? 'L' : 'M') + n2(w[0]) + ' ' + n2(w[1]); }).join(''));
+        }
+        // the panels that light up in turn, away from the rim
+        const pool = cells.filter(c => c.al > .2 && c.al < 1.25 && c.y > h), lit = [];
+        for (let i = 0; i < 9 && pool.length; i++) lit.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
+        return { cells: cells, seams: seams, lit: lit };
+    })();
     function domeBack() {
         const d = DOME, foot = 'M' + (d.x - d.a) + ' ' + d.base + 'A' + d.a + ' ' + d.ry + ' 0 0 1 ' + (d.x + d.a) + ' ' + d.base;
         return '<g class="oblivion-shield-back">' +
-            '<ellipse cx="' + d.x + '" cy="' + d.base + '" rx="' + d.a + '" ry="' + d.ry + '" fill="' + SHIELD.line + '" fill-opacity=".16"/>' +
-            '<path d="' + foot + '" fill="none" stroke="' + SHIELD.line + '" stroke-opacity=".7" stroke-width="3"/></g>';
+            '<ellipse cx="' + d.x + '" cy="' + d.base + '" rx="' + d.a + '" ry="' + d.ry + '" fill="' + SHIELD.bright + '" fill-opacity=".14"/>' +
+            '<path d="' + foot + '" fill="none" stroke="' + SHIELD.bright + '" stroke-opacity=".7" stroke-width="2.6"/></g>';
     }
     function domeFront() {
-        const d = DOME, top = d.base - d.b;
-        const front = 'A' + d.a + ' ' + d.ry + ' 0 0 1 ' + (d.x - d.a) + ' ' + d.base;
-        const pts = (from, to, inset, hw, side) => {
-            let p = '';
-            for (let i = 0; i <= 16; i++) {
-                const q = domePoint(from + (to - from) * i / 16, inset);
-                p += (i ? 'L' : 'M') + n2(d.x + (q[0] - d.x) * (hw || 1) * (side || 1)) + ' ' + n2(q[1]);
-            }
-            return p;
-        };
-        let s = '<g class="oblivion-shield">';
-        // the glass: one clear purple tint over all of it, and thicker
-        // round its edge, where you look through more of it
-        s += '<path d="' + domeArc(1) + front + 'z" fill="' + SHIELD.line + '" fill-opacity=".13"/>';
-        s += '<path d="' + domeArc(1) + 'L' + pts(0, 1, 10, 1, -1).slice(1) + pts(1, 0, 10).replace('M', 'L') + 'z" fill="' + SHIELD.line + '" fill-opacity=".2"/>';
-        // its cap: two rings round the top, drifting, and ribs from the
-        // crown down to them, all clear of the castle under it
-        const rings = [d.base - d.b * .84, d.base - d.b * .935];
-        rings.forEach((y, i) => {
-            const w = n2(domeHalf(y)), ry = n2(d.ry * w / d.a);
-            s += '<path class="dome-flow' + (i ? ' slow' : '') + '" d="M' + n2(d.x - w) + ' ' + n2(y) + 'A' + w + ' ' + ry + ' 0 0 0 ' + n2(d.x + w) + ' ' + n2(y) +
-                '" fill="none" stroke="' + SHIELD.pale + '" stroke-opacity=".75" stroke-width="1.8" stroke-dasharray="14 9"/>';
+        const d = DOME, P = DOME_PANELS, outline = domeOutline();
+        let s = '<g class="oblivion-shield"><defs><clipPath id="' + DOME_CLIP + '"><path d="' + outline + DOME_FRONT + 'z"/></clipPath></defs>' +
+            '<g clip-path="url(#' + DOME_CLIP + ')">';
+        // the panels: dark violet glass, edged in violet
+        s += '<path d="' + P.cells.map(c => c.d).join('') + '" fill="' + SHIELD.mid + '" fill-opacity=".14" stroke="' + SHIELD.bright +
+            '" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round"/>';
+        // the upper left catching the light: the nearer a panel is to the
+        // middle of that patch, the paler
+        const shine = [[], [], []];
+        P.cells.forEach(c => {
+            const w = Math.min(1 - Math.abs(c.th - 2.15) / .5, 1 - Math.abs(c.al - 1.08) / .32);
+            if (w > .15) shine[w > .7 ? 2 : w > .42 ? 1 : 0].push(c.d);
         });
-        // (each rib starts where it meets the near side of the lower ring)
-        const t0 = domeT(rings[0]), w0 = domeHalf(rings[0]), ry0 = d.ry * w0 / d.a;
-        let ribs = '';
-        [.42, .78].forEach(hw => {
-            [-1, 1].forEach(side => {
-                ribs += 'M' + n2(d.x - side * w0 * hw) + ' ' + n2(rings[0] + ry0 * Math.sqrt(1 - hw * hw)) + 'L' + pts(t0 + .02, 1, 0, hw, side).slice(1);
-            });
+        shine.forEach((list, i) => { if (list.length) s += '<path d="' + list.join('') + '" fill="' + SHIELD.core + '" fill-opacity="' + [.1, .18, .27][i] + '"/>'; });
+        // the panels that light up in turn (where nothing moves, only the
+        // first three, lit)
+        P.lit.forEach((c, i) => {
+            s += '<path class="dome-lit' + (i > 2 ? ' more' : '') + '" style="animation-delay:' + (-i * 0.83).toFixed(2) + 's" d="' + c.d + '" fill="' + SHIELD.bright +
+                '" fill-opacity=".5" stroke="' + SHIELD.core + '" stroke-width="1.3" stroke-linejoin="round"/>';
         });
-        s += '<path d="' + ribs + '" fill="none" stroke="' + SHIELD.pale + '" stroke-opacity=".55" stroke-width="1.5" stroke-linecap="round"/>';
-        // the ring where it meets the ground, in front
-        s += '<path d="M' + (d.x + d.a) + ' ' + d.base + front + '" fill="none" stroke="' + SHIELD.line + '" stroke-width="3.6"/>';
-        // the rim, its bright edge running down the middle of it
-        s += '<path d="' + domeArc(1) + '" fill="none" stroke="' + SHIELD.deep + '" stroke-width="6.4"/>';
-        s += '<path d="' + domeArc(1) + '" fill="none" stroke="' + SHIELD.line + '" stroke-width="4"/>';
-        s += '<path d="' + domeArc(1) + '" fill="none" stroke="' + SHIELD.core + '" stroke-width="1.2"/>';
-        // the sheen down the upper left, and a short one after it
-        const sheen = (t0, t1) => {
-            let p = '';
-            for (let i = 0; i <= 12; i++) { const q = domePoint(t0 + (t1 - t0) * i / 12, 13); p += (i ? 'L' : 'M') + n2(q[0]) + ' ' + n2(q[1]); }
-            return p;
-        };
-        s += '<path d="' + sheen(.4, .74) + sheen(.79, .86) + '" fill="none" stroke="' + SHIELD.core + '" stroke-opacity=".8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
-        // glints
-        s += sparkle(822, 178, 7) + sparkle(838, 196, 3.5) + sparkle(632, 430, 5);
+        // energy running in along the seams
+        P.seams.forEach((p, i) => {
+            const delay = 'style="animation-delay:' + (-i * 0.9).toFixed(2) + 's"';
+            s += '<path class="dome-pulse" ' + delay + ' d="' + p + '" pathLength="100" fill="none" stroke="' + SHIELD.bright +
+                '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="22 200"/>';
+            s += '<path class="dome-pulse" ' + delay + ' d="' + p + '" pathLength="100" fill="none" stroke="' + SHIELD.core +
+                '" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="22 200"/>';
+        });
+        s += '</g>';
+        // the ring where it meets the ground, in front, and the rim, its
+        // bright edge running down the middle of it
+        s += '<path d="M' + (d.x + d.a) + ' ' + d.base + DOME_FRONT + '" fill="none" stroke="' + SHIELD.bright + '" stroke-width="3.2"/>';
+        s += '<path d="' + outline + '" fill="none" stroke="' + SHIELD.deep + '" stroke-width="5.6" stroke-linejoin="round"/>';
+        s += '<path d="' + outline + '" fill="none" stroke="' + SHIELD.bright + '" stroke-width="3.4" stroke-linejoin="round"/>';
+        s += '<path d="' + outline + '" fill="none" stroke="' + SHIELD.core + '" stroke-width="1.1" stroke-linejoin="round"/>';
         return s + '</g>';
+    }
+    // The arena's button is the dome's box; this is the dome's outline in
+    // it, a little outside the rim, shown when the button is pointed at or
+    // a piece stands in the arena (style.css .dome-ring).
+    function arenaRing() {
+        const b = ARENA_BOX, cy = DOME.base - DOME.b / 2;
+        return '<svg class="dome-ring" viewBox="' + b.x + ' ' + b.y + ' ' + b.w + ' ' + b.h + '" preserveAspectRatio="none" aria-hidden="true">' +
+            '<path transform="translate(' + DOME.x + ' ' + cy + ') scale(1.045) translate(' + -DOME.x + ' ' + -cy + ')" d="' +
+            domeOutline() + DOME_FRONT + 'z"/></svg>';
     }
 
     // The castle under its dome, in board units: on the board, and framed
@@ -5304,7 +5387,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += '<rect width="' + WALL_X + '" height="700" fill="#000000" fill-opacity=".2"/>';
         s += '<rect x="' + WALL_X + '" width="' + (1200 - WALL_X) + '" height="700" fill="#c8b898" fill-opacity=".09"/>';
         // cracks of fire in the ground, running out from under the dome
-        s += line('M606 488l-22 10-8 16-20 6M894 488l22 10 6 16 20 6M688 500l-8 18 10 14M812 500l10 16-8 14', '#ff6a1a', 2.6);
+        s += line('M606 458l-22 10-8 16-20 6M894 458l22 10 6 16 20 6M688 470l-8 18 10 14M812 470l10 16-8 14', '#ff6a1a', 2.6);
 
         // the roads, square to square
         const main = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '25', '26', '27', '28', '29', '30',
@@ -5369,6 +5452,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         castleSvg: id => wrap(arenaScene(id), ARENA_FRAME),
         // Where a piece stands when the shield stops it, on the 1200 x 700 board.
         SHIELD_EDGE: SHIELD_EDGE,
+        arenaRing: arenaRing,
         // The castles on offer (CASTLES), to choose from.
         CASTLES: Object.keys(CASTLES).map(k => ({ id: k, name: CASTLES[k].name, blurb: CASTLES[k].blurb, tag: CASTLES[k].tag || '' })),
         CASTLE: CASTLE,
@@ -11221,7 +11305,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const box = b => 'left:' + (b.x / 12).toFixed(3) + '%;top:' + (b.y / 7).toFixed(3) + '%;width:' +
             (b.w / 12).toFixed(3) + '%;height:' + (b.h / 7).toFixed(3) + '%';
         html += '<button class="hot arena" data-sq="' + D.ARENA + '" style="' + box(A.ARENA_BOX) + '" aria-label="Fenrirak’s Arena">' +
-            '<span class="hot-label">Fenrirak’s Arena</span></button>';
+            A.arenaRing() + '<span class="hot-label">Fenrirak’s Arena</span></button>';
         html += '<button class="hot merchant" id="merchant-hot" style="' + box(A.MERCHANT_BOX) + '" ' +
             'aria-label="The Merchant"><span class="hot-label">Merchant</span></button>';
         html += '<div class="tokens" id="tokens"></div>';
