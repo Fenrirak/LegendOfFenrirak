@@ -1911,8 +1911,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .zap-caption.show b { animation: zap-word .55s cubic-bezier(.2, 1.3, .4, 1) both; }
 .zap-caption span {
     display: inline-block; margin-top: 4px; max-width: 680px;
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 26px; font-weight: 700; line-height: 1.35;
-    letter-spacing: .01em; color: #fff4e0; -webkit-text-stroke: 4px #000; paint-order: stroke fill;
+    font-family: 'Cutive Mono', 'Courier New', monospace; font-size: 28px; font-weight: normal; line-height: 1.5;
+    color: #fff4e0; -webkit-text-stroke: 3px #000; paint-order: stroke fill;
 }
 @keyframes zap-word {
     from { transform: scale(1.8); opacity: 0; letter-spacing: 28px; }
@@ -2763,6 +2763,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     });
 
     const MERCHANT_GEAR = Object.keys(ITEMS).filter(id => ITEMS[id].price);
+    // The Merchant buys any weapon or armour you are not wearing, all for
+    // the same flat price (the user's call, 2026-10-05).
+    const SELL_PRICE = 5;
     const PYRITE_GEAR = Object.keys(ITEMS).filter(id => ITEMS[id].pyrite);
     const PYRITE_GOLD = 75;
 
@@ -2977,12 +2980,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
           text: 'Lose 40 Gold or 1 equipped item.' },
 
         // ---- the two routes meet ----
-        { id: '25', name: 'Farmer’s Market', row: 0, col: 4, next: ['26'], pic: 'market',
-          action: 'pay_draw', deck: 'item', count: 1, price: 10,
-          text: 'You may draw an item card for 10 Gold.' },
-        { id: '26', name: 'Adventurers’ Inn', row: 0, col: 5, next: ['27'], pic: 'adv_inn',
+        // The Inn comes first and the Market after it (swapped 2026-10-05).
+        { id: '25', name: 'Adventurers’ Inn', row: 0, col: 4, next: ['26'], pic: 'adv_inn',
           action: 'battle', enemy: 'barbarian',
           text: 'Fight Barbarian. Win and he follows you as your Barbarian (Ally).' },
+        { id: '26', name: 'Farmer’s Market', row: 0, col: 5, next: ['27'], pic: 'market',
+          action: 'pay_draw', deck: 'item', count: 1, price: 10,
+          text: 'You may draw an item card for 10 Gold.' },
         { id: '27', name: 'Ametin’s Inn', row: 0, col: 6, next: ['28'], pic: 'inn',
           action: 'heal', heal: 30, text: 'Heal 30 HP.' },
         { id: '28', name: 'The Golden Dice', row: 0, col: 7, next: ['29'], pic: 'dice',
@@ -3111,7 +3115,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     global.LOF_DATA = {
         CLASSES, CLASS_ORDER, BARBARIAN, PVP_DEFENCE, ENEMIES, ITEMS, ITEM_DECK,
-        MERCHANT_GEAR, PYRITE_GEAR, PYRITE_GOLD, POTIONS, POTION_DECK,
+        MERCHANT_GEAR, SELL_PRICE, PYRITE_GEAR, PYRITE_GOLD, POTIONS, POTION_DECK,
         MERCHANT_POTIONS, ASTRIX_POTIONS, BOARD, SQUARES, PROGRESS,
         START, SPLIT, TEMPLE, ARENA, FRAGMENTS, MODIFIERS, HALVING_NOTE, RULES, foeName
     };
@@ -7598,6 +7602,26 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return payAndTake(state, p, 'merchant', entry, pay);
     }
 
+    // Selling to the Merchant: any weapon or armour you carry but are not
+    // wearing, for D.SELL_PRICE Gold each, whatever it is.
+    function sell(state, pid, itemUid) {
+        const p = player(state, pid);
+        if (!p) return fail('Unknown player.');
+        if (state.phase !== 'playing') return fail('The game is not running.');
+        if (inBattle(state, pid)) return fail('The Merchant will not deal during a battle.');
+        if (state.pending && state.pending.playerId === pid && state.pending.type !== 'astrix') {
+            return fail('Finish what your square asks first.');
+        }
+        const inst = ownedItem(p, itemUid);
+        const def = itemDef(inst);
+        if (!def) return fail('You do not have that.');
+        if (p.weaponUid === inst.uid || p.armourUid === inst.uid) return fail('Take it off before you sell it.');
+        discardItem(p, inst.uid);
+        p.gold += D.SELL_PRICE;
+        log(state, p.name + ' sells the ' + def.name + ' to the Merchant for ' + D.SELL_PRICE + ' Gold.', 'item');
+        return ok();
+    }
+
     function buyAstrix(state, pid, id, pay) {
         const p = player(state, pid);
         if (!p) return fail('Unknown player.');
@@ -7920,6 +7944,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         equip:         (s, pid, a) => equip(s, pid, a.uid, !!a.barbarian),
         buy:           (s, pid, a) => buy(s, pid, a.kind, a.id, a.pay),
         buyAstrix:     (s, pid, a) => buyAstrix(s, pid, a.id, a.pay),
+        sell:          (s, pid, a) => sell(s, pid, a.uid),
         battleOrderRoll:(s, pid)   => battleOrderRoll(s, pid),
         battleAttack:  (s, pid, a) => battleAttack(s, pid, a.moveId, a.target),
         enemyAct:      (s, pid)    => enemyAct(s, pid),
@@ -10401,6 +10426,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     function hoverSquare() { /* reserved for a future hint; the card is a click away */ }
 
+    // Where the Barbarian waits when nobody has him.
+    const INN_SQ = D.BOARD.find(q => q.enemy === 'barbarian').id;
     function sqEl(id) { return document.querySelector('#board [data-sq="' + id + '"]'); }
 
     function renderBoard() {
@@ -10413,7 +10440,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         }
         // The Adventurers' Inn is empty while the Barbarian is out following
         // somebody.
-        const inn = sqEl('26');
+        const inn = sqEl(INN_SQ);
         if (inn) {
             const away = S.barbarian && S.barbarian.ownerId;
             let q = inn.querySelector('.sq-quiet');
@@ -10557,7 +10584,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 const o = want['p_' + bar.ownerId];
                 want.barb = { x: o.x + 1.9, y: o.y - 2.6, ally: true };
             } else if (!bar.ownerId) {
-                const c = centreOf('26');
+                const c = centreOf(INN_SQ);
                 want.barb = { x: (c.x + .3) / 12 * 100, y: (c.y - .02) / 7 * 100, ally: true, inn: true };
             }
         }
@@ -10778,7 +10805,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const st = abilityState(p);
             const can = E.canUseAbility(S, p.id);
             h += btn('a-ability', esc(ab.name), '', !can.ok, can.ok ? ab.text : can.why, st.text);
-            h += btn('a-merchant', 'Merchant', '', E.inBattle(S, p.id), 'Buy potions and gear', 'any time');
+            h += btn('a-merchant', 'Merchant', '', E.inBattle(S, p.id), 'Buy potions and gear, or sell gear', 'any time');
             h += btn('a-trade', 'Trade', '', !(free), 'Offer another player a trade', 'your turn');
             h += btn('a-guide', 'How to play', 'ghost', false);
             h += btn('a-end', 'End turn', 'primary span2', !(free && p.hasMoved), p.hasMoved ? '' : 'Roll to move first');
@@ -11899,7 +11926,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 'He has unlimited stock.' + (S && S.mods && S.mods.fleeingMerchant ? ' <b>Fleeing Merchant: everything is half price!</b>' : '') + '</div>';
             if (p) h += '<div class="purse">' + A.ICONS.gold(18) + p.gold + ' Gold · ' + A.ICONS.gem(18) + p.gems + ' Gemstones</div>';
             h += '<div class="tabs shop-tabs"><button id="shop-p" class="' + (shopTab === 'potions' ? 'on' : '') + '">Potions</button>' +
-                '<button id="shop-g" class="' + (shopTab === 'gear' ? 'on' : '') + '">Weapons &amp; Armour</button></div><div class="shop-list">';
+                '<button id="shop-g" class="' + (shopTab === 'gear' ? 'on' : '') + '">Weapons &amp; Armour</button>' +
+                '<button id="shop-s" class="' + (shopTab === 'sell' ? 'on' : '') + '">Sell</button></div>';
+            if (shopTab === 'sell') h += '<div class="sub">He buys any weapon or armour you are not wearing, ' + D.SELL_PRICE + ' Gold a piece, whatever it is.</div>';
+            h += '<div class="shop-list">';
             const blocked = !p || (S && E.inBattle(S, p.id));
             if (shopTab === 'potions') {
                 D.MERCHANT_POTIONS.forEach(e => {
@@ -11909,6 +11939,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                         '<div class="price">' + (p ? priceButton('data-buy-potion', e.id, gold, 'gold', p, e.price) +
                         (e.alt ? priceButton('data-buy-potion', e.id, E.priceFor(S, 'merchant', e, 'alt'), 'alt', p, e.alt.gold) : '') : '') + '</div></div></div>';
                 });
+            } else if (shopTab === 'sell') {
+                h += sellRows(p);
             } else {
                 D.MERCHANT_GEAR.forEach(id => {
                     const it = D.ITEMS[id];
@@ -11926,6 +11958,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             setPanel(h, 'mid');
             bind('shop-p', () => { shopTab = 'potions'; panel.draw(); });
             bind('shop-g', () => { shopTab = 'gear'; panel.draw(); });
+            bind('shop-s', () => { shopTab = 'sell'; panel.draw(); });
+            $$('[data-sell]').forEach(x => {
+                if (blocked) x.disabled = true;
+                x.addEventListener('click', () => act('sell', { uid: x.getAttribute('data-sell') }));
+            });
             $$('[data-buy-potion]').forEach(x => {
                 if (blocked) x.disabled = true;
                 x.addEventListener('click', () => act('buy', { kind: 'potion', id: x.getAttribute('data-buy-potion'), pay: x.getAttribute('data-pay') }));
@@ -11935,6 +11972,34 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 x.addEventListener('click', () => act('buy', { kind: 'gear', id: x.getAttribute('data-buy-gear') }));
             });
         }, true);
+    }
+
+    // Everything the Merchant would buy off you: weapons first, then armour,
+    // best first, with identical spares on one row (one sells at a time).
+    function sellRows(p) {
+        if (!p) return '';
+        const loose = p.inventory.filter(it => E.itemDef(it) && it.uid !== p.weaponUid && it.uid !== p.armourUid)
+            .sort((a, b) => {
+                const da = E.itemDef(a), db = E.itemDef(b);
+                return (da.kind === db.kind ? 0 : da.kind === 'weapon' ? -1 : 1) || db.score - da.score;
+            });
+        if (!loose.length) return '<div class="empty-note">Nothing to sell. What you are wearing stays on you.</div>';
+        const rows = [];
+        const spare = {};
+        loose.forEach(inst => {
+            if (!inst.uses) {
+                if (spare[inst.id]) { spare[inst.id].n += 1; return; }
+                spare[inst.id] = { inst: inst, n: 1 };
+                rows.push(spare[inst.id]);
+            } else rows.push({ inst: inst, n: 1 });
+        });
+        return rows.map(row => {
+            const d = E.itemDef(row.inst);
+            return '<div class="shop-item"><div><div class="nm">' + esc(d.name) + (row.n > 1 ? ' ×' + row.n : '') +
+                ' <span class="muted" style="font-size:11px">' + (d.kind === 'weapon' ? 'Weapon' : 'Armour') + ', ' + className(d.cls) + '</span></div>' +
+                '<div class="tx">' + esc(d.text) + (row.inst.uses ? ' <b>' + row.inst.uses + ' uses left.</b>' : '') + '</div>' +
+                '<div class="price"><button class="btn small" data-sell="' + esc(row.inst.uid) + '">Sell for ' + A.ICONS.gold(14) + D.SELL_PRICE + '</button></div></div></div>';
+        }).join('');
     }
 
     /* ---- trading -------------------------------------------------------- */
@@ -12262,7 +12327,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<h3>Pendant Fragments</h3><p>You need all 5 different Pendant Fragments to pass the Oblivion Mage’s shield. Reach it without them and ' +
             'it throws you back to the Start (this counts as a death).</p>' +
             '<h3>Trading and the Merchant</h3><p>Only Gold, Pendant Fragments, Potions, Gemstones, Weapons and Armour can be traded, and both sides ' +
-            'must agree. The Merchant is open any time except during your battles (click his stall on the board). Astrix’s Alchemy only sells ' +
+            'must agree. The Merchant is open any time except during your battles (click his stall on the board), and he buys any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold a piece. Astrix’s Alchemy only sells ' +
             'to whoever is standing on it.</p>' +
             '<h3>Characters</h3><table><tr><th>Class</th><th>HP</th><th>DEF</th><th>Moves</th><th>Ability</th></tr>' + clsRows + '</table></div>';
     }
@@ -12311,7 +12376,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 { id: 'list-potions', title: 'Potions', body: 'Every potion you carry. Drink movement potions before you roll, ' +
                     'battle potions during a fight.' },
                 { id: 'log-card', title: 'The game log', body: 'Everything that has happened, the newest at the top.' },
-                { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles, or click his stall on the board.' },
+                { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles, or click his stall on the board. Buy potions and gear, or sell him any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold.' },
                 { id: 'a-trade', title: 'Trade', live: true, body: 'Offer another player Gold, Fragments, Potions, Gemstones, Weapons or Armour.' },
                 { id: 'a-end', title: 'End turn', live: true, body: 'Press it when you are done. This is the last stop of the tour.' }
             ].filter(s => document.getElementById(s.id));
