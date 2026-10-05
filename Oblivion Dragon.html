@@ -1942,6 +1942,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     font-family: 'Cutive Mono', 'Courier New', monospace; font-size: 28px; font-weight: normal; line-height: 1.5;
     color: #fff4e0; -webkit-text-stroke: 3px #000; paint-order: stroke fill;
 }
+/* The words (the shield's, and the pendant's) sit on a dark band right
+   across the screen, so they read clearly over the effect and the board
+   (the user asked for a background, 2026-10-06; not the old rounded box). */
+.zap-caption {
+    left: 0; right: 0; width: auto; max-width: none; transform: none;
+    padding: 14px 16px 16px;
+    background: rgba(6, 3, 10, .86);
+    border-top: 2px solid var(--zap-mid); border-bottom: 2px solid var(--zap-mid);
+}
+.zap-caption span { -webkit-text-stroke: 2px #000; }
 @keyframes zap-word {
     from { transform: scale(1.8); opacity: 0; letter-spacing: 28px; }
     to { transform: scale(1); opacity: 1; letter-spacing: 8px; }
