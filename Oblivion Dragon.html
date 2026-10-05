@@ -1153,7 +1153,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 /* The arena's button is the shield's dome: rounded to about its shape, so
    only the dome takes the click, and ringed by the dome's own outline
    (art.js arenaRing) when pointed at or when a piece stands in it. */
-.hot.arena { border-radius: 50% / 50% 50% 10.5% 10.5%; }
+.hot.arena { border-radius: 50% / 50% 50% 11.3% 11.3%; }
 .hot.arena:hover, .hot.arena.here { box-shadow: none; }
 .hot.arena .dome-ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .hot.arena .dome-ring path { fill: none; stroke: var(--marker); stroke-width: 5; opacity: 0; transition: opacity .12s ease; }
@@ -1438,12 +1438,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .order-track .ot.down { text-decoration: line-through; opacity: .5; }
 .order-track .ot-sep { color: var(--accent-soft); }
 
-/* The attack just used, across the top of the fight. */
+/* The attack just used, across the top of the fight: no highlight on it,
+   no bar down its side and no flash as it comes in (the user, 2026-10-05). */
 .blow-line {
     display: flex; align-items: center; gap: 12px;
     margin-top: 12px; padding: 9px 12px;
     background: rgba(0, 0, 0, .32);
-    border: 1px solid var(--panel-edge); border-left: 4px solid var(--btn-edge); border-radius: 10px;
+    border: 1px solid var(--panel-edge); border-radius: 10px;
     font-size: 14.5px; line-height: 1.35; color: var(--cream);
 }
 .blow-line .bl-icon { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--btn-bottom); }
@@ -1457,11 +1458,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .blow-line .bl-dmg { flex: none; text-align: center; line-height: 1; min-width: 56px; }
 .blow-line .bl-dmg b { display: block; font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 24px; color: #ff6a5a; }
 .blow-line .bl-dmg small { font-size: 10px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
-.blow-line.quiet { color: var(--muted); border-left-color: var(--panel-edge); }
+.blow-line.quiet { color: var(--muted); }
 .blow-line.fresh { animation: blow-in .55s ease-out; }
 @keyframes blow-in {
-    from { transform: translateY(-6px); opacity: 0; background: color-mix(in srgb, var(--accent) 55%, transparent); }
-    to { transform: none; opacity: 1; background: rgba(0, 0, 0, .32); }
+    from { transform: translateY(-6px); opacity: 0; }
+    to { transform: none; opacity: 1; }
 }
 
 /* The final battle: Fenrirak and Helen across the top, your side under
@@ -1909,8 +1910,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 }
 .zap-caption.show b { animation: zap-word .55s cubic-bezier(.2, 1.3, .4, 1) both; }
 .zap-caption span {
-    display: inline-block; margin-top: 4px; font-size: 15px;
-    background: rgba(0, 0, 0, .72); padding: 6px 14px; border-radius: 12px; color: var(--cream);
+    display: inline-block; margin-top: 4px; max-width: 680px;
+    font-family: 'Cinzel', Georgia, serif; font-size: 27px; font-weight: 800; line-height: 1.35;
+    color: #fff4e0; -webkit-text-stroke: 5px #000; paint-order: stroke fill;
 }
 @keyframes zap-word {
     from { transform: scale(1.8); opacity: 0; letter-spacing: 28px; }
@@ -1924,7 +1926,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 }
 @media (max-width: 700px) {
     .zap-caption b { font-size: 36px; letter-spacing: 4px; }
-    .zap-caption span { font-size: 13px; }
+    .zap-caption span { font-size: 16px; }
 }
 
 .paused-veil {
@@ -4477,7 +4479,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     // `turn` turns it so it is the same either side of the middle
     // (DOME_PANELS). Its right-hand side stays just clear of the temple's
     // square.
-    const DOME = { x: 750, base: 452, a: 150, b: 306, n: 3, tilt: .24, freq: 6, reach: 2.24, turn: -Math.PI / 2 };
+    const DOME = { x: 750, base: 452, a: 150, b: 280, n: 3.4, tilt: .24, freq: 6, reach: 2.24, turn: -Math.PI / 2 };
     DOME.ry = DOME.a * DOME.tilt;
     // how far above its foot the top of the dome comes, as you see it
     DOME.rise = (function () {
@@ -4675,8 +4677,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function castle() {
         const S = '#6f6b64', SH = '#5e5a54', SL = '#817c74', RUBBLE = '#827d74', LIGHT = '#9b5cff';
         let s = '<g class="castle">' + BRICKS + castleRock();
-        // the crystal that broke the tower on the left, standing up out of it
-        s += crystal(44, 52, 48, -30, 18) + crystal(78, 52, 54, 24, 20) + crystal(60, 54, 98, -4, 30);
+        // the crystal that broke the tower on the left, splaying out of it:
+        // two leaning apart, a short one between them and a shard out
+        // either side
+        s += crystal(74, 56, 56, 20, 20) + crystal(52, 56, 76, -14, 24) + crystal(80, 54, 32, 40, 12) +
+            crystal(40, 58, 32, -44, 13) + crystal(63, 58, 46, 6, 14);
         s += stone('M36 214V48L44 34 52 44 58 26 68 38 74 30 84 50V214z', SH);
         s += line('M47 58l6 11-4 9 6 13', LIGHT, 2.4);
         s += archWin(60, 98, 10, 18, LIGHT) + archWin(60, 146, 10, 18, GATE_DARK);
@@ -4728,7 +4733,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* dark violet glass right up to the violet seams it shares, deeper     */
     /* where the dome turns away from you; the upper left catches the       */
     /* light, a few panels light up in turn and energy runs up the seams    */
-    /* from the foot (style.css .dome-lit, .dome-pulse). No glow. It comes  */
+    /* from the foot (style.css .dome-lit, .dome-pulse). No outline round   */
+    /* it, the glass makes its edge (the user's pick), and no glow. It comes */
     /* in two parts: domeBack (the floor, the far side and the back of the  */
     /* ring) goes under the castle, domeFront over it.                      */
     const SHIELD = { deep: '#330d4a', mid: '#6a2fc0', bright: '#9b5cff', core: '#eadcff' };
@@ -4797,6 +4803,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     // The outline, as you see it: from the left foot up the left side,
     // over the top and down to the right foot, where the side turns from
     // you. (The ring in front, DOME_FRONT, takes it back to where it began.)
+    // It is not drawn on the dome; the arena's ring (arenaRing) follows it.
     const DOME_OUTLINE = (function () {
         const P = DOME_SIDE, N = P.length - 1, k = DOME.tilt / DOME_COS;
         let i0 = 0;
@@ -4807,10 +4814,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const q = -Math.min(1, p.nh * k / p.nr), c = Math.sqrt(1 - q * q);
             right.push([p.r * c, p.h, p.r * q]);
         }
-        const pts = right.slice().reverse().map(p => [-p[0], p[1], p[2]]).concat(right.slice(1));
-        return pts.map((p, i) => (i ? 'L' : 'M') + domePt(p)).join('');
+        return right.slice().reverse().map(p => [-p[0], p[1], p[2]]).concat(right.slice(1)).map(domeSee);
     })();
-    function domeOutline() { return DOME_OUTLINE; }
+    function domeOutline() { return DOME_OUTLINE.map((q, i) => (i ? 'L' : 'M') + n2(q[0]) + ' ' + n2(q[1])).join(''); }
     const DOME_FRONT = 'A' + DOME.a + ' ' + n2(DOME.ry) + ' 0 0 1 ' + (DOME.x - DOME.a) + ' ' + DOME.base;
     const DOME_REAR = 'M' + (DOME.x - DOME.a) + ' ' + DOME.base + 'A' + DOME.a + ' ' + n2(DOME.ry) + ' 0 0 1 ' + (DOME.x + DOME.a) + ' ' + DOME.base;
     // The same few panels light up every time.
@@ -4962,9 +4968,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += '<path d="' + DOME_REAR + '" fill="none" stroke="' + SHIELD.bright + '" stroke-opacity=".75" stroke-width="2.6"/>';
         return s + '</g>';
     }
-    // Over the castle: the near side, the ring in front and the rim.
+    // Over the castle: the near side and the ring in front.
     function domeFront() {
-        const d = DOME, P = DOME_PANELS, outline = domeOutline();
+        const d = DOME, P = DOME_PANELS;
         let s = '<g class="oblivion-shield">';
         // the glass, deeper where the dome turns from you
         s += domeGlass(P.front, c => c.f > .75 ? 0 : c.f > .5 ? 1 : c.f > .25 ? 2 : 3, SHIELD.mid, [.1, .13, .18, .26]);
@@ -4981,12 +4987,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // the panels that light up in turn (where nothing moves, only the
         // first three, lit), and energy running up the seams
         s += domeLit(P.lit, 0, .5) + domePulses(P.seams, 3, 1);
-        // the ring where it meets the ground, in front, and the rim, its
-        // bright edge running down the middle of it
+        // the ring where it meets the ground, in front. No line round the
+        // rim: the glass makes the edge (the user's pick, 2026-10-05).
         s += '<path d="M' + (d.x + d.a) + ' ' + d.base + DOME_FRONT + '" fill="none" stroke="' + SHIELD.bright + '" stroke-width="3.2"/>';
-        s += '<path d="' + outline + '" fill="none" stroke="' + SHIELD.deep + '" stroke-width="5.6" stroke-linejoin="round"/>';
-        s += '<path d="' + outline + '" fill="none" stroke="' + SHIELD.bright + '" stroke-width="3.4" stroke-linejoin="round"/>';
-        s += '<path d="' + outline + '" fill="none" stroke="' + SHIELD.core + '" stroke-width="1.1" stroke-linejoin="round"/>';
         return s + '</g>';
     }
     // The arena's button is the dome's box; this is the dome's outline in
@@ -5947,8 +5950,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             p.pos = D.ARENA;
             state.zapSeq = (state.zapSeq | 0) + 1;
             state.lastZap = { who: p.name, playerId: p.id, n: state.zapSeq };
-            log(state, 'The Oblivion Mage’s shield refuses ' + p.name +
-                '. Without all the Pendant Fragments it casts them back to the Start.', 'death');
+            log(state, 'The shield’s magic rips through ' + p.name + '’s flesh before they make it through. ' +
+                'Without all 5 Pendant Fragments, the Oblivion Magic is overwhelming. Back to the Start.', 'death');
             sendToStart(state, p);
             return ok();
         }
@@ -9012,7 +9015,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     const BOOM = 2450;     // ...is pulled in tight, and goes off
     const FLING = 2580;    // a beat later the piece is thrown...
     const LAND = 3450;     // ...and comes down on the Start
-    const END = 3900;
+    const END = 5300;     // the words stay up a while after it lands
 
     const TAU = Math.PI * 2;
     const SQ3 = Math.sqrt(3);
@@ -9355,7 +9358,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const b = document.createElement('b'), sp = document.createElement('span');
             b.textContent = o.caption.big || '';
             sp.textContent = o.caption.small || '';
-            cap.appendChild(b);
+            if (o.caption.big) cap.appendChild(b);
             if (o.caption.small) cap.appendChild(sp);
         }
         // Nobody is watching: no show, just the outcome.
@@ -9404,7 +9407,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (!fx.fired.boom && t >= BOOM) { fx.fired.boom = true; boom(); }
         if (!fx.fired.cap && t >= BOOM + 80) { fx.fired.cap = true; cap.classList.add('show'); }
         if (!fx.fired.land && t >= LAND) { fx.fired.land = true; land(); }
-        if (!fx.fired.capOff && t >= LAND + 200) { fx.fired.capOff = true; cap.classList.remove('show'); }
+        if (!fx.fired.capOff && t >= END - 300) { fx.fired.capOff = true; cap.classList.remove('show'); }
         movePiece(dt);
         if (!fx.reduced) fx.look.step(fx, dt);
         stepCommon(dt);
@@ -10215,7 +10218,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 done();
             };
             if (!FX || !el || !$('#screen-game.active') || document.hidden) {
-                notice(z.who + ' is thrown back by the Oblivion Mage’s shield!');
+                notice('The shield’s magic rips through ' + z.who + '’s flesh before they make it through!');
                 end();
                 return;
             }
@@ -10234,8 +10237,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 seat: seatColour(pid),
                 shake: $('#board'),
                 caption: {
-                    big: 'REFUSED',
-                    small: 'Without all 5 Pendant Fragments the shield casts ' + (mine ? 'you' : z.who) + ' back to the Start.'
+                    small: 'The shield’s magic rips through ' + (mine ? 'your flesh before you make' : z.who + '’s flesh before they make') +
+                        ' it through. Without all 5 Pendant Fragments, the Oblivion Magic is overwhelming.'
                 },
                 // Let go of at the boom: put on the Start, still hidden.
                 release() {
