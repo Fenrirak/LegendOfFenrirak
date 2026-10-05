@@ -1053,6 +1053,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 @keyframes flicker { from { transform: scaleY(.9) skewX(-3deg); } to { transform: scaleY(1.08) skewX(3deg); } }
 .board-scene .lava { animation: lava 3s linear infinite; }
 @keyframes lava { to { stroke-dashoffset: -48; } }
+/* the rings round the shield's dome, drifting slowly round it */
+.board-scene .dome-flow { animation: dome-flow 6s linear infinite; }
+.board-scene .dome-flow.slow { animation-duration: 9s; animation-direction: reverse; }
+@keyframes dome-flow { to { stroke-dashoffset: -52; } }
+@media (prefers-reduced-motion: reduce) {
+    .board-scene .dome-flow { animation: none; }
+}
 
 .sq {
     position: absolute;
@@ -1141,6 +1148,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .hot:hover { box-shadow: 0 0 0 .25cqw var(--marker); }
 .hot.merchant .hot-label { font-size: .85cqw; bottom: -2%; }
 .hot.arena.here { box-shadow: 0 0 0 .35cqw var(--marker); }
+/* The arena's button is the shield's dome: its top rounded to the dome
+   (art.js DOME: 344 of its 360 high), its foot to the ring on the ground. */
+.hot.arena { border-radius: 50% 50% 50% 50% / 95.6% 95.6% 4.4% 4.4%; }
 
 /* the pieces */
 .tokens { position: absolute; inset: 0; pointer-events: none; z-index: 6; }
@@ -4554,15 +4564,25 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* ------------------------------------------------------------------ */
 
     // The castle is drawn 300 wide and scaled down into the middle of its
-    // three-by-three cells, so there is open ground round it. Its east gate
-    // is at (271, 152) in its own drawing; the shield stands in front of it,
-    // well clear of the Royal Cleric's Temple.
-    const CASTLE_AT = { x: 750, y: 350, scale: 0.86 };
-    const SHIELD_AT = { x: CASTLE_AT.x + (271 - 150) * CASTLE_AT.scale - 2, y: 350, scale: 0.9 };
+    // three-by-three cells, standing on the floor of the shield's dome. Its
+    // east gate is at (271, 152) in its own drawing, where the road from the
+    // Royal Cleric's Temple runs in under the dome.
+    const CASTLE_AT = { x: 750, y: 358, scale: 0.82 };
+    const GATE_AT = { x: CASTLE_AT.x + (271 - 150) * CASTLE_AT.scale, y: 350 };
+    // The Oblivion Mage's shield: a dome over the whole castle. Its foot is
+    // an ellipse round (x, base), `a` across either way and `ry` deep, and
+    // its crown `b` above that. `k` is how full its shoulders are (.55 would
+    // be half an ellipse; fuller clears the towers). Its right-hand side
+    // stays just clear of the temple's square.
+    const DOME = { x: 750, base: 482, a: 150, b: 344, ry: 16, k: .66 };
     // Where the castle and the Merchant's stall are, on the 1200 x 700
-    // board, for the buttons laid over them.
-    const ARENA_BOX = { x: 622, y: 204, w: 256, h: 268 };
+    // board, for the buttons laid over them (the arena's is the dome's own
+    // box; style.css rounds it to the dome's shape).
+    const ARENA_BOX = { x: DOME.x - DOME.a, y: DOME.base - DOME.b, w: DOME.a * 2, h: DOME.b + DOME.ry };
     const MERCHANT_BOX = { x: 944, y: 454, w: 146, h: 108 };
+    // Where a piece stands when the shield stops it: on the road, against
+    // the dome's east side.
+    const SHIELD_EDGE = { x: 888, y: 350 };
 
     function cellCentre(sq) {
         const rs = sq.rowSpan || 1, cs = sq.colSpan || 1;
@@ -4574,18 +4594,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return 'M' + pts.map(p => p.x + ' ' + p.y).join(' L');
     }
 
+    // The wall down the outer side of the main route, x = WALL_X on the board.
+    const WALL_X = 372;
     function wallRun(x, y0, y1) {
-        let s = '<rect x="' + (x - 7) + '" y="' + y0 + '" width="14" height="' + (y1 - y0) + '" fill="' + STONE + '" stroke="' + INK + '" stroke-width="3"/>';
+        let s = '<rect x="' + (x - 10) + '" y="' + y0 + '" width="20" height="' + (y1 - y0) + '" fill="' + STONE + '" stroke="' + INK + '" stroke-width="3"/>';
         for (let y = y0 + 6; y < y1 - 6; y += 16) {
-            s += '<rect x="' + (x - 11) + '" y="' + y + '" width="22" height="8" fill="' + STONE_LIT + '" stroke="' + INK + '" stroke-width="2"/>';
+            s += '<rect x="' + (x - 14) + '" y="' + y + '" width="28" height="8" fill="' + STONE_LIT + '" stroke="' + INK + '" stroke-width="2"/>';
         }
         s += tower(x, y0) + tower(x, y1);
         return s;
     }
     function tower(x, y) {
         return '<g transform="translate(' + x + ' ' + y + ')">' +
-            grp(STONE, P('M-16-14h32v28h-32z')) + grp(STONE_LIT, P('M-19-20h38v8h-38z')) +
-            line('M-19-20v-5h7v5M-4-20v-5h8v5M12-20v-5h7v5', INK, 2.4) +
+            grp(STONE, P('M-18-14h36v28h-36z')) + grp(STONE_LIT, P('M-21-20h42v8h-42z')) +
+            line('M-21-20v-5h8v5M-4-20v-5h8v5M13-20v-5h8v5', INK, 2.4) +
             grp(CRIMSON, P('M-2-40h14l-4 5 4 5H-2z')) + line('M-2-40v20', INK, 2.4) + '</g>';
     }
 
@@ -4682,10 +4704,424 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<path d="' + d + '" fill="none" stroke="' + INK + '" stroke-width="' + (sw || 2.8) + '" stroke-linejoin="round"/>';
     }
 
-    function castle() {
-        // Fenrirak's Arena: the kingdom's castle, taken. Grey stone blocks,
-        // red banners, fire in the windows and the purple shield on the
-        // east gate.
+    /* Fenrirak's Arena: the kingdom's castle, taken. Each castle is drawn   */
+    /* 300 wide standing on y 270, with its east gate at about (271, 150),  */
+    /* where the road from the temple runs up to it, and fits under the     */
+    /* shield's dome. CASTLE is the one in the game; the others are kept to */
+    /* compare (see "Castle Designs.html").                                 */
+
+    // Numbers for the castles' paths, to two places.
+    const n2 = v => +(+v).toFixed(2);
+    const box = (x, y, w, h) => 'M' + n2(x) + ' ' + n2(y) + 'h' + n2(w) + 'v' + n2(h) + 'h' + n2(-w) + 'z';
+    // Merlons along a wall top from x0 to x1, the end ones flush with its ends.
+    function merlons(x0, x1, y, h, w, gap) {
+        const n = Math.max(2, Math.round((x1 - x0 + gap) / (w + gap)));
+        const g = (x1 - x0 - n * w) / (n - 1);
+        let d = '';
+        for (let i = 0; i < n; i++) d += box(x0 + i * (w + g), y, w, h);
+        return d;
+    }
+    // A row of fangs along a wall top instead of merlons.
+    function fangs(x0, x1, y, h, fill) {
+        const n = Math.max(2, Math.round((x1 - x0) / (h * 1.05))), w = (x1 - x0) / n;
+        let d = 'M' + n2(x0) + ' ' + y;
+        for (let i = 0; i < n; i++) d += 'L' + n2(x0 + (i + .5) * w) + ' ' + n2(y - h) + 'L' + n2(x0 + (i + 1) * w) + ' ' + y;
+        return stone(d + 'z', fill, 2.4);
+    }
+    // A tower's stone; a round one has its right-hand third in shadow.
+    function towerStone(x, y, w, h, fill, shade) {
+        const d = box(x, y, w, h);
+        return '<path d="' + d + '" fill="' + fill + '"/>' +
+            (shade ? '<path d="' + box(x + w * .66, y, w * .34, h) + '" fill="' + shade + '"/>' : '') +
+            '<path d="' + d + '" fill="url(#' + BRICKS_ID + ')"/>' +
+            '<path d="' + d + '" fill="none" stroke="' + INK + '" stroke-width="2.8" stroke-linejoin="round"/>';
+    }
+    // A cone roof over a round tower: the eave a shallow curve, the right
+    // half in shadow and a line of slates down either side.
+    function cone(cx, y, w, h, fill, shade) {
+        const l = n2(cx - w / 2), r = n2(cx + w / 2), c = n2(w * .14), top = n2(y - h);
+        const out = 'M' + l + ' ' + y + 'L' + cx + ' ' + top + 'L' + r + ' ' + y + 'Q' + cx + ' ' + n2(y + c) + ' ' + l + ' ' + y + 'z';
+        return '<path d="' + out + '" fill="' + fill + '"/>' +
+            '<path d="M' + cx + ' ' + top + 'L' + cx + ' ' + n2(y + c / 2) + 'Q' + n2((cx + r) / 2) + ' ' + n2(y + c / 2) + ' ' + r + ' ' + y + 'z" fill="' + shade + '"/>' +
+            '<path d="M' + cx + ' ' + top + 'L' + n2(cx - w / 4) + ' ' + n2(y + c * .375) + 'M' + cx + ' ' + top + 'L' + n2(cx + w / 4) + ' ' + n2(y + c * .375) +
+            '" fill="none" stroke="' + INK + '" stroke-opacity=".45" stroke-width="1.4"/>' +
+            '<path d="' + out + '" fill="none" stroke="' + INK + '" stroke-width="2.8" stroke-linejoin="round"/>';
+    }
+    // A needle roof: its sides curve in to a sharp point and sweep out into
+    // a hook at either eave.
+    function needle(cx, y, w, h, fill, shade) {
+        const l = cx - w / 2, r = cx + w / 2, top = n2(y - h), k = n2(y - h * .3);
+        const side = 'Q' + n2(cx + w * .1) + ' ' + k + ' ' + n2(r + 7) + ' ' + n2(y - 9) + 'L' + n2(r) + ' ' + y;
+        const out = 'M' + n2(l - 7) + ' ' + n2(y - 9) + 'Q' + n2(cx - w * .1) + ' ' + k + ' ' + cx + ' ' + top + side + 'H' + n2(l) + 'z';
+        return '<path d="' + out + '" fill="' + fill + '"/>' +
+            '<path d="M' + cx + ' ' + top + side + 'H' + cx + 'z" fill="' + shade + '"/>' +
+            '<path d="' + out + '" fill="none" stroke="' + INK + '" stroke-width="2.8" stroke-linejoin="round"/>';
+    }
+    // A flag on a pole standing on (x, y), h tall.
+    function pennant(x, y, h, fill, w) {
+        w = w || 22;
+        const t = y - h;
+        return line('M' + x + ' ' + (y + 2) + 'V' + (t - 3), INK, 2.6) +
+            grpW(fill, 2.2, P('M' + x + ' ' + t + 'h' + w + 'l-6 6 6 6h' + (-w) + 'z'));
+    }
+    // Windows w wide and h tall from (x - w/2, y): round-headed, pointed,
+    // or an arrow slit.
+    function archWin(x, y, w, h, fill, sw) {
+        const r = n2(w / 2);
+        return '<path d="M' + n2(x - r) + ' ' + n2(y + h) + 'V' + n2(y + r) + 'A' + r + ' ' + r + ' 0 0 1 ' + n2(x + r) + ' ' + n2(y + r) +
+            'V' + n2(y + h) + 'z" fill="' + fill + '" stroke="' + INK + '" stroke-width="' + (sw || 2.4) + '" stroke-linejoin="round"/>';
+    }
+    function pointWin(x, y, w, h, fill, sw) {
+        const l = n2(x - w / 2), r = n2(x + w / 2), m = n2(y + w * .75);
+        return '<path d="M' + l + ' ' + n2(y + h) + 'V' + m + 'Q' + l + ' ' + n2(y + w * .2) + ' ' + x + ' ' + y + 'Q' + r + ' ' + n2(y + w * .2) + ' ' + r + ' ' + m +
+            'V' + n2(y + h) + 'z" fill="' + fill + '" stroke="' + INK + '" stroke-width="' + (sw || 2.4) + '" stroke-linejoin="round"/>';
+    }
+    function slit(x, y, h) { return '<path d="' + box(x - 2, y, 4, h || 14) + '" fill="#1b1418" stroke="' + INK + '" stroke-width="1.6"/>'; }
+    const GATE_DARK = '#1b1418';
+    // The rock a castle stands on, cracked with fire.
+    function castleRock() {
+        return grpW('#3a312b', 3, P('M-4 264h308l-6 14-20 8H30l-22-6z')) +
+            line('M64 272l14 6 12-5M206 274l16 5 12-6', '#ff6a1a', 2.4);
+    }
+
+    // A: a citadel out of a storybook. Round towers under tall slate cones,
+    // a keep with a spire roof and a rose window, the gatehouse between two
+    // drum towers, and Oblivion's purple light in every window.
+    function royalCitadel() {
+        const S = '#8b887f', SH = '#75726a', SL = '#a29f95', ROOF = '#41385e', ROOF_SH = '#2f2847', WIN = '#9b5cff';
+        let s = '<g class="castle">' + BRICKS + castleRock();
+        // the towers at the back
+        [66, 234].forEach(cx => {
+            s += towerStone(cx - 18, 52, 36, 138, SH, '#68655e') + archWin(cx, 70, 10, 18, WIN);
+            s += cone(cx, 52, 46, 62, ROOF, ROOF_SH) + pennant(cx, -10, 18, CRIMSON);
+        });
+        // the keep: two tall windows, the rose window, the spire roof and
+        // the great banner on top
+        s += towerStone(104, 50, 92, 140, S);
+        s += archWin(128, 60, 14, 26, WIN) + archWin(172, 60, 14, 26, WIN);
+        s += '<circle cx="150" cy="106" r="12" fill="' + WIN + '" stroke="' + INK + '" stroke-width="2.6"/>' +
+            line('M150 94v24M138 106h24M141.5 97.5l17 17M158.5 97.5l-17 17', INK, 1.6);
+        s += stone(box(98, 40, 104, 12), SL, 2.6);
+        s += cone(150, 40, 112, 94, ROOF, ROOF_SH) + pennant(150, -54, 24, CRIMSON, 32);
+        // the curtain wall
+        s += stone(box(16, 176, 268, 94), S) + stone(merlons(16, 284, 164, 12, 14, 10), SL, 2.4);
+        // the drum towers at its corners, each with a ring of corbels under
+        // its parapet
+        [28, 272].forEach(cx => {
+            s += towerStone(cx - 24, 120, 48, 150, S, SH);
+            let c = '';
+            for (let x = cx - 24; x < cx + 24; x += 8) c += 'M' + x + ' 122a4 4 0 0 0 8 0';
+            s += stone(box(cx - 28, 108, 56, 14), SL, 2.6) + line(c, INK, 1.6);
+            s += cone(cx, 108, 64, 78, ROOF, ROOF_SH) + pennant(cx, 30, 20, CRIMSON);
+        });
+        s += slit(28, 146) + slit(28, 206) + slit(272, 206);
+        // the east gate, where the shield stands across it
+        s += '<path d="M263 176v-22c0-12 18-12 18 0v22z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3"/>';
+        // the gatehouse, its banner and the portcullis
+        s += stone(box(112, 146, 76, 124), S) + stone(box(106, 136, 88, 12), SL, 2.6) + stone(merlons(106, 194, 124, 12, 13, 9), SL, 2.4);
+        s += grpW(CRIMSON, 2.4, P('M140 154h20v38l-10-7-10 7z')) + thornSigil(150, 169, INK);
+        s += '<path d="M127 270v-40c0-30 46-30 46 0v40z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3.2"/>';
+        s += line('M135 214v56M143 209v61M150 207v63M157 209v61M165 214v56M127 236h46M127 254h46', '#4a3f45', 2.2);
+        return s + '</g>';
+    }
+
+    // B: the Dragon's Maw. Black basalt, needle spires, fangs for
+    // battlements, the gate a dragon's skull with its jaws open and purple
+    // fire in its eyes, and Fenrirak's own banners on the hall.
+    function dragonMaw() {
+        const S = '#4e4954', SH = '#403b46', SL = '#615c68', ROOF = '#2b2334', ROOF_SH = '#1e1827',
+            EYE = '#9b5cff', BONE = '#e6dcc4', BONE_SH = '#bfb195', VIOLET = '#3b1d5e';
+        let s = '<g class="castle">' + BRICKS + castleRock();
+        // the two needle towers at the back
+        [72, 228].forEach(cx => {
+            s += towerStone(cx - 17, 14, 34, 180, SH, '#37333d');
+            s += pointWin(cx, 32, 10, 24, EYE) + pointWin(cx, 84, 10, 24, EYE);
+            s += needle(cx, 14, 46, 92, ROOF, ROOF_SH);
+        });
+        // the hall, fanged along the top, its tall windows and Fenrirak's
+        // banners: the slit eye in gold on violet
+        s += fangs(90, 210, 64, 13, SL) + towerStone(90, 64, 120, 140, S);
+        s += pointWin(122, 86, 14, 32, EYE) + pointWin(150, 80, 16, 38, EYE) + pointWin(178, 86, 14, 32, EYE);
+        [103, 197].forEach(x => {
+            s += grpW(VIOLET, 2.2, P('M' + (x - 7) + ' 72h14v54l-7-6-7 6z')) +
+                grpW(GOLD, 1.4, P('M' + (x - 5.5) + ' 92q5.5-6 11 0q-5.5 6-11 0z')) + line('M' + x + ' 88.6v6.8', INK, 1.6);
+        });
+        // the front wall
+        s += fangs(8, 292, 164, 12, SL) + stone(box(8, 164, 284, 106), S);
+        // the corner towers; the east gate is in the one on the right
+        [30, 270].forEach(cx => {
+            s += towerStone(cx - 22, 108, 44, 162, S, SH) + needle(cx, 108, 56, 70, ROOF, ROOF_SH);
+        });
+        s += pointWin(30, 130, 10, 24, EYE) + slit(30, 200) + slit(270, 206);
+        s += pointWin(271, 134, 18, 40, GATE_DARK, 3);
+        // the gatehouse
+        s += fangs(98, 202, 122, 13, SL) + stone(box(98, 122, 104, 148), S);
+        // the mouth is the gate: the dark beyond, the arena's purple floor,
+        // and the fangs of the lower jaw standing up from the ground
+        s += '<path d="' + box(122, 196, 56, 74) + '" fill="#140e12" stroke="' + INK + '" stroke-width="3"/>';
+        s += '<path d="' + box(123.5, 258, 53, 10.5) + '" fill="#6a2fc0"/>';
+        s += grpW(BONE, 2, P('M124 270l4-22 5 22zM167 270l5-22 4 22z'));
+        // the skull: horns swept back, the frills at its cheeks, the wedge
+        // of the head with a ridge down the middle, heavy brows over the
+        // eyes, the nostrils, and the upper fangs hanging over the gate
+        s += grpW(BONE, 2.6, P('M120 146C100 140 84 124 78 94C92 110 110 118 130 126zM180 146C200 140 216 124 222 94C208 110 190 118 170 126z'));
+        s += line('M100 134l5-7M90 122l5-6M84 110l5-4M200 134l-5-7M210 122l-5-6M216 110l-5-4', BONE_SH, 1.8);
+        s += grpW(BONE_SH, 2.2, P('M114 166L96 172 116 178zM112 178 98 188 120 188zM186 166 204 172 184 178zM188 178 202 188 180 188z'));
+        s += grpW(BONE, 2.8, P('M150 124L171 131 189 148 185 170 178 198H122L115 170 111 148 129 131z'));
+        s += line('M150 130V172M119 176l9 17M181 176l-9 17', BONE_SH, 2);
+        s += grpW(EYE, 2.2, P('M118 158L142 164 139 175 124 171zM182 158 158 164 161 175 176 171z'));
+        s += grpW(INK, 1, P('M131.2 161.6l1.6 5-1.6 5-1.6-5zM168.8 161.6l1.6 5-1.6 5-1.6-5z'));
+        s += grpW(BONE, 2.2, P('M108 146 145 155 146 162 111 155zM192 146 155 155 154 162 189 155z'));
+        s += '<ellipse cx="144" cy="186" rx="2.2" ry="3.6" fill="' + INK + '" transform="rotate(-24 144 186)"/>' +
+            '<ellipse cx="156" cy="186" rx="2.2" ry="3.6" fill="' + INK + '" transform="rotate(24 156 186)"/>';
+        let t = 'M123 198l4 24 5-24zM168 198l5 24 4-24z';
+        [137, 143.5, 150, 156.5, 163].forEach(x => { t += 'M' + (x - 3) + ' 198l3 10 3-10z'; });
+        s += grpW(BONE, 1.8, P(t));
+        return s + '</g>';
+    }
+
+    // C: the Arena itself. A great round amphitheatre of sandstone arches,
+    // the rows of seats inside it showing over the near wall, the purple
+    // floor of the fighting ground through its arches, gate towers either
+    // end, and the castle's keep rising behind.
+    function grandArena() {
+        const S = '#a3927a', SH = '#8c7c65', SL = '#b8a78c', IN = '#7d6d56', IN_D = '#65573f', DARK = '#211a1e', FLOOR = '#6a2fc0',
+            KS = '#6a6b66', KS_SH = '#5f605b', KS_L = '#777872', ROOF = '#41385e', ROOF_SH = '#2f2847', WIN = '#ff7a1a';
+        let s = '<g class="castle">' + BRICKS + castleRock();
+        // the castle behind: two slender towers and the keep
+        [88, 212].forEach(cx => {
+            s += towerStone(cx - 12, 30, 24, 84, KS_SH, '#55564f') + cone(cx, 30, 32, 44, ROOF, ROOF_SH) + pennant(cx, -14, 14, CRIMSON, 18);
+        });
+        s += towerStone(116, 6, 68, 110, KS) + stone(box(112, -4, 76, 12), KS_L, 2.6) + stone(merlons(112, 188, -16, 12, 12, 8), KS_L, 2.4);
+        s += archWin(136, 24, 12, 20, WIN) + archWin(164, 24, 12, 20, WIN) + archWin(150, 52, 14, 26, WIN);
+        s += pennant(150, -16, 26, CRIMSON, 30);
+        // The bowl. The near rim runs from (8, 128) down to 144 in the
+        // middle and back up, the far rim the other way; everything on the
+        // front follows the near rim down by a fixed amount.
+        const RIM = 128, BULGE = 32, H = 134;
+        const yAt = (x, off) => { const t = (x - 8) / 284; return n2(RIM + off + 2 * BULGE * t * (1 - t)); };
+        const curve = (off, back) => back ? 'Q150 ' + (RIM + BULGE + off) + ' 8 ' + (RIM + off) : 'Q150 ' + (RIM + BULGE + off) + ' 292 ' + (RIM + off);
+        const band = (a, b, fill, sw) => '<path d="M8 ' + (RIM + a) + curve(a) + 'V' + (RIM + b) + curve(b, true) + 'z" fill="' + fill + '"' +
+            (sw ? ' stroke="' + INK + '" stroke-width="' + sw + '" stroke-linejoin="round"' : '') + '/>';
+        // Inside, over the near wall: the top of the far wall, its rows of
+        // seats stepping down, and the purple fighting ground in front of
+        // them. Each is a curve from end to end of the bowl, lower than
+        // the one before.
+        const far = c => 'M8 ' + RIM + 'Q150 ' + (RIM + c) + ' 292 ' + RIM;
+        const lens = (c0, c1, fill) => '<path d="' + far(c0) + 'Q150 ' + (RIM + c1) + ' 8 ' + RIM + 'z" fill="' + fill + '"/>';
+        const rows = [-80, -66, -52, -38, -24];
+        s += lens(-88, BULGE, SL);
+        rows.forEach((c, i) => { s += lens(c, BULGE, i % 2 ? IN_D : IN); });
+        s += lens(4, BULGE, FLOOR);
+        s += line(rows.map(far).join('') + far(4), INK, 1.4);
+        // the stairs down through the seats, all heading for the middle
+        const onFar = (x, c) => { const t = (x - 8) / 284; return n2(RIM + 2 * c * t * (1 - t)); };
+        s += line([44, 84, 122, 178, 216, 256].map(x => {
+            const x2 = n2(150 + (x - 150) * .8);
+            return 'M' + x + ' ' + onFar(x, -88) + 'L' + x2 + ' ' + onFar(x2, 4);
+        }).join(''), '#4d4232', 1.8);
+        s += '<path d="' + far(-88) + curve(0, true) + 'z" fill="none" stroke="' + INK + '" stroke-width="2.8" stroke-linejoin="round"/>';
+        // the near wall: plain stone, two cornices, and its far right-hand
+        // end turning away into shadow
+        s += band(0, H, S);
+        let shade = 'M236 ' + yAt(236, 0);
+        for (let x = 248; x < 292; x += 12) shade += 'L' + x + ' ' + yAt(x, 0);
+        shade += 'L292 ' + RIM + 'V' + (RIM + H);
+        for (let x = 292; x >= 236; x -= 8) shade += 'L' + x + ' ' + yAt(x, H);
+        s += '<path d="' + shade + 'z" fill="' + SH + '"/>';
+        s += band(22, 28, SL, 2) + band(64, 70, SL, 2);
+        // arches round the drum: spaced by the angle round it, so they
+        // crowd and narrow towards the ends as the wall turns away
+        const angles = [-41, -28, -14, 0, 14, 28, 41];
+        angles.forEach((a, i) => {
+            const r = a * Math.PI / 180, x = n2(150 + 142 * Math.sin(r)), k = Math.cos(r);
+            // the attic's little windows, between the arches below
+            if (i < angles.length - 1) {
+                const m = (a + angles[i + 1]) / 2 * Math.PI / 180, mx = 150 + 142 * Math.sin(m), mk = Math.cos(m);
+                s += '<path d="' + box(mx - 4 * mk, yAt(mx, 8), 8 * mk, 9) + '" fill="' + DARK + '" stroke="' + INK + '" stroke-width="1.6"/>';
+                s += line('M' + n2(mx) + ' ' + yAt(mx, 28) + 'V' + yAt(mx, 64) + 'M' + n2(mx) + ' ' + yAt(mx, 70) + 'V' + yAt(mx, H - 2), SH, 2.4);
+            }
+            // the upper arches, and the lower ones with the purple floor
+            // of the fighting ground showing through them
+            const up = yAt(x, 34), w2 = 18 * k;
+            if (a) s += '<path d="M' + n2(x - w2 / 2) + ' ' + n2(up + 27) + 'V' + n2(up + 9) + 'A' + n2(w2 / 2) + ' 9 0 0 1 ' + n2(x + w2 / 2) + ' ' + n2(up + 9) + 'V' + n2(up + 27) +
+                'z" fill="' + DARK + '" stroke="' + INK + '" stroke-width="2"/>';
+            const W = a ? 22 : 34, w = W * k, top = yAt(x, a ? 80 : 74), bot = yAt(x, H), ry = W / 2;
+            const arch = 'M' + n2(x - w / 2) + ' ' + bot + 'V' + n2(top + ry) + 'A' + n2(w / 2) + ' ' + ry + ' 0 0 1 ' + n2(x + w / 2) + ' ' + n2(top + ry) + 'V' + bot + 'z';
+            s += '<path d="' + arch + '" fill="' + DARK + '"/>';
+            s += '<path d="' + box(x - w / 2, bot - 9, w, 9) + '" fill="' + FLOOR + '"/>';
+            if (!a) s += line('M' + (x - 9) + ' ' + n2(top + 8) + 'V' + bot + 'M' + x + ' ' + n2(top + 1) + 'V' + bot + 'M' + (x + 9) + ' ' + n2(top + 8) + 'V' + bot +
+                'M' + (x - 17) + ' ' + n2(top + 30) + 'h34', '#4a3f45', 2.2);
+            s += '<path d="' + arch + '" fill="none" stroke="' + INK + '" stroke-width="' + (a ? 2.2 : 3) + '"/>';
+        });
+        // the kingdom's banner over the great gate
+        s += grpW(CRIMSON, 2.4, P('M140 ' + yAt(150, 30) + 'h20v32l-10-7-10 7z')) + thornSigil(150, yAt(150, 44), INK);
+        s += band(0, H, 'none', 2.8);
+        // the gate towers at either end; the east gate is in the right one
+        [29, 271].forEach(cx => {
+            s += towerStone(cx - 19, 104, 38, 166, S) + stone(box(cx - 23, 94, 46, 12), SL, 2.6) + stone(merlons(cx - 23, cx + 23, 82, 12, 10, 8), SL, 2.4);
+            s += pennant(cx, 82, 22, CRIMSON, 18);
+        });
+        s += archWin(29, 118, 12, 22, WIN) + slit(29, 180) + slit(271, 206);
+        s += '<path d="M262 176v-22c0-12 18-12 18 0v22z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3"/>';
+        return s + '</g>';
+    }
+
+    // D: the Fallen Fortress. The castle after the dragon came: a tower
+    // snapped off and burning with purple fire, the keep's corner fallen
+    // in and split by a crack of purple light, a breach in the wall, the
+    // portcullis torn and the banners in rags.
+    function fallenFortress() {
+        const S = '#6f6b64', SH = '#5e5a54', SL = '#817c74', F = '#9b5cff', F_IN = '#dccbff', RUBBLE = '#827d74';
+        let s = '<g class="castle">' + BRICKS + castleRock();
+        // the broken tower on the left, and the fire coming out of it
+        s += '<g class="flicker">' + grpW(F, 2.4, P('M33 52C24 38 28 22 38 10C38 20 42 25 47 27C44 12 50-6 62-26C62-8 72 0 75 14C78 8 79 3 78-4C90 10 94 36 86 52z')) +
+            grpW(F_IN, 1.8, P('M45 50C39 40 42 31 48 24C48 31 51 35 55 37C54 25 58 15 64 6C66 18 73 26 72 37C74 35 76 33 77 30C81 38 81 45 77 50z')) + '</g>';
+        s += stone('M36 214V48L44 34 52 44 58 26 68 38 74 30 84 50V214z', SH);
+        s += archWin(60, 74, 10, 18, F) + archWin(60, 132, 10, 18, GATE_DARK);
+        // the tower on the right still stands, its flag torn on a bent pole
+        s += towerStone(216, 46, 48, 168, SH) + stone(box(212, 36, 56, 12), SL, 2.6) + stone(merlons(212, 268, 24, 12, 12, 9), SL, 2.4);
+        s += archWin(240, 70, 10, 18, F);
+        s += line('M244 24L250 -12', INK, 2.6) + grpW(CRIMSON, 2.2, P('M250 -12l22 5-4 4 4 5-8 1 2 5-19-5z'));
+        // the keep, its right-hand corner fallen in, split by the crack
+        s += stone('M92 214V68H160L168 78 175 72 184 88 194 82 208 104V214z', S);
+        s += stone(box(88, 58, 74, 12), SL, 2.6) + stone(merlons(88, 162, 46, 12, 12, 9), SL, 2.4);
+        s += grpW(RUBBLE, 2, P('M162 80l8-6 7 4-2 7-9 2zM186 92l8-4 6 6-5 6-8-2z'));
+        s += archWin(112, 92, 14, 24, F) + archWin(182, 116, 14, 24, F);
+        s += grpW(F, 1.8, P('M132 70l6 15-6 11 8 18-5 13 4 3 8-16-8-18 6-11-6-15z'));
+        // the front wall and the breach in it, dark through the gap, the
+        // stones fallen below
+        s += '<path d="M48 176H100V230H48z" fill="#241e1b"/>';
+        s += stone('M10 270V178H50L57 192 64 186 71 224 80 204 88 210 98 178H290V270z', S);
+        s += stone(merlons(10, 50, 166, 12, 12, 9) + merlons(98, 290, 166, 12, 12, 9), SL, 2.4);
+        s += grpW(RUBBLE, 2.2, P('M42 270l5-12 12-5 9 7-2 10zM58 270l8-14 12-3 7 10-2 7zM80 270l2-11 12-2 8 13zM66 254l7-10 10 3 2 9-12 2zM96 270l3-7 9 1 3 6z'));
+        // the east tower, its gate where the shield stands across it
+        s += towerStone(252, 114, 38, 156, S) + stone(box(248, 104, 46, 12), SL, 2.6) + stone(merlons(248, 294, 92, 12, 11, 8), SL, 2.4);
+        s += '<path d="M262 176v-22c0-12 18-12 18 0v22z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3"/>' + slit(271, 208);
+        // the gatehouse, one merlon gone, the banner in rags and the
+        // portcullis torn half out
+        s += stone(box(114, 146, 72, 124), S) + stone(box(110, 134, 80, 12), SL, 2.6);
+        s += stone(box(110, 122, 12, 12) + box(127, 122, 12, 12) + box(144, 122, 12, 12) + box(178, 122, 12, 12), SL, 2.4);
+        s += stone(box(161, 128, 12, 6), SL, 2.2);
+        s += grpW(CRIMSON, 2.4, P('M140 152h20v30l-3 7-4-5-3 6-3-6-4 5-3-7z')) + thornSigil(150, 166, INK);
+        s += '<path d="M127 270v-40c0-30 46-30 46 0v40z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3.2"/>';
+        s += line('M135 214v22M143 209v44M150 207v16M157 209v34M165 214v12M127 234h14M147 234h26M150 223l-7 13', '#4a3f45', 2.2);
+        return s + '</g>';
+    }
+
+    // E: the Oblivion Spire. Dark stone, one great spire crowned with a
+    // purple crystal, and the same crystal breaking out through the walls,
+    // the towers and the ground, as Oblivion grows through the castle.
+    function crystal(x, y, len, deg, w) {
+        // a shard standing on (x, y), len long, leaning deg from upright:
+        // the lit face on the left, the shaded one on the right
+        const r = deg * Math.PI / 180, dx = Math.sin(r), dy = -Math.cos(r), nx = Math.cos(r), ny = Math.sin(r), h = w / 2;
+        const pt = (a, b) => n2(x + dx * a + nx * b) + ' ' + n2(y + dy * a + ny * b);
+        const tip = pt(len, 0), mid = pt(len * .74, 0);
+        return '<path d="M' + pt(0, -h) + 'L' + pt(len * .74, -h) + 'L' + tip + 'L' + mid + 'L' + pt(0, 0) + 'z" fill="#9b5cff"/>' +
+            '<path d="M' + pt(0, 0) + 'L' + mid + 'L' + tip + 'L' + pt(len * .74, h) + 'L' + pt(0, h) + 'z" fill="#6a2fc0"/>' +
+            '<path d="M' + pt(0, 0) + 'L' + mid + 'L' + tip + '" fill="none" stroke="#3b1d5e" stroke-width="1.4"/>' +
+            '<path d="M' + pt(0, -h) + 'L' + pt(len * .74, -h) + 'L' + tip + 'L' + pt(len * .74, h) + 'L' + pt(0, h) + '" fill="none" stroke="' + INK + '" stroke-width="2.2" stroke-linejoin="round"/>';
+    }
+    function oblivionSpire() {
+        const S = '#57525e', SH = '#48444f', SL = '#6a6572', ROOF = '#2c2536', ROOF_SH = '#1f1a28', WIN = '#9b5cff';
+        let s = '<g class="castle">' + BRICKS + castleRock();
+        // the two towers either side of the spire
+        [86, 214].forEach(cx => {
+            s += towerStone(cx - 20, 52, 40, 140, SH, '#3d3944') + pointWin(cx, 74, 10, 24, WIN) + needle(cx, 52, 52, 62, ROOF, ROOF_SH);
+        });
+        // the spire, and the great crystal held up in stone claws on top
+        s += towerStone(130, 4, 40, 190, S, SH);
+        s += pointWin(150, 30, 10, 26, WIN) + pointWin(150, 76, 10, 26, WIN);
+        s += '<path d="M150-92L166-62V-24L150-6 134-24V-62z" fill="#6a2fc0"/>' +
+            '<path d="M150-92 134-62V-24L150-6z" fill="#9b5cff"/>' +
+            '<path d="M140-58V-28" fill="none" stroke="#cdb4ff" stroke-width="3" stroke-linecap="round"/>' +
+            '<path d="M150-92V-6M134-62 150-52 166-62M134-24 150-16 166-24" fill="none" stroke="#3b1d5e" stroke-width="1.4"/>' +
+            '<path d="M150-92L166-62V-24L150-6 134-24V-62z" fill="none" stroke="' + INK + '" stroke-width="2.6" stroke-linejoin="round"/>';
+        s += grpW(SL, 2.4, P('M126 0C120-12 122-26 130-36L134-30C130-22 130-12 134-2zM174 0C180-12 178-26 170-36L166-30C170-22 170-12 166-2z'));
+        s += stone(box(122, -6, 56, 12), SL, 2.6);
+        // crystal breaking out of the tower on the right
+        s += crystal(224, 152, 34, 72, 15) + crystal(222, 150, 30, -4, 14) + crystal(224, 152, 52, 32, 20);
+        // the front wall
+        s += stone(box(8, 166, 284, 104), S) + stone(merlons(8, 292, 154, 12, 13, 9), SL, 2.4);
+        // the corner towers; the east gate is in the one on the right
+        [29, 271].forEach(cx => {
+            s += towerStone(cx - 20, 108, 40, 162, S, SH) + stone(box(cx - 24, 98, 48, 12), SL, 2.6) + stone(merlons(cx - 24, cx + 24, 86, 12, 11, 8), SL, 2.4);
+        });
+        s += pointWin(29, 124, 10, 24, WIN) + slit(29, 192) + slit(271, 208);
+        s += pointWin(271, 134, 18, 40, GATE_DARK, 3);
+        // the gatehouse and its pointed gate, purple light on the ground
+        // inside
+        s += stone(box(110, 140, 80, 130), S) + stone(box(106, 130, 88, 12), SL, 2.6) + stone(merlons(106, 194, 118, 12, 12, 8), SL, 2.4);
+        s += '<path d="M128 270V222Q128 196 150 184Q172 196 172 222V270z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3.2"/>';
+        s += '<path d="' + box(129.6, 258, 40.8, 10.4) + '" fill="#6a2fc0"/>';
+        s += pointWin(150, 148, 12, 26, WIN);
+        // crystal breaking through the wall and out of the ground
+        // and the cracks of its light it sends up the stone
+        s += line('M84 222l7-12-4-9 8-13-3-8M218 230l-6-11 5-10-6-12M196 222l6-9-3-8', '#9b5cff', 2.4);
+        s += crystal(44, 270, 50, -36, 20) + crystal(92, 270, 46, 24, 20) + crystal(68, 270, 82, -8, 28);
+        s += crystal(232, 270, 36, 42, 16) + crystal(212, 270, 60, 14, 24);
+        s += crystal(110, 170, 26, -76, 13) + crystal(110, 168, 42, -36, 18);
+        return s + '</g>';
+    }
+
+    // F and G: the Fallen Fortress and the Oblivion Spire in one. The castle
+    // broken where Oblivion's crystal came up through it: out of the
+    // snapped-off tower, out of the keep's fallen corner, through the breach
+    // in the wall and out of the ground, with cracks of its light in the
+    // stone. F is in the Fallen Fortress's grey stone, G in the Spire's dark.
+    function shatteredFortress(dark) {
+        const S = dark ? '#57525e' : '#6f6b64', SH = dark ? '#48444f' : '#5e5a54', SL = dark ? '#6a6572' : '#817c74',
+            RUBBLE = dark ? '#716c79' : '#827d74', LIGHT = '#9b5cff';
+        let s = '<g class="castle">' + BRICKS + castleRock();
+        // the crystal that broke the tower on the left, standing up out of it
+        s += crystal(44, 52, 48, -30, 18) + crystal(78, 52, 54, 24, 20) + crystal(60, 54, 98, -4, 30);
+        s += stone('M36 214V48L44 34 52 44 58 26 68 38 74 30 84 50V214z', SH);
+        s += line('M47 58l6 11-4 9 6 13', LIGHT, 2.4);
+        s += archWin(60, 98, 10, 18, LIGHT) + archWin(60, 146, 10, 18, GATE_DARK);
+        // the tower on the right still stands, its flag torn on a bent pole
+        s += towerStone(216, 46, 48, 168, SH) + stone(box(212, 36, 56, 12), SL, 2.6) + stone(merlons(212, 268, 24, 12, 12, 9), SL, 2.4);
+        s += archWin(240, 70, 10, 18, LIGHT);
+        s += line('M244 24L250 -12', INK, 2.6) + grpW(CRIMSON, 2.2, P('M250 -12l22 5-4 4 4 5-8 1 2 5-19-5z'));
+        // the crystal that brought the keep's corner down, behind what is
+        // left of it
+        s += crystal(176, 104, 46, 2, 16) + crystal(196, 112, 74, 34, 24);
+        // the keep, its right-hand corner fallen in, split by a crack
+        s += stone('M92 214V68H160L168 78 175 72 184 88 194 82 208 104V214z', S);
+        s += stone(box(88, 58, 74, 12), SL, 2.6) + stone(merlons(88, 162, 46, 12, 12, 9), SL, 2.4);
+        s += grpW(RUBBLE, 2, P('M162 80l8-6 7 4-2 7-9 2zM196 94l7-3 6 6-4 6-8-2z'));
+        s += archWin(112, 92, 14, 24, LIGHT) + archWin(182, 120, 14, 24, LIGHT);
+        s += grpW(LIGHT, 1.8, P('M132 70l6 15-6 11 8 18-5 13 4 3 8-16-8-18 6-11-6-15z'));
+        // the front wall, dark through the breach, and the cracks running
+        // out from it and from the crystal by the east tower
+        s += '<path d="M48 176H100V230H48z" fill="#241e1b"/>';
+        s += stone('M10 270V178H50L57 192 64 186 71 224 80 204 88 210 98 178H290V270z', S);
+        s += stone(merlons(10, 50, 166, 12, 12, 9) + merlons(98, 290, 166, 12, 12, 9), SL, 2.4);
+        s += line('M100 206l9-5 3-11 9-6M28 236l-8-8 3-10-6-9M220 232l-6-11 5-10-6-12M198 226l6-9-3-8', LIGHT, 2.4);
+        // the east tower, its gate where the shield stands across it
+        s += towerStone(252, 114, 38, 156, S) + stone(box(248, 104, 46, 12), SL, 2.6) + stone(merlons(248, 294, 92, 12, 11, 8), SL, 2.4);
+        s += '<path d="M262 176v-22c0-12 18-12 18 0v22z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3"/>' + slit(271, 208);
+        // the gatehouse, one merlon gone, the banner in rags, the portcullis
+        // torn half out and the purple light on the ground inside
+        s += stone(box(114, 146, 72, 124), S) + stone(box(110, 134, 80, 12), SL, 2.6);
+        s += stone(box(110, 122, 12, 12) + box(127, 122, 12, 12) + box(144, 122, 12, 12) + box(178, 122, 12, 12), SL, 2.4);
+        s += stone(box(161, 128, 12, 6), SL, 2.2);
+        s += grpW(CRIMSON, 2.4, P('M140 152h20v30l-3 7-4-5-3 6-3-6-4 5-3-7z')) + thornSigil(150, 166, INK);
+        s += '<path d="M127 270v-40c0-30 46-30 46 0v40z" fill="' + GATE_DARK + '" stroke="' + INK + '" stroke-width="3.2"/>';
+        s += '<path d="' + box(128.6, 258, 42.8, 10.4) + '" fill="#6a2fc0"/>';
+        s += line('M135 214v22M143 209v44M150 207v16M157 209v34M165 214v12M127 234h14M147 234h26M150 223l-7 13', '#4a3f45', 2.2);
+        // the crystal that came up through the breach, and more breaking
+        // out of the ground by the east tower, the fallen stones round them
+        s += crystal(48, 270, 52, -34, 20) + crystal(94, 270, 48, 24, 20) + crystal(70, 270, 86, -6, 28);
+        s += crystal(232, 270, 36, 42, 16) + crystal(212, 270, 60, 14, 24);
+        s += grpW(RUBBLE, 2.2, P('M34 270l5-11 11-3 7 8-2 6zM100 270l3-9 10-1 5 10zM84 270l4-7 8 1 2 6zM196 270l3-7 9 0 4 7z'));
+        return s + '</g>';
+    }
+
+    // The castle as it was first drawn, kept to compare.
+    function greyKeep() {
+        // Grey stone blocks, red banners, fire in the windows and the purple
+        // shield on the east gate.
         let s = '<g class="castle">' + BRICKS;
         // the moat of fire
         s += '<path d="M10 268c40-16 240-16 280 0l-6 18c-40-12-228-12-268 0z" fill="#8a1c12" stroke="' + INK + '" stroke-width="3"/>';
@@ -4722,14 +5158,131 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return s;
     }
 
-    function shield() {
-        return '<g class="oblivion-shield">' +
-            '<path d="M0 -70C46 -50 46 50 0 70" fill="#7d4ccc" fill-opacity=".55" stroke="#9b5cff" stroke-width="4"/>' +
-            '<path d="M6 -52C38 -36 38 36 6 52" fill="none" stroke="#5a2ea0" stroke-width="2"/>' +
-            '</g>';
+    // The user's pick (2026-10-05): F, the Shattered Fortress in grey stone.
+    // The others are kept to compare ("Castle Designs.html").
+    const CASTLE = 'shattered';
+    const CASTLES = {
+        citadel: { name: 'The Royal Citadel', draw: royalCitadel,
+            blurb: 'A storybook citadel: round towers under tall slate cones, a spire-roofed keep with a rose window, the gatehouse between two drum towers. Oblivion’s purple light in every window.' },
+        maw: { name: 'The Dragon’s Maw', draw: dragonMaw,
+            blurb: 'Black basalt and needle spires, fangs for battlements, and the gate a horned dragon skull with its jaws open and purple fire in its eyes. Fenrirak’s own banners on the hall.' },
+        arena: { name: 'The Grand Arena', draw: grandArena,
+            blurb: 'The arena itself: a great round amphitheatre of sandstone arches, the seats inside showing over the near wall and the purple fighting ground through the arches. The castle’s keep rises behind.' },
+        fallen: { name: 'The Fallen Fortress', draw: fallenFortress,
+            blurb: 'The castle after the dragon came: a tower snapped off and burning with purple fire, the keep’s corner fallen in and split by a crack of purple light, a breach in the wall, the banners in rags.' },
+        spire: { name: 'The Oblivion Spire', draw: oblivionSpire,
+            blurb: 'Dark stone and one great spire crowned with a purple crystal, the same crystal breaking out through the walls and the ground as Oblivion grows through the castle.' },
+        shattered: { name: 'The Shattered Fortress', draw: () => shatteredFortress(false), tag: 'D and E together, grey stone',
+            blurb: 'The castle broken where Oblivion’s crystal came up through it: out of the snapped-off tower, out of the keep’s fallen corner, through the breach in the wall and out of the ground, with cracks of its light in the stone. In the Fallen Fortress’s grey stone.' },
+        shatteredDark: { name: 'The Shattered Fortress', draw: () => shatteredFortress(true), tag: 'D and E together, dark stone',
+            blurb: 'The same castle in the Oblivion Spire’s dark stone, so the crystal stands out harder against it.' },
+        keep: { name: 'The Grey Keep', draw: greyKeep, blurb: 'The castle the game started with.' }
+    };
+    const castleOf = id => CASTLES[id] || CASTLES[CASTLE];
+    function castle(id) { return castleOf(id).draw(); }
+
+    /* The Oblivion Mage's shield: a dome of purple glass over the castle.  */
+    /* Flat colour and crisp lines only, no glow: a clear purple tint over  */
+    /* everything under it, the bright rim, the ring where it meets the     */
+    /* ground, rings and ribs across it so it reads as round, a hard white  */
+    /* sheen down its upper left and a glint or two. It comes in two parts: */
+    /* the floor and the far side of the ring go under the castle, the rest */
+    /* over it. The rings drift slowly round (style.css, .dome-flow).       */
+    const SHIELD = { line: '#9b5cff', deep: '#6a2fc0', pale: '#c79bff', core: '#eadcff' };
+    // The dome's outline: the left side up from the foot to the crown and
+    // down the right. hw scales it across, so the ribs are the same curve
+    // narrowed; lift raises the foot (a rib meets the ring in front).
+    function domeArc(hw, lift) {
+        const d = DOME, l = n2(d.x - d.a * hw), r = n2(d.x + d.a * hw), y0 = n2(d.base + (lift || 0)), top = d.base - d.b;
+        return 'M' + l + ' ' + y0 + 'C' + l + ' ' + n2(d.base - d.k * d.b) + ' ' + n2(d.x - d.k * d.a * hw) + ' ' + top + ' ' + d.x + ' ' + top +
+            'C' + n2(d.x + d.k * d.a * hw) + ' ' + top + ' ' + r + ' ' + n2(d.base - d.k * d.b) + ' ' + r + ' ' + y0;
+    }
+    // A point on the left half of the outline, t from the foot (0) to the
+    // crown (1), drawn in by `inset`.
+    function domePoint(t, inset) {
+        const d = DOME, u = 1 - t, a = d.a - (inset || 0), b = d.b - (inset || 0);
+        const x = u * u * u * -a + 3 * u * u * t * -a + 3 * u * t * t * -d.k * a;
+        const y = 3 * u * u * t * d.k * b + 3 * u * t * t * b + t * t * t * b;
+        return [d.x + x, d.base - y];
+    }
+    // The t of the outline at height y, and how far across the dome is there.
+    function domeT(y) {
+        let lo = 0, hi = 1;
+        for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (domePoint(m)[1] > y) lo = m; else hi = m; }
+        return lo;
+    }
+    function domeHalf(y) { return DOME.x - domePoint(domeT(y))[0]; }
+    function sparkle(x, y, r) {
+        return '<path d="M' + x + ' ' + (y - r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + r) +
+            'Q' + x + ' ' + y + ' ' + (x - r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - r) + 'z" fill="' + SHIELD.core + '"/>';
+    }
+    function domeBack() {
+        const d = DOME, foot = 'M' + (d.x - d.a) + ' ' + d.base + 'A' + d.a + ' ' + d.ry + ' 0 0 1 ' + (d.x + d.a) + ' ' + d.base;
+        return '<g class="oblivion-shield-back">' +
+            '<ellipse cx="' + d.x + '" cy="' + d.base + '" rx="' + d.a + '" ry="' + d.ry + '" fill="' + SHIELD.line + '" fill-opacity=".16"/>' +
+            '<path d="' + foot + '" fill="none" stroke="' + SHIELD.line + '" stroke-opacity=".7" stroke-width="3"/></g>';
+    }
+    function domeFront() {
+        const d = DOME, top = d.base - d.b;
+        const front = 'A' + d.a + ' ' + d.ry + ' 0 0 1 ' + (d.x - d.a) + ' ' + d.base;
+        const pts = (from, to, inset, hw, side) => {
+            let p = '';
+            for (let i = 0; i <= 16; i++) {
+                const q = domePoint(from + (to - from) * i / 16, inset);
+                p += (i ? 'L' : 'M') + n2(d.x + (q[0] - d.x) * (hw || 1) * (side || 1)) + ' ' + n2(q[1]);
+            }
+            return p;
+        };
+        let s = '<g class="oblivion-shield">';
+        // the glass: one clear purple tint over all of it, and thicker
+        // round its edge, where you look through more of it
+        s += '<path d="' + domeArc(1) + front + 'z" fill="' + SHIELD.line + '" fill-opacity=".13"/>';
+        s += '<path d="' + domeArc(1) + 'L' + pts(0, 1, 10, 1, -1).slice(1) + pts(1, 0, 10).replace('M', 'L') + 'z" fill="' + SHIELD.line + '" fill-opacity=".2"/>';
+        // its cap: two rings round the top, drifting, and ribs from the
+        // crown down to them, all clear of the castle under it
+        const rings = [d.base - d.b * .84, d.base - d.b * .935];
+        rings.forEach((y, i) => {
+            const w = n2(domeHalf(y)), ry = n2(d.ry * w / d.a);
+            s += '<path class="dome-flow' + (i ? ' slow' : '') + '" d="M' + n2(d.x - w) + ' ' + n2(y) + 'A' + w + ' ' + ry + ' 0 0 0 ' + n2(d.x + w) + ' ' + n2(y) +
+                '" fill="none" stroke="' + SHIELD.pale + '" stroke-opacity=".75" stroke-width="1.8" stroke-dasharray="14 9"/>';
+        });
+        // (each rib starts where it meets the near side of the lower ring)
+        const t0 = domeT(rings[0]), w0 = domeHalf(rings[0]), ry0 = d.ry * w0 / d.a;
+        let ribs = '';
+        [.42, .78].forEach(hw => {
+            [-1, 1].forEach(side => {
+                ribs += 'M' + n2(d.x - side * w0 * hw) + ' ' + n2(rings[0] + ry0 * Math.sqrt(1 - hw * hw)) + 'L' + pts(t0 + .02, 1, 0, hw, side).slice(1);
+            });
+        });
+        s += '<path d="' + ribs + '" fill="none" stroke="' + SHIELD.pale + '" stroke-opacity=".55" stroke-width="1.5" stroke-linecap="round"/>';
+        // the ring where it meets the ground, in front
+        s += '<path d="M' + (d.x + d.a) + ' ' + d.base + front + '" fill="none" stroke="' + SHIELD.line + '" stroke-width="3.6"/>';
+        // the rim, its bright edge running down the middle of it
+        s += '<path d="' + domeArc(1) + '" fill="none" stroke="' + SHIELD.deep + '" stroke-width="6.4"/>';
+        s += '<path d="' + domeArc(1) + '" fill="none" stroke="' + SHIELD.line + '" stroke-width="4"/>';
+        s += '<path d="' + domeArc(1) + '" fill="none" stroke="' + SHIELD.core + '" stroke-width="1.2"/>';
+        // the sheen down the upper left, and a short one after it
+        const sheen = (t0, t1) => {
+            let p = '';
+            for (let i = 0; i <= 12; i++) { const q = domePoint(t0 + (t1 - t0) * i / 12, 13); p += (i ? 'L' : 'M') + n2(q[0]) + ' ' + n2(q[1]); }
+            return p;
+        };
+        s += '<path d="' + sheen(.4, .74) + sheen(.79, .86) + '" fill="none" stroke="' + SHIELD.core + '" stroke-opacity=".8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
+        // glints
+        s += sparkle(822, 178, 7) + sparkle(838, 196, 3.5) + sparkle(632, 430, 5);
+        return s + '</g>';
     }
 
-    function boardScene(D) {
+    // The castle under its dome, in board units: on the board, and framed
+    // on its own for the arena's card.
+    function arenaScene(castleId) {
+        return domeBack() +
+            '<g transform="translate(' + CASTLE_AT.x + ' ' + CASTLE_AT.y + ') scale(' + CASTLE_AT.scale + ') translate(-150 -150)">' + castle(castleId) + '</g>' +
+            domeFront();
+    }
+    const ARENA_FRAME = n2(DOME.x - DOME.a - 14) + ' ' + n2(DOME.base - DOME.b - 12) + ' ' + n2(DOME.a * 2 + 28) + ' ' + n2(DOME.b + DOME.ry + 26);
+
+    function boardScene(D, castleId) {
         const B = D.SQUARES;
         const defs = '<defs>' +
             '<radialGradient id="ground" cx="58%" cy="50%" r="70%">' +
@@ -4746,8 +5299,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         let s = defs;
         s += '<rect width="1200" height="700" fill="url(#ground)"/>';
         s += '<rect width="1200" height="700" fill="url(#grass)"/>';
-        // cracks of fire in the ground round the castle
-        s += line('M622 508l28-24 20 14 24-28M884 218l-24 24 10 18M626 238l20 18-6 20M872 492l-18-20-22 10', '#ff6a1a', 2.6);
+        // the wild ground outside the wall a shade darker, the kingdom's
+        // ground inside it a shade lighter
+        s += '<rect width="' + WALL_X + '" height="700" fill="#000000" fill-opacity=".2"/>';
+        s += '<rect x="' + WALL_X + '" width="' + (1200 - WALL_X) + '" height="700" fill="#c8b898" fill-opacity=".09"/>';
+        // cracks of fire in the ground, running out from under the dome
+        s += line('M606 488l-22 10-8 16-20 6M894 488l22 10 6 16 20 6M688 500l-8 18 10 14M812 500l10 16-8 14', '#ff6a1a', 2.6);
 
         // the roads, square to square
         const main = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '25', '26', '27', '28', '29', '30',
@@ -4756,7 +5313,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += '<path d="' + roadPath(B, long) + '" fill="none" stroke="#2a2018" stroke-width="44" stroke-linejoin="round"/>';
         s += '<path d="' + roadPath(B, long) + '" fill="none" stroke="#6a5238" stroke-width="36" stroke-linejoin="round" stroke-dasharray="2 0"/>';
         // the main road runs on from the temple to the castle's east gate
-        const gate = ' L' + SHIELD_AT.x.toFixed(1) + ' ' + SHIELD_AT.y;
+        const gate = ' L' + GATE_AT.x.toFixed(1) + ' ' + GATE_AT.y;
         s += '<path d="' + roadPath(B, main) + gate + '" fill="none" stroke="#2a2018" stroke-width="48" stroke-linejoin="round"/>';
         s += '<path d="' + roadPath(B, main) + gate + '" fill="none" stroke="url(#cobble)" stroke-width="40" stroke-linejoin="round"/>';
 
@@ -4769,19 +5326,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // the wall between the main route and the long one: the safe way
         // through. (Only the outer side is walled; the inner side, facing
         // the castle, is open.)
-        s += wallRun(372, 110, 590);
+        s += wallRun(WALL_X, 110, 590);
 
-        // the castle, in the middle of the arena's three cells, and the
-        // shield on its gate
-        s += '<g transform="translate(' + CASTLE_AT.x + ' ' + CASTLE_AT.y + ') scale(' + CASTLE_AT.scale + ') translate(-150 -150)">' + castle() + '</g>';
-        s += '<g transform="translate(' + SHIELD_AT.x.toFixed(1) + ' ' + SHIELD_AT.y + ') scale(' + SHIELD_AT.scale + ')">' + shield() + '</g>';
-        s += brazier(606, 300, 1.2) + brazier(606, 462, 1.2) + brazier(930, 470, 1) + brazier(930, 260, 1);
+        // the castle, in the middle of the arena's three cells, under the
+        // shield's dome, and braziers burning outside it
+        s += arenaScene(castleId);
+        s += brazier(566, 300, 1.2) + brazier(566, 462, 1.2) + brazier(930, 470, 1) + brazier(930, 260, 1);
 
         // the Merchant's humble stall, near the Start
         s += '<g transform="translate(940 454) scale(.95)">' + merchantHut() + '</g>';
 
         // thorn bushes dotted about Thornwick
-        [[640, 150, 1.5], [860, 160, 1.3], [1040, 250, 1.4], [700, 580, 1.4], [850, 600, 1.2],
+        [[628, 150, 1.5], [878, 166, 1.3], [1040, 250, 1.4], [700, 580, 1.4], [850, 600, 1.2],
          [560, 640, 1.1], [1150, 520, .9], [990, 360, 1], [470, 50, .8], [300, 100, 1.2],
          [60, 520, 1], [1120, 160, 1.1]].forEach(b => { s += thornBush(b[0], b[1], b[2]); });
 
@@ -4809,7 +5365,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         boardScene: boardScene,
         ARENA_BOX: ARENA_BOX,
         MERCHANT_BOX: MERCHANT_BOX,
-        castleSvg: () => wrap(castle(), '0 -40 300 330'),
+        // The arena's own picture: the castle under the shield's dome.
+        castleSvg: id => wrap(arenaScene(id), ARENA_FRAME),
+        // Where a piece stands when the shield stops it, on the 1200 x 700 board.
+        SHIELD_EDGE: SHIELD_EDGE,
+        // The castles on offer (CASTLES), to choose from.
+        CASTLES: Object.keys(CASTLES).map(k => ({ id: k, name: CASTLES[k].name, blurb: CASTLES[k].blurb, tag: CASTLES[k].tag || '' })),
+        CASTLE: CASTLE,
         merchantSvg: () => wrap(merchantHut(), '0 0 160 112'),
         enemySvg: id => ENEMY_ART[id] ? wrap(ENEMY_ART[id]) : '',
         // The Royal Guards in each helmet on offer (GUARD_HELMS), to choose from.
@@ -10724,12 +11286,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 const go = () => {
                     const w = walking[p.id];
                     if (!w) return;
-                    // Walked into the shield: the piece stops there, and the
-                    // shield throws it back (ZAP) once nothing else is moving.
-                    if (shown[p.id] === D.ARENA && w.steps.length && ZAP.wants(p.id)) {
+                    // Walked into the shield: the piece stops against the
+                    // dome, never inside it, and the shield throws it back
+                    // (ZAP) once nothing else is moving.
+                    const into = shown[p.id] === D.ARENA ? w.steps.length > 0 : w.steps[0] === D.ARENA && w.steps.length > 1;
+                    if (into && ZAP.wants(p.id)) {
+                        if (shown[p.id] !== D.ARENA) shown[p.id] = w.steps.shift();
                         delete walking[p.id];
                         held[p.id] = true;
-                        placeTokens();
+                        placeTokens(p.id);
                         renderBoardHighlight();
                         afterSettle();
                         return;
@@ -10756,6 +11321,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return {
             update: update,
             shown: pid => shown[pid],
+            held: pid => !!held[pid],
             busy: () => Object.keys(walking).length > 0,
             // Thrown back from the shield: the piece is where the game says.
             release(pid) {
@@ -10803,18 +11369,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const cur = E.currentPlayer(S);
         const groups = {};
         S.players.filter(p => p.cls).forEach(p => {
-            const at = WALK.shown(p.id) || p.pos;
+            // stopped by the shield: against the dome, on the road
+            const at = WALK.held(p.id) ? 'shield' : WALK.shown(p.id) || p.pos;
             (groups[at] = groups[at] || []).push(p);
         });
         const want = {};
         Object.keys(groups).forEach(at => {
             const list = groups[at];
-            const c = centreOf(at);
+            const edge = at === 'shield';
+            const c = edge ? { x: A.SHIELD_EDGE.x / 100, y: A.SHIELD_EDGE.y / 100 } : centreOf(at);
             const slots = CLUSTER[Math.min(6, list.length)];
             list.forEach((p, i) => {
                 const o = slots[i] || [0, 0];
                 const sx = c.big ? o[0] * 1.6 : o[0];
-                const sy = c.big ? o[1] - .1 : o[1];
+                const sy = edge ? (o[1] - .25) * 1.6 : c.big ? o[1] - .1 : o[1];
                 want['p_' + p.id] = { x: (c.x + sx) / 12 * 100, y: (c.y + sy) / 7 * 100, p: p };
             });
         });
