@@ -7344,8 +7344,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             }
         }
         sendToStart(state, loser);
-        // A PvP fight ends the turn of whoever was moving.
-        if (state.phase === 'playing') advanceTurn(state);
+        if (state.phase !== 'playing') return;
+        // Whoever was moving and won is still standing on the square, and
+        // it does what it does for them as if nobody had been there (the
+        // user's change, 2026-10-05). Lose, and their turn is over.
+        const mover = player(state, b.moverId);
+        if (mover && mover.id === winner.id && mover.pos === b.squareId) {
+            resolveSquare(state, mover, square(mover.pos));
+        } else {
+            advanceTurn(state);
+        }
     }
 
     /* ------------------------------------------------------------------ */
@@ -12010,11 +12018,35 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const others = S.players.filter(x => x.id !== p.id && x.cls);
         if (!others.length) { notice('There is nobody to trade with.'); return; }
         let partner = others[0].id;
-        const open = (S.trades || []).find(t => t.fromId === p.id && t.status === 'open');
+        // The panel follows the game: it redraws when the offer is answered
+        // or either side's goods change, keeping whatever you had filled in.
+        let sig = null, waitingOn = null, drawnFor = null;
         openPanel('trade', function draw() {
             const mine = me();
+            if (!mine) { closePanel(); return; }
+            const others = S.players.filter(x => x.id !== mine.id && x.cls);
+            if (!others.length) { closePanel(); notice('There is nobody to trade with.'); return; }
+            if (!others.some(o => o.id === partner)) partner = others[0].id;
             const them = E.player(S, partner);
             const openNow = (S.trades || []).find(t => t.fromId === mine.id && t.status === 'open');
+            // An offer that was waiting has been answered.
+            if (waitingOn && (!openNow || openNow.id !== waitingOn)) {
+                const t = (S.trades || []).find(x => x.id === waitingOn);
+                const to = t && E.player(S, t.toId);
+                const who = to ? to.name : 'They';
+                if (t && t.status === 'accepted') notice(who + ' accepted your trade.');
+                else if (t && t.status === 'declined') notice(who + ' declined your trade.');
+                else if (t && t.status === 'void') notice('The trade with ' + who + ' could not go through.');
+            }
+            waitingOn = openNow ? openNow.id : null;
+            const goods = x => [x.id, x.name, x.gold, x.gems, x.fragments.join(','), x.weaponUid, x.armourUid,
+                x.inventory.map(i => i.uid).join(','), x.potions.map(i => i.uid).join(',')].join('|');
+            const now = JSON.stringify([partner, openNow ? openNow.id : '', goods(mine), others.map(goods)]);
+            if (now === sig) return;
+            sig = now;
+            // Switching who you trade with starts the form over.
+            const kept = openNow || drawnFor !== partner ? null : keepTradeForm();
+            drawnFor = partner;
             let h = '<h2>Propose a trade</h2><div class="sub">Gold, Pendant Fragments, Potions, Gemstones, Weapons and Armour can be ' +
                 'traded, and nothing else. Both sides have to agree.</div>';
             if (openNow) {
@@ -12023,7 +12055,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     '<p><b>You give:</b> ' + esc(bundleLines(openNow.give, mine)) + '</p><p><b>You get:</b> ' + esc(bundleLines(openNow.want, to)) + '</p></div>' +
                     '<div class="modal-actions"><button class="btn danger" id="tr-cancel">Withdraw the offer</button></div>';
                 setPanel(h, 'mid');
-                bind('tr-cancel', () => act('cancelTrade', { tradeId: openNow.id }).then(() => panel && panel.draw()));
+                bind('tr-cancel', () => act('cancelTrade', { tradeId: openNow.id }).then(() => { waitingOn = null; if (panel) panel.draw(); }));
                 return;
             }
             h += '<div class="trade-num"><span>Trade with</span><select id="tr-who" class="btn small">' + others.map(o =>
@@ -12031,16 +12063,37 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             h += '<div class="trade-cols">' + bundleUi(mine, them, 'g', 'You give') + bundleUi(them, mine, 'w', esc(them.name) + ' gives') + '</div>';
             h += '<div class="modal-actions"><button class="btn primary" id="tr-send">Send the offer</button></div>';
             setPanel(h, 'wide');
+            if (kept) kept();
             const sel = $('#tr-who');
-            if (sel) sel.addEventListener('change', () => { partner = sel.value; panel.draw(); });
+            if (sel) sel.addEventListener('change', () => { partner = sel.value; sig = null; panel.draw(); });
             bind('tr-send', () => {
                 const give = readBundle('g'), want = readBundle('w');
                 act('proposeTrade', { toId: partner, give: give, want: want }).then(r => {
                     if (r) { notice('Offer sent to ' + them.name + '.'); if (panel) panel.draw(); }
                 });
             });
-        }, false);
-        void open;
+        }, true);
+    }
+
+    // What is filled in on the trade form, and a function that puts it back
+    // after a redraw (things no longer there are simply dropped).
+    function keepTradeForm() {
+        if (!$('#tr-send')) return null;
+        const vals = {};
+        $$('#panel input').forEach(el => {
+            const k = el.id || (el.getAttribute('data-item') || el.getAttribute('data-pot') || el.getAttribute('data-frag')) + ':' + el.value;
+            vals[k] = el.type === 'checkbox' ? el.checked : el.value;
+        });
+        const focus = document.activeElement && document.activeElement.id;
+        return () => {
+            $$('#panel input').forEach(el => {
+                const k = el.id || (el.getAttribute('data-item') || el.getAttribute('data-pot') || el.getAttribute('data-frag')) + ':' + el.value;
+                if (!(k in vals)) return;
+                if (el.type === 'checkbox') { if (!el.disabled) el.checked = vals[k]; } else el.value = vals[k];
+            });
+            const f = focus && document.getElementById(focus);
+            if (f) f.focus();
+        };
     }
 
     function bundleUi(owner, taker, prefix, title) {
@@ -12320,7 +12373,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             'as the Gold; his player keeps theirs.</p>' +
             '<h3>PvP</h3><p>Land on another player’s square (not the Start) and you fight. Both roll for who strikes first. All defence is ' +
             'reduced to the class base (Mage 10, Archer 15, Knight 20, Barbarian 10); potions work as normal. The winner takes all of the loser’s ' +
-            'Gold and the loser goes back to the Start. Afterwards the moving player’s turn is over.</p>' +
+            'Gold and the loser goes back to the Start. If the moving player wins, the square then does its usual thing for them; if they lose, their turn is over.</p>' +
             '<h3>Potions</h3><p>On a battle turn: at most 2 non-healing and 3 healing potions. An Astrix’s Alchemy potion must be the only potion ' +
             'that turn. A damage potion on an attack that would do no damage without it is wasted. A healing potion at full health adds bonus HP on ' +
             'top, which goes first when you are hurt.</p>' +
