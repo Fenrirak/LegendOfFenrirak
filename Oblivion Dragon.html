@@ -1048,16 +1048,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .board-scene .lava { animation: lava 3s linear infinite; }
 @keyframes lava { to { stroke-dashoffset: -48; } }
 /* The shield's dome (art.js domeBack, domeFront): a few of its panels light
-   up in turn, and energy runs up its seams from the foot, as in the
-   Barrier that throws a refused player back. Each seam is 100 long
-   (pathLength) and carries one short dash up it. The far side's lit
+   up in turn, and energy runs down its seams from the top to the foot
+   (the user's call 2026-10-07; it ran up before). Each seam is 100 long
+   (pathLength), drawn from the foot up, and carries one short dash down it. The far side's lit
    panels are .more too, so where nothing moves only three are lit. */
 .dome-lit.more { display: none; }
 .board-scene .dome-lit.more { display: inline; }
 .board-scene .dome-lit { animation: dome-lit 7.5s ease-in-out infinite; opacity: 0; }
 @keyframes dome-lit { 0%, 100% { opacity: 0; } 12% { opacity: 1; } 30% { opacity: 0; } }
-.board-scene .dome-pulse { animation: dome-pulse 6.3s linear infinite; stroke-dashoffset: 22; }
-@keyframes dome-pulse { 0% { stroke-dashoffset: 22; } 34%, 100% { stroke-dashoffset: -100; } }
+.board-scene .dome-pulse { animation: dome-pulse 6.3s linear infinite; stroke-dashoffset: -100; }
+@keyframes dome-pulse { 0% { stroke-dashoffset: -100; } 34%, 100% { stroke-dashoffset: 22; } }
 @media (prefers-reduced-motion: reduce) {
     .board-scene .dome-lit { animation: none; opacity: 1; }
     .board-scene .dome-lit.more { display: none; }
@@ -3917,6 +3917,29 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return grpW(STEEL_L, .8, P(t));
     }
 
+    // A four-pointed twinkle (no glow: a hard outline, like the rest).
+    function twinkle(x, y, r, fill) {
+        const k = r * .3, f = v => v.toFixed(2);
+        return '<path d="M' + f(x) + ' ' + f(y - r) + 'L' + f(x + k) + ' ' + f(y - k) + 'L' + f(x + r) + ' ' + f(y) +
+            'L' + f(x + k) + ' ' + f(y + k) + 'L' + f(x) + ' ' + f(y + r) + 'L' + f(x - k) + ' ' + f(y + k) +
+            'L' + f(x - r) + ' ' + f(y) + 'L' + f(x - k) + ' ' + f(y - k) + 'z" fill="' + fill + '" stroke="' + INK +
+            '" stroke-width=".5" stroke-linejoin="round"/>';
+    }
+
+    // A cube of pyrite seen a little from above, standing on (x, y), `s`
+    // to a side: a pale top, a gold face and a shadowed face.
+    function pyriteCube(x, y, s) {
+        const w = s * .87, f = v => v.toFixed(2);
+        const pt = (a, b) => f(x + a) + ' ' + f(y + b);
+        return '<path d="M' + pt(0, -2 * s) + 'L' + pt(w, -1.5 * s) + 'L' + pt(0, -s) + 'L' + pt(-w, -1.5 * s) + 'z" fill="#f8e08a"/>' +
+            '<path d="M' + pt(-w, -1.5 * s) + 'L' + pt(0, -s) + 'L' + pt(0, 0) + 'L' + pt(-w, -.5 * s) + 'z" fill="' + GOLD + '"/>' +
+            '<path d="M' + pt(0, -s) + 'L' + pt(w, -1.5 * s) + 'L' + pt(w, -.5 * s) + 'L' + pt(0, 0) + 'z" fill="#b8862a"/>' +
+            '<path d="M' + pt(-w, -1.5 * s) + 'L' + pt(0, -s) + 'L' + pt(w, -1.5 * s) + 'M' + pt(0, -s) + 'V' + f(y) +
+            '" fill="none" stroke="' + INK + '" stroke-width=".7" stroke-linejoin="round"/>' +
+            '<path d="M' + pt(0, -2 * s) + 'L' + pt(w, -1.5 * s) + 'L' + pt(w, -.5 * s) + 'L' + pt(0, 0) + 'L' + pt(-w, -.5 * s) +
+            'L' + pt(-w, -1.5 * s) + 'z" fill="none" stroke="' + INK + '" stroke-width="1.2" stroke-linejoin="round"/>';
+    }
+
     const SQUARE_ART = {
         // The Start: a stone gateway with the road running out through it,
         // a red banner flying over the arch and a torch burning either side.
@@ -4092,10 +4115,44 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#5a5f66', 1.2, P('M58.6 31.4l6 2-1.2 3-6-2z')) +
             dot(47, 21.6, .8, '#ffd04a') + dot(52.4, 20.4, .7, '#ff8c2a') + dot(55.6, 22.6, .8, '#ffd04a') + dot(44, 19.4, .6, '#ff8c2a'),
 
+        // The Orc Training Camp: a patched hide tent with a skull over its
+        // door, a straw dummy hacked about with an orc axe left in it, and
+        // the orcs' green skull banner on a spear over a round shield.
         orc_camp:
-            grp('#8a6a44', P('M6 44 24 14l18 30z')) + grp('#5a4028', P('M20 44l4-14 4 14z')) +
-            line('M46 44V8', INK, 2.6) + grp('#4a7a2e', P('M47 9h14l-4 6 4 6H47z')) +
-            dot(53, 15, 2.2, '#f4f0e2'),
+            grp('#6a5238', P('M0 44c14-3 50-3 64 0v4H0z')) +
+            line('M11.6 4.6 17.4 13.4M18.4 4.6 12.6 13.4', INK, 2.8) + line('M11.6 4.6 17.4 13.4M18.4 4.6 12.6 13.4', '#8a6a44', 1.2) +
+            grp('#8a6a44', P('M1.6 44.4 15 10l13.6 34.4z')) +
+            line('M15 11.4 8.4 43.4M15 11.4l7.4 32', '#6a4a2e', 1) +
+            grpW('#a07a50', 1, P('M20.6 30.4l4.2-1.2 1.4 4.6-4.2 1.2z')) +
+            line('M21.4 31.8l-.9.3M22 34l-.9.3M24.6 29.8l.9-.3M25.4 32.6l.9-.3', INK, .7) +
+            grpW('#a07a50', 1, P('M4.8 38.6l3.4-1 1 3.2-3.4 1z')) +
+            grp('#3a2818', P('M10.6 44.4 15 27.4l4.4 17z')) +
+            grpW('#a07a50', 1.2, P('M15 27.4l4.4 17h4.4z')) +
+            grpW('#f4f0e2', 1, P('M12.6 22.6c0-3.4 4.8-3.4 4.8 0 0 1.2-.6 1.8-1 2.2v1.2h-2.8v-1.2c-.4-.4-1-1-1-2.2z')) +
+            dot(14.1, 22.6, .65) + dot(15.9, 22.6, .65) + line('M14.6 25.2v1M15.4 25.2v1', INK, .5) +
+            line('M40 44V14', INK, 3.6) + line('M40 44V14', '#8a6a44', 1.8) +
+            line('M35.6 43.4 40 38.8l4.4 4.6', INK, 2.8) + line('M35.6 43.4 40 38.8l4.4 4.6', '#8a6a44', 1.2) +
+            line('M32.4 24.4h15.2', INK, 3.2) + line('M32.4 24.4h15.2', '#8a6a44', 1.4) +
+            line('M32.4 24.4l-2.2-1.6M32.4 24.4l-2.6.2M32.4 24.4l-1.8 1.8M47.6 24.4l2.2-1.6M47.6 24.4l2.6.2M47.6 24.4l1.8 1.8', '#b8902a', 1) +
+            grpW('#d8b860', 1.4, P('M34.6 21.2c1.6-1.6 9.2-1.6 10.8 0l.8 13.6c-1.6 1.8-10.8 1.8-12.4 0z')) +
+            line('M34.4 25.6c3.6 1 7.6 1 11.2 0M34 31.6c3.8 1 8.2 1 12 0', '#8a6a2a', 1.2) +
+            '<circle cx="40" cy="28.6" r="2.4" fill="none" stroke="#c8342b" stroke-width="1.2"/>' + dot(40, 28.6, .8, '#c8342b') +
+            line('M36.2 33.2l2.4-1.4M42.4 22.8l1.8 1.4', INK, .8) +
+            line('M38.6 11.2l-.8-2.2M40 11V8.6M41.4 11.2l.8-2.2', '#b8902a', 1) +
+            '<circle cx="40" cy="15.4" r="4.2" fill="#d8b860" stroke="' + INK + '" stroke-width="1.4"/>' +
+            line('M37.8 14.2l1.4 1.4M39.2 14.2l-1.4 1.4M40.8 14.2l1.4 1.4M42.2 14.2l-1.4 1.4M38.6 17.6h2.8', INK, .8) +
+            line('M45.2 30.6 51 24.2', INK, 3.2) + line('M45.2 30.6 51 24.2', '#6a4a2e', 1.4) +
+            grpW(STEEL, 1.2, P('M43.4 26.2c1.6.2 3.4 1.2 4.4 2.8l-2.2 2.2c-1.4-1.2-2.6-2.8-2.2-5z')) +
+            line('M44 27.4c1 .4 2 1 2.8 1.8', STEEL_L, .8) +
+            line('M33.8 42.4l-1.8-.6M45.6 42l2-.8M47 43.2l1.6.2', '#b8902a', .9) +
+            line('M53 44V6.6', INK, 3) + line('M53 44V6.6', '#8a6a44', 1.4) +
+            grpW(STEEL_L, 1, P('M51.8 7 53 2.4 54.2 7z')) +
+            grpW('#4a7a2e', 1.4, P('M53.8 6.8h9.4l-2.8 4.6 2.8 4.6h-9.4z')) +
+            dot(57.6, 10.8, 2, '#f4f0e2') + dot(56.9, 10.6, .5) + dot(58.3, 10.6, .5) +
+            '<path d="M56.5 12.3h2.2v1.6h-2.2z" fill="#f4f0e2"/>' + line('M57.2 12.4v1.4M58 12.4v1.4', INK, .4) +
+            '<circle cx="56.6" cy="39.2" r="4.6" fill="#8a6a44" stroke="' + INK + '" stroke-width="1.6"/>' +
+            line('M54.2 35.4v7.6M59 35.4v7.6', '#6a4a2e', .8) +
+            '<circle cx="56.6" cy="39.2" r="1.5" fill="' + STEEL + '" stroke="' + INK + '" stroke-width="1"/>',
 
         ruins:
             grp('#9a948a', P('M8 44V22l6-4 6 4v22zM34 44V14h10l2 6-2 4v20z')) +
@@ -4138,10 +4195,32 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#8a7a5a', P('M0 40c20-6 44-6 64 0v8H0z')) + line('M20 40l6 4-4 4M36 39l-3 5 5 3', INK, 1.4) +
             line('M44 38V18M44 26l-8-6M44 22l7-6M44 30l6-3M36 20l-3-4M51 16l2-4', '#4a3a2a', 2.4),
 
+        // The Chest of Majesties: a royal chest bound in gold, a crown on
+        // its lid and a keyhole in its lock plate, a Chest Key stood up
+        // against it and a Gemstone in front: the key goes in, the gem
+        // comes out.
         majesties:
-            grp('#8e1c24', P('M12 24h40v20H12z')) + grp('#a8242c', P('M12 24c0-10 40-10 40 0z')) +
-            line('M12 24h40M12 32h40M32 24v20', GOLD, 2.2) + grp(GOLD, P('M29 30h6v6h-6z')) +
-            crown(32, 10, .9),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            grp('#8e1c24', P('M12 26h40v18H12z')) +
+            line('M13 32h38M13 38h38', '#6a1218', 1) +
+            grp('#a8242c', P('M12 26v-4c0-9 40-9 40 0v4z')) +
+            line('M15.2 19.6c5.6-3.2 28-3.2 33.6 0', '#c8444a', 1.2) +
+            grpW(GOLD, 1.4, P('M16.4 44V17.6l3.2-1V44zM47.6 44V17.6l-3.2-1V44z')) +
+            grpW(GOLD, 1.2, P('M12 44v-5.4l5.4 5.4zM52 44v-5.4L46.6 44z')) +
+            grpW(GOLD, 1.6, P('M11 24.6h42v3.2H11z')) +
+            [[18, 20.4], [18, 31], [18, 41], [46, 20.4], [46, 31], [46, 41]].map(r => dot(r[0], r[1], .75, '#8a5a1a')).join('') +
+            line('M14 26.2h36', '#f4d77a', .7) +
+            '<circle cx="32" cy="19.8" r="1.7" fill="#3a8ad2" stroke="' + INK + '" stroke-width="1"/>' +
+            grpW(GOLD, 1.4, P('M27.4 23.4h9.2v6c0 2.8-2.6 4.6-4.6 5.4-2-.8-4.6-2.6-4.6-5.4z')) +
+            dot(32, 27, 1.4) + '<path d="M31.2 27.6h1.6l.5 3.2h-2.6z" fill="' + INK + '"/>' +
+            crown(32, 12.6, .8) +
+            '<g transform="rotate(-8 56.6 43.4)">' +
+            '<circle cx="56.6" cy="31.2" r="3.2" fill="none" stroke="' + INK + '" stroke-width="3.4"/>' +
+            '<circle cx="56.6" cy="31.2" r="3.2" fill="none" stroke="' + GOLD + '" stroke-width="1.6"/>' +
+            line('M56.6 34.6V43.4M56.6 41.4h2.8M56.6 38.6h2.2', INK, 3.2) + line('M56.6 34.6V43.4M56.6 41.4h2.8M56.6 38.6h2.2', GOLD, 1.4) +
+            '</g>' +
+            gemShape(6.6, 38.8, .55, '#3a9ad8') +
+            twinkle(4.4, 30.6, 1.8, '#f4e38a') + twinkle(45, 8.4, 1.8, '#f4e38a') + twinkle(20, 9.4, 1.3, '#f4e38a'),
 
         // The orcs' outpost: a rough log watchtower on four legs, a lookout
         // under a hide roof, a ladder up the middle, their green banner with
@@ -4182,11 +4261,33 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M54 31v1.6', INK, .9) +
             grpW(GOLD, 1, P('M51.8 36.6c0-3 1-4.2 2.2-4.2s2.2 1.2 2.2 4.2z')) + dot(54, 37.4, .9, INK),
 
+        // The Thorned Pyrite: a purple and gold temple up its own steps,
+        // a cluster of pyrite in its pediment, a great sword waiting in its
+        // lit door, and thorns climbing its corners and crowding its feet.
         pyrite:
-            grp('#3d2a4a', P('M8 44V22h48v22z')) + grp(GOLD, P('M4 22 32 6l28 16z')) +
-            line('M14 22v22M24 22v22M40 22v22M50 22v22', GOLD, 2) +
-            grp('#f4e38a', P('M28 44V32c0-5 8-5 8 0v12z')) +
-            gemShape(32, 15, .8, '#f0c33c') + line('M4 22h56', INK, 1.6),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            grpW('#a39b8f', 1.6, P('M4 44v-3h56v3z')) +
+            grpW('#b8b0a2', 1.6, P('M7 41v-2.8h50V41z')) +
+            line('M16 42.5h4M34 42.5h6M50 42.5h3', '#7c746a', .8) +
+            grp('#3d2a4a', P('M10 38.2V22h44v16.2z')) +
+            line('M11.6 30h14M38.4 30H52.4', '#2e1f38', 1) +
+            [14, 22, 42, 50].map(x =>
+                grpW('#f0c33c', 1.2, P('M' + (x - 1.8) + ' 36.4V24.6h3.6v11.8z')) +
+                line('M' + x + ' 25.6v9.8', '#b8862a', .8) +
+                grpW(GOLD, 1.2, P('M' + (x - 2.8) + ' 22.8h5.6v1.8h-5.6zM' + (x - 2.8) + ' 36.4h5.6v1.8h-5.6z'))).join('') +
+            grpW('#f4e38a', 1.6, P('M27.4 38.2V30c0-6 9.2-6 9.2 0v8.2z')) +
+            sword(32, 32.2, 0, .21) +
+            grpW(GOLD, 1.6, P('M7 20h50v3.2H7z')) +
+            [10, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54].map(x => dot(x, 21.6, .55, '#b8862a')).join('') +
+            grp(GOLD, P('M5 20.2 32 5l27 15.2z')) +
+            grpW('#c8942a', 1, P('M12 18.4 32 7.4l20 11z')) +
+            pyriteCube(27.6, 17.8, 2.4) + pyriteCube(36.6, 17.8, 2.6) + pyriteCube(32, 18, 4.2) +
+            line('M8.6 41c-1.8-3 1.8-5.4.4-8.6-1.4-3 2-5.2 1-8.6M55.4 41c1.8-3-1.8-5.4-.4-8.6 1.4-3-2-5.2-1-8.6', INK, 3.2) +
+            line('M8.6 41c-1.8-3 1.8-5.4.4-8.6-1.4-3 2-5.2 1-8.6M55.4 41c1.8-3-1.8-5.4-.4-8.6 1.4-3-2-5.2-1-8.6', '#3f6a34', 1.6) +
+            line('M7.6 37.8l-2-.6M9.4 34l2-.4M8.6 29.4l-2-.8M10.8 26l2-.6M56.4 37.8l2-.6M54.6 34l-2-.4M55.4 29.4l2-.8M53.2 26l-2-.6', INK, 1) +
+            dot(7, 33, 1.1, '#c8342b') + dot(10.6, 28.4, 1, '#c8342b') + dot(57, 33, 1.1, '#c8342b') + dot(53.4, 28.4, 1, '#c8342b') +
+            thornBush(6.4, 44, .46) + thornBush(57.6, 44, .46) +
+            twinkle(32, 2.6, 1.6, '#f4e38a') + twinkle(43.4, 6.2, 1.2, '#f4e38a'),
 
         outpost:
             grp('#8a8278', P('M18 44V12h26v32z')) + grp('#9e968a', P('M16 6h30v8H16z')) +
@@ -4327,9 +4428,40 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#8a8278', P('M4 44V20h56v24z')) + grp('#6a5a4a', P('M2 20 32 8l30 12z')) +
             [12, 26, 40, 52].map(x => grp(CRIMSON, P('M' + (x - 4) + ' 26h8v8c0 3-4 5-4 5s-4-2-4-5z'))).join(''),
 
+        // The Ancient Shrine: a blue crystal held in a gold cup on a worn
+        // stone altar, moss on it and a crack, a rune carved in its face,
+        // a candle burning either side, and offerings left at its foot (a
+        // healing potion one side, Gold the other).
         shrine:
-            grp('#8a8278', P('M14 44V34h36v10z')) + grp('#a39b8f', P('M20 34V20h24v14z')) +
-            grp('#7ad4ff', P('M32 6l6 8-6 10-6-10z')),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            grp('#8a8278', P('M14 44V34h36v10z')) +
+            line('M15 39h34M22 34.8v4.2M37 34.8v4.2M29 39v4.2M44 39v4.2', '#6a645a', 1) +
+            '<path d="M32 6l6 8-6 10-6-10z" fill="#7ad4ff"/>' +
+            '<path d="M32 6 26 14h3.4zM26 14l6 10-2.6-10z" fill="#ffffff" fill-opacity=".45"/>' +
+            '<path d="M32 6l6 8h-3.4zM38 14l-6 10 2.6-10z" fill="#000000" fill-opacity=".18"/>' +
+            '<path d="M26 14h12M32 6 29.4 14 32 24 34.6 14z" fill="none" stroke="' + INK + '" stroke-width=".7" stroke-linejoin="round"/>' +
+            '<path d="M32 6l6 8-6 10-6-10z" fill="none" stroke="' + INK + '" stroke-width="2.4" stroke-linejoin="round"/>' +
+            '<path d="M28.6 11.2l.5 1.1 1.1.5-1.1.5-.5 1.1-.5-1.1-1.1-.5 1.1-.5z" fill="#ffffff"/>' +
+            grp('#a39b8f', P('M20 34V20h24v14z')) +
+            line('M21 27.4h2.6M41 27.4h2', '#7c746a', 1) +
+            grpW('#958d80', 1, P('M25 23.2h14v8H25z')) +
+            '<circle cx="32" cy="27.2" r="2.4" fill="none" stroke="#5a544a" stroke-width="1"/>' +
+            line('M32 23.8v6.8M26.8 27.2h2.4M34.8 27.2h2.4', '#5a544a', 1) +
+            line('M41.8 20.4l-1.6 2.8 1.2 1.6-.8 2.2', '#6a645a', .9) +
+            grpW('#5a8a3a', .8, P('M20 20.8c1.4-1.6 4-1.4 5 .2.8-.6 1.8-.2 1.8.6-1.2 0-1.6 1.6-2.6 1.4-.6 1.4-1.8 1.4-2.2.2-.8.6-1.6.2-2-.4z')) +
+            grpW('#5a8a3a', .8, P('M44 34.8c1-1.2 3.2-1 3.8.2.8-.4 1.8 0 2.2.8-1.2.2-1.4 1.4-2.4 1.2-.8 1-2 .8-2.2-.2-.6.2-1.2 0-1.4-.4z')) +
+            line('M12.4 44l-.8-2.4M13.4 44l.2-2.8M51.6 44l-.2-2.8M52.6 44l.8-2.4', '#5a8a3a', 1) +
+            [17, 47].map(x =>
+                grpW('#f4ecd8', 1, P('M' + (x - 1.2) + ' 34v-5.4h2.4V34z')) +
+                line('M' + (x + .5) + ' 28.8v1.6', '#d8ccb0', .8) +
+                line('M' + x + ' 28.6v-1', INK, .7) +
+                grpW('#ffb43a', .7, P('M' + x + ' 27.6c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4z'))).join('') +
+            grpW(GOLD, 1.2, P('M27.4 16.6l.6-2.4 1.6 2.4zM36.6 16.6l-.6-2.4-1.6 2.4z')) +
+            grpW(GOLD, 1.3, P('M26.6 16.6h10.8L35.6 20h-7.2z')) +
+            line('M28 18.2h8', '#b8862a', .8) +
+            twinkle(21.6, 8.4, 2.2, '#bfe6ff') + twinkle(43, 6, 1.8, '#bfe6ff') + twinkle(45.2, 14.6, 1.3, '#bfe6ff') + twinkle(19.4, 15, 1.2, '#bfe6ff') +
+            flask(7.6, 39.8, .45, '#d23a3a') +
+            coin(55.2, 42, 2) + coin(59.6, 42, 2) + coin(57.4, 39.4, 2),
 
         // The Wild Brewery: a cask on its cradle, its ale running from the
         // brass tap into a foaming tankard, and wild hops climbing over it.
@@ -4791,8 +4923,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* fainter, and the near side is drawn over the castle. Each panel is   */
     /* dark violet glass right up to the violet seams it shares, deeper     */
     /* where the dome turns away from you; the upper left catches the       */
-    /* light, a few panels light up in turn and energy runs up the seams    */
-    /* from the foot (style.css .dome-lit, .dome-pulse). No outline round   */
+    /* light, a few panels light up in turn and energy runs down the seams  */
+    /* to the foot (style.css .dome-lit, .dome-pulse). No outline round     */
     /* it, the glass makes its edge (the user's pick), and no glow. It comes */
     /* in two parts: domeBack (the floor, the far side and the back of the  */
     /* ring) goes under the castle, domeFront over it.                      */
@@ -5044,7 +5176,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         s += '<path d="' + P.edges.front + '" fill="none" stroke="' + SHIELD.bright + '" stroke-opacity=".5" stroke-width="1.1" stroke-linecap="round"/>';
         s += '<path d="' + P.edges.near + '" fill="none" stroke="' + SHIELD.bright + '" stroke-opacity=".7" stroke-width="1.3" stroke-linecap="round"/>';
         // the panels that light up in turn (where nothing moves, only the
-        // first three, lit), and energy running up the seams
+        // first three, lit), and energy running down the seams
         s += domeLit(P.lit, 0, .5) + domePulses(P.seams, 3, 1);
         // the ring where it meets the ground, in front. No line round the
         // rim: the glass makes the edge (the user's pick, 2026-10-05).
