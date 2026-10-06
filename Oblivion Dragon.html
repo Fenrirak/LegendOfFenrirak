@@ -4116,7 +4116,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             dot(47, 21.6, .8, '#ffd04a') + dot(52.4, 20.4, .7, '#ff8c2a') + dot(55.6, 22.6, .8, '#ffd04a') + dot(44, 19.4, .6, '#ff8c2a'),
 
         // The Orc Training Camp: a patched hide tent with a skull over its
-        // door, a straw dummy hacked about with an orc axe left in it, and
+        // door, a straw dummy with a target on it, hacked about, and
         // the orcs' green skull banner on a spear over a round shield.
         orc_camp:
             grp('#6a5238', P('M0 44c14-3 50-3 64 0v4H0z')) +
@@ -4141,9 +4141,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M38.6 11.2l-.8-2.2M40 11V8.6M41.4 11.2l.8-2.2', '#b8902a', 1) +
             '<circle cx="40" cy="15.4" r="4.2" fill="#d8b860" stroke="' + INK + '" stroke-width="1.4"/>' +
             line('M37.8 14.2l1.4 1.4M39.2 14.2l-1.4 1.4M40.8 14.2l1.4 1.4M42.2 14.2l-1.4 1.4M38.6 17.6h2.8', INK, .8) +
-            line('M45.2 30.6 51 24.2', INK, 3.2) + line('M45.2 30.6 51 24.2', '#6a4a2e', 1.4) +
-            grpW(STEEL, 1.2, P('M43.4 26.2c1.6.2 3.4 1.2 4.4 2.8l-2.2 2.2c-1.4-1.2-2.6-2.8-2.2-5z')) +
-            line('M44 27.4c1 .4 2 1 2.8 1.8', STEEL_L, .8) +
+            line('M43.2 29.6l1.8-1.6', INK, .8) +
             line('M33.8 42.4l-1.8-.6M45.6 42l2-.8M47 43.2l1.6.2', '#b8902a', .9) +
             line('M53 44V6.6', INK, 3) + line('M53 44V6.6', '#8a6a44', 1.4) +
             grpW(STEEL_L, 1, P('M51.8 7 53 2.4 54.2 7z')) +
@@ -4154,12 +4152,38 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M54.2 35.4v7.6M59 35.4v7.6', '#6a4a2e', .8) +
             '<circle cx="56.6" cy="39.2" r="1.5" fill="' + STEEL + '" stroke="' + INK + '" stroke-width="1"/>',
 
+        // The Cursed Ruins: what is left of an arch, one column still
+        // carrying a broken piece of it, the other snapped off, a drum of it
+        // fallen in the dirt with a skull by it and Gold half buried, purple
+        // runes in the stone, the curse rising off it in wisps, and its eye
+        // watching over them.
         ruins:
-            grp('#9a948a', P('M8 44V22l6-4 6 4v22zM34 44V14h10l2 6-2 4v20z')) +
-            line('M8 30h12M34 26h10M34 36h10', '#6a645a', 1.2) +
-            grp('#7a746a', P('M22 44l4-6 6 2 2 4zM48 44l6-4 4 4z')) +
-            '<g fill="none" stroke="#b77cff" stroke-width="1.8" stroke-linecap="round">' +
-            '<path d="M24 26c-4-6 4-8 2-14M52 20c4-4 0-8 4-12"/></g>',
+            grp('#5a4a48', P('M0 44h64v4H0z')) +
+            grpW('#8a8278', 1.6, P('M7.4 44v-3h9.2v3zM39.4 44v-3h9.2v3z')) +
+            grp('#9a948a', P('M9 41V25h6v16z')) +
+            line('M11 26.4v13.4M13 26.4v13.4', '#7a746a', .8) +
+            grpW('#8a8278', 1.6, P('M7.4 25v-3h9.2v3z')) +
+            grp('#9a948a', P('M10.5 22A17.5 17.5 0 0 1 23.47 5.1L25 6.6 23.2 7.8 24.4 8.8 23.55 9.78A13 13 0 0 0 15 22z')) +
+            line('M15.78 17.55 11.56 16.01M18.04 13.64 14.6 10.75M21.5 10.74 19.25 6.85', '#6a645a', 1) +
+            line('M17 13.6l1.4 1.6-.4 1.8', INK, .7) +
+            grp('#9a948a', P('M41 41V31l2-1.4 1.4 1.6 1.8-2.6.8 1.4V41z')) +
+            line('M43 32.4V40M45 32V40', '#7a746a', .8) + line('M42.2 35.6l1.6 1.2-.6 1.6', INK, .7) +
+            line('M8.6 43c1.6-2.6.2-5 1.8-7.6 1.4-2.2.2-4.6 1.6-7', '#2f4a2a', 1.4) +
+            grpW('#3f6a34', .7, P('M9.4 38.4c-1.6-.4-2-1.8-1-2.6.6.8 1.4 1 1 2.6zM11.4 33.2c1.6-.2 2.2-1.6 1.2-2.4-.6.8-1.4 1-1.2 2.4zM10.8 29.6c-1.6-.4-2-1.8-1-2.6.6.8 1.4 1 1 2.6z')) +
+            line('M13.2 31.4h-2l1 1.6h-1.4M43 37.4l1.6-1.6 1.4 1.4', '#b77cff', 1.1) +
+            grpW('#9a948a', 1.6, P('M23.4 44v-5.6h10V44z')) +
+            '<ellipse cx="33.4" cy="41.2" rx="1.7" ry="2.8" fill="#7a746a" stroke="' + INK + '" stroke-width="1.4"/>' +
+            line('M25.4 39.8v3M28.6 39.8v3', '#7a746a', .8) +
+            grpW('#f4f0e2', .9, P('M35.6 43.6c-.4-2.6.6-3.8 2.2-3.8s2.6 1.2 2.2 3.8z')) + dot(37, 41.8, .5) + dot(38.6, 41.8, .5) +
+            grpW('#7a746a', 1.2, P('M50.6 44l1.6-3.6 4.4.6.4 3zM57.6 44l1-2.2 3 .4.4 1.8zM18.4 44l.8-1.8 2.4.2.2 1.6z')) +
+            '<ellipse cx="21.4" cy="44.6" rx="1.8" ry=".9" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>' +
+            '<ellipse cx="47.6" cy="45" rx="1.8" ry=".9" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>' +
+            '<ellipse cx="4.4" cy="44.8" rx="1.6" ry=".8" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>' +
+            line('M44.4 28.6c-2.6-2.8 1.8-4.6-.6-7.8-1.6-2.2.8-4 .4-6M29.4 37.4c-2.4-3 1.8-4.8-.4-8M56.4 39.6c2-2.8-1.8-4.4.4-7.2', INK, 3) +
+            line('M44.4 28.6c-2.6-2.8 1.8-4.6-.6-7.8-1.6-2.2.8-4 .4-6M29.4 37.4c-2.4-3 1.8-4.8-.4-8M56.4 39.6c2-2.8-1.8-4.4.4-7.2', '#b77cff', 1.4) +
+            grpW('#3d2a4a', 1.4, P('M44 8.4c3.4-4 10.6-4 14 0-3.4 4-10.6 4-14 0z')) +
+            '<circle cx="51" cy="8.4" r="2.4" fill="#b77cff" stroke="' + INK + '" stroke-width=".9"/>' + dot(51, 8.4, 1) +
+            line('M51 2.4V.8M45.4 4.2l-1-1.2M56.6 4.2l1-1.2', '#b77cff', 1),
 
         // The Vault of Comets: a round steel vault door in a stone wall,
         // its locking wheel at the middle and a comet on the keystone, and
@@ -4186,14 +4210,51 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<circle cx="6" cy="13.6" r="2.2" fill="#dff2ff" stroke="' + INK + '" stroke-width="1.1"/>' +
             '<path d="M25.4 3.6l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5zM61 12.6l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>',
 
+        // The Cliff of Doom: a sheer cliff with a skull warning on its
+        // edge, its lip crumbling, rocks tumbling down into the chasm and
+        // the far side of it across the drop.
         cliff:
-            grp('#7a6a5a', P('M0 18h30l4 6-2 8 4 14H0z')) + line('M0 18h30', '#5a6a3a', 3) +
-            grp('#8a7a6a', P('M44 14l6 2-2 6-6-2zM50 30l5 1-1 5-5-1zM42 38l4 1-1 4-4-1z')) +
-            line('M46 8l-2 4M52 26l-1 3', '#c9c2b4', 1.2),
+            grpW('#a39686', 1.6, P('M64 48V22.6l-2.4-1.4-2.6 2.4-3.2-.8-1.6 3 1 3.6-1.8 3 1 14.6z')) +
+            line('M57.6 30.4h5M56.4 37.6h6.4M58.6 43.6h4.6', '#857868', .9) +
+            '<path d="M30 48c3-3 8-4.4 13-4.4s9.4 1.4 11 4.4z" fill="#3a2e34"/>' +
+            grp('#7a6a5a', P('M-2 16h30.6l2.8 4.4-1.8 4.8 3.4 4.2-2.2 5.8 3.2 14.8H-2z')) +
+            line('M1 22.6h16M21 23.4h6M3 29.4h11M17.6 29h12M1 36h20M24 36.4h7M5 42.4h22', '#5f5246', 1) +
+            line('M27.8 16.4l-1.4 3 1 2.4-1.2 2.6M30.2 30.6l-2 1.8.4 2.4', INK, .9) +
+            grpW('#6a8a3a', 1.2, P('M-2 13.8h31.2l.8 2.4-2.2.6-1.2-1.2-1.6 1.6-1.6-1.4H-2z')) +
+            line('M3 13.8l-.6-2.2M4.4 13.8l.4-2.4M13.6 13.8l-.6-2M14.8 13.8l.6-2.2M23.6 13.8l.2-2.2', '#4a7a2e', 1) +
+            line('M17 13.8V3.4', INK, 2.8) + line('M17 13.8V3.4', '#8a6a44', 1.2) +
+            grpW('#c8a060', 1.2, P('M11.4 3.2h11.2v6.4H11.4z')) +
+            grpW('#f4f0e2', .7, P('M15.2 6c0-2.4 3.6-2.4 3.6 0 0 .8-.4 1.2-.8 1.6v.8h-2v-.8c-.4-.4-.8-.8-.8-1.6z')) +
+            dot(16.3, 6, .45) + dot(17.7, 6, .45) +
+            line('M13 4.6l1.6 1.6M14.6 4.6 13 6.2M19.4 7.2l1.6 1.6M21 7.2l-1.6 1.6', INK, .7) +
+            line('M36.4 4.6v4M38.8 3.4v4.4M46.6 16v4M49 15v4.6M40.4 29.6v3.4M42.6 28.8v3.6', '#b8ae9e', 1) +
+            grpW('#8a7a6a', 1.4, P('M35 10.6l3.4-1.6 3.2 1.4.6 3.4-2.8 2-3.6-.8z')) + grpW('#a39686', .6, P('M38.4 9l3.2 1.4-1.6 1.6-2-.8z')) +
+            grpW('#8a7a6a', 1.4, P('M45.4 21.6l3-1.2 2.6 1.6-.4 3-2.8 1.2-2.6-1.6z')) + grpW('#a39686', .6, P('M48.4 20.4l2.6 1.6-1.4 1-1.6-.8z')) +
+            grpW('#8a7a6a', 1.2, P('M39.6 34.6l2.4-1 2 1.2-.4 2.4-2.2.8-2-1.2z')) +
+            dot(33.6, 22, .8, '#7a6a5a') + dot(35.4, 26.8, .7, '#7a6a5a') + dot(33.2, 30.6, .6, '#7a6a5a'),
 
+        // The Forsaken Road: a rutted road winding away over bare hills,
+        // its signpost broken and leaning, a dead tree with a crow on it,
+        // and a skull lying by the way.
         forsaken:
-            grp('#8a7a5a', P('M0 40c20-6 44-6 64 0v8H0z')) + line('M20 40l6 4-4 4M36 39l-3 5 5 3', INK, 1.4) +
-            line('M44 38V18M44 26l-8-6M44 22l7-6M44 30l6-3M36 20l-3-4M51 16l2-4', '#4a3a2a', 2.4),
+            grpW('#a8987a', 1.4, P('M-1 30c8-5 15-5.6 22-2.4 7-4.4 15-5.4 23-2.4 6-2.6 13-2.6 21 0V48H-1z')) +
+            grp('#8a7a5a', P('M-2 35c10-2.4 22-2.6 32-1.4 12-1.4 24-1 36 1.4V50H-2z')) +
+            grpW('#c8b48a', 1.4, P('M8 49C14 43 24 41.6 27 38.4c1.8-2-1.2-3.6.4-5.8H30c-.6 2 2.4 3.6.8 6.6-2 3.6-6.4 5.6-5.2 9.8z')) +
+            line('M15 47.6c3.4-2.6 8.6-4 11.4-6.6M28.8 33.6c-.4 1.4 1 2.6.8 4.2', '#a08a5a', .9) +
+            '<ellipse cx="20.6" cy="45.6" rx="2.4" ry=".8" fill="#6a5a3a"/>' +
+            line('M4 41.4l3 1.4-1.4 2M44 39l-2.4 1.6 1.6 1.4M52 44.6l2.6-1.4', INK, 1) +
+            line('M8.6 44 6.4 21.6', INK, 3) + line('M8.6 44 6.4 21.6', '#8a6a44', 1.4) +
+            grpW('#c8a060', 1.2, P('M6.6 23.4l11.4-1.2 2.6 2.4-2.2 2.6-11.2 1.2z')) +
+            line('M9.6 24.8l6-.6', '#8a6a2a', .8) +
+            grpW('#c8a060', 1.2, P('M7 31l-5.4 3.6-1.6-1.6 1.4-2.8 4-2.6z')) +
+            line('M47 44c.4-5 .2-10-1.4-14.6', INK, 3.6) + line('M47 44c.4-5 .2-10-1.4-14.6', '#5a4a3a', 2) +
+            line('M45.8 30.4c-2.4-3.4-5.6-5-8.6-5.4M38.8 25.6l-2-3.4M45.6 30c1-4 4-7 7.4-8.4M51 22.6l1-3.6M49.6 23.8c2 .2 3.6 1 4.8 2.4M46 36c2.4-1.4 4.2-1.6 6-.6', INK, 2.6) +
+            line('M45.8 30.4c-2.4-3.4-5.6-5-8.6-5.4M38.8 25.6l-2-3.4M45.6 30c1-4 4-7 7.4-8.4M51 22.6l1-3.6M49.6 23.8c2 .2 3.6 1 4.8 2.4M46 36c2.4-1.4 4.2-1.6 6-.6', '#5a4a3a', 1.2) +
+            grp('#2a2228', P('M38.6 22.6c.4-1.8 1.8-2.6 3.2-2.2l1.4-.8-.4 1.2c.6.8.4 2-.6 2.6l1.8 1.6-3.2-.6c-.8.2-1.8 0-2.2-.6z'), 'stroke-width=".8"') +
+            dot(41.8, 21.2, .4, '#f4d23c') + line('M43.2 20.4l1.2.2', '#c8a040', .7) +
+            grpW('#f4f0e2', .9, P('M54.6 43.8c-.4-2.6.6-3.8 2.2-3.8s2.6 1.2 2.2 3.8z')) + dot(56, 42, .5) + dot(57.6, 42, .5) +
+            line('M59.4 43.6l3-1.4', '#f4f0e2', 1.2) +
+            line('M33.6 45.6l-.6-1.8M34.6 45.6l.4-2M60.6 37.6l-.4-1.8M61.6 37.6l.6-1.8', '#7a6a3a', .9),
 
         // The Chest of Majesties: a royal chest bound in gold, a crown on
         // its lid and a keyhole in its lock plate, a Chest Key stood up
@@ -4286,8 +4347,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M8.6 41c-1.8-3 1.8-5.4.4-8.6-1.4-3 2-5.2 1-8.6M55.4 41c1.8-3-1.8-5.4-.4-8.6 1.4-3-2-5.2-1-8.6', '#3f6a34', 1.6) +
             line('M7.6 37.8l-2-.6M9.4 34l2-.4M8.6 29.4l-2-.8M10.8 26l2-.6M56.4 37.8l2-.6M54.6 34l-2-.4M55.4 29.4l2-.8M53.2 26l-2-.6', INK, 1) +
             dot(7, 33, 1.1, '#c8342b') + dot(10.6, 28.4, 1, '#c8342b') + dot(57, 33, 1.1, '#c8342b') + dot(53.4, 28.4, 1, '#c8342b') +
-            thornBush(6.4, 44, .46) + thornBush(57.6, 44, .46) +
-            twinkle(32, 2.6, 1.6, '#f4e38a') + twinkle(43.4, 6.2, 1.2, '#f4e38a'),
+            thornBush(6.4, 44, .46) + thornBush(57.6, 44, .46),
 
         outpost:
             grp('#8a8278', P('M18 44V12h26v32z')) + grp('#9e968a', P('M16 6h30v8H16z')) +
@@ -4390,8 +4450,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#8a5a32', 1.6, P('M49.6 33.6h10.6c1 3.4 1 7 0 10.4H49.6c-1-3.4-1-7 0-10.4z')) +
             line('M49.2 36.6h11.4M49.2 41h11.4', '#4a4e55', 1.3),
 
-        // Ametin's Inn: two storeys of timber and white plaster, the upper
-        // one jutting out over the street, warm light in every window, smoke
+        // Ametin's Inn: two storeys of timber and white plaster, the one
+        // as wide as the other (the user's call 2026-10-07), warm light in every window, smoke
         // from the chimney, and its sign -- a crescent moon -- hung out over
         // the road.
         inn:
@@ -4402,10 +4462,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M17 17v11M33 17v11M5 17l12 11M17 17 5 28M33 17l12 11M45 17 33 28', '#5a3a22', 1.5) +
             grp('#f4d23c', P('M21.5 19.5h7v6h-7z'), 'stroke-width="1.6"') + line('M25 19.5v6M21.5 22.5h7', '#5a3a22', 1.1) +
             grp('#5a3a22', P('M4 28h42v2.4H4z'), 'stroke-width="1.6"') +
-            grp('#efe2c0', P('M8 30.4h34V44H8z')) +
+            grp('#efe2c0', P('M5 30.4h40V44H5z')) +
             grp('#5a3a22', P('M21 44V37c0-4.5 8-4.5 8 0v7z'), 'stroke-width="1.6"') + dot(27.4, 40.6, .8, '#f4d23c') +
-            grp('#f4d23c', P('M11 33h6v6h-6zM33 33h6v6h-6z'), 'stroke-width="1.6"') +
-            line('M14 33v6M11 36h6M36 33v6M33 36h6', '#5a3a22', 1) +
+            grp('#f4d23c', P('M9.6 33h6v6h-6zM34.4 33h6v6h-6z'), 'stroke-width="1.6"') +
+            line('M12.6 33v6M9.6 36h6M37.4 33v6M34.4 36h6', '#5a3a22', 1) +
             line('M45 23h15M48 23v4M57 23v4', INK, 1.5) +
             grp('#8a5a32', P('M46 27h13v10H46z'), 'stroke-width="1.6"') +
             '<path d="M52.6 28.8a3.6 3.6 0 1 0 3.2 5.6 2.9 2.9 0 1 1-3.2-5.6z" fill="#f4e38a" stroke="' + INK + '" stroke-width="1"/>' +
@@ -4490,10 +4550,31 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M22 46V4', INK, 3) + grp(ROYAL_RED, P('M23 6h26v24l-13-5-13 5z')) + line('M23 6h26', GOLD, 2) +
             crown(36, 16, .75) + at(54, 0, .62, halberd(0, 14, 74)),
 
+        // The Palace Gates: a gatehouse between two round-roofed towers,
+        // royal banners on the towers and a crown over the arch, and the
+        // portcullis hanging half raised, its spikes ready to drop.
         gates:
-            grp('#8a8278', P('M4 44V10h14v34zM46 44V10h14v34z')) + grp('#9e968a', P('M18 18h28v6H18z')) +
-            line('M22 24v20M28 24v20M34 24v20M40 24v20M18 32h28M18 40h28', '#4a4e55', 1.8) +
-            line('M4 10v-4h4v4M14 10v-4h4v4M46 10v-4h4v4M56 10v-4h4v4', INK, 1.6),
+            grp('#a39b8f', P('M0 44h64v4H0z')) + line('M6 46h6M22 45.6h5M37 46.2h6M52 45.6h6', '#7c746a', 1) +
+            grp('#9e968a', P('M19 44V13h26v31z')) +
+            grp('#9e968a', P('M19 13V9.6h3.6V13zM25.2 13V9.6h3.6V13zM35.2 13V9.6h3.6V13zM41.4 13V9.6H45V13z')) +
+            line('M20 19.6h6M38 19.6h6M20 26h3M41 26h3', '#7c746a', 1) +
+            '<path d="M22.4 44V31c0-9.6 19.2-9.6 19.2 0v13" fill="none" stroke="' + INK + '" stroke-width="5.6"/>' +
+            '<path d="M22.4 44V31c0-9.6 19.2-9.6 19.2 0v13" fill="none" stroke="#b8b0a2" stroke-width="3"/>' +
+            grp('#2a2028', P('M24 44V31c0-7.4 16-7.4 16 0v13z')) +
+            line('M26.4 27.2v10.6M29.2 26v11.8M32 25.7v12.1M34.8 26v11.8M37.6 27.2v10.6M24.6 29.2h14.8M24.4 33.2h15.2M24.4 37.2h15.2', '#6d737b', 1.4) +
+            grpW('#6d737b', .6, P('M25.6 37.8l.8 2.2.8-2.2zM28.4 37.8l.8 2.2.8-2.2zM31.2 37.8l.8 2.2.8-2.2zM34 37.8l.8 2.2.8-2.2zM36.8 37.8l.8 2.2.8-2.2z')) +
+            grpW(GOLD, 1.2, P('M30.2 20.8h3.6l-.6 4.4h-2.4z')) +
+            crown(32, 17, .5) +
+            [3, 45].map(x =>
+                grp('#8a8278', P('M' + x + ' 44V11h16v33z')) +
+                line('M' + (x + 1) + ' 34.6h14M' + (x + 1) + ' 40h14M' + (x + 6) + ' 34.6V40M' + (x + 11) + ' 40v4', '#6d665c', 1) +
+                grp(ROYAL_NAVY, P('M' + (x - 1.4) + ' 11.4 ' + (x + 8) + ' 2l9.4 9.4z')) +
+                line('M' + (x + 4) + ' 8.4h8M' + (x + 6.2) + ' 5.6h3.6', '#34467a', .9) +
+                '<circle cx="' + (x + 8) + '" cy="1.8" r="1.1" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>' +
+                grp(ROYAL_RED, P('M' + (x + 3.6) + ' 14h8.8v15.6l-4.4-3-4.4 3z'), 'stroke-width="1.6"') +
+                line('M' + (x + 3) + ' 14h10', GOLD, 1.6) +
+                crown(x + 8, 20.4, .42) +
+                '<path d="M' + (x + 7.2) + ' 35.6h1.6v3.6h-1.6z" fill="' + INK + '"/>').join(''),
 
         // King's Square: a fountain of three tiers, water falling from bowl
         // to bowl into the basin, and the royal banners either side of it.
@@ -4515,10 +4596,32 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<circle cx="32" cy="10" r="1.9" fill="#a39b8f" stroke="' + INK + '" stroke-width="1.4"/>' +
             line('M32 8.1V4.4', '#7ad4ff', 1.4) + line('M32 4.6c-1.6.2-2.8 1.8-3.2 4M32 4.6c1.6.2 2.8 1.8 3.2 4', '#7ad4ff', 1),
 
+        // The Royal Watchtower: a tall stone tower, a little narrower at the
+        // top, its gallery out on corbels with the battlements round it,
+        // the royal flag flying over it and the royal banner down its face,
+        // arrow slits, a lit window, and a studded door at its foot between
+        // two torches.
         watchtower:
-            grp('#8a8278', P('M22 46V14h20v32z')) + grp('#9e968a', P('M18 8h28v8H18z')) +
-            line('M18 8v-3h5v3M29 8v-3h6v3M41 8v-3h5v3', INK, 1.6) +
-            grp('#f4d23c', P('M29 22h6v8h-6z')) + line('M32 5V-2', INK, 1.4),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            line('M12 44l-.6-2.2M13.2 44l.4-2.4M50.8 44l-.4-2.4M52 44l.6-2.2', '#5a8a3a', 1) +
+            grp('#8a8278', P('M21 44l1.6-27h18.8L43 44z')) +
+            line('M22.4 23h19.2M22 29h20M21.6 35h20.8M21.4 40h21.2', '#6d665c', 1) +
+            line('M28 17.4V23M36 17.4V23M25.4 23v6M33 23v6M39.4 23v6M27.4 29v6M36.6 29v6M24.4 35v5M30.6 35v5M38 35v5M26.6 40v4M37.4 40v4', '#6d665c', 1) +
+            grpW('#9e968a', 1.4, P('M18.6 17h3.4l-1 2.6h-1.4zM42 17h3.4l-1 2.6H43z')) +
+            grp('#9e968a', P('M18 12.6h28V17H18z')) +
+            line('M19 14.8h26', GOLD, 1.2) +
+            grp('#9e968a', P('M18 12.6V9h3.6v3.6zM24.4 12.6V9H28v3.6zM36 12.6V9h3.6v3.6zM42.4 12.6V9H46v3.6z')) +
+            line('M32 12.6V1.6', INK, 1.6) + dot(32, 1.4, 1, GOLD) +
+            grpW(ROYAL_RED, 1.2, P('M32.8 1.8h11l-2.6 3.2 2.6 3.2h-11z')) +
+            crown(37.4, 5.6, .3) +
+            grp(ROYAL_RED, P('M27.8 17.4h8.4v11L32 25.8l-4.2 2.6z'), 'stroke-width="1.6"') +
+            line('M27.4 17.6h9.2', GOLD, 1.4) + crown(32, 22.6, .42) +
+            '<path d="M24.6 21h1.4v4.4h-1.4zM38 21h1.4v4.4H38z" fill="' + INK + '"/>' +
+            line('M25 39.8v-2.6M39 39.8v-2.6', INK, 1.6) +
+            grpW('#ffb43a', .7, P('M25 36.8c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4zM39 36.8c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4z')) +
+            grpW('#f4d23c', 1.4, P('M30 35.6v-2.8c0-2.6 4-2.6 4 0v2.8z')) + line('M32 30.8v4.8', '#5a3a22', .8) +
+            grpW('#5a3a22', 1.6, P('M28.6 44v-4.2c0-3.8 6.8-3.8 6.8 0V44z')) + line('M32 37v7', '#3a2618', .8) +
+            dot(30.2, 40.6, .5, STEEL_L) + dot(33.8, 40.6, .5, STEEL_L) + dot(30.2, 42.8, .5, STEEL_L) + dot(33.8, 42.8, .5, STEEL_L),
 
         // The Royal Garden: a clipped hedge in rose, the blossom tree, a
         // stone urn spilling flowers, and a bed of tulips along the front.
