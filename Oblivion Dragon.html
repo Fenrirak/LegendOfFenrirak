@@ -2508,14 +2508,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             loot: { gold: 60, keys: 1 }
         },
         orc_warriors: {
-            id: 'orc_warriors', plural: true, name: 'Orc Warriors', hp: 155, defence: 15,
+            id: 'orc_warriors', plural: true, name: 'Orc Warriors', hp: 145, defence: 15,
             passives: [{
                 id: 'mountain_magic', name: 'Mountain Magic',
                 text: 'Orc Warriors heal 10 HP at every start of their turn.'
             }],
             moves: [
-                move('charge', 'Charge', 75, 1),
-                move('wreak_havoc', 'Wreak Havoc', 135, 5, 3,
+                move('charge', 'Charge', 70, 1),
+                move('wreak_havoc', 'Wreak Havoc', 130, 5, 3,
                      [{ t: 'weaken', value: 10, uses: 1 }],
                      'The opponent does 10 less damage on their next turn.')
             ],
@@ -3050,7 +3050,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: '29', name: 'Soldier Garrison', row: 0, col: 8, next: ['30'], pic: 'garrison',
           action: 'battle', enemy: 'soldier_garrison', text: 'Fight Soldier Garrison.' },
         { id: '30', name: 'Ancient Shrine', row: 0, col: 9, next: ['31'], pic: 'shrine',
-          action: 'shrine', heal: 25, gold: 15, text: 'Heal 25 HP or take 15 Gold.' },
+          action: 'shrine', heal: 25, gold: 15, items: 2, text: 'Heal 25 HP, take 15 Gold or draw 2 item cards.' },
         { id: '31', name: 'The Wild Brewery', row: 0, col: 10, next: ['32'], pic: 'brewery',
           action: 'pay_draw', deck: 'potion', count: 2, price: 10,
           text: 'Draw 2 potion cards for 10 Gold.' },
@@ -5546,10 +5546,28 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     // Item cards are dealt off one deck, but you are only ever handed gear
     // you can hold: anything else is set aside and goes back underneath.
-    function drawItems(state, p, count) {
+    // With the Barbarian following you, you first choose how many of the
+    // cards are his (`forBarbarian`); the rest are for your own class.
+    function drawItems(state, p, count, forBarbarian) {
+        if (forBarbarian == null && count > 0 && hasBarbarian(state, p) && !mod(state, 'itemChaos')) {
+            const mine = D.CLASSES[p.cls].name;
+            const cards = (n, who) => plural(n, who + ' item card');
+            const options = [];
+            for (let b = 0; b <= count; b++) {
+                const label = !b ? cards(count, mine) : (b === count ? cards(count, 'Barbarian')
+                    : cards(count - b, mine) + ' and ' + cards(b, 'Barbarian'));
+                options.push({ key: 'split' + b, label: 'Draw ' + label });
+            }
+            state.pending = {
+                type: 'choose', split: count, playerId: p.id, squareId: p.pos, options: options,
+                prompt: 'Your Barbarian is with you. Choose whose item cards you draw.'
+            };
+            return [];
+        }
         const names = mod(state, 'itemChaos') ? drawFromChaos(state, p, count) : [];
         if (!mod(state, 'itemChaos')) {
             for (let n = 0; n < count; n++) {
+                const cls = forBarbarian == null ? null : (n < count - forBarbarian ? p.cls : 'barbarian');
                 const aside = [];
                 let id = null;
                 for (let tries = 0; tries < 300; tries++) {
@@ -5558,7 +5576,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                         log(state, 'The item deck is reshuffled.', 'muted');
                     }
                     const card = state.decks.item.shift();
-                    if (suits(state, p, card)) { id = card; break; }
+                    if (cls ? D.ITEMS[card] && D.ITEMS[card].cls === cls : suits(state, p, card)) { id = card; break; }
                     aside.push(card);
                 }
                 state.decks.item = state.decks.item.concat(shuffle(aside));
@@ -6162,7 +6180,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     type: 'choose', playerId: p.id, squareId: sq.id,
                     options: [
                         { key: 'heal', label: 'Heal ' + sq.heal + ' HP' },
-                        { key: 'gold', label: 'Take ' + payout(state, sq.gold) + ' Gold' }
+                        { key: 'gold', label: 'Take ' + payout(state, sq.gold) + ' Gold' },
+                        { key: 'items', label: 'Draw ' + plural(sq.items, 'item card') }
                     ],
                     prompt: sq.text
                 };
@@ -6334,7 +6353,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (!opt) return fail('That is not one of the choices.');
                 if (opt.disabled) return fail(opt.why || 'You cannot choose that.');
                 state.pending = null;
-                if (sq.action === 'nobles_secret') {
+                if (pend.split) {
+                    drawItems(state, p, pend.split, parseInt(choice.slice(5), 10));
+                } else if (sq.action === 'nobles_secret') {
                     if (choice === 'gold') gainGold(state, p, sq.gold, sq.name);
                     else { p.gems += 1; log(state, p.name + ' takes a Gemstone.', 'item'); }
                 } else if (sq.action === 'shrine') {
@@ -6343,7 +6364,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                         log(state, got ? p.name + ' heals ' + got + ' HP at the Ancient Shrine.'
                                        : p.name + ' is already at full health.', 'heal');
                         healBarbarianToo(state, p, sq.heal);
-                    } else gainGold(state, p, sq.gold, sq.name);
+                    } else if (choice === 'items') drawItems(state, p, sq.items);
+                    else gainGold(state, p, sq.gold, sq.name);
                 } else if (sq.action === 'nobles_district') {
                     if (choice === 'gold') {
                         forfeitGold(state, p, sq.gold, sq.name);
@@ -8619,8 +8641,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function chooseOption(state, p, pend) {
         const sq = E.square(pend.squareId);
         const keys = pend.options.map(o => o.key);
+        if (pend.split) return 'split' + Math.floor(pend.split / 2);
         if (sq.action === 'nobles_secret') return p.gems < 2 ? 'gem' : 'gold';
-        if (sq.action === 'shrine') return p.hp < p.maxHp - 15 ? 'heal' : 'gold';
+        if (sq.action === 'shrine') return p.hp < p.maxHp - 15 ? 'heal' : 'items';
         if (sq.action === 'nobles_district') {
             // Lose whatever matters least.
             let best = null;
