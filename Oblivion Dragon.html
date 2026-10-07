@@ -1057,7 +1057,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .board-scene .dome-lit { animation: dome-lit 7.5s ease-in-out infinite; opacity: 0; }
 @keyframes dome-lit { 0%, 100% { opacity: 0; } 12% { opacity: 1; } 30% { opacity: 0; } }
 .board-scene .dome-pulse { animation: dome-pulse 6.3s linear infinite; stroke-dashoffset: -100; }
-@keyframes dome-pulse { 0% { stroke-dashoffset: -100; } 34%, 100% { stroke-dashoffset: 22; } }
+@keyframes dome-pulse { 0% { stroke-dashoffset: -100; } 38%, 100% { stroke-dashoffset: 22; } }
 @media (prefers-reduced-motion: reduce) {
     .board-scene .dome-lit { animation: none; opacity: 1; }
     .board-scene .dome-lit.more { display: none; }
@@ -4464,9 +4464,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M20.8 24.6c-3.4 3.4-3.4 12 0 15.4', INK, 2.6) + line('M20.8 24.6c-3.4 3.4-3.4 12 0 15.4', '#8a5a32', 1.2) +
             line('M20.8 24.6v15.4', '#e8dcc0', .6) +
             sword(25.4, 33.2, 0, .42) +
-            line('M32 35.6v6', INK, 2.4) + line('M32 35.6v6', '#8a6a44', 1) +
-            grpW(STEEL_L, 1.3, P('M27.6 25c1.4-1 2.8-1.4 4.4-1.4s3 .4 4.4 1.4l-.6 3.2.8 5.4c-1.4 1.2-3 1.6-4.6 1.6s-3.2-.4-4.6-1.6l.8-5.4z')) +
-            line('M32 24.2v10.6', STEEL, .9) + line('M28.6 25c2.2 1.4 4.6 1.4 6.8 0', GOLD, 1.1) +
+            line('M32 22.6v19', INK, 2.4) + line('M32 22.6v19', '#8a6a44', 1) +
+            grpW('#8a6a44', 1, P('M29.2 41.6h5.6l.6 1.4h-6.8z')) +
+            at(32, 29.2, .9,
+                grpW(STEEL_L, 1.4, P('M-5-4.4c1.2-.6 2.2-.8 3-.8.6 1.2 1.2 1.6 2 1.6s1.4-.4 2-1.6c.8 0 1.8.2 3 .8l-.4 2.2c-1 .4-1.4 1.4-1.2 2.6l.4 4.4c-1.2 1-2.4 1.4-3.8 1.4s-2.6-.4-3.8-1.4l.4-4.4c.2-1.2-.2-2.2-1.2-2.6z')) +
+                line('M0-3.2v8.6', STEEL, .9) +
+                line('M-3.2-.4c1 .8 2.1 1 3.2.6M3.2-.4c-1 .8-2.1 1-3.2.6', STEEL, .7) +
+                line('M-2.2-4.4c.6 1.1 1.3 1.5 2.2 1.5s1.6-.4 2.2-1.5', GOLD, 1.1) +
+                line('M-3.6 3.8c1.2.9 2.4 1.3 3.6 1.3s2.4-.4 3.6-1.3', GOLD, 1.1) +
+                line('M-3.6-2.2c-.4 1.3-.4 2.8 0 4.2', '#ffffff', .7)) +
             line('M39 40.4V25.8', INK, 2.4) + line('M39 40.4V25.8', '#6a4a2e', 1.1) +
             '<circle cx="39" cy="24.2" r="2.1" fill="#7ad4ff" stroke="' + INK + '" stroke-width="1.1"/>' +
             '<circle cx="38.4" cy="23.6" r=".6" fill="#ffffff"/>' +
@@ -4799,34 +4805,34 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // from the spray. Steps all round it, and flowers in the grass.
         temple:
             grpW('#5a8a3a', 1.4, P('M-1 42.4c12-2 54-2 66 0V49H-1z')) +
-            '<path d="M7 42.4v2.4a25 2.8 0 0 0 50 0v-2.4z" fill="#cfc4ae" stroke="' + INK + '" stroke-width="1.6"/>' +
-            '<ellipse cx="32" cy="42.4" rx="25" ry="2.8" fill="#e4dccb" stroke="' + INK + '" stroke-width="1.6"/>' +
-            '<path d="M9.4 40.4v1.8a22.6 2.4 0 0 0 45.2 0v-1.8z" fill="#d8cdb8" stroke="' + INK + '" stroke-width="1.4"/>' +
-            '<path d="M12 23v17.4h40V23z" fill="#ddd3bf"/>' +
-            '<ellipse cx="32" cy="40.4" rx="22.6" ry="2.4" fill="#f2ece0" stroke="' + INK + '" stroke-width="1.4"/>' +
-            grpW('#d8cdb8', 1, P('M16.3 38.6V22.4h2.6v16.2zM45.1 38.6V22.4h2.6v16.2z')) +
-            '<path d="M24 36.4h16l-1.4 4.2H25.4z" fill="#f2ece0" stroke="' + INK + '" stroke-width="1.4" stroke-linejoin="round"/>' +
-            '<ellipse cx="32" cy="36.4" rx="8" ry="1.5" fill="#5ab8f0" stroke="' + INK + '" stroke-width="1.3"/>' +
-            heartAt(32, 38.6, .1, null, .5) +
-            grpW('#f2ece0', 1.2, P('M31 36.2v-5h2v5z')) +
-            grpW('#f2ece0', 1.3, P('M27.4 31h9.2c0 2-2 3-4.6 3s-4.6-1-4.6-3z')) +
-            '<ellipse cx="32" cy="31" rx="4.6" ry=".9" fill="#5ab8f0" stroke="' + INK + '" stroke-width="1.1"/>' +
-            grpW('#8fd0f5', .7, P('M27.5 31.3c-1.2.6-1.9 2.4-1.9 5.1H27c0-2 .4-3.6 1.2-4.5zM36.5 31.3c1.2.6 1.9 2.4 1.9 5.1H37c0-2-.4-3.6-1.2-4.5z' +
+            '<path d="M7 42.6v2.2a25 2.8 0 0 0 50 0v-2.2z" fill="#cfc4ae" stroke="' + INK + '" stroke-width="1.4"/>' +
+            '<ellipse cx="32" cy="42.6" rx="25" ry="2.8" fill="#e4dccb" stroke="' + INK + '" stroke-width="1.4"/>' +
+            '<path d="M9.4 39.2v1.8a22.6 2.4 0 0 0 45.2 0v-1.8z" fill="#d8cdb8" stroke="' + INK + '" stroke-width=".9"/>' +
+            '<path d="M12 21v18.2h40V21z" fill="#ddd3bf"/>' +
+            '<ellipse cx="32" cy="39.2" rx="22.6" ry="2.4" fill="#f2ece0" stroke="' + INK + '" stroke-width=".9"/>' +
+            grpW('#d8cdb8', 1, P('M16.3 38V22.4h2.6V38zM45.1 38V22.4h2.6V38z')) +
+            '<path d="M24 36h16l-1.4 4.2H25.4z" fill="#f2ece0" stroke="' + INK + '" stroke-width="1.3" stroke-linejoin="round"/>' +
+            '<ellipse cx="32" cy="36" rx="8" ry="1.5" fill="#5ab8f0" stroke="' + INK + '" stroke-width="1.2"/>' +
+            heartAt(32, 38.3, .09, null, .45) +
+            grpW('#f2ece0', 1.1, P('M31 35.8v-4.8h2v4.8z')) +
+            grpW('#f2ece0', 1.2, P('M27.4 31h9.2c0 2-2 3-4.6 3s-4.6-1-4.6-3z')) +
+            '<ellipse cx="32" cy="31" rx="4.6" ry=".9" fill="#5ab8f0" stroke="' + INK + '" stroke-width="1"/>' +
+            grpW('#8fd0f5', .65, P('M27.5 31.3c-1.2.6-1.9 2.2-1.9 4.7H27c0-1.8.4-3.3 1.2-4.2zM36.5 31.3c1.2.6 1.9 2.2 1.9 4.7H37c0-1.8-.4-3.3-1.2-4.2z' +
                 'M31.3 30.9c-.3-1.6-.1-3.6.7-5.2.8 1.6 1 3.6.7 5.2z')) +
-            '<circle cx="30.1" cy="26.6" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
-            '<circle cx="33.9" cy="26.6" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
-            heartAt(27.4, 27.2, .08, null, .45) + heartAt(36.8, 26.6, .07, null, .45) +
-            grpW('#f8f4ea', 1.3, P('M11 41.2V23.4h3.2v17.8zM20.8 42V24.5h3.2V42zM40 42V24.5h3.2V42zM49.8 41.2V23.4H53v17.8z')) +
-            line('M12.6 25v14.6M22.4 26.1v14.3M41.6 26.1v14.3M51.4 25v14.6', '#d8cdb8', .8) +
-            grpW('#f2ece0', 1, P('M10.2 24.8v-1.4h4.8v1.4zM10.2 41.2v-1.4h4.8v1.4zM20 25.9v-1.4h4.8v1.4zM20 42v-1.4h4.8V42z' +
-                'M39.2 25.9v-1.4h4.8v1.4zM39.2 42v-1.4h4.8V42zM49 24.8v-1.4h4.8v1.4zM49 41.2v-1.4h4.8v1.4z')) +
-            '<path d="M10 18.6v3.6a22 2.6 0 0 0 44 0v-3.6a22 2.6 0 0 1-44 0z" fill="#e4dccb" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/>' +
-            line('M10.6 20.6a21.4 2.6 0 0 0 42.8 0', GOLD, 1) +
-            grpW('#f2ece0', 1.9, P('M12 18.6C12 3.2 52 3.2 52 18.6a20 2.6 0 0 1-40 0z')) +
-            line('M17.8 14.2c1.4-2.8 3.6-4.8 6.2-6', '#ffffff', 1.4) +
-            line('M32 7v14.2M25 8.2c-2.8 3-4.4 7.2-4.6 12.2M39 8.2c2.8 3 4.4 7.2 4.6 12.2', GOLD, 1.1) +
-            grpW('#f2ece0', 1.2, P('M30 7.6V5h4v2.6z')) + grpW(GOLD, 1.1, P('M29.6 5c0-1.8 4.8-1.8 4.8 0z')) +
-            heartAt(32, 2.2, .15) +
+            '<circle cx="30.1" cy="26.4" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
+            '<circle cx="33.9" cy="26.4" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
+            heartAt(27.4, 27, .08, null, .45) + heartAt(36.8, 26.4, .07, null, .45) +
+            grpW('#f8f4ea', 1.2, P('M11 40.2V23h3.2v17.2zM20.8 41V23.8h3.2v17.2zM40 41V23.8h3.2v17.2zM49.8 40.2V23H53v17.2z')) +
+            line('M12.6 24.6v14.4M22.4 25.4v14.4M41.6 25.4v14.4M51.4 24.6v14.4', '#d8cdb8', .8) +
+            grpW('#f2ece0', .9, P('M10.2 24.4V23h4.8v1.4zM10.2 40.2v-1.4h4.8v1.4zM20 25.2v-1.4h4.8v1.4zM20 41v-1.4h4.8V41z' +
+                'M39.2 25.2v-1.4h4.8v1.4zM39.2 41v-1.4h4.8V41zM49 24.4V23h4.8v1.4zM49 40.2v-1.4h4.8v1.4z')) +
+            grpW('#f2ece0', 1.6, P('M12.4 19.4C12.4 3.4 51.6 3.4 51.6 19.4a19.6 2.6 0 0 1-39.2 0z')) +
+            '<path d="M10 18.6a22 2.6 0 0 0 44 0v3.2a22 2.6 0 0 1-44 0z" fill="#e4dccb" stroke="' + INK + '" stroke-width="1.4" stroke-linejoin="round"/>' +
+            line('M11 21.6a21 2.4 0 0 0 42 0', GOLD, 1) +
+            line('M32 7.4v12.6M25.2 8.6c-2.8 3-4.4 6.8-4.6 11M38.8 8.6c2.8 3 4.4 6.8 4.6 11', GOLD, 1) +
+            grpW('#f2ece0', 1.1, P('M30 7.8V5h4v2.8z')) + line('M32 5.6v1.6', '#d8cdb8', .7) +
+            grpW(GOLD, 1, P('M29.4 5c0-1.9 5.2-1.9 5.2 0z')) +
+            '<path d="M32 .2l.9 1.9 2.1.3-1.5 1.5.4 2.1-1.9-1-1.9 1 .4-2.1-1.5-1.5 2.1-.3z" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8" stroke-linejoin="round"/>' +
             flower(3.4, 41.2, 2, '#f4f0e2') + tulip(3.2, 48.4, 1.8, '#d23a3a') +
             flower(60.6, 41.4, 2, '#f0a8c8') + tulip(60.8, 48.4, 1.8, '#f4d23c'),
 
