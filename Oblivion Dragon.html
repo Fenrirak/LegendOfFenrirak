@@ -3927,17 +3927,147 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     // A cube of pyrite seen a little from above, standing on (x, y), `s`
-    // to a side: a pale top, a gold face and a shadowed face.
-    function pyriteCube(x, y, s) {
+    // to a side: a pale top, a gold face and a shadowed face. A `great`
+    // one has a heavier outline and the fine lines pyrite has across its
+    // faces.
+    function pyriteCube(x, y, s, great) {
         const w = s * .87, f = v => v.toFixed(2);
         const pt = (a, b) => f(x + a) + ' ' + f(y + b);
+        let lines = '';
+        if (great) [.32, .64].forEach(v => {
+            lines += line('M' + pt(-w * .86, -1.5 * s + (v + .07) * s) + 'L' + pt(-w * .14, -1.5 * s + (v + .43) * s), '#c99a2e', .6) +
+                line('M' + pt(w * .14, -s + (v - .07) * s) + 'L' + pt(w * .86, -s + (v - .43) * s), '#9a7020', .6);
+        });
         return '<path d="M' + pt(0, -2 * s) + 'L' + pt(w, -1.5 * s) + 'L' + pt(0, -s) + 'L' + pt(-w, -1.5 * s) + 'z" fill="#f8e08a"/>' +
             '<path d="M' + pt(-w, -1.5 * s) + 'L' + pt(0, -s) + 'L' + pt(0, 0) + 'L' + pt(-w, -.5 * s) + 'z" fill="' + GOLD + '"/>' +
-            '<path d="M' + pt(0, -s) + 'L' + pt(w, -1.5 * s) + 'L' + pt(w, -.5 * s) + 'L' + pt(0, 0) + 'z" fill="#b8862a"/>' +
+            '<path d="M' + pt(0, -s) + 'L' + pt(w, -1.5 * s) + 'L' + pt(w, -.5 * s) + 'L' + pt(0, 0) + 'z" fill="#b8862a"/>' + lines +
             '<path d="M' + pt(-w, -1.5 * s) + 'L' + pt(0, -s) + 'L' + pt(w, -1.5 * s) + 'M' + pt(0, -s) + 'V' + f(y) +
-            '" fill="none" stroke="' + INK + '" stroke-width=".7" stroke-linejoin="round"/>' +
+            '" fill="none" stroke="' + INK + '" stroke-width="' + (great ? 1.1 : .7) + '" stroke-linejoin="round"/>' +
             '<path d="M' + pt(0, -2 * s) + 'L' + pt(w, -1.5 * s) + 'L' + pt(w, -.5 * s) + 'L' + pt(0, 0) + 'L' + pt(-w, -.5 * s) +
-            'L' + pt(-w, -1.5 * s) + 'z" fill="none" stroke="' + INK + '" stroke-width="1.2" stroke-linejoin="round"/>';
+            'L' + pt(-w, -1.5 * s) + 'z" fill="none" stroke="' + INK + '" stroke-width="' + (great ? 1.8 : 1.2) + '" stroke-linejoin="round"/>';
+    }
+
+    // A crow perched with its feet at (x, y), facing right (`flip` turns
+    // it round): one dark shape, outlined only round the outside.
+    function crowAt(x, y, s, flip) {
+        const B = '#2a2228';
+        const body = P('M-1.4-3.4-6-1.6l.5 1 4.6-.6z') +
+            '<ellipse cx="-.2" cy="-2.9" rx="2.8" ry="1.8" transform="rotate(-20 -.2 -2.9)"/>' +
+            '<circle cx="2.2" cy="-5" r="1.4"/>' + P('M3.2-5.6 5.8-4.9 3.3-4.2z');
+        return at(x, y, s || 1,
+            line('M-.7-1.4-1 0M.7-1.4.6 0', INK, .7) +
+            grpW(B, 1.2, body) + '<g fill="' + B + '">' + body + '</g>' +
+            line('M-2.6-3.4c1.4-1 3.2-1.1 4.4-.2', '#544a52', .7) +
+            dot(2.5, -5.2, .42, '#f4d23c'), flip);
+    }
+    // The game's red heart (its healing mark), centred on (x, y), `s` of its
+    // 20-wide icon.
+    function heartAt(x, y, s, fill, sw) {
+        return '<path transform="translate(' + (x - 12 * s).toFixed(2) + ' ' + (y - 11.6 * s).toFixed(2) + ') scale(' + s +
+            ')" d="M12 21C5 15 2 12 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 4-3 7-10 13z" fill="' + (fill || '#d23a3a') +
+            '" stroke="' + INK + '" stroke-width="' + ((sw || 1) / s).toFixed(2) + '" stroke-linejoin="round"/>';
+    }
+    // A wisp of the curse rising from (x, y), `h` tall and leaning `lean`
+    // degrees: a thin violet flame tapering to a curl (`flip` curls it
+    // the other way). A hard dark edge, no glow.
+    function wisp(x, y, h, flip, lean) {
+        const k = h / 10;
+        return '<path transform="translate(' + x + ' ' + y + ') rotate(' + (lean || 0) + ') scale(' + (flip ? -k : k) + ' ' + k + ')" ' +
+            'd="M-1.2 0C-2.8-3 1-4.6-.6-7.4-1.4-8.8-.8-10.2.6-10.8 0-9.8.2-8.6.9-7.6 2.9-4.6-.8-3 1.2 0z" ' +
+            'fill="#b77cff" stroke="' + INK + '" stroke-width="' + (.8 / k).toFixed(2) + '" stroke-linejoin="round"/>';
+    }
+    // A red rose, `r` across the flower: its petals curled round the bud,
+    // a leaf either side.
+    function rose(x, y, r) {
+        return at(x, y, r / 1.4,
+            grpW('#3f6a34', .6, P('M-.8.6C-2 .2-3 .8-3.2 1.8-2 2-1.2 1.6-.8.6zM.8.6C2 .2 3 .8 3.2 1.8 2 2 1.2 1.6.8.6z')) +
+            '<circle r="1.4" fill="#d23a3a" stroke="' + INK + '" stroke-width=".8"/>' +
+            line('M-.7.2a.75.75 0 1 1 1.1.6M-1-.55c.6-.65 1.5-.7 2.1-.1', '#7a1418', .5));
+    }
+    // A coin lying flat in the dirt.
+    function flatCoin(x, y, r) {
+        return '<ellipse cx="' + x + '" cy="' + y + '" rx="' + (r || 1.8) + '" ry="' + ((r || 1.8) / 2) + '" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>';
+    }
+    // A soldier's kettle helmet, the top of a head under it, centred at x
+    // with its brim at y: the men on a wall, behind its battlements.
+    function helmTop(x, y) {
+        return grpW(SKIN, 1, P('M' + (x - 2.4) + ' ' + y + 'h4.8v2.6h-4.8z')) +
+            grpW(STEEL, 1.1, P('M' + (x - 2.6) + ' ' + y + 'c0-3.4 5.2-3.4 5.2 0h1.4v1.2h-8z')) +
+            line('M' + (x - 1.4) + ' ' + (y - 2) + 'c.6-.6 1.4-.8 2.2-.6', STEEL_L, .7);
+    }
+    function smallSigil(x, y, s, col) { return at(x, y, s, thornSigil(0, 0, col || GOLD)); }
+    // One of the garrison on guard, feet at (x, y): his kettle helmet, his
+    // crimson tower shield with the thorn on it, and his spear grounded on
+    // his outer side (the left; `flip` stands him the other way round).
+    function guard(x, y, flip) {
+        return at(x, y, 1,
+            line('M-5.6 0V-18', INK, 2) + line('M-5.6 0V-18', '#7a5232', 1) +
+            grpW('#3a2a20', 1, P('M-3.2 0v-2.6h2.4V0zM.8 0v-2.6h2.4V0z')) +
+            grpW(CRIMSON, 1.2, P('M-4.2-11c0-2.4 1.8-3.6 4.2-3.6s4.2 1.2 4.2 3.6v1.4h-8.4z')) +
+            line('M-3.6-12.2-5.2-9.8', INK, 2.6) + line('M-3.6-12.2-5.2-9.8', CRIMSON, 1.3) +
+            '<circle cx="0" cy="-13.8" r="2.1" fill="' + SKIN + '" stroke="' + INK + '" stroke-width="1.1"/>' +
+            dot(-.8, -13.4, .38) + dot(.8, -13.4, .38) +
+            grpW(STEEL, 1.1, P('M-2.6-15.6c0-3.4 5.2-3.4 5.2 0h1.4v1.2h-8v-1.2z')) +
+            line('M-1.4-17.6c.6-.6 1.4-.8 2.2-.6', STEEL_L, .7) +
+            grpW(CRIMSON, 1.4, P('M-4.2-12.2h8.4v7.6c0 2.6-4.2 4.6-4.2 4.6s-4.2-2-4.2-4.6z')) +
+            line('M-3.6-11.8h7.2', STEEL_L, 1.2) + smallSigil(0, -6.8, .4) +
+            '<circle cx="-5.6" cy="-9.4" r="1.1" fill="' + SKIN + '" stroke="' + INK + '" stroke-width=".9"/>' +
+            grpW(STEEL_L, .8, P('M-5.6-21.4l1.3 3.6h-2.6z')), flip);
+    }
+    // A rose window: panes of coloured glass between stone spokes, a
+    // stone ring round them and a boss at the middle, all in `stone`.
+    function roseWindow(cx, cy, r, cols, stone) {
+        let s = '', spokes = '';
+        const n = cols.length, f = v => v.toFixed(2);
+        for (let i = 0; i < n; i++) {
+            const a0 = (i / n) * Math.PI * 2 - Math.PI / 2, a1 = ((i + 1) / n) * Math.PI * 2 - Math.PI / 2;
+            s += '<path d="M' + cx + ' ' + cy + 'L' + f(cx + r * Math.cos(a0)) + ' ' + f(cy + r * Math.sin(a0)) +
+                'A' + r + ' ' + r + ' 0 0 1 ' + f(cx + r * Math.cos(a1)) + ' ' + f(cy + r * Math.sin(a1)) + 'z" fill="' + cols[i] + '"/>';
+            spokes += 'M' + cx + ' ' + cy + 'L' + f(cx + r * Math.cos(a0)) + ' ' + f(cy + r * Math.sin(a0));
+        }
+        return s + line(spokes, INK, 2.2) + line(spokes, stone, .9) +
+            '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + INK + '" stroke-width="3.6"/>' +
+            '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + stone + '" stroke-width="1.6"/>' +
+            '<circle cx="' + cx + '" cy="' + cy + '" r="' + f(r * .26) + '" fill="' + stone + '" stroke="' + INK + '" stroke-width="1"/>';
+    }
+    // A thorned vine trained round an arch: up from (l, y1) to (l, y0),
+    // over the top (`c` is how far its curve's handles rise) to (r, y0)
+    // and down to (r, y1): the stem, a leaf here and there either side of
+    // it, and thorns standing out from it.
+    function thornArch(l, r, y0, c, y1) {
+        const raw = [], pts = [], f = v => v.toFixed(2);
+        for (let y = y1; y > y0; y -= .2) raw.push([l, y]);
+        for (let i = 0; i <= 80; i++) {
+            const t = i / 80, u = 1 - t;
+            raw.push([l + (r - l) * (3 * u * t * t + t * t * t), y0 - 3 * c * u * t]);
+        }
+        for (let y = y0 + .2; y <= y1; y += .2) raw.push([r, y]);
+        // the same path again, a point every half unit along it, each with
+        // the way out from the arch (n) and the way along it (-ny, nx)
+        let run = 0, next = 0;
+        for (let i = 1; i < raw.length; i++) {
+            const dx = raw[i][0] - raw[i - 1][0], dy = raw[i][1] - raw[i - 1][1], d = Math.hypot(dx, dy);
+            for (; d && next <= run + d; next += .5) {
+                const k = (next - run) / d;
+                pts.push({ x: raw[i - 1][0] + dx * k, y: raw[i - 1][1] + dy * k, nx: dy / d, ny: -dx / d, s: next });
+            }
+            run += d;
+        }
+        const stem = 'M' + l + ' ' + y1 + 'V' + y0 + 'C' + l + ' ' + (y0 - c) + ' ' + r + ' ' + (y0 - c) + ' ' + r + ' ' + y0 + 'V' + y1;
+        let thorns = '', leaves = '';
+        for (let i = 3; i < pts.length - 2; i += 5) {
+            const p = pts[i], tx = -p.ny, ty = p.nx, bx = p.x + p.nx * 1.1, by = p.y + p.ny * 1.1;
+            thorns += 'M' + f(bx + tx * .9) + ' ' + f(by + ty * .9) + 'L' + f(bx + p.nx * 2.8 - tx * 1.1) + ' ' + f(by + p.ny * 2.8 - ty * 1.1) +
+                'L' + f(bx - tx * .9) + ' ' + f(by - ty * .9) + 'z';
+        }
+        for (let i = 12, side = 1; i < pts.length - 8; i += 15, side = -side) {
+            const p = pts[i], a = Math.atan2(p.ny * side + p.nx * .9, p.nx * side - p.ny * .9) * 180 / Math.PI;
+            leaves += '<path transform="translate(' + f(p.x + p.nx * side * 1.1) + ' ' + f(p.y + p.ny * side * 1.1) + ') rotate(' + f(a) +
+                ')" d="M0 0c.8-.9 2-1.1 2.8-.6-.6.9-1.8 1.2-2.8.6z"/>';
+        }
+        return grpW('#4a1c1c', .6, P(thorns)) +
+            line(stem, INK, 3.2) + line(stem, '#3f6a34', 1.6) +
+            grpW('#4a7a3a', .5, leaves);
     }
 
     const SQUARE_ART = {
@@ -4152,42 +4282,43 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M54.2 35.4v7.6M59 35.4v7.6', '#6a4a2e', .8) +
             '<circle cx="56.6" cy="39.2" r="1.5" fill="' + STEEL + '" stroke="' + INK + '" stroke-width="1"/>',
 
-        // The Cursed Ruins: what is left of an arch, one column still
-        // carrying a broken piece of it, the other snapped off, a drum of it
-        // fallen in the dirt with a skull by it and Gold half buried, purple
-        // runes in the stone, the curse rising off it in wisps, and its eye
-        // watching over them.
+        // The Cursed Ruins: the gable end of a roofless chapel, its rose
+        // window lit violet by the curse and one pane broken out, eyes
+        // watching from the dark of its door, a crow on its broken top and
+        // the curse rising off it in wisps. Ivy up one side, the side wall
+        // fallen in, a gravestone leaning, a skull, and Gold in the dirt.
         ruins:
             grp('#5a4a48', P('M0 44h64v4H0z')) +
-            grpW('#8a8278', 1.6, P('M7.4 44v-3h9.2v3zM39.4 44v-3h9.2v3z')) +
-            grp('#9a948a', P('M9 41V25h6v16z')) +
-            line('M11 26.4v13.4M13 26.4v13.4', '#7a746a', .8) +
-            grpW('#8a8278', 1.6, P('M7.4 25v-3h9.2v3z')) +
-            grp('#9a948a', P('M10.5 22A17.5 17.5 0 0 1 23.47 5.1L25 6.6 23.2 7.8 24.4 8.8 23.55 9.78A13 13 0 0 0 15 22z')) +
-            line('M15.78 17.55 11.56 16.01M18.04 13.64 14.6 10.75M21.5 10.74 19.25 6.85', '#6a645a', 1) +
-            line('M17 13.6l1.4 1.6-.4 1.8', INK, .7) +
-            grp('#9a948a', P('M41 41V31l2-1.4 1.4 1.6 1.8-2.6.8 1.4V41z')) +
-            line('M43 32.4V40M45 32V40', '#7a746a', .8) + line('M42.2 35.6l1.6 1.2-.6 1.6', INK, .7) +
-            line('M8.6 43c1.6-2.6.2-5 1.8-7.6 1.4-2.2.2-4.6 1.6-7', '#2f4a2a', 1.4) +
-            grpW('#3f6a34', .7, P('M9.4 38.4c-1.6-.4-2-1.8-1-2.6.6.8 1.4 1 1 2.6zM11.4 33.2c1.6-.2 2.2-1.6 1.2-2.4-.6.8-1.4 1-1.2 2.4zM10.8 29.6c-1.6-.4-2-1.8-1-2.6.6.8 1.4 1 1 2.6z')) +
-            line('M13.2 31.4h-2l1 1.6h-1.4M43 37.4l1.6-1.6 1.4 1.4', '#b77cff', 1.1) +
-            grpW('#9a948a', 1.6, P('M23.4 44v-5.6h10V44z')) +
-            '<ellipse cx="33.4" cy="41.2" rx="1.7" ry="2.8" fill="#7a746a" stroke="' + INK + '" stroke-width="1.4"/>' +
-            line('M25.4 39.8v3M28.6 39.8v3', '#7a746a', .8) +
-            grpW('#f4f0e2', .9, P('M35.6 43.6c-.4-2.6.6-3.8 2.2-3.8s2.6 1.2 2.2 3.8z')) + dot(37, 41.8, .5) + dot(38.6, 41.8, .5) +
-            grpW('#7a746a', 1.2, P('M50.6 44l1.6-3.6 4.4.6.4 3zM57.6 44l1-2.2 3 .4.4 1.8zM18.4 44l.8-1.8 2.4.2.2 1.6z')) +
-            '<ellipse cx="21.4" cy="44.6" rx="1.8" ry=".9" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>' +
-            '<ellipse cx="47.6" cy="45" rx="1.8" ry=".9" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>' +
-            '<ellipse cx="4.4" cy="44.8" rx="1.6" ry=".8" fill="' + GOLD + '" stroke="' + INK + '" stroke-width=".8"/>' +
-            line('M44.4 28.6c-2.6-2.8 1.8-4.6-.6-7.8-1.6-2.2.8-4 .4-6M29.4 37.4c-2.4-3 1.8-4.8-.4-8M56.4 39.6c2-2.8-1.8-4.4.4-7.2', INK, 3) +
-            line('M44.4 28.6c-2.6-2.8 1.8-4.6-.6-7.8-1.6-2.2.8-4 .4-6M29.4 37.4c-2.4-3 1.8-4.8-.4-8M56.4 39.6c2-2.8-1.8-4.4.4-7.2', '#b77cff', 1.4) +
-            grpW('#3d2a4a', 1.4, P('M44 8.4c3.4-4 10.6-4 14 0-3.4 4-10.6 4-14 0z')) +
-            '<circle cx="51" cy="8.4" r="2.4" fill="#b77cff" stroke="' + INK + '" stroke-width=".9"/>' + dot(51, 8.4, 1) +
-            line('M51 2.4V.8M45.4 4.2l-1-1.2M56.6 4.2l1-1.2', '#b77cff', 1),
+            wisp(33.6, 15.8, 12, false, 22) + wisp(37.6, 19.6, 7.4, true, 30) + wisp(19.8, 14.6, 7, false, 14) +
+            grp('#8a8278', P('M38 44V26.6l2.4-1.4 1.6 1.8 2.6-2.6 1.8 2.2 2.4-1.2 1.6 2.4 2.2-.8V44z')) +
+            line('M39.4 31.4h3.6M47.4 30.6h4M39.4 38.6h11.6M41.6 31.4v7.2', '#6d665c', .9) +
+            grpW('#2a1f30', 1.4, P('M45 36.4v-3.8c0-2.4 3.8-2.4 3.8 0v3.8z')) +
+            grp('#9a948a', P('M12 44V21l9.6-9.9 1.4 2.5 1.4-2.4 1.4 1.8 1.6-2.8 1 1.4 1.2-1.3L40 21v23z')) +
+            line('M13.4 20.6l8-8.2M30.4 11.4l8.2 8.4', '#b8b0a2', 1.1) +
+            line('M13.4 27.4h5.4M33.4 27.4h5.2M13.4 33.4h6.2M32.4 33.4h6.2M13.4 39.4h6.6M31.6 39.4h7M16.4 27.4v6M35.4 27.4v6M17 33.4v6M35 33.4v6', '#7c746a', .9) +
+            roseWindow(26, 22.4, 5.8, ['#9b5cff', '#6a2fc0', '#9b5cff', '#2a1f30', '#9b5cff', '#6a2fc0'], '#b8b0a2') +
+            line('M29.8 11.6l-.8 1.8.9 1.2-.5 1.2', INK, .8) +
+            '<path d="M20.4 44V36.6c0-3.4 2.6-6.2 5.6-7.8 3 1.6 5.6 4.4 5.6 7.8V44" fill="none" stroke="' + INK + '" stroke-width="3.6"/>' +
+            '<path d="M20.4 44V36.6c0-3.4 2.6-6.2 5.6-7.8 3 1.6 5.6 4.4 5.6 7.8V44" fill="none" stroke="#b8b0a2" stroke-width="1.6"/>' +
+            grpW('#2a1f30', 1.4, P('M21.8 44V36.8c0-2.6 2-4.6 4.2-5.8 2.2 1.2 4.2 3.2 4.2 5.8V44z')) +
+            grpW('#c79bff', .6, P('M23.2 37.6c.6-.8 1.8-.8 2.4 0-.6.8-1.8.8-2.4 0zM26.4 37.6c.6-.8 1.8-.8 2.4 0-.6.8-1.8.8-2.4 0z')) +
+            dot(24.4, 37.6, .35) + dot(27.6, 37.6, .35) +
+            line('M12.8 44c1.4-3.2-.4-6 1.2-9.2 1.4-2.8 0-5.4 1.4-8.2.8-1.8.4-3 1.2-4.6', '#2f4a2a', 1.4) +
+            grpW('#3f6a34', .7, P('M13.2 40.6c-1.6-.2-2.2-1.6-1.2-2.6.6.8 1.4 1.2 1.2 2.6zM14.6 35.6c1.6-.4 2-1.8 1-2.6-.6.8-1.4 1.2-1 2.6zM14.2 30.4c-1.6-.2-2.2-1.6-1.2-2.6.6.8 1.4 1.2 1.2 2.6zM15.8 25.6c1.6-.4 2-1.8 1-2.6-.6.8-1.4 1.2-1 2.6z')) +
+            grpW('#7a746a', 1.2, P('M35.6 44l1.4-3 3.6.4.6 2.6zM8.6 44l1-2.2 2.8.2.4 2z')) +
+            '<g transform="rotate(8 57 44)">' + grpW('#a39b8f', 1.4, P('M53.6 44v-7.6c0-2.8 6.8-2.8 6.8 0V44z')) +
+            line('M55.4 38.8h3.2M55.6 40.8h2.8', '#6d665c', .8) + '</g>' +
+            grpW('#f4f0e2', .9, P('M3.4 43.8c-.4-2.6.6-3.8 2.2-3.8s2.6 1.2 2.2 3.8z')) + dot(4.8, 42, .5) + dot(6.4, 42, .5) +
+            line('M1.2 44l-.4-1.6M1.9 44l.1-1.9M2.6 44l.6-1.3M50.6 44l-.4-1.5M51.3 44l.1-1.8M52 44l.6-1.2', '#8a8a5a', .8) +
+            flatCoin(33.6, 44.8) + flatCoin(17.6, 45) + flatCoin(46.4, 45.4, 1.6) +
+            crowAt(27.4, 10.4, .62) +
+            line('M47 8.6c.8-1 1.8-1.2 2.6-.2.8-1 1.8-.8 2.6.2', INK, 1.1) +
+            line('M55 12.6c.5-.7 1.2-.8 1.7-.1.5-.7 1.2-.6 1.7.1', INK, .9),
 
         // The Vault of Comets: a round steel vault door in a stone wall,
-        // its locking wheel at the middle and a comet on the keystone, and
-        // two comets streaking over it with their tails behind them.
+        // its locking wheel at the middle under a plain keystone, and a
+        // comet streaking over it with its tail behind it. (The blue comet
+        // and the mark on the keystone went at the user's asking, 2026-10-07.)
         vault:
             grp('#6a5238', P('M0 44h64v4H0z')) +
             grpW('#9a948a', 1.8, P('M5 17h54v27H5z')) +
@@ -4203,20 +4334,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M32 26v10.8M26.6 31.4h10.8M28.2 27.6l7.6 7.6M35.8 27.6l-7.6 7.6', INK, 1.5) +
             dot(32, 31.4, 1.6, GOLD) +
             grpW('#b8b0a2', 1.4, P('M28 16.6h8l-1.2 3.2h-5.6z')) +
-            dot(33, 18, .9, GOLD) + line('M32.4 18.4l-2.4.6', GOLD, .8) +
             '<path d="M39 9.6 56.4 2.8M40.6 12.2 57.4 6.4M42 7.6 52 2.4" fill="none" stroke="#f4e38a" stroke-width="1.3" stroke-linecap="round"/>' +
-            '<path d="M7 12.4 19.6 7.6M8.2 14.4 20 10.4" fill="none" stroke="#bfe6ff" stroke-width="1.1" stroke-linecap="round"/>' +
             grpW('#ffe27a', 1.2, P('M38.4 7.6l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z')) +
-            '<circle cx="6" cy="13.6" r="2.2" fill="#dff2ff" stroke="' + INK + '" stroke-width="1.1"/>' +
             '<path d="M25.4 3.6l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5zM61 12.6l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>',
 
         // The Cliff of Doom: a sheer cliff with a skull warning on its
-        // edge, its lip crumbling, rocks tumbling down into the chasm and
-        // the far side of it across the drop.
+        // edge, its lip crumbling and rocks tumbling down off it into the
+        // drop. (No far wall: the user had it taken out, 2026-10-07.)
         cliff:
-            grpW('#a39686', 1.6, P('M64 48V22.6l-2.4-1.4-2.6 2.4-3.2-.8-1.6 3 1 3.6-1.8 3 1 14.6z')) +
-            line('M57.6 30.4h5M56.4 37.6h6.4M58.6 43.6h4.6', '#857868', .9) +
-            '<path d="M30 48c3-3 8-4.4 13-4.4s9.4 1.4 11 4.4z" fill="#3a2e34"/>' +
             grp('#7a6a5a', P('M-2 16h30.6l2.8 4.4-1.8 4.8 3.4 4.2-2.2 5.8 3.2 14.8H-2z')) +
             line('M1 22.6h16M21 23.4h6M3 29.4h11M17.6 29h12M1 36h20M24 36.4h7M5 42.4h22', '#5f5246', 1) +
             line('M27.8 16.4l-1.4 3 1 2.4-1.2 2.6M30.2 30.6l-2 1.8.4 2.4', INK, .9) +
@@ -4322,32 +4447,36 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M54 31v1.6', INK, .9) +
             grpW(GOLD, 1, P('M51.8 36.6c0-3 1-4.2 2.2-4.2s2.2 1.2 2.2 4.2z')) + dot(54, 37.4, .9, INK),
 
-        // The Thorned Pyrite: a purple and gold temple up its own steps,
-        // a cluster of pyrite in its pediment, a great sword waiting in its
-        // lit door, and thorns climbing its corners and crowding its feet.
+        // The Thorned Pyrite: an alcove cut into a crag of great gold pyrite
+        // cubes, framed in a thorned vine with red roses on it, and kept in
+        // it a weapon for every class (the Archer's bow, the Knight's
+        // sword, the Mage's staff, the Barbarian's axe) round a gilded
+        // breastplate on its stand. Gold in the dirt before it.
         pyrite:
             grp('#6a5238', P('M0 44h64v4H0z')) +
-            grpW('#a39b8f', 1.6, P('M4 44v-3h56v3z')) +
-            grpW('#b8b0a2', 1.6, P('M7 41v-2.8h50V41z')) +
-            line('M16 42.5h4M34 42.5h6M50 42.5h3', '#7c746a', .8) +
-            grp('#3d2a4a', P('M10 38.2V22h44v16.2z')) +
-            line('M11.6 30h14M38.4 30H52.4', '#2e1f38', 1) +
-            [14, 22, 42, 50].map(x =>
-                grpW('#f0c33c', 1.2, P('M' + (x - 1.8) + ' 36.4V24.6h3.6v11.8z')) +
-                line('M' + x + ' 25.6v9.8', '#b8862a', .8) +
-                grpW(GOLD, 1.2, P('M' + (x - 2.8) + ' 22.8h5.6v1.8h-5.6zM' + (x - 2.8) + ' 36.4h5.6v1.8h-5.6z'))).join('') +
-            grpW('#f4e38a', 1.6, P('M27.4 38.2V30c0-6 9.2-6 9.2 0v8.2z')) +
-            sword(32, 32.2, 0, .21) +
-            grpW(GOLD, 1.6, P('M7 20h50v3.2H7z')) +
-            [10, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54].map(x => dot(x, 21.6, .55, '#b8862a')).join('') +
-            grp(GOLD, P('M5 20.2 32 5l27 15.2z')) +
-            grpW('#c8942a', 1, P('M12 18.4 32 7.4l20 11z')) +
-            pyriteCube(27.6, 17.8, 2.4) + pyriteCube(36.6, 17.8, 2.6) + pyriteCube(32, 18, 4.2) +
-            line('M8.6 41c-1.8-3 1.8-5.4.4-8.6-1.4-3 2-5.2 1-8.6M55.4 41c1.8-3-1.8-5.4-.4-8.6 1.4-3-2-5.2-1-8.6', INK, 3.2) +
-            line('M8.6 41c-1.8-3 1.8-5.4.4-8.6-1.4-3 2-5.2 1-8.6M55.4 41c1.8-3-1.8-5.4-.4-8.6 1.4-3-2-5.2-1-8.6', '#3f6a34', 1.6) +
-            line('M7.6 37.8l-2-.6M9.4 34l2-.4M8.6 29.4l-2-.8M10.8 26l2-.6M56.4 37.8l2-.6M54.6 34l-2-.4M55.4 29.4l2-.8M53.2 26l-2-.6', INK, 1) +
-            dot(7, 33, 1.1, '#c8342b') + dot(10.6, 28.4, 1, '#c8342b') + dot(57, 33, 1.1, '#c8342b') + dot(53.4, 28.4, 1, '#c8342b') +
-            thornBush(6.4, 44, .46) + thornBush(57.6, 44, .46),
+            grp('#b8862a', P('M1.4 44V34.6L9.6 28V20.2l6.8-4.2 7 .4V11L32 6.4l8.6 4.6v5.4l7-.4 6.8 4.2V28l8.2 6.6V44z')) +
+            pyriteCube(32, 24.8, 10, true) + pyriteCube(16.4, 31.6, 8.4, true) + pyriteCube(47.6, 31.6, 8.4, true) +
+            pyriteCube(6.6, 44, 7, true) + pyriteCube(57.4, 44, 7, true) +
+            pyriteCube(21.6, 15.8, 2.2) + pyriteCube(42.6, 15.4, 2) + pyriteCube(3, 33.4, 1.8) + pyriteCube(61.2, 33.6, 1.6) +
+            grpW('#3d2a4a', 2, P('M15 44V27.6c0-11 34-11 34 0V44z')) +
+            line('M16.6 41.6h30.8', '#5a4a62', 1.2) +
+            line('M17.6 26.4h28.8', INK, 2.6) + line('M17.6 26.4h28.8', '#8a6a44', 1.2) +
+            line('M20.8 24.6c-3.4 3.4-3.4 12 0 15.4', INK, 2.6) + line('M20.8 24.6c-3.4 3.4-3.4 12 0 15.4', '#8a5a32', 1.2) +
+            line('M20.8 24.6v15.4', '#e8dcc0', .6) +
+            sword(25.4, 33.2, 0, .42) +
+            line('M32 35.6v6', INK, 2.4) + line('M32 35.6v6', '#8a6a44', 1) +
+            grpW(STEEL_L, 1.3, P('M27.6 25c1.4-1 2.8-1.4 4.4-1.4s3 .4 4.4 1.4l-.6 3.2.8 5.4c-1.4 1.2-3 1.6-4.6 1.6s-3.2-.4-4.6-1.6l.8-5.4z')) +
+            line('M32 24.2v10.6', STEEL, .9) + line('M28.6 25c2.2 1.4 4.6 1.4 6.8 0', GOLD, 1.1) +
+            line('M39 40.4V25.8', INK, 2.4) + line('M39 40.4V25.8', '#6a4a2e', 1.1) +
+            '<circle cx="39" cy="24.2" r="2.1" fill="#7ad4ff" stroke="' + INK + '" stroke-width="1.1"/>' +
+            '<circle cx="38.4" cy="23.6" r=".6" fill="#ffffff"/>' +
+            line('M43.4 40.4V26', INK, 2.4) + line('M43.4 40.4V26', '#8a5a32', 1.1) +
+            grpW(STEEL, .9, P('M42.8 28.6l-1.4.8 1.4.8z')) +
+            grpW(STEEL_L, 1.1, P('M43.8 27.4c1.6-.4 2.8-1.2 3.4-2.2.9 2.4.9 6.4 0 8.8-.6-1-1.8-1.8-3.4-2.2z')) +
+            line('M47.5 26.6c.5 1.9.5 4.7 0 6.6', '#eef1f5', .7) +
+            thornArch(13.4, 50.6, 27.6, 11.4, 44) +
+            rose(13.4, 33.6, 1.5) + rose(16.4, 22.4, 1.5) + rose(32, 19, 1.7) + rose(47.6, 22.4, 1.5) + rose(50.6, 38, 1.5) +
+            flatCoin(9.6, 45.4) + flatCoin(55, 45.4) + flatCoin(24.6, 45.8, 1.5) + flatCoin(40.4, 45.6, 1.5),
 
         outpost:
             grp('#8a8278', P('M18 44V12h26v32z')) + grp('#9e968a', P('M16 6h30v8H16z')) +
@@ -4484,9 +4613,34 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<ellipse cx="47.5" cy="24" rx="1.4" ry="2.3" fill="' + INK + '"/>' +
             '<ellipse cx="49.3" cy="29.7" rx="1.4" ry="2.3" fill="' + INK + '"/>',
 
+        // The Soldier Garrison: a stone gatehouse between two stretches of
+        // wall, the garrison's helmets and spears showing over the
+        // battlements and two of them on guard either side of its studded
+        // door, with their tower shields and spears. The thorn sigil on the
+        // crimson banners down the walls and on the flag over the gate.
         garrison:
-            grp('#8a8278', P('M4 44V20h56v24z')) + grp('#6a5a4a', P('M2 20 32 8l30 12z')) +
-            [12, 26, 40, 52].map(x => grp(CRIMSON, P('M' + (x - 4) + ' 26h8v8c0 3-4 5-4 5s-4-2-4-5z'))).join(''),
+            grp('#6a5238', P('M0 44h64v4H0z')) +
+            '<path d="M25.6 45.2h12.8l2 2.8H23.6z" fill="#8a6e4a"/>' +
+            [7.8, 15.8, 48.2, 56.2].map(x => line('M' + x + ' 21V7.6', INK, 2) + line('M' + x + ' 21V7.6', '#7a5232', 1) +
+                grpW(STEEL_L, .8, P('M' + x + ' 4.4l1.3 3.6h-2.6z')) + helmTop(x, 18.8)).join('') +
+            grp('#8a8278', P('M2 44V22h20v22zM42 44V22h20v22z')) +
+            grp('#8a8278', P('M2 22v-4h3.6v4zM10 22v-4h3.6v4zM18 22v-4h4v4zM42 22v-4h4v4zM50.4 22v-4H54v4zM58.4 22v-4H62v4z')) +
+            line('M3 40.6h6M55 40.6h6', '#6d665c', 1) +
+            [7.6, 56.4].map(x => grpW(CRIMSON, 1.3, P('M' + (x - 3.5) + ' 25h7v12l-3.5-2.6-3.5 2.6z')) + line('M' + (x - 4.1) + ' 25h8.2', GOLD, 1.4) +
+                smallSigil(x, 30.2, .4)).join('') +
+            grp('#9a948a', P('M22 44V14h20v30z')) +
+            grp('#9a948a', P('M22 14v-4h3.6v4zM27.6 14v-4h3.4v4zM33 14v-4h3.4v4zM38.4 14v-4H42v4z')) +
+            line('M23 18.6h5M36 18.6h5', '#7c746a', 1) +
+            '<path d="M31.2 16.2h1.6v4.6h-1.6z" fill="' + INK + '"/>' +
+            line('M32 10V1.4', INK, 1.4) +
+            grpW(CRIMSON, 1.1, P('M32.6 1.6h9.6l-2.4 3.2 2.4 3.2h-9.6z')) + smallSigil(36.6, 4.8, .3) +
+            '<path d="M25.2 44V30c0-5.4 13.6-5.4 13.6 0V44" fill="none" stroke="' + INK + '" stroke-width="4.6"/>' +
+            '<path d="M25.2 44V30c0-5.4 13.6-5.4 13.6 0V44" fill="none" stroke="#b8b0a2" stroke-width="2.4"/>' +
+            grpW('#6a4a2e', 1.4, P('M26.6 44V30c0-3.8 10.8-3.8 10.8 0V44z')) +
+            line('M30.2 27.4V44M33.8 27.4V44', '#4a3220', .8) +
+            line('M26.8 32.6h10.4M26.8 39h10.4', '#3a3a40', 1.3) +
+            dot(28.4, 32.6, .5, STEEL_L) + dot(35.6, 32.6, .5, STEEL_L) + dot(28.4, 39, .5, STEEL_L) + dot(35.6, 39, .5, STEEL_L) +
+            guard(19.4, 44) + guard(44.6, 44, true),
 
         // The Ancient Shrine: a blue crystal held in a gold cup on a worn
         // stone altar, moss on it and a crack, a rune carved in its face,
@@ -4638,10 +4792,43 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M45.6 30h16.8', '#7c746a', 1) +
             flower(48.6, 27.4, 2.6, '#f4f0e2') + flower(54, 25.2, 2.8, '#9b5cff') + flower(59.4, 27.4, 2.6, '#e2b13c'),
 
+        // The Royal Cleric's Temple: a round temple open to the air, white
+        // columns under a white and gold dome with the red heart over it,
+        // and in the middle a fountain of healing water spilling from its
+        // bowl into its basin, the heart on the basin and two more rising
+        // from the spray. Steps all round it, and flowers in the grass.
         temple:
-            grp('#f2ece0', P('M10 44V24h44v20z')) + grp('#f2ece0', P('M14 24c0-14 36-14 36 0z')) +
-            line('M18 28v16M26 28v16M38 28v16M46 28v16', '#c9c2b4', 2) + line('M32 4v6M29 7h6', GOLD, 2) +
-            grp('#e2b13c', P('M28 44V34c0-4 8-4 8 0v10z')),
+            grpW('#5a8a3a', 1.4, P('M-1 42.4c12-2 54-2 66 0V49H-1z')) +
+            '<path d="M7 42.4v2.4a25 2.8 0 0 0 50 0v-2.4z" fill="#cfc4ae" stroke="' + INK + '" stroke-width="1.6"/>' +
+            '<ellipse cx="32" cy="42.4" rx="25" ry="2.8" fill="#e4dccb" stroke="' + INK + '" stroke-width="1.6"/>' +
+            '<path d="M9.4 40.4v1.8a22.6 2.4 0 0 0 45.2 0v-1.8z" fill="#d8cdb8" stroke="' + INK + '" stroke-width="1.4"/>' +
+            '<path d="M12 23v17.4h40V23z" fill="#ddd3bf"/>' +
+            '<ellipse cx="32" cy="40.4" rx="22.6" ry="2.4" fill="#f2ece0" stroke="' + INK + '" stroke-width="1.4"/>' +
+            grpW('#d8cdb8', 1, P('M16.3 38.6V22.4h2.6v16.2zM45.1 38.6V22.4h2.6v16.2z')) +
+            '<path d="M24 36.4h16l-1.4 4.2H25.4z" fill="#f2ece0" stroke="' + INK + '" stroke-width="1.4" stroke-linejoin="round"/>' +
+            '<ellipse cx="32" cy="36.4" rx="8" ry="1.5" fill="#5ab8f0" stroke="' + INK + '" stroke-width="1.3"/>' +
+            heartAt(32, 38.6, .1, null, .5) +
+            grpW('#f2ece0', 1.2, P('M31 36.2v-5h2v5z')) +
+            grpW('#f2ece0', 1.3, P('M27.4 31h9.2c0 2-2 3-4.6 3s-4.6-1-4.6-3z')) +
+            '<ellipse cx="32" cy="31" rx="4.6" ry=".9" fill="#5ab8f0" stroke="' + INK + '" stroke-width="1.1"/>' +
+            grpW('#8fd0f5', .7, P('M27.5 31.3c-1.2.6-1.9 2.4-1.9 5.1H27c0-2 .4-3.6 1.2-4.5zM36.5 31.3c1.2.6 1.9 2.4 1.9 5.1H37c0-2-.4-3.6-1.2-4.5z' +
+                'M31.3 30.9c-.3-1.6-.1-3.6.7-5.2.8 1.6 1 3.6.7 5.2z')) +
+            '<circle cx="30.1" cy="26.6" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
+            '<circle cx="33.9" cy="26.6" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
+            heartAt(27.4, 27.2, .08, null, .45) + heartAt(36.8, 26.6, .07, null, .45) +
+            grpW('#f8f4ea', 1.3, P('M11 41.2V23.4h3.2v17.8zM20.8 42V24.5h3.2V42zM40 42V24.5h3.2V42zM49.8 41.2V23.4H53v17.8z')) +
+            line('M12.6 25v14.6M22.4 26.1v14.3M41.6 26.1v14.3M51.4 25v14.6', '#d8cdb8', .8) +
+            grpW('#f2ece0', 1, P('M10.2 24.8v-1.4h4.8v1.4zM10.2 41.2v-1.4h4.8v1.4zM20 25.9v-1.4h4.8v1.4zM20 42v-1.4h4.8V42z' +
+                'M39.2 25.9v-1.4h4.8v1.4zM39.2 42v-1.4h4.8V42zM49 24.8v-1.4h4.8v1.4zM49 41.2v-1.4h4.8v1.4z')) +
+            '<path d="M10 18.6v3.6a22 2.6 0 0 0 44 0v-3.6a22 2.6 0 0 1-44 0z" fill="#e4dccb" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/>' +
+            line('M10.6 20.6a21.4 2.6 0 0 0 42.8 0', GOLD, 1) +
+            grpW('#f2ece0', 1.9, P('M12 18.6C12 3.2 52 3.2 52 18.6a20 2.6 0 0 1-40 0z')) +
+            line('M17.8 14.2c1.4-2.8 3.6-4.8 6.2-6', '#ffffff', 1.4) +
+            line('M32 7v14.2M25 8.2c-2.8 3-4.4 7.2-4.6 12.2M39 8.2c2.8 3 4.4 7.2 4.6 12.2', GOLD, 1.1) +
+            grpW('#f2ece0', 1.2, P('M30 7.6V5h4v2.6z')) + grpW(GOLD, 1.1, P('M29.6 5c0-1.8 4.8-1.8 4.8 0z')) +
+            heartAt(32, 2.2, .15) +
+            flower(3.4, 41.2, 2, '#f4f0e2') + tulip(3.2, 48.4, 1.8, '#d23a3a') +
+            flower(60.6, 41.4, 2, '#f0a8c8') + tulip(60.8, 48.4, 1.8, '#f4d23c'),
 
         castle:
             grp('#6a6b66', P('M4 44V16h12v6h6v-6h20v6h6v-6h12v28z')) +
@@ -6442,7 +6629,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             }
 
             case 'pyrite': {
-                const opts = D.PYRITE_GEAR.filter(id => suits(state, p, id)).map(id => ({
+                // Any class's piece may be taken (the user's call, 2026-10-07):
+                // what you cannot wear yourself you can trade or sell. Your
+                // own class's come first, then the Barbarian's if he follows
+                // you, then the rest.
+                const rank = id => D.ITEMS[id].cls === p.cls ? 0 : (suits(state, p, id) ? 1 : 2);
+                const opts = D.PYRITE_GEAR.slice().sort((a, b) => rank(a) - rank(b)).map(id => ({
                     key: id, label: D.ITEMS[id].name
                 }));
                 opts.push({ key: 'gold', label: 'Take ' + payout(state, D.PYRITE_GOLD) + ' Gold' });
@@ -8898,7 +9090,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (sq.action === 'pyrite') {
             let best = { key: 'gold', gain: 18 };
             keys.forEach(k => {
-                if (k === 'gold') return;
+                if (k === 'gold' || !E.suits(state, p, k)) return;
                 const d = D.ITEMS[k];
                 let cur;
                 if (d.cls === 'barbarian') {
@@ -12621,8 +12813,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     pend.options.map(o => {
                         const item = D.ITEMS[o.key];
                         if (item) {
+                            const whose = item.cls === p.cls ? '' : (item.cls === 'barbarian' && E.hasBarbarian(S, p) ? ' (for your Barbarian)'
+                                : ' (' + className(item.cls) + ' gear, to trade or sell)');
                             return '<button class="choice-btn" data-choose="' + esc(o.key) + '"><b>' + esc(item.name) + '</b><span>' +
-                                esc(item.text) + (item.cls === 'barbarian' ? ' (for your Barbarian)' : '') + '</span></button>';
+                                esc(item.text) + whose + '</span></button>';
                         }
                         const inst = p.inventory.find(x => x.uid === o.key);
                         if (o.disabled) return '<button class="choice-btn" disabled><b>' + esc(o.label) + '</b><span>' + esc(o.why || '') + '</span></button>';
