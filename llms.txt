@@ -22,10 +22,10 @@ Gallery photos (board games, cards, characters, book cover, timeline, Minecraft 
 
 ## Pages
 
-- [Home](https://fenrirak.github.io/Legend-of-Fenrirak/index.html): Overview and links to everything on the site.
-- [About](https://fenrirak.github.io/Legend-of-Fenrirak/About.html): The project's origin story, its current games and books, and a photo gallery.
-- [Creators](https://fenrirak.github.io/Legend-of-Fenrirak/Creators.html): Meet the team behind Legend of Fenrirak.
-- [The Thunder Dragon](https://fenrirak.github.io/Legend-of-Fenrirak/Thunder%20Dragon.html): Play the board game online, up to 6 players.
-- [The Ice Dragon](https://fenrirak.github.io/Legend-of-Fenrirak/Ice%20Dragon.html): Play the board game online, up to 6 players.
-- [The Oblivion Dragon](https://fenrirak.github.io/Legend-of-Fenrirak/Oblivion%20Dragon.html): Play the board game online, up to 6 players, or against 1-5 computer players.
-- [Showdowns](https://fenrirak.github.io/Legend-of-Fenrirak/Testplay%20Showdowns.html): A free, single-player online board game — battle AI opponents on a board of terrains and chests.
+- [Home](https://www.legend-of-fenrirak.com/index.html): Overview and links to everything on the site.
+- [About](https://www.legend-of-fenrirak.com/About.html): The project's origin story, its current games and books, and a photo gallery.
+- [Creators](https://www.legend-of-fenrirak.com/Creators.html): Meet the team behind Legend of Fenrirak.
+- [The Thunder Dragon](https://www.legend-of-fenrirak.com/Thunder%20Dragon.html): Play the board game online, up to 6 players.
+- [The Ice Dragon](https://www.legend-of-fenrirak.com/Ice%20Dragon.html): Play the board game online, up to 6 players.
+- [The Oblivion Dragon](https://www.legend-of-fenrirak.com/Oblivion%20Dragon.html): Play the board game online, up to 6 players, or against 1-5 computer players.
+- [Showdowns](https://www.legend-of-fenrirak.com/Testplay%20Showdowns.html): A free, single-player online board game — battle AI opponents on a board of terrains and chests.
