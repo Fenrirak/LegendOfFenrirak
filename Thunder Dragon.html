@@ -742,14 +742,6 @@ h3 { font-size: 17px; }
 
 .muted { color: #9a9a9a; }
 
-.note-link {
-    color: var(--gold-bright);
-    text-decoration: none;
-    border-bottom: 1px dotted var(--gold);
-    cursor: pointer;
-}
-.note-link:hover { color: var(--gold); border-bottom-style: solid; }
-
 /* ---- the rules, in something you can actually read ---------------------
    The whole page is set in Cutive Mono, which is the game's voice: a
    typewriter, a rulebook run off on one. It carries a heading and a card's
@@ -810,18 +802,19 @@ h3 { font-size: 17px; }
 .btn.primary:hover:not(:disabled) { background: var(--gold-bright); color: #1a1108; }
 
 .btn.action {
-    /* A light, slightly misty blue -- distinct from the gold "do this next"
-       primary button and the crimson danger one, so a turn action reads as
-       its own third thing rather than a dimmer copy of either. Scoped to
-       the action row only; see the comment on .btn above. */
-    border-color: #9fb7cc;
-    background: linear-gradient(180deg, #e4edf6, #c9d9e8);
-    color: #223247;
+    /* Storm blue: a dark, slate-blue fill with a pale blue face, so a turn
+       action still reads as its own third thing beside the gold "do this
+       next" button and the grey everything-else -- but it sits in the dark
+       panel with them instead of glaring out of it the way the old near-white
+       pill did. Scoped to the action row only; see the comment on .btn above. */
+    border-color: #4f739b;
+    background: linear-gradient(180deg, #2a4361, #1d3048);
+    color: #d3e3f6;
 }
 .btn.action:hover:not(:disabled) {
-    background: linear-gradient(180deg, #eef4fa, #d5e3f0);
+    background: linear-gradient(180deg, #33507a, #243b58);
     border-color: var(--gold);
-    color: #1a1108;
+    color: var(--gold-bright);
 }
 
 .btn.danger {
@@ -4675,6 +4668,208 @@ body.modal-cover #board * { animation-play-state: paused; }
     }
 }
 
+/* ---- the whole of a square, under the pointer --------------------------
+   A square only has room for a line or two of its card. Pointing at one (or
+   tapping it on a touch screen) brings up the full text, whether it is a
+   stop, the monster there and what it hits for, and who is standing on it. */
+.sq-tip {
+    position: fixed; z-index: 880; pointer-events: none;
+    width: max-content; max-width: 270px;
+    background: linear-gradient(180deg, #1f1f1f, #151515);
+    border: 1px solid var(--panel-edge); border-radius: 12px;
+    padding: 10px 13px; color: #d9d6d0; font-size: 13px; line-height: 1.45;
+    box-shadow: 0 10px 24px -8px #000;
+    opacity: 0; transition: opacity .12s ease;
+}
+.sq-tip.show { opacity: 1; }
+.sq-tip > b { display: block; font-size: 15px; color: var(--gold-bright); }
+.sq-tip p { margin: 5px 0 0; }
+.sq-tip .tip-tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0 1px; }
+.sq-tip .tip-tag {
+    font-size: 10.5px; letter-spacing: .4px; padding: 1px 7px; border-radius: 999px;
+    border: 1px solid rgba(217, 163, 92, .55); color: var(--gold);
+}
+.sq-tip .tip-tag.hard { border-color: rgba(210, 99, 90, .6); color: #e6a49d; }
+.sq-tip .tip-foe {
+    margin-top: 8px; padding-top: 7px;
+    border-top: 1px dashed rgba(255, 255, 255, .14);
+}
+.sq-tip .tip-foe-head { color: var(--cream); }
+.sq-tip .tip-foe-stats { color: #a0a0a0; font-size: 12px; margin-bottom: 3px; }
+.sq-tip .tip-move { display: flex; justify-content: space-between; gap: 14px; font-size: 12.5px; }
+.sq-tip .tip-move span:last-child { color: #a0a0a0; font-size: 12px; white-space: nowrap; }
+.sq-tip .tip-mine { font-size: 12px; color: #c6d6ef; }
+.sq-tip .tip-here { font-size: 12px; color: #a0a0a0; }
+
+/* ---- the hunt can be backed out of -------------------------------------- */
+.hunt-note { text-align: center; font-size: 12.5px; margin-top: 12px; }
+
+/* ---- the battle panel ---------------------------------------------------
+   A little wider than the other panels: two portraits, two stat cards and a
+   row of attacks side by side were squeezed into the 720 every panel gets. */
+.modal-back[data-key="battle"] .modal { max-width: 880px; max-height: 94vh; position: relative; }
+/* Each side used to shrink to its own content -- a 130px health bar over a
+   150px card, with the extra room left empty in the middle. Now each side
+   fills its half, up to a comfortable width. */
+.modal-back[data-key="battle"] .battle-col > .battle-side,
+.modal-back[data-key="battle"] .battle-col > .battle-statcard { width: 100%; max-width: 300px; }
+
+/* The minimise button on a fight you are only watching. */
+.x-btn {
+    position: absolute; top: 14px; right: 14px;
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid var(--panel-edge); background: rgba(0, 0, 0, .3); color: var(--cream);
+    display: grid; place-items: center; padding: 0; cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+}
+.x-btn svg {
+    width: 18px; height: 18px; display: block;
+    fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round;
+}
+.x-btn:hover { border-color: var(--gold); color: var(--gold-bright); }
+/* The rest of the fight panel is out of reach while a die is being read
+   (see body.holding above), but tucking it away answers nothing, so the
+   minimise button stays live through a roll. */
+body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto; }
+
+/* ---- a fight watched from the corner ------------------------------------ */
+.modal-back.mini {
+    background: transparent; backdrop-filter: none; pointer-events: none;
+    align-items: flex-end; justify-content: flex-end;
+}
+.modal-back.mini .modal {
+    pointer-events: auto; max-width: 360px; padding: 12px 14px;
+    text-align: left; animation: none;
+}
+.mini-bar { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+.mini-bar .mini-what { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.mini-bar .mini-now { color: var(--cream); }
+.mini-bar .mini-what small { font-size: 12px; color: #9a9a9a; line-height: 1.35; }
+.mini-bar .btn { flex: none; }
+.mini-hp { display: grid; grid-template-columns: minmax(0, 1fr) 72px auto; align-items: center; gap: 8px; font-size: 12.5px; }
+.mini-hp .mini-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #d9d6d0; }
+.mini-hp .mini-track { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.mini-hp .mini-track i { display: block; height: 100%; background: var(--crimson); border-radius: inherit; }
+.mini-hp .mini-num { color: #a0a0a0; font-size: 12px; min-width: 52px; text-align: right; }
+
+/* ---- which Fenrirak, at the arena door ----------------------------------
+   The two stat cards side by side, each with its own button under it, so
+   the difference is plain before anything is pressed. Kept side by side on
+   a phone as well: comparing them is the whole point. */
+.fen-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fen-opt { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.fen-opt .paper { flex: 1 1 auto; }
+.fen-opt .btn { width: 100%; }
+@media (max-width: 560px) {
+    .fen-pick { gap: 8px; }
+    .fen-opt .paper { font-size: 11.5px; padding: 7px 8px 9px; }
+    .fen-opt .paper .p-name { font-size: 13px; }
+    .fen-opt .paper .p-art { width: 40px; height: 40px; margin-left: 4px; }
+    .fen-opt .paper .p-stat, .fen-opt .paper .p-move, .fen-opt .paper .p-energy { padding-left: 4px; }
+    .fen-opt .paper .p-move { gap: 6px; }
+    .fen-opt .btn { padding-left: 6px; padding-right: 6px; font-size: 13px; min-height: 3.4em; }
+}
+
+/* ---- the narrator's All / Just mine switch ------------------------------ */
+.log-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.log-head h3 { margin: 0; }
+.log-filter { display: inline-flex; flex: none; border: 1px solid var(--panel-edge); border-radius: 999px; overflow: hidden; }
+.log-filter button {
+    font-family: inherit; font-size: 12px; color: #9a9a9a; cursor: pointer;
+    background: transparent; border: 0; padding: 4px 11px;
+}
+.log-filter button:hover:not(.on) { color: var(--cream); }
+.log-filter button.on { color: var(--cream); background: rgba(217, 163, 92, .3); }
+
+/* ---- the buttons pinned to the bottom -----------------------------------
+   Below 1080px the board takes the whole width and the Actions card falls
+   a long way under it, so Roll & move, Merchant and End turn are also on a
+   bar fixed to the bottom of the screen (renderPhoneBar in ui.js). */
+.phone-bar { display: none; }
+@media (max-width: 1080px) {
+    .phone-bar {
+        display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px;
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 850;
+        padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(14, 14, 14, .96); border-top: 1px solid var(--panel-edge);
+    }
+    .phone-bar.empty { display: none; }
+    .phone-bar .btn { padding: 10px 6px; font-size: 14px; }
+    /* Room underneath, so the bar never sits over the last of the page. */
+    body:has(#screen-game.active) { padding-bottom: 66px; }
+    /* A fight watched from the corner sits above the bar, not behind it. */
+    #screen-game.active ~ .modal-back.mini { bottom: 62px; }
+}
+
+/* ---- the turn timer when there is none ----------------------------------
+   On your own nothing is timed, so the badge says "No time limit" instead
+   of counting -- dimmer and dashed, so it never reads as a countdown. */
+.me-card .me-top .timer.off {
+    color: #9a958f;
+    font-weight: normal;
+    font-style: italic;
+    border-style: dashed;
+}
+
+/* ---- the walkthrough, waiting on a real press ---------------------------
+   While a lit button works itself out the tour steps aside; this small note
+   along the bottom says it is waiting, not gone, and its x ends it. */
+.spot-wait-badge {
+    position: fixed; left: 50%; bottom: 18px; z-index: 5000;
+    transform: translate(-50%, 12px);
+    display: flex; align-items: center; gap: 10px;
+    max-width: calc(100vw - 24px);
+    padding: 9px 10px 9px 16px;
+    border-radius: 999px;
+    font-family: 'Comfortaa', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    font-size: 13px; color: var(--gold-bright);
+    background: #1d1a16;
+    border: 1px solid var(--gold);
+    box-shadow: 0 14px 30px -12px #000;
+    opacity: 0;
+    transition: opacity .2s ease, transform .2s ease;
+    pointer-events: none;
+}
+.spot-wait-badge.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.spot-wait-badge button {
+    background: none; border: 0; color: #9a958f; font-size: 18px; line-height: 1;
+    cursor: pointer; padding: 2px 6px;
+}
+.spot-wait-badge button:hover { color: var(--gold-bright); }
+
+/* ---- the lower half of the battle panel ---------------------------------
+   What you can do on the left (the roll, the attacks, eating and drinking),
+   the fight's own log on the right, instead of one stacked under the other
+   -- stacked, they ran off the bottom of a laptop screen. The die that was
+   just thrown sits between the two sides under the VS. One column again on
+   a phone. */
+.battle-lower { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 18px; }
+.battle-do > :first-child { margin-top: 0; }
+.battle-do h3, .battle-logcol h3 { margin: 0 0 10px; }
+.battle-do .modal-actions { margin-top: 12px; }
+.battle-logcol .log { max-height: 175px; }
+.battle-mid { display: flex; flex-direction: column; align-items: center; }
+.battle-mid .die { margin: 18px auto 5px; }
+.die-say { font-size: 13px; color: #9a9a9a; text-align: center; white-space: nowrap; }
+@media (max-width: 720px) {
+    .battle-lower { grid-template-columns: minmax(0, 1fr); }
+}
+/* On a phone the two sides have to give a little so that neither card
+   pushes past the edge of the panel, and the die between them shrinks. */
+@media (max-width: 560px) {
+    .modal-back[data-key="battle"] .battle-top { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; }
+    .modal-back[data-key="battle"] .battle-vs { font-size: 18px; letter-spacing: 1px; }
+    .battle-mid .die { width: 38px; height: 38px; padding: 5px; border-radius: 8px; margin-top: 14px; }
+    .battle-mid .die i { width: 6px; height: 6px; }
+    .die-say { font-size: 11.5px; }
+    .modal-back[data-key="battle"] .battle-statcard .paper { padding: 7px 8px 9px; font-size: 12px; }
+    .modal-back[data-key="battle"] .battle-statcard .p-art { width: 38px; height: 38px; margin-left: 4px; }
+    .modal-back[data-key="battle"] .battle-statcard .p-stat,
+    .modal-back[data-key="battle"] .battle-statcard .p-move,
+    .modal-back[data-key="battle"] .battle-statcard .p-energy { padding-left: 4px; }
+    .modal-back[data-key="battle"] .battle-statcard .p-move { gap: 6px; }
+}
+
     </style>
 
     <script type="application/ld+json">
@@ -4818,9 +5013,6 @@ body.modal-cover #board * { animation-play-state: paused; }
                     <input type="text" id="inp-name" maxlength="16" placeholder="e.g. Nathan">
                     <button class="btn primary" id="btn-create">Create a new room</button>
                     <p class="muted note">
-                        <a href="#" id="btn-fenrirak-mode" class="note-link">Fight settings</a>
-                    </p>
-                    <p class="muted note">
                         You will get a 5-letter room code and an invite link to share.
                         <span id="online-note"></span>
                     </p>
@@ -4843,8 +5035,7 @@ body.modal-cover #board * { animation-play-state: paused; }
                     </div>
                     <p class="muted note">
                         Three at the table, one of each class. You choose first and the
-                        computer takes the other two. The ORIGINAL Fenrirak toggle above
-                        applies here too.
+                        computer takes the other two.
                     </p>
                 </div>
             </div>
@@ -4962,12 +5153,19 @@ body.modal-cover #board * { animation-play-state: paused; }
                         <div id="side-actions"></div>
                     </div>
                     <div class="card">
-                        <h3>The narrator</h3>
+                        <div class="log-head">
+                            <h3>The narrator</h3>
+                            <div class="log-filter" role="group" aria-label="Which lines to show">
+                                <button id="log-all" class="on" aria-pressed="true">All</button><button id="log-mine" aria-pressed="false">Just mine</button>
+                            </div>
+                        </div>
                         <div class="log" id="log"></div>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- On narrower screens the main buttons are pinned along the bottom too. -->
+        <div class="phone-bar empty" id="phone-bar"></div>
     </section>
 
     <!-- ================= GAME OVER ================= -->
@@ -5013,7 +5211,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             starterWeapon: 'rusty_claymore',
             starterArmour: 'rusted_armour',
             moves: [
-                { id: 'light_swing', name: 'Light Swing', damage: 10, energy: 1 },
+                { id: 'light_swing', name: 'Light Swing', damage: 15, energy: 1 },
                 { id: 'heavy_swing', name: 'Heavy Swing', damage: 55, energy: 5 }
             ],
             ability: {
@@ -5484,11 +5682,11 @@ body.modal-cover #board * { animation-play-state: paused; }
             id: 'swarm_of_bats',
             name: 'Swarm of Bats',
             crest: { initials: 'SB', tint: '#6d5f8c' }, pic: 'bats',
-            hp: 90,
+            hp: 105,
             defence: 0,
             moves: [
-                { id: 'bite', name: 'Bite', damage: 30, energy: 1 },
-                { id: 'frenzy', name: 'Frenzy', damage: 75, energy: 5 }
+                { id: 'bite', name: 'Bite', damage: 45, energy: 1 },
+                { id: 'frenzy', name: 'Frenzy', damage: 90, energy: 5 }
             ]
         },
         seraphina: {
@@ -5507,11 +5705,11 @@ body.modal-cover #board * { animation-play-state: paused; }
             id: 'goblin_scout_group',
             name: 'Goblin Scout Group',
             crest: { initials: 'GS', tint: '#8c6a3a' }, pic: 'goblins',
-            hp: 100,
+            hp: 115,
             defence: 5,
             moves: [
-                { id: 'club_bash', name: 'Club Bash', damage: 40, energy: 1 },
-                { id: 'heavy_wack', name: 'Heavy Wack', damage: 80, energy: 5 }
+                { id: 'club_bash', name: 'Club Bash', damage: 55, energy: 1 },
+                { id: 'heavy_wack', name: 'Heavy Wack', damage: 95, energy: 5 }
             ]
         },
         goblin_hideout: {
@@ -5542,8 +5740,8 @@ body.modal-cover #board * { animation-play-state: paused; }
             // modal, board token, stat card).
             crest: { initials: 'F', tint: '#4a6a8c', art: 'Fenrirak Boss.png' },
             pic: 'fenrirak',
-            hp: 375,
-            defence: 25,
+            hp: 350,
+            defence: 20,
             boss: true,
             moves: [
                 { id: 'thunder', name: 'Thunder', damage: 75, energy: 1 },
@@ -5556,10 +5754,10 @@ body.modal-cover #board * { animation-play-state: paused; }
                   heal: 50, energySpent: 2 },
                 { id: 'discharge', name: 'Discharge', damage: 175, energy: 8 }
             ],
-            // "The ORIGINAL Fenrirak" -- an optional, tougher fight, chosen
-            // once when a room (or a solo game) is created and fixed for the
-            // rest of that game. Off by default; see RULES.originalFenrirak
-            // for how state.originalFenrirak is read everywhere this matters.
+            // "The ORIGINAL Fenrirak" -- an optional, far tougher fight.
+            // Whoever reaches the arena is asked which of the two they will
+            // face, every time, and the answer holds for that one fight only
+            // (battle.original). See enemyStats() in engine.js.
             original: {
                 hp: 750,
                 defence: 65,
@@ -6205,7 +6403,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         // even if defence would otherwise reduce it to 0.
         enemyMinDamage: 5,
         rawSteakHeal: 5,
-        searedSteakHeal: 10,
+        searedSteakHeal: 15,
         foodPoisoningLoss: 15,
         foodPoisoningRoll: 3,
         steakRolls: [2, 4, 6]
@@ -6251,21 +6449,31 @@ body.modal-cover #board * { animation-play-state: paused; }
     }
 
     /* ---- The ORIGINAL Fenrirak ------------------------------------------
-       An optional, tougher version of the boss fight, chosen once when a
-       room (or a solo game) is created -- see createGame -- and fixed for
-       the rest of that game via state.originalFenrirak. Off by default.
+       An optional, far tougher version of the boss fight. It is no longer a
+       setting for the whole game: whoever reaches the arena is asked which
+       Fenrirak they will face (the 'fenrirak_choice' question, see
+       resolveSquare), every time they get there, and the answer holds for
+       that one fight only. It is kept on the fight as battle.original.
 
        Everywhere in this file that cares what Fenrirak's hp, defence or
        move damage actually is goes through this function rather than
        reading D.ENEMIES[enemyId] directly, so the switch stays in one
-       place. For every enemy other than Fenrirak, and for an ordinary
-       game, this is just D.ENEMIES[enemyId] back unchanged. */
-    function enemyStats(state, enemyId) {
+       place. `original` says which one when there is no fight yet (the
+       moment one starts); otherwise the fight in progress decides. For
+       every enemy other than Fenrirak, and for the ordinary Fenrirak, this
+       is just D.ENEMIES[enemyId] back unchanged. */
+    function enemyStats(state, enemyId, original) {
         const e = D.ENEMIES[enemyId];
         if (!e) return e;
-        if (enemyId !== 'fenrirak' || !e.original || !(state && state.originalFenrirak)) {
-            return e;
-        }
+        const b = state && state.battle;
+        // A fight begun under the old whole-game setting (a room opened
+        // before the choice moved to the arena door) carries no flag of its
+        // own, and is still the fight it started as.
+        const hard = original === undefined
+            ? !!(b && b.kind === 'pve' && b.enemyId === enemyId &&
+                 (b.original || (b.original === undefined && state.originalFenrirak)))
+            : !!original;
+        if (enemyId !== 'fenrirak' || !e.original || !hard) return e;
         const o = e.original;
         return Object.assign({}, e, {
             hp: o.hp,
@@ -6567,10 +6775,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             // Stamped once, the moment Fenrirak falls, so the victory screen
             // is showing the time the game actually took rather than
             // whatever the clock has ticked on to since.
-            finishedPlayMs: null,
-            // "The ORIGINAL Fenrirak" -- chosen once, here, by whoever opens
-            // the room, and fixed for the rest of the game. See enemyStats().
-            originalFenrirak: !!(opts && opts.originalFenrirak)
+            finishedPlayMs: null
         };
         addPlayer(state, hostId, hostName);
         log(state, 'Room ' + code + ' opened. Waiting for adventurers…', 'muted');
@@ -6764,6 +6969,12 @@ body.modal-cover #board * { animation-play-state: paused; }
         // else's clock running now.
         state.tutorialPausedFor = null;
         state.tutorialPausedAt = null;
+        // Somebody left standing at the arena door -- the clock ran out
+        // while they were deciding which Fenrirak to fight -- is asked again
+        // at the start of their next go. There is nowhere else to move to.
+        if (p.pos >= D.ARENA_INDEX && !state.battle && !state.pending && state.phase === 'playing') {
+            askWhichFenrirak(state, p);
+        }
     }
 
     function isMyTurn(state, pid) {
@@ -7217,6 +7428,12 @@ body.modal-cover #board * { animation-play-state: paused; }
                 return ok();
 
             case 'battle':
+                // Fenrirak's arena asks first: the ordinary Fenrirak or the
+                // ORIGINAL one. Asked every time, for this one fight only.
+                if (D.ENEMIES[sq.enemy] && D.ENEMIES[sq.enemy].original) {
+                    askWhichFenrirak(state, p);
+                    return ok();
+                }
                 return startEnemyBattle(state, p, sq.enemy, sq.i);
 
             default:
@@ -7249,8 +7466,20 @@ body.modal-cover #board * { animation-play-state: paused; }
     /* Battles                                                             */
     /* ------------------------------------------------------------------ */
 
-    function startEnemyBattle(state, p, enemyId, squareIndex) {
-        const e = enemyStats(state, enemyId);
+    // The question at the arena door. Nothing is decided for the player and
+    // nothing carries over: the next time they reach the arena they are
+    // asked again.
+    function askWhichFenrirak(state, p) {
+        state.pending = {
+            type: 'fenrirak_choice',
+            playerId: p.id,
+            squareIndex: D.ARENA_INDEX,
+            prompt: 'Which Fenrirak will you fight?'
+        };
+    }
+
+    function startEnemyBattle(state, p, enemyId, squareIndex, original) {
+        const e = enemyStats(state, enemyId, !!original);
         p.energy = R.startingEnergy;
         p.extraRun = null;              // a fresh fight, a fresh Triple Whack
         p.battlePotionUsed = false;
@@ -7264,7 +7493,9 @@ body.modal-cover #board * { animation-play-state: paused; }
             aId: p.id,
             turn: 'a',
             phase: 'roll',
-            lastRoll: null
+            lastRoll: null,
+            // The ORIGINAL Fenrirak, for this fight only -- see enemyStats.
+            original: !!original
         };
         /* A fight runs on its own, shorter clock, so it has to start its own
            clock too. Without this the time already spent on the ordinary turn
@@ -7275,7 +7506,8 @@ body.modal-cover #board * { animation-play-state: paused; }
            first one. */
         state.turnStartedAt = Date.now();
         state.tutorialExemptMs = 0;
-        log(state, p.name + ' faces ' + D.foeName(e) + '!', 'battle');
+        log(state, p.name + ' faces ' + (original ? 'the ORIGINAL Fenrirak' : D.foeName(e)) +
+                   '!', 'battle');
         // Where this fight's own log begins. Stamped after the line that
         // announces it, so the battle panel opens empty and fills with
         // nothing but the fight -- see renderBattleModal.
@@ -8302,7 +8534,24 @@ body.modal-cover #board * { animation-play-state: paused; }
             case 'move_bonus':
                 return takeMoveBonus(state, p, pend, choice);
 
+            case 'fenrirak_choice': {
+                // Anything but a plain 'original' is the ordinary Fenrirak,
+                // so a question nobody answered properly never lands anyone
+                // in the far harder fight by accident.
+                const original = choice === 'original';
+                state.pending = null;
+                return startEnemyBattle(state, p, 'fenrirak', D.ARENA_INDEX, original);
+            }
+
             case 'steak_roll': {
+                // Changed your mind about ending the turn. Nothing has been
+                // thrown yet, so backing out costs nothing: the hunt is put
+                // away and the turn carries on exactly where it was, and End
+                // turn has to be pressed again to give it up.
+                if (choice === 'cancel') {
+                    state.pending = null;
+                    return ok();
+                }
                 const roll = throwDie(state, p.name, 'hunt');
                 if (R.steakRolls.indexOf(roll) >= 0) {
                     p.steaks.raw += 1;
@@ -8972,8 +9221,9 @@ body.modal-cover #board * { animation-play-state: paused; }
         };
     }
 
-    function asMonster(enemy) {
-        return { hp: enemy.hp, moves: enemy.moves, bonus: 0, defence: enemy.defence, heal: 0 };
+    function asMonster(enemy, hpNow) {
+        return { hp: hpNow === undefined ? enemy.hp : hpNow, moves: enemy.moves, bonus: 0,
+                 defence: enemy.defence, heal: 0 };
     }
 
     function pveOdds(state, p, enemyId, hpOverride) {
@@ -8982,6 +9232,17 @@ body.modal-cover #board * { animation-play-state: paused; }
     }
 
     function pvpOdds(state, p, other) { return oddsOf(fightOut(asFighter(state, p), asFighter(state, other))); }
+
+    // The fight in front of you as it stands right now: your health and
+    // theirs as they are, not as they started.
+    function oddsNow(state, p, b) {
+        if (b.kind === 'pve') {
+            return oddsOf(fightOut(asFighter(state, p),
+                                   asMonster(E.enemyStats(state, b.enemyId), b.enemyHp)));
+        }
+        const other = E.player(state, b.aId === p.id ? b.bId : b.aId);
+        return other ? pvpOdds(state, p, other) : 0.5;
+    }
     /* ------------------------------------------------------------------ */
     /* Reading the board                                                   */
     /*                                                                     */
@@ -9142,27 +9403,69 @@ body.modal-cover #board * { animation-play-state: paused; }
         };
     }
 
-    // The biggest heal in hand, but only counted for what it can actually put
-    // back -- a 50 card on a character missing 10 health is mostly wasted,
-    // though at full health it is never wasted at all: it becomes bonus
-    // health instead, worth every point.
-    function bestHeal(p) {
+    /* In a fight a potion is one a turn -- healing ones excepted -- while a
+       power-up card is never limited. So the bot never reaches for a potion
+       the rules will refuse, and of two cards that do the same thing it
+       plays the power-up first and keeps the turn's potion free. */
+    function playable(state, p, c) {
+        if (!state || !state.battle) return true;
+        return c.list === 'powerups' || c.def.effect === 'health' || !p.battlePotionUsed;
+    }
+
+    function bestOf(p, effect, state) {
         let best = null, bestV = 0;
         heldCards(p).forEach(c => {
-            if (c.def.effect !== 'health') return;
-            const worth = p.hp >= p.maxHp ? c.def.value : Math.min(p.maxHp - p.hp, c.def.value);
-            if (worth > bestV) { bestV = worth; best = c; }
+            if (c.def.effect !== effect) return;
+            if (!playable(state, p, c)) return;
+            const v = c.def.value + (c.list === 'powerups' ? 0.5 : 0);
+            if (v > bestV) { bestV = v; best = c; }
         });
         return best;
     }
 
-    function bestOf(p, effect) {
-        let best = null, bestV = 0;
-        heldCards(p).forEach(c => {
-            if (c.def.effect !== effect) return;
-            if (c.def.value > bestV) { bestV = c.def.value; best = c; }
-        });
-        return best;
+    // How many cards of one kind are in hand, potions and power-ups alike.
+    function countOf(p, effect) { return heldCards(p).filter(c => c.def.effect === effect).length; }
+
+    /* ---- getting ready for Fenrirak ------------------------------------
+       The arena is one fight that decides the game, so what is worth
+       carrying into it is saved for it rather than spent on the monsters
+       along the way. A bot is "preparing" once it holds all three
+       fragments: from then on the arena is the only fight that matters. */
+    function preparing(p) { return fragmentCount(p) >= D.KEY_FRAGMENTS_NEEDED; }
+
+    // Enough defence that a monster's usual blows (everything short of a
+    // move it has to save up for, like Fenrirak's Discharge) are down to the
+    // least a monster's hit can do. Past this, another defence card buys
+    // nothing against them. Fenrirak, unless another monster is named.
+    function enoughDefence(state, p, enemy) {
+        const f = enemy || E.enemyStats(state, 'fenrirak', false);
+        const usual = f.moves.filter(m => m.energy <= 3)
+            .reduce((n, m) => Math.max(n, m.damage), 0);
+        return E.totalDefence(state, p) >= usual - (D.RULES.enemyMinDamage || 0);
+    }
+
+    // The arena is all but certain to be where this turn ends: all three
+    // fragments, and standing on the Gate (any roll walks in) or on the
+    // Fountain of Life just before it (anything but a 1 does).
+    function arenaThisTurn(p) {
+        return preparing(p) && !p.hasMoved && D.ARENA_INDEX - p.pos <= 2;
+    }
+
+    /* Everything that lasts is put on before walking in. A defence card
+       lasts the whole of the turn, so drunk now it stands through every one
+       of Fenrirak's blows instead of only the ones after it is drunk in the
+       fight -- and outside a fight there is no one-potion-a-turn rule. A
+       strength card waits for your next hit however long that takes, and a
+       healing card at full health becomes bonus health. Energy is not
+       carried in: every fight starts you back at 1. */
+    function armUp(state, p) {
+        const guard = bestOf(p, 'defence');
+        if (guard && !enoughDefence(state, p)) return useCard(guard);
+        const heal = bestOf(p, 'health');
+        if (heal && (p.hp >= p.maxHp || p.maxHp - p.hp >= heal.def.value)) return useCard(heal);
+        const punch = bestOf(p, 'damage');
+        if (punch && E.totalAttackBonus(p) < 60) return useCard(punch);
+        return null;
     }
 
     /* ------------------------------------------------------------------ */
@@ -9173,14 +9476,31 @@ body.modal-cover #board * { animation-play-state: paused; }
     /* is already carrying.                                                */
     /* ------------------------------------------------------------------ */
 
-    const shopping = { key: '', bought: 0 };
+    const shopping = { key: '', bought: 0, purse: null };
 
     function shopKey(state, pid) { return state.turnNo + ':' + pid; }
 
+    // What to stock up on for Fenrirak, best value first, and how many of
+    // each kind is worth carrying. Defence lasts the whole fight; energy
+    // turns a light swing into a heavy one; healing tops up or becomes bonus
+    // health; strength is one harder hit.
+    const ARENA_KIT = ['super_health_up', 'defence_up', 'energy_up', 'health_up',
+                       'low_defence_up', 'super_strength_up', 'low_health_up',
+                       'strength_up', 'low_energy_up', 'low_strength_up'];
+    const KIT_CAP = { health: 4, defence: 5, energy: 3, damage: 4 };
+
     function goShopping(state, p) {
         const key = shopKey(state, p.id);
-        if (shopping.key !== key) { shopping.key = key; shopping.bought = 0; }
-        if (shopping.bought >= 2) return null;
+        if (shopping.key !== key) { shopping.key = key; shopping.bought = 0; shopping.purse = null; }
+        // decide() is asked more than once before what it says is done --
+        // solo.js asks to pace the table, again while the screen is busy,
+        // and again when it acts -- so a purchase is counted only once the
+        // purse has actually gone down, not every time it is suggested.
+        // Counting the suggestions used to use up the turn's purchases
+        // before more than one was ever made.
+        if (shopping.purse !== null && p.coins < shopping.purse) shopping.bought += 1;
+        shopping.purse = null;
+        if (shopping.bought >= (preparing(p) ? 5 : 2)) return null;
 
         // Gear first: an upgrade you keep beats a potion you drink once.
         let pick = null, gain = 0;
@@ -9194,32 +9514,35 @@ body.modal-cover #board * { animation-play-state: paused; }
             if (improvement > gain) { gain = improvement; pick = id; }
         });
         if (pick && gain >= 5) {
-            shopping.bought += 1;
+            shopping.purse = p.coins;
             return { action: 'buy', args: { kind: 'gear', id: pick } };
         }
 
-        // Then a potion, but only out of money that is doing nothing else.
-        // Each list is the pick in order of preference, with the cheaper
-        // version of the same thing straight after it as the fallback when
-        // the good one is out of reach -- so a bot with modest spare coins
-        // still buys something instead of walking past the whole stall.
-        const spare = p.coins - 20;
-        if (spare > 0) {
-            const hurt = p.hp < p.maxHp * 0.6;
-            const wanted = hurt
-                ? ['super_health_up', 'health_up', 'low_health_up']
-                : ['super_strength_up', 'strength_up', 'low_strength_up',
-                   'defence_up', 'low_defence_up',
-                   'speed_up', 'low_speed_up',
-                   'energy_up', 'low_energy_up'];
-            for (let i = 0; i < wanted.length; i++) {
-                const id = wanted[i];
-                const row = D.MERCHANT_POTIONS[id];
-                if (!row || !(state.merchant.potions[id] > 0)) continue;
-                if (row.price > spare) continue;
-                shopping.bought += 1;
-                return { action: 'buy', args: { kind: 'potions', id: id } };
-            }
+        /* Then potions, planned rather than bought on a whim. With all three
+           fragments in hand the next fight is Fenrirak, and every coin is
+           worth more turned into something for the arena than carried in a
+           purse a rival can take off you in a duel. Before that, only a
+           small kit out of money doing nothing else -- a heal or two and a
+           guard for a monster that turns nasty, which carry on to the arena
+           if they are never needed. A card already in hand counts toward
+           the kit, so nothing is bought twice over. */
+        const ready = preparing(p);
+        const spare = p.coins - (ready ? 0 : 20);
+        if (spare <= 0) return null;
+        const hurt = p.hp < p.maxHp * 0.6;
+        const wanted = ready ? ARENA_KIT
+            : hurt ? ['super_health_up', 'health_up', 'low_health_up']
+                   : ['super_health_up', 'health_up', 'defence_up', 'low_defence_up'];
+        const cap = ready ? KIT_CAP : { health: 2, defence: 1 };
+        for (let i = 0; i < wanted.length; i++) {
+            const id = wanted[i];
+            const row = D.MERCHANT_POTIONS[id];
+            const def = D.POWERUPS[id];
+            if (!row || !def || !(state.merchant.potions[id] > 0)) continue;
+            if (row.price > spare) continue;
+            if (countOf(p, def.effect) >= (cap[def.effect] || 0)) continue;
+            shopping.purse = p.coins;
+            return { action: 'buy', args: { kind: 'potions', id: id } };
         }
         return null;
     }
@@ -9312,6 +9635,54 @@ body.modal-cover #board * { animation-play-state: paused; }
         return pick;
     }
 
+    function isBossFight(b) {
+        const e = b.kind === 'pve' ? D.ENEMIES[b.enemyId] : null;
+        return !!(e && e.boss);
+    }
+
+    /* Is this a fight worth spending cards on? Fenrirak always is: he is the
+       game. A monster or a rival only when it could go the wrong way -- a
+       fight you are winning comfortably is not where the arena's kit goes. */
+    function worthSpending(state, p, b) {
+        if (isBossFight(b)) return true;
+        return oddsNow(state, p, b) < (b.kind === 'pve' ? 0.65 : 0.55);
+    }
+
+    // The healing card that wastes least. Below full health a heal stops at
+    // full, so the biggest one that still fits is first; at full health a
+    // heal turns into bonus health instead, so the biggest of all.
+    function pickHeal(state, p) {
+        const cards = heldCards(p).filter(c => c.def.effect === 'health' && playable(state, p, c));
+        if (!cards.length) return null;
+        const missing = p.maxHp - p.hp;
+        const big = (x, y) => y.def.value - x.def.value;
+        if (missing <= 0) return cards.sort(big)[0];
+        const fits = cards.filter(c => c.def.value <= missing).sort(big);
+        return fits.length ? fits[0] : cards.sort((x, y) => x.def.value - y.def.value)[0];
+    }
+
+    // How much health could be stood on right now with everything that heals:
+    // seared steaks first (they stop at full and never become bonus health),
+    // then the cards in the order pickHeal would play them.
+    function healReach(state, p) {
+        let hp = p.hp, bonus = p.bonusHp || 0;
+        hp = Math.min(p.maxHp, hp + p.steaks.cooked * D.RULES.searedSteakHeal);
+        const vals = heldCards(p).filter(c => c.def.effect === 'health' && playable(state, p, c))
+            .map(c => c.def.value);
+        while (vals.length) {
+            const missing = p.maxHp - hp;
+            let i;
+            if (missing <= 0) i = vals.indexOf(Math.max.apply(null, vals));
+            else {
+                const fits = vals.filter(v => v <= missing);
+                i = vals.indexOf(fits.length ? Math.max.apply(null, fits) : Math.min.apply(null, vals));
+            }
+            const v = vals.splice(i, 1)[0];
+            if (hp >= p.maxHp) bonus += v; else hp = Math.min(p.maxHp, hp + v);
+        }
+        return hp + bonus;
+    }
+
     function battleStep(state, p, b) {
         // The monster's own die and its blow. The bot is on the other side of
         // the table, so it throws for the monster exactly as a person would.
@@ -9319,13 +9690,15 @@ body.modal-cover #board * { animation-play-state: paused; }
         if (b.phase === 'enemy_act') return { action: 'enemyStrike', args: {} };
 
         // Iron Body or Runed Relic, at the top of the turn, before
-        // the die. Only if there is not already a matching buff standing: a
+        // the die. Only if the ability's own buff is not already standing: a
         // second one on top of the first would be the cooldown spent for
-        // nothing.
+        // nothing. A potion's buff of the same kind is no reason to wait --
+        // they stack.
         const inFightCls = D.CLASSES[p.cls];
         if (b.phase === 'roll' && inFightCls.ability.inBattle &&
             state.turnNo - p.lastAbilityTurn >= D.RULES.abilityCooldownTurns &&
-            !(p.buffs || []).some(x => x.kind === inFightCls.ability.buffKind)) {
+            !(p.buffs || []).some(x => x.kind === inFightCls.ability.buffKind &&
+                                       x.from === inFightCls.ability.name)) {
             return { action: 'useAbility', args: {} };
         }
         // Part way through a run of swings: the turn was bought by the blow
@@ -9335,24 +9708,52 @@ body.modal-cover #board * { animation-play-state: paused; }
         const threat = incomingBlow(state, b, p);
         const dying = threat > 0 && effHp(p) <= threat;
 
-        // About to be knocked out: eat, drink, or put something in the way.
+        /* About to be knocked out: eat, drink, or put something in the way --
+           but only if it would actually keep you standing. Cards are kept
+           when you fall, so spending them on a blow that finishes you anyway
+           only throws them away. Several heals may go in one turn (healing
+           potions are never limited), so it is everything that heals
+           together that has to be enough, not one card on its own. */
         if (dying) {
-            if (p.steaks.cooked > 0 && effHp(p) + D.RULES.searedSteakHeal > threat) {
-                return { action: 'eatSteak', args: { type: 'cooked' } };
+            const reach = healReach(state, p);
+            if (reach > threat) {
+                if (p.steaks.cooked > 0 && p.hp < p.maxHp) {
+                    return { action: 'eatSteak', args: { type: 'cooked' } };
+                }
+                const heal = pickHeal(state, p);
+                if (heal) return useCard(heal);
             }
-            const heal = bestHeal(p);
-            if (heal && effHp(p) + heal.def.value > threat) return useCard(heal);
-            const guard = bestOf(p, 'defence');
-            if (guard && guard.def.value >= threat - effHp(p)) return useCard(guard);
+            const guard = bestOf(p, 'defence', state);
+            if (guard && threat - guard.def.value < reach) return useCard(guard);
         }
 
-        if (b.phase === 'roll') return { action: 'battleRoll', args: {} };
+        const boss = isBossFight(b);
+        const spend = worthSpending(state, p, b);
 
-        // The die has already come up a hit, so this is the blow itself.
+        if (b.phase === 'roll') {
+            if (spend) {
+                // Defence first: it stands for the rest of the fight, so the
+                // sooner it is on the more blows it takes the edge off.
+                const foe = b.kind === 'pve' ? E.enemyStats(state, b.enemyId) : null;
+                const guard = bestOf(p, 'defence', state);
+                if (guard && (foe ? !enoughDefence(state, p, foe) : threat > 0)) return useCard(guard);
+                // Against Fenrirak, healing that would not be wasted goes in
+                // now: at full health it is bonus health, and below full only
+                // a card that fits in the gap.
+                if (boss) {
+                    const heal = pickHeal(state, p);
+                    if (heal && (p.hp >= p.maxHp || p.maxHp - p.hp >= heal.def.value)) return useCard(heal);
+                }
+            }
+            return { action: 'battleRoll', args: {} };
+        }
+
+        // The die has already come up a hit, so this is the blow itself --
+        // and anything played now cannot be wasted on a miss.
         const move = battleMove(state, p, b);
         if (!move) {
             // Nothing is affordable yet. Energy cards exist for exactly this.
-            const juice = bestOf(p, 'energy');
+            const juice = bestOf(p, 'energy', state);
             if (juice) return useCard(juice);
             const any = E.availableMoves(state, p.id).find(m => m.usable);
             return any ? { action: 'battleAttack', args: { moveId: any.id } } : null;
@@ -9367,20 +9768,24 @@ body.modal-cover #board * { animation-play-state: paused; }
             ? Math.max(0, move.damage + bonus - foeDefence) : 0;
 
         // An energy card that unlocks a much heavier move is worth playing
-        // before the blow rather than after it.
+        // before the blow rather than after it -- in a fight worth spending
+        // on, or when the heavier move would end it.
         const locked = E.availableMoves(state, p.id).filter(m => !m.usable);
         if (locked.length) {
-            const juice = bestOf(p, 'energy');
+            const juice = bestOf(p, 'energy', state);
             const reachable = locked.filter(m => p.energy + (juice ? juice.def.value : 0) >= m.energy);
             const bigger = reachable.reduce((n, m) =>
                 Math.max(n, Math.max(0, m.damage + bonus - foeDefence)), 0);
-            if (juice && bigger > would + 15) return useCard(juice);
+            if (juice && bigger > would + 15 && (spend || (bigger >= left && would < left))) {
+                return useCard(juice);
+            }
         }
 
-        // A strength card that turns a hit into a kill is worth it now.
+        // A strength card that turns a hit into a kill is always worth it.
+        // In a fight worth spending on, it goes on every hit that lands.
         if (would < left) {
-            const punch = bestOf(p, 'damage');
-            if (punch && would + punch.def.value >= left) return useCard(punch);
+            const punch = bestOf(p, 'damage', state);
+            if (punch && (would + punch.def.value >= left || spend)) return useCard(punch);
         }
 
         return { action: 'battleAttack', args: { moveId: move.id } };
@@ -9398,12 +9803,26 @@ body.modal-cover #board * { animation-play-state: paused; }
             case 'steak_roll':
                 return { action: 'resolvePending', args: {} };
 
+            case 'fenrirak_choice':
+                // The ORIGINAL Fenrirak is a fight no sensible player takes
+                // on for the same prize: always the ordinary one.
+                return { action: 'resolvePending', args: { choice: 'normal' } };
+
             case 'pot':
-                // Cook the lot: a seared steak heals twice what a raw one does
-                // and cannot poison you.
+                // Cook the lot: a seared steak heals three times what a raw
+                // one does and cannot poison you.
                 return { action: 'resolvePending', args: { choice: p.steaks.raw } };
 
             case 'optional_stop': {
+                // The Fountain of Life, with Fenrirak next: stopping heals you
+                // to full and lets you walk in next turn with everything that
+                // lasts the fight already on (armUp) -- rather than straight
+                // in now, hurt, with it all still in the pack.
+                const sq = D.BOARD[p.pos];
+                if (preparing(p) && sq && sq.action === 'heal' && D.ARENA_INDEX - p.pos <= 2 &&
+                    (p.hp < p.maxHp || countOf(p, 'defence') + countOf(p, 'damage') > 0)) {
+                    return { action: 'resolvePending', args: { choice: 'stop' } };
+                }
                 const stay = landingValue(state, p, p.pos, 0);
                 const on = walkValue(state, p, p.pos, p.movesLeft || 0, 0);
                 return {
@@ -9485,7 +9904,11 @@ body.modal-cover #board * { animation-play-state: paused; }
             if (p.hasMoved) return null;
             return { action: 'useAbility', args: {} };
         }
-        if (cls.ability.id === 'iron_body' || cls.ability.id === 'runed_relic') {
+        // The Relic's +15 waits for your next two hits however long they
+        // take, so calling on it between fights loses nothing. Iron Body's
+        // defence wears off as your turn ends, so it is kept for the fight
+        // itself, where it is called on at the top of a turn (battleStep).
+        if (cls.ability.id === 'runed_relic') {
             return { action: 'useAbility', args: {} };
         }
         return null;
@@ -9507,6 +9930,16 @@ body.modal-cover #board * { animation-play-state: paused; }
             const v = walkValue(state, p, p.pos, Math.max(1, pend.raw + n), 0);
             if (v > best) { best = v; pick = n; }
         });
+
+        // The number is on the table and it walks into the arena: this is
+        // the last moment to put on what lasts the fight (see armUp).
+        if (preparing(p)) {
+            const w = E.previewWalk(state, p, Math.max(1, pend.raw + pick));
+            if (w.pos >= D.ARENA_INDEX && w.outcome !== 'zapped') {
+                const arm = armUp(state, p);
+                if (arm) return arm;
+            }
+        }
         return {
             action: 'resolvePending',
             args: { choice: pick === 0 ? false : pick }
@@ -9529,12 +9962,15 @@ body.modal-cover #board * { animation-play-state: paused; }
             }
         }
 
-        // 2. Patch yourself up before walking into something.
-        if (p.hp < p.maxHp * 0.5 && p.steaks.cooked > 0) {
+        // 2. Patch yourself up before walking into something. A seared steak
+        //    is eaten the moment there is room for all of it; a healing card
+        //    only when badly hurt, because the arena is where it is worth
+        //    most (at full health it becomes bonus health there).
+        if (p.steaks.cooked > 0 && p.maxHp - p.hp >= D.RULES.searedSteakHeal) {
             return { action: 'eatSteak', args: { type: 'cooked' } };
         }
         if (p.hp < p.maxHp * 0.4) {
-            const heal = bestHeal(p);
+            const heal = pickHeal(state, p);
             if (heal) return useCard(heal);
         }
 
@@ -9550,7 +9986,14 @@ body.modal-cover #board * { animation-play-state: paused; }
             if (ability) return ability;
         }
 
-        // 5. A speed card only helps the movement roll it is used ahead of,
+        // 5. About to walk into the arena: put on everything that lasts the
+        //    fight while there is no one-potion-a-turn rule (see armUp).
+        if (arenaThisTurn(p)) {
+            const arm = armUp(state, p);
+            if (arm) return arm;
+        }
+
+        // 6. A speed card only helps the movement roll it is used ahead of,
         //    so play one now, before the die goes down, rather than let it
         //    sit in hand unused.
         if (!p.hasMoved) {
@@ -9558,11 +10001,11 @@ body.modal-cover #board * { animation-play-state: paused; }
             if (speed) return useCard(speed);
         }
 
-        // 6. Move. The die is thrown blind; the bonus is answered afterwards,
+        // 7. Move. The die is thrown blind; the bonus is answered afterwards,
         //    once the number is known.
         if (!p.hasMoved && p.pos < D.ARENA_INDEX) return { action: 'rollMove', args: {} };
 
-        // 7. Nothing left but the hunt that ends a turn.
+        // 8. Nothing left but the hunt that ends a turn.
         return { action: 'endTurn', args: {} };
     }
 
@@ -10093,6 +10536,7 @@ body.modal-cover #board * { animation-play-state: paused; }
     let unsub = null;
     let invTab = 'gear';
     let openPanel = null;      // 'merchant' | 'trade' | 'purse' | null
+    let miniBattle = null;     // the fight being watched from the corner (its logFrom)
 
     /* A small panel opened on top of whatever else is up: the power-up picker
        in a fight, the confirmation before calling on a class ability, the
@@ -11283,7 +11727,13 @@ body.modal-cover #board * { animation-play-state: paused; }
 
         function play(r) {
             showing = true;
-            showModal(battleOverHtml(r), false, 'battle-over');
+            // A fight that was being watched from the corner finishes there.
+            if (miniBattle !== null) {
+                miniBattle = null;
+                showMiniBattle(miniResultHtml(r), 'battle-over');
+            } else {
+                showModal(battleOverHtml(r), false, 'battle-over');
+            }
             dueAt = Date.now() + SHOW_MS;
             clearTimeout(hideT);
             hideT = setTimeout(done, SHOW_MS);
@@ -11521,59 +11971,6 @@ body.modal-cover #board * { animation-play-state: paused; }
     /* Home screen                                                         */
     /* ------------------------------------------------------------------ */
 
-    // Set once here, before a room exists, by whoever is about to create
-    // one -- see openFenrirakMode below.
-    let wantOriginalFenrirak = false;
-
-    // Keeps the link on the home screen honest about which mode is
-    // currently chosen, so leaving it set to Original and coming back
-    // later does not look like it reset to Classic.
-    function fenrirakModeChosen() {
-        const el = $('#btn-fenrirak-mode');
-        if (el) el.textContent = wantOriginalFenrirak
-            ? 'Fight settings — The ORIGINAL Fenrirak'
-            : 'Fight settings — Classic Fenrirak';
-    }
-
-    // A small popup, not a checkbox nobody reads the label of. Explains
-    // exactly what changes before it is turned on, since 750 HP and a much
-    // harder-hitting boss is not something to switch on by accident.
-    function openFenrirakMode() {
-        const e = D.ENEMIES.fenrirak;
-        const o = e.original;
-        overlay = { key: 'fenrirak-mode', draw: openFenrirakMode };
-        showModal(
-            '<div class="guide-ask">' +
-                '<h2>Fenrirak\u2019s Arena</h2>' +
-                '<div class="sub">' +
-                    'By default Fenrirak has <b>' + e.hp + ' HP</b> and <b>' + e.defence +
-                    ' defence</b>. <b>The ORIGINAL Fenrirak</b> is a tougher fight: ' +
-                    '<b>' + o.hp + ' HP</b>, <b>' + o.defence + ' defence</b>, and every one ' +
-                    'of his moves hits <b>' + o.damageBonus + ' harder</b>. It is settled once, ' +
-                    'when the room is created, and holds for the rest of that game.' +
-                '</div>' +
-                '<div class="modal-actions">' +
-                    '<button class="btn' + (wantOriginalFenrirak ? ' primary' : '') +
-                        '" id="fenrirak-mode-on">The ORIGINAL Fenrirak</button>' +
-                    '<button class="btn' + (wantOriginalFenrirak ? '' : ' primary') +
-                        '" id="fenrirak-mode-off">Classic Fenrirak</button>' +
-                '</div>' +
-            '</div>', true, 'fenrirak-mode');
-
-        bind('fenrirak-mode-on', () => {
-            wantOriginalFenrirak = true;
-            fenrirakModeChosen();
-            closeOverlay();
-            closeModal();
-        });
-        bind('fenrirak-mode-off', () => {
-            wantOriginalFenrirak = false;
-            fenrirakModeChosen();
-            closeOverlay();
-            closeModal();
-        });
-    }
-
     function initHome() {
         $('#inp-name').value = NET.localName();
 
@@ -11583,18 +11980,6 @@ body.modal-cover #board * { animation-play-state: paused; }
         $('#btn-join').disabled = !ONLINE;
         if (!ONLINE) $('#online-note').textContent = 'Connecting…';
 
-        // The ORIGINAL Fenrirak -- decided by whoever is about to create the
-        // room (or start a solo game), so it has to be settled before either
-        // button is pressed. A checkbox sitting in the middle of the form
-        // said nothing about what it actually did; this opens a small popup
-        // instead that explains the change, and remembers the answer here
-        // for whichever button gets pressed next.
-        fenrirakModeChosen();
-        $('#btn-fenrirak-mode').addEventListener('click', (e) => {
-            e.preventDefault();
-            openFenrirakMode();
-        });
-
         $('#btn-create').addEventListener('click', async () => {
             const name = $('#inp-name').value.trim();
             if (!name) return notice('Please enter a name first.');
@@ -11602,8 +11987,9 @@ body.modal-cover #board * { animation-play-state: paused; }
             NET = ONLINE;
             $('#btn-create').disabled = true;
             try {
-                const opts = { originalFenrirak: wantOriginalFenrirak };
-                const code = await NET.createRoom(name, opts);
+                // Which Fenrirak to fight is no longer a setting for the
+                // room: it is asked at the arena, every time.
+                const code = await NET.createRoom(name, {});
                 enterRoom(code);
             } catch (err) {
                 NET = SOLO;
@@ -11624,8 +12010,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             NET = SOLO;
             $('#btn-solo').disabled = true;
             try {
-                const opts = { originalFenrirak: wantOriginalFenrirak };
-                enterRoom(await SOLO.createRoom(name, opts));
+                enterRoom(await SOLO.createRoom(name, {}));
             } catch (err) {
                 notice(err.message || 'Could not start a game.');
             } finally { $('#btn-solo').disabled = false; }
@@ -11771,6 +12156,7 @@ body.modal-cover #board * { animation-play-state: paused; }
 
     function enterRoom(code) {
         ROOM = code;
+        miniBattle = null;
         stopReconnecting();
         // A solo game has nothing to invite anybody to, so it does not go in
         // the address bar.
@@ -12546,7 +12932,8 @@ body.modal-cover #board * { animation-play-state: paused; }
                 chest:          'choosing what to take from the chest',
                 crimson_keep:   'choosing at the Crimson Keep',
                 sea_of_castout: 'choosing what the whirlpool takes',
-                pvp_avoid:      'deciding whether to fight'
+                pvp_avoid:      'deciding whether to fight',
+                fenrirak_choice: 'at the arena, choosing which Fenrirak to fight'
             };
             const what = WORDS[S.pending.type] || 'deciding';
             return {
@@ -12579,6 +12966,8 @@ body.modal-cover #board * { animation-play-state: paused; }
     function tickTimer() {
         const el = $('#turn-timer');
         if (!el || !S || S.phase !== 'playing') return;
+        // On your own nothing is timed, and the badge says so.
+        if (S.solo) { el.textContent = 'No time limit'; el.className = 'timer off'; timerTier = null; return; }
         // No countdown during a battle -- a fight is not timed at all any
         // more (see checkTimeout in engine.js), so there is nothing here
         // worth showing while one is on.
@@ -13608,7 +13997,7 @@ body.modal-cover #board * { animation-play-state: paused; }
                 // Bare brown card with the floor scored across it, as on the
                 // real board. Whoever is fighting stands in the middle.
                 return '<div class="arena' + (anyoneInArena ? ' lit' : '') +
-                    '" style="' + place + '">' +
+                    '" data-sq="' + sq.i + '" style="' + place + '">' +
                     '<div class="arena-disc"></div>' +
                     '<div class="arena-inner">' +
                         '<div class="arena-title">Fenrirak’s Arena</div>' +
@@ -13624,7 +14013,8 @@ body.modal-cover #board * { animation-play-state: paused; }
             const badge = sq.stop ? 'STOP' : (sq.optionalStop ? 'OPTIONAL STOP' : '');
             return '<div class="sq kind-' + squareKind(sq) + ' key-' + esc(sq.key) +
                 (sq.gateway ? ' gateway' : '') +
-                (sq.scenery ? ' scenery-' + esc(sq.scenery) : '') + '" style="' + place + '">' +
+                (sq.scenery ? ' scenery-' + esc(sq.scenery) : '') + '" data-sq="' + sq.i +
+                '" style="' + place + '">' +
                 (sq.gateway ? GATE_ART : '') +
                 (sq.scenery === 'broken_bridge' ? WHIRL_ART : '') +
                 '<div class="sq-name">' + esc(sq.name) + '</div>' +
@@ -13663,6 +14053,131 @@ body.modal-cover #board * { animation-play-state: paused; }
     // Starting or joining a game draws a board that is not the one on the
     // screen, so the next render has to be a full one.
     function forgetBoard() { boardBuilt = false; }
+
+    /* ---- what a square says, in full ----------------------------------
+       A square only has room for a line or two of its card, and the longer
+       ones are cut off. Point at one and the whole of it comes up in a
+       small card beside it: the full text, whether it is a stop, the
+       monster waiting there and what it hits for, and who is standing on
+       it. With a mouse it follows the pointer; on a touch screen a tap
+       shows it and a tap anywhere else puts it away.
+       ------------------------------------------------------------------ */
+    const HOVER_OK = !!(window.matchMedia &&
+        window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+    let tipEl = null;
+    let tipFor = null;
+
+    function hideSquareTip() {
+        tipFor = null;
+        if (tipEl) tipEl.classList.remove('show');
+    }
+
+    function squareTipHtml(sq) {
+        const p = me();
+        const tags = [];
+        if (sq.stop) tags.push('<span class="tip-tag hard">STOP</span>');
+        if (sq.optionalStop) tags.push('<span class="tip-tag">OPTIONAL STOP</span>');
+        let h = '<b>' + esc(sq.name) + '</b>' +
+            (tags.length ? '<div class="tip-tags">' + tags.join('') + '</div>' : '') +
+            '<p>' + esc(sq.text) + '</p>';
+
+        // The monster, with the numbers the fight will actually use. At the
+        // arena that is the ordinary Fenrirak, with a line for the ORIGINAL
+        // one, which is chosen at the door.
+        if (sq.action === 'battle' && sq.enemy) {
+            const e = E.enemyStats(S, sq.enemy, false);
+            if (e) {
+                h += '<div class="tip-foe"><div class="tip-foe-head">' + esc(e.name) + '</div>' +
+                    '<div class="tip-foe-stats">' + e.hp + ' HP · ' + e.defence + ' defence</div>' +
+                    e.moves.map(m => '<div class="tip-move"><span>' + esc(m.name) +
+                        '</span><span>' + m.damage + ' dmg · ' + m.energy + ' energy</span></div>').join('') +
+                    '</div>';
+                if (e.original) {
+                    const o = E.enemyStats(S, sq.enemy, true);
+                    h += '<p class="tip-mine">Or the ORIGINAL Fenrirak: ' + o.hp + ' HP · ' +
+                         o.defence + ' defence, every attack +' + e.original.damageBonus +
+                         '. You choose at the arena, every time.</p>';
+                }
+            }
+            if (sq.keyFragment && p) {
+                if (E.fragmentsOf(p).indexOf(sq.keyFragment) >= 0) {
+                    h += '<p class="tip-mine">You already hold this key fragment.</p>';
+                }
+            }
+        }
+        if (p && sq.action === 'chest') {
+            h += '<p class="tip-mine">You have ' + (p.chestKeys | 0) + ' chest key' +
+                 ((p.chestKeys | 0) === 1 ? '' : 's') + '.</p>';
+        }
+        if (p && sq.gateway) {
+            h += '<p class="tip-mine">You hold ' + (p.keyFragments | 0) + ' of ' +
+                 D.KEY_FRAGMENTS_NEEDED + ' key fragments.</p>';
+        }
+
+        const here = S.players.filter(x => x.cls && x.pos === sq.i);
+        if (here.length) {
+            h += '<p class="tip-here">Here: ' + colourNames(here.map(x => x.name).join(', ')) + '</p>';
+        }
+        return h;
+    }
+
+    function showSquareTip(el) {
+        if (!S || !el) return hideSquareTip();
+        const sq = D.BOARD[+el.getAttribute('data-sq')];
+        // Not over the top of a panel that is asking something.
+        const back = $('#modal-back');
+        const covered = back && back.classList.contains('show') &&
+                        !back.classList.contains('dock') && !back.classList.contains('mini');
+        if (!sq || covered) return hideSquareTip();
+
+        if (!tipEl) {
+            tipEl = document.createElement('div');
+            tipEl.className = 'sq-tip';
+            tipEl.setAttribute('role', 'tooltip');
+            document.body.appendChild(tipEl);
+        }
+        tipFor = el;
+        tipEl.innerHTML = squareTipHtml(sq);
+        tipEl.style.left = '0px';
+        tipEl.style.top = '0px';
+        tipEl.classList.add('show');
+
+        // Above the square if it fits, otherwise below it, and never off
+        // either side of the screen.
+        const r = el.getBoundingClientRect();
+        const w = tipEl.offsetWidth, t = tipEl.offsetHeight;
+        const vw = window.innerWidth, vh = window.innerHeight;
+        let x = r.left + r.width / 2 - w / 2;
+        x = Math.max(8, Math.min(vw - w - 8, x));
+        let y = r.top - t - 8;
+        if (y < 8) y = Math.min(vh - t - 8, r.bottom + 8);
+        tipEl.style.left = Math.round(x) + 'px';
+        tipEl.style.top = Math.round(y) + 'px';
+    }
+
+    function initSquareTips() {
+        const board = $('#board');
+        if (!board) return;
+        if (HOVER_OK) {
+            board.addEventListener('mouseover', e => {
+                const el = e.target.closest && e.target.closest('[data-sq]');
+                if (!el) hideSquareTip();
+                else if (el !== tipFor) showSquareTip(el);
+            });
+            board.addEventListener('mouseleave', hideSquareTip);
+        } else {
+            // A tap on a square, unless it was meant for something on it (one
+            // of the "how far?" marks answers that question instead).
+            document.addEventListener('click', e => {
+                const el = e.target.closest && e.target.closest('#board [data-sq]');
+                if (!el || e.target.closest('.landing, button')) return hideSquareTip();
+                if (el === tipFor) return hideSquareTip();
+                showSquareTip(el);
+            });
+        }
+        window.addEventListener('scroll', hideSquareTip, { passive: true });
+        window.addEventListener('resize', hideSquareTip);
+    }
 
     /* ------------------------------------------------------------------ */
     /* The stat block                                                      */
@@ -13754,11 +14269,12 @@ body.modal-cover #board * { animation-play-state: paused; }
                         esc(E.square(x.pos).name) + '</div>' +
                 '</div>' +
                 // The countdown only exists to stop an absent player stalling
-                // everyone else. On your own there is nobody to stall, so
-                // take your time -- but the box is shown either way. Lives
-                // here, on the profile box, rather than pinned to a corner
-                // of the screen.
-                (S.solo ? '' : '<span class="timer" id="turn-timer"></span>') +
+                // everyone else. On your own there is nobody to stall, so it
+                // says so rather than counting -- but it is always there, so
+                // How to play can point at it. Lives here, on the profile
+                // box, rather than pinned to a corner of the screen.
+                '<span class="timer' + (S.solo ? ' off' : '') + '" id="turn-timer">' +
+                    (S.solo ? 'No time limit' : '') + '</span>' +
             '</div>' +
             '<div class="me-hp">' +
                 '<div class="bar hp"><i style="width:' +
@@ -13842,7 +14358,7 @@ body.modal-cover #board * { animation-play-state: paused; }
                sees, and "roll for turn order" is the first thing they are
                asked to do -- so it is the likeliest moment in the whole game
                for somebody to want to know what they have sat down to. */
-            box.innerHTML = '<button class="btn primary" id="a-order"' +
+            box.innerHTML = '<button class="btn primary" id="a-order" title="Shortcut: R"' +
                 (p.orderRoll !== null || tableHeld() ? ' disabled' : '') + '>' +
                 (p.orderRoll !== null ? 'Rolled ' + p.orderRoll : 'Roll for turn order') +
                 '</button>' +
@@ -13853,6 +14369,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             if (b) b.addEventListener('click', () =>
                 rollAct('Turn Order', 'rollForOrder', {}, 'Highest goes first.'));
             bind('a-guide', openGuide);
+            renderPhoneBar();
             return;
         }
 
@@ -13870,7 +14387,7 @@ body.modal-cover #board * { animation-play-state: paused; }
 
         const buttons = [];
         buttons.push(btn('a-move', 'Roll & move', 'primary',
-            !mine || blocked || p.hasMoved));
+            !mine || blocked || p.hasMoved, 'Shortcut: R'));
         // When it is not ready, the button says how long it has left rather
         // than sitting there greyed out for no stated reason.
         buttons.push(btn('a-ability',
@@ -13884,7 +14401,7 @@ body.modal-cover #board * { animation-play-state: paused; }
         // own square still waiting on a choice from you.
         const shopBlocked = !!S.battle || !!S.paused || holding ||
             (!!S.pending && S.pending.playerId === NET.PID);
-        buttons.push(btn('a-shop', 'Visit the Merchant', 'action', shopBlocked));
+        buttons.push(btn('a-shop', 'Visit the Merchant', 'action', shopBlocked, 'Shortcut: M'));
         // Offering a trade is a turn action like any other. It used to be open
         // at all times, which read as an invitation and was not one: the panel
         // cannot come up over a battle or over somebody else's square, so the
@@ -13912,7 +14429,7 @@ body.modal-cover #board * { animation-play-state: paused; }
             p.steaks.raw < 1 || cannotEat));
         buttons.push(btn('a-steak-cooked', 'Eat seared steak', 'action',
             p.steaks.cooked < 1 || cannotEat));
-        buttons.push(btn('a-end', 'End turn', 'primary', !mine || blocked));
+        buttons.push(btn('a-end', 'End turn', 'primary', !mine || blocked, 'Shortcut: Backspace'));
 
         // The two that end things stand together underneath, matched and
         // side by side, set apart from the things you do on your turn.
@@ -13970,6 +14487,32 @@ body.modal-cover #board * { animation-play-state: paused; }
         bind('a-close', confirmCloseGame);
         bind('a-leave', leaveRoom);
         bind('a-pause', () => act('setPaused', { on: !S.paused }));
+        renderPhoneBar();
+    }
+
+    /* On a narrower screen the board comes first and the Actions card is a
+       long way below it, so the three buttons a turn is made of are also
+       pinned along the bottom of the screen, as in The Oblivion Dragon.
+       Each presses its twin in the Actions card, so it can do nothing that
+       button could not, and is greyed out whenever its twin is. */
+    function renderPhoneBar() {
+        const bar = $('#phone-bar');
+        if (!bar) return;
+        const twin = id => document.getElementById(id);
+        const roll = twin('a-move') || twin('a-order');
+        const items = [
+            [roll, roll && roll.id === 'a-order' ? 'Roll for turn order' : 'Roll &amp; move', 'primary'],
+            [twin('a-shop'), 'Merchant', 'action'],
+            [twin('a-end'), 'End turn', 'primary']
+        ].filter(x => x[0]);
+        bar.innerHTML = items.map(x =>
+            '<button class="btn ' + x[2] + '" data-twin="' + x[0].id + '"' +
+            (x[0].disabled ? ' disabled' : '') + '>' + x[1] + '</button>').join('');
+        bar.classList.toggle('empty', !items.length);
+        bar.querySelectorAll('[data-twin]').forEach(b => b.addEventListener('click', () => {
+            const t = document.getElementById(b.getAttribute('data-twin'));
+            if (t && !t.disabled) t.click();
+        }));
     }
 
     // Ending the game early. The room document is deleted rather than left
@@ -14017,8 +14560,9 @@ body.modal-cover #board * { animation-play-state: paused; }
         });
     }
 
-    function btn(id, label, cls, disabled) {
+    function btn(id, label, cls, disabled, title) {
         return '<button class="btn ' + (cls || '') + '" id="' + id + '"' +
+            (title ? ' title="' + esc(title) + '"' : '') +
             (disabled ? ' disabled' : '') + '>' + esc(label) + '</button>';
     }
     function bind(id, fn) {
@@ -14026,13 +14570,109 @@ body.modal-cover #board * { animation-play-state: paused; }
         if (el) el.addEventListener('click', fn);
     }
 
+    /* ---- keyboard shortcuts --------------------------------------------
+       The same keys as The Oblivion Dragon: R rolls, Backspace ends your
+       turn, M opens the Merchant, Escape closes the window that is open.
+       Each one presses the real button, so a key does nothing its button
+       would not -- a greyed-out button is a dead key.
+
+       R is whichever die is yours to throw right now: for turn order, to
+       move, to strike in a fight, or for the hunt once End turn has been
+       pressed. Escape on the hunt is "Back to my turn", and on a fight you
+       are only watching it tucks the fight into the corner.
+
+       Not while you are typing in a box, and not while the walk-through is
+       open: that asks you to press the buttons yourself, and closes itself
+       on Escape. */
+    const ESCAPE_BUTTONS = ['#orig-no', '#ab-cancel', '#pick-cancel', '#close-no', '#guide-close',
+        '#guide-pick-close', '#guide-no', '#purse-cancel', '#shop-close', '#tr-close',
+        '#hunt-back', '#b-hide'];
+
+    function initShortcuts() {
+        const press = sel => {
+            const b = document.querySelector(sel);
+            // offsetParent is null for a button that is not on the screen.
+            if (!b || b.disabled || !b.offsetParent) return false;
+            b.click();
+            return true;
+        };
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            const t = e.target || {};
+            if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || '') || t.isContentEditable) return;
+            if (SPOTLIGHT.isOpen()) return;
+
+            if (e.key === 'Escape') {
+                hideSquareTip();
+                if (ESCAPE_BUTTONS.some(press)) e.preventDefault();
+                return;
+            }
+
+            if (e.repeat || !S || !$('#screen-game.active')) return;
+            if (document.body.classList.contains('holding')) return;
+            // Which window, if any, is up in the middle of the screen. A
+            // docked panel (how far should the die carry you?) or a fight
+            // tucked in the corner leaves the board and its buttons free.
+            const back = $('#modal-back');
+            const up = back.classList.contains('show') && !back.classList.contains('dock') &&
+                       !back.classList.contains('mini') ? (shownKey || 'other') : '';
+            const k = (e.key || '').toLowerCase();
+
+            if (k === 'r') {
+                const ok = up === 'battle' ? press('#b-roll')
+                         : up === 'pending' ? press('#modal [data-choice="roll"]')
+                         : !up && (press('#a-move') || press('#a-order'));
+                if (ok) e.preventDefault();
+            } else if (e.key === 'Backspace') {
+                // Always swallowed in the game: in some browsers Backspace on
+                // its own is still "go back a page".
+                e.preventDefault();
+                if (!up) press('#a-end');
+            } else if (k === 'm') {
+                if (!up && press('#a-shop')) e.preventDefault();
+            }
+        });
+    }
+
     /* ------------------------------------------------------------------ */
     /* Game — log                                                          */
     /* ------------------------------------------------------------------ */
 
+    /* The narrator's "Just mine" switch, as in The Oblivion Dragon: only
+       the lines that name you. A line carries no player id, only the
+       words, so "yours" is any line your name appears in as a whole word. */
+    let logMine = false;
+
+    function mineOnly(lines) {
+        const p = me();
+        if (!p || !p.name) return lines;
+        const re = new RegExp('(^|[^A-Za-z0-9])' +
+            p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^A-Za-z0-9])');
+        return lines.filter(l => re.test(String(l.t)));
+    }
+
+    function setLogMine(on) {
+        logMine = on;
+        $('#log-all').classList.toggle('on', !on);
+        $('#log-mine').classList.toggle('on', on);
+        $('#log-all').setAttribute('aria-pressed', String(!on));
+        $('#log-mine').setAttribute('aria-pressed', String(on));
+        $('#log').scrollTop = 0;
+        if (S && S.log) renderLog();
+    }
+
+    function initLogFilter() {
+        $('#log-all').addEventListener('click', () => setLogMine(false));
+        $('#log-mine').addEventListener('click', () => setLogMine(true));
+    }
+
     function renderLog() {
-        $('#log').innerHTML = (S.log || []).slice(-60).reverse()
-            .map(l => '<div class="t-' + esc(l.tone) + '">' + colourNames(l.t) + '</div>').join('');
+        const all = S.log || [];
+        const lines = logMine ? mineOnly(all) : all;
+        $('#log').innerHTML = lines.length
+            ? lines.slice(-60).reverse()
+                .map(l => '<div class="t-' + esc(l.tone) + '">' + colourNames(l.t) + '</div>').join('')
+            : '<div class="t-muted">Nothing about you yet.</div>';
     }
 
     /* ------------------------------------------------------------------ */
@@ -14250,7 +14890,9 @@ body.modal-cover #board * { animation-play-state: paused; }
             '<span>Walk the board and beat monsters until you hold all <em>' +
             D.KEY_FRAGMENTS_NEEDED + ' key fragments</em>. Those open <em>the Gate</em>. ' +
             'Through the Gate is the arena, and in the arena is <em>Fenrirak</em>. ' +
-            'Beat him and you have won.</span>' +
+            'Beat him and you have won. Each time you reach the arena you choose which ' +
+            'Fenrirak to fight: the ordinary one, or <em>the ORIGINAL Fenrirak</em>, a far ' +
+            'harder fight. The choice is yours alone and only for that one fight.</span>' +
         '</div>' +
 
         '<h3 class="guide-h">Your turn, in order</h3>' +
@@ -14269,7 +14911,9 @@ body.modal-cover #board * { animation-play-state: paused; }
                  '<b>The Merchant</b> keeps different hours: see below.') +
             step(4, 'End your turn',
                  'Press <b>End turn</b> to hand over. You get a hunting roll on the way out, ' +
-                 'which is where steaks come from.') +
+                 'which is where steaks come from. Pressed it too soon? <b>Back to my turn</b> ' +
+                 'on the hunt puts you straight back into your go, as long as you have not ' +
+                 'gone hunting yet.') +
         '</ol>' +
 
         '<div class="guide-note">' +
@@ -14284,6 +14928,22 @@ body.modal-cover #board * { animation-play-state: paused; }
             'shuts the stall during a battle, or while you have a square choice of your ' +
             'own still waiting on an answer.' +
         '</div>' +
+
+        '<h3 class="guide-h">The turn timer</h3>' +
+        '<div class="guide-facts">' +
+            '<div class="guide-fact"><b>' + turnSecs + ' seconds</b>' +
+                '<span>for each turn, in a game with other people. Away too long and your ' +
+                'turn is skipped.</span></div>' +
+            '<div class="guide-fact"><b>Not timed</b>' +
+                '<span>a battle, on your own or online. The countdown steps aside until ' +
+                'the fight is over.</span></div>' +
+            '<div class="guide-fact"><b>No time limit</b>' +
+                '<span>when you play on your own. The timer still shows, and says so.</span></div>' +
+        '</div>' +
+        '<p class="guide-p">The timer sits in your profile box, beside your name. It turns ' +
+            'amber with 30 seconds left and red with 15. While you are being walked through ' +
+            'the game (<b>How to play → Walk me through it</b>) your own turn’s clock is held ' +
+            'for you.</p>' +
 
         '<h3 class="guide-h">Fighting, step by step</h3>' +
         '<ol class="guide-steps">' +
@@ -14340,11 +15000,23 @@ body.modal-cover #board * { animation-play-state: paused; }
                 'power-ups, steaks, coins and chest keys. You equip and use them from there.</li>' +
             '<li><b>Playing with other people</b>, a turn runs on ' + turnSecs +
                 ' seconds, so nobody can hold the table up outside a fight — that countdown sits ' +
-                'in the corner of the screen and warns you as it runs low. A battle itself is not ' +
-                'timed, on your own or online. On your own, nothing at all is timed.</li>' +
+                'in your profile box, beside your name, and warns you as it runs low. A battle ' +
+                'itself is not timed, on your own or online. On your own, nothing at all is timed.</li>' +
             '<li><b>The host</b> may pause the game, and may end it for everybody.</li>' +
             '<li><b>The narrator</b> down the right-hand side says everything that happens. ' +
-                'If you missed something, it is in there.</li>' +
+                'If you missed something, it is in there. <b>Just mine</b> at the top of it ' +
+                'shows only the lines about you; <b>All</b> shows everything again.</li>' +
+            '<li><b>On a phone or a narrow window</b>, Roll &amp; move, the Merchant and End ' +
+                'turn are also on a bar along the bottom of the screen, so you never have to ' +
+                'scroll down to them.</li>' +
+            '<li><b>Point at a square</b> to read the whole of it, with the monster waiting ' +
+                'there and what it hits for. On a touch screen, tap it.</li>' +
+            '<li><b>Watching somebody else fight?</b> The button in the top corner of the ' +
+                'battle tucks it into the corner of the screen, and <b>Watch</b> brings it back.</li>' +
+            '<li><b>Keyboard shortcuts:</b> <b>R</b> rolls the die (for turn order, to move, ' +
+                'to strike, or to hunt). <b>Backspace</b> ends your turn. <b>M</b> opens the ' +
+                'Merchant. <b>Escape</b> closes the window that is open. They do just what the ' +
+                'buttons do, so a key does nothing while its button is greyed out.</li>' +
         '</ul>' +
 
         '<div class="modal-actions">' +
@@ -14574,6 +15246,17 @@ body.modal-cover #board * { animation-play-state: paused; }
                 { id: 'side-hero', title: 'Your stats',
                   body: 'Health, defence, coins, energy and key fragments — kept ' +
                       'up to date the moment anything about them changes.' },
+                { id: 'turn-timer', title: 'The turn timer',
+                  body: S && S.solo
+                      ? 'Playing on your own there is <b>no time limit</b>, so it says ' +
+                        'so. In a game with other people it counts down instead: <b>' +
+                        Math.round(R.turnTimeoutMs / 1000) + ' seconds</b> a turn, ' +
+                        'amber at 30 and red at 15. Run out and your turn is skipped. ' +
+                        'A battle is never timed.'
+                      : 'You have <b>' + Math.round(R.turnTimeoutMs / 1000) +
+                        ' seconds</b> a turn. It turns amber at 30 and red at 15; run ' +
+                        'out and the turn is skipped. A battle is not timed. It is ' +
+                        '<b>held for you</b> while this walkthrough is open.' },
                 { id: 'board', title: 'The board',
                   body: 'Your piece is the one ringed in gold. Wherever it lands, ' +
                       'something happens straight away.' },
@@ -14608,7 +15291,11 @@ body.modal-cover #board * { animation-play-state: paused; }
                       ' — twice what a raw one does.' },
                 { id: 'a-end', title: 'End turn', live: true,
                   body: 'Press it once you\u2019re done. You get a hunting ' +
-                      'roll on the way out, which is where steaks come from. ' +
+                      'roll on the way out, which is where steaks come from, ' +
+                      'and you can still go back to your turn until you ' +
+                      'throw it. Shortcut: <b>Backspace</b>. All the keys: ' +
+                      '<b>R</b> roll, <b>M</b> Merchant, <b>Backspace</b> end ' +
+                      'turn, <b>Escape</b> close a window. ' +
                       'This is the last stop — the tour only ever runs on ' +
                       'your own turn, and this is what gives it up.' }
             ].filter(targetEl);
@@ -15006,8 +15693,8 @@ body.modal-cover #board * { animation-play-state: paused; }
                     '<span class="guide-pick-icon">' + guideIcon('spotlight') + '</span>' +
                     '<b>Walk me through it</b>' +
                     '<span>The real buttons on your real turn, lit up one at a ' +
-                        'time — everything else dims. Press the real thing and ' +
-                        'see what it does before the tour moves on.</span>' +
+                        'time — everything else dims, the turn timer included. Press ' +
+                        'the real thing and see what it does before the tour moves on.</span>' +
                     '<i class="guide-pick-tag">' + (canSpotlight
                         ? 'Live · press each button for real'
                         : walkBlockedLabel(walkBlocked)) + '</i>' +
@@ -15015,8 +15702,8 @@ body.modal-cover #board * { animation-play-state: paused; }
                 '<button class="guide-pick-card" id="guide-pick-rules">' +
                     '<span class="guide-pick-icon">' + guideIcon('scroll') + '</span>' +
                     '<b>Read the rules</b>' +
-                    '<span>The whole rulebook on one page — the goal, every square, ' +
-                        'how fighting is scored, and what each class can do.</span>' +
+                    '<span>The whole rulebook on one page — the goal, the turn timer, ' +
+                        'every square, how fighting is scored, and what each class can do.</span>' +
                     '<i class="guide-pick-tag">Reference · skim anytime</i>' +
                 '</button>' +
             '</div>' +
@@ -15139,7 +15826,7 @@ body.modal-cover #board * { animation-play-state: paused; }
     }
 
     function closeModal() {
-        $('#modal-back').classList.remove('show', 'dock');
+        $('#modal-back').classList.remove('show', 'dock', 'mini');
         document.body.classList.remove('modal-cover');
         $('#modal').innerHTML = '';
         clearLandings();
@@ -15201,13 +15888,14 @@ body.modal-cover #board * { animation-play-state: paused; }
         const back = $('#modal-back');
         $('#modal').innerHTML = html;
         back.classList.add('show');
+        back.classList.remove('mini');
         back.classList.toggle('dock', !!dock);
         // A panel that covers the board hides the scenery behind 72% black and
         // a blur. The stylesheet stops the scenery moving while it is under
         // there -- see "Nothing moves behind a closed door" in style.css. A
         // docked panel covers nothing, so the board keeps its life.
         document.body.classList.toggle('modal-cover', !dock);
-        if (!dock) clearLandings();
+        if (!dock) { clearLandings(); hideSquareTip(); }
         back.dataset.dismissable = dismissable ? '1' : '0';
         // Which panel this is, so the stylesheet can tell the fight -- the one
         // panel that stays up across a roll -- from the rest.
@@ -15229,7 +15917,14 @@ body.modal-cover #board * { animation-play-state: paused; }
            to a fight that is now over. */
         if (overlay) {
             if (overlay.key === 'pick' && !S.battle) overlay = null;
-            else {
+            // "Are you sure?" about the ORIGINAL Fenrirak means nothing once
+            // the question at the arena door has gone (answered, or the
+            // clock took the turn).
+            else if (overlay.key === 'fenrirak-sure' &&
+                     !(S.pending && S.pending.type === 'fenrirak_choice' &&
+                       S.pending.playerId === NET.PID)) {
+                overlay = null;
+            } else {
                 if (shownKey !== overlay.key) overlay.draw();
                 return;
             }
@@ -15315,6 +16010,82 @@ body.modal-cover #board * { animation-play-state: paused; }
         '</div>';
     }
 
+    /* ---- a fight tucked into the corner ------------------------------
+       Somebody else's fight takes the middle of the screen by default, so
+       nobody misses it starting. Whoever is only watching can press the
+       minimise button (or Escape) and it shrinks to a bar in the bottom
+       corner: both sides' health, what is going on, and the latest line of
+       the fight, with the board free to look at behind it. Each new fight
+       starts in the middle again. */
+    function showMiniBattle(html, key) {
+        const back = $('#modal-back');
+        $('#modal').innerHTML = html;
+        back.classList.add('show', 'mini');
+        back.classList.remove('dock');
+        document.body.classList.remove('modal-cover');
+        back.dataset.dismissable = '0';
+        back.dataset.key = key || 'battle-mini';
+        shownKey = key || 'battle-mini';
+    }
+
+    function miniHpRow(name, hp, max) {
+        const pct = Math.max(0, Math.min(100, Math.round(hp / max * 100)));
+        return '<div class="mini-hp"><span class="mini-name">' + colourNames(name) + '</span>' +
+            '<span class="mini-track"><i style="width:' + pct + '%"></i></span>' +
+            '<span class="mini-num">' + Math.max(0, hp) + '/' + max + '</span></div>';
+    }
+
+    function miniBattleHtml(b, a, foe, foeHp, foeMax) {
+        const since = b.logFrom | 0;
+        const lines = (S.log || []).filter(l => (l.n | 0) > since);
+        const last = lines.length ? lines[lines.length - 1] : null;
+        const now = whatIsHappening();
+        const said = now && now.text ? now.text : 'the fight goes on';
+        return '<div class="mini-bar">' +
+            '<div class="mini-what">' +
+                miniHpRow(a.name, a.hp, a.maxHp) +
+                miniHpRow(foe.name, foeHp, foeMax) +
+                '<span class="mini-now">' + said.charAt(0).toUpperCase() + said.slice(1) + '</span>' +
+                (last ? '<small>' + colourNames(last.t) + '</small>' : '') +
+            '</div>' +
+            '<button class="btn small" id="b-show">Watch</button>' +
+        '</div>';
+    }
+
+    // Whatever is waiting on the table to go quiet: a die being read, a card.
+    function afterHold(fn) {
+        if (!tableHeld()) { fn(); return; }
+        setTimeout(() => afterHold(fn), 120);
+    }
+
+    /* Tucking a fight away, or bringing it back, can be asked for at any
+       moment -- including while a die is still deciding a blow, which in a
+       fight between two computers is most of the time. Neither side of the
+       switch may show what that die did before it has been read, so in that
+       beat the corner only says it is there, and the numbers (or the full
+       panel) follow once the table is quiet. */
+    function tuckBattle(id) {
+        miniBattle = id;
+        if (!tableHeld()) { renderModal(); return; }
+        showMiniBattle('<div class="mini-bar"><div class="mini-what">' +
+            '<span class="mini-now">Watching from the corner…</span></div></div>');
+        afterHold(() => { if (miniBattle === id && S && S.battle) renderModal(); });
+    }
+    function untuckBattle() {
+        miniBattle = null;
+        if (!tableHeld()) { renderModal(); return; }
+        const b = document.getElementById('b-show');
+        if (b) { b.disabled = true; b.textContent = 'Opening…'; }
+        afterHold(() => { if (miniBattle === null && S && S.battle) renderModal(); });
+    }
+
+    function miniResultHtml(r) {
+        return '<div class="mini-bar"><div class="mini-what">' +
+            '<span class="mini-now">' + (r.kind === 'pvp' ? 'Player battle over' : 'Battle over') + '</span>' +
+            '<span><b>' + colourNames(r.winner.name) + '</b> beat ' + colourNames(r.loser.name) + '</span>' +
+            '</div></div>';
+    }
+
     function renderBattleModal() {
         const b = S.battle;
         const p = me();
@@ -15327,6 +16098,22 @@ body.modal-cover #board * { animation-play-state: paused; }
 
         const foeHp = isPvp ? foe.hp : b.enemyHp;
         const foeMax = isPvp ? foe.maxHp : b.enemyMaxHp;
+        // The ORIGINAL Fenrirak is named as such, so nobody watching takes
+        // his 750 health for a mistake.
+        const foeTitle = !isPvp && b.original ? 'The ORIGINAL ' + foe.name : foe.name;
+
+        // A fight you are only watching can be tucked into the corner of
+        // the screen, out of the way of the board, and brought back with
+        // one press.
+        if (!involved && miniBattle === (b.logFrom | 0)) {
+            showMiniBattle(miniBattleHtml(b, a, foe, foeHp, foeMax));
+            bind('b-show', untuckBattle);
+            driveEnemyTurn(b);
+            return;
+        }
+        // Tucked away was a different fight; this one starts in the middle.
+        if (miniBattle !== null && miniBattle !== (b.logFrom | 0)) miniBattle = null;
+
         const foePortrait = isPvp
             ? '<img src="' + esc(D.CLASSES[foe.cls].art) + '" alt="' + esc(foe.name) + '">'
             : enemyPic(foe, 96);
@@ -15340,8 +16127,38 @@ body.modal-cover #board * { animation-play-state: paused; }
         const rollerIsMe = !isPvp ? !enemyPhase && a.id === NET.PID
                                   : (myMove && involved);
 
+        /* The flat die in the panel, and what it came to. It sits in the gap
+           between the two sides, under the VS, where there was nothing but
+           empty space -- not on a line of its own pushing the attacks down.
+
+           It used to be written the moment the answer reached the client,
+           which in a fight between two players is while the thrown cube is
+           still tumbling -- so the panel gave the number away before the die
+           had finished deciding it. It waits now: nothing is shown here
+           while a die is in the air, and the panel redraws itself the
+           instant one lands. */
+        let dieHtml = '';
+        if (b.lastRoll != null && b.phase !== 'auto') {
+            if (DICE.busy()) {
+                if (!renderBattleModal._waiting) {
+                    renderBattleModal._waiting = true;
+                    DICE.whenIdle(() => {
+                        renderBattleModal._waiting = false;
+                        renderModal();
+                    });
+                }
+            } else {
+                dieHtml = '<div class="die">' + pipsHtml(b.lastRoll) + '</div>' +
+                    '<div class="die-say">' +
+                    (b.lastRoll > missesUpTo() ? 'A hit!' : 'A miss.') + '</div>';
+            }
+        }
+
         let body =
-            '<h2>' + (isPvp ? 'Player Battle' : esc(foe.name)) + '</h2>' +
+            (involved ? '' : '<button class="x-btn" id="b-hide" title="Watch from the corner (Escape)" ' +
+                'aria-label="Watch from the corner"><svg viewBox="0 0 24 24" aria-hidden="true">' +
+                '<path d="M6.5 12h11"/></svg></button>') +
+            '<h2>' + (isPvp ? 'Player Battle' : esc(foeTitle)) + '</h2>' +
             '<div class="turn-flag' + (rollerIsMe ? ' mine' : '') + '">' +
                 esc(roller) + (rollerIsMe ? ' — your go' : '') + ': ' +
                 (b.phase === 'auto' ? 'the blow is already coming'
@@ -15367,7 +16184,7 @@ body.modal-cover #board * { animation-play-state: paused; }
                         moves: D.CLASSES[a.cls].moves
                     }) + '</div>' +
                 '</div>' +
-                '<div class="battle-vs">VS</div>' +
+                '<div class="battle-mid"><div class="battle-vs">VS</div>' + dieHtml + '</div>' +
                 '<div class="battle-col">' +
                     sideHtml(foePortrait, foeHp, foeMax, foe.name, isPvp ? 'hp' : 'enemy',
                              'side-b', isPvp ? foe.energy : b.enemyEnergy, isPvp ? foe.bonusHp : 0) +
@@ -15376,35 +16193,16 @@ body.modal-cover #board * { animation-play-state: paused; }
                         hp: D.CLASSES[foe.cls].hp, defence: D.CLASSES[foe.cls].defence,
                         moves: D.CLASSES[foe.cls].moves
                     }) : statCardHtml({
-                        name: foe.name, hp: foe.maxHp || b.enemyMaxHp, defence: foe.defence,
+                        name: foeTitle, hp: foe.maxHp || b.enemyMaxHp, defence: foe.defence,
                         moves: foe.moves, svg: enemyPic(foe, 58)
                     })) + '</div>' +
                 '</div>' +
-            '</div>';
-
-        /* The flat die in the panel, and what it came to.
-
-           It used to be written the moment the answer reached the client,
-           which in a fight between two players is while the thrown cube is
-           still tumbling -- so the panel gave the number away before the die
-           had finished deciding it. It waits now: nothing is shown here
-           while a die is in the air, and the panel redraws itself the
-           instant one lands. */
-        if (b.lastRoll != null && b.phase !== 'auto') {
-            if (DICE.busy()) {
-                if (!renderBattleModal._waiting) {
-                    renderBattleModal._waiting = true;
-                    DICE.whenIdle(() => {
-                        renderBattleModal._waiting = false;
-                        renderModal();
-                    });
-                }
-            } else {
-                body += '<div class="die">' + pipsHtml(b.lastRoll) + '</div>' +
-                    '<div class="muted" style="text-align:center;font-size:13px">' +
-                    (b.lastRoll > missesUpTo() ? 'A hit!' : 'A miss.') + '</div>';
-            }
-        }
+            '</div>' +
+            // Underneath: what you can do on the left, the fight's own log
+            // beside it on the right, rather than one under the other -- the
+            // panel is wide enough now, and stacked they ran off the bottom
+            // of a laptop screen.
+            '<div class="battle-lower"><div class="battle-do">';
 
         // The monster takes its own turn. Nobody presses a button for it any
         // more, so this line stands in for the button that used to be here:
@@ -15432,7 +16230,7 @@ body.modal-cover #board * { animation-play-state: paused; }
                     '<button class="btn primary" id="b-roll">Roll to strike</button></div>';
             } else {
                 const moves = E.availableMoves(S, NET.PID);
-                body += '<h3 style="margin-top:18px">Choose your attack</h3><div class="moves">' +
+                body += '<h3>Choose your attack</h3><div class="moves">' +
                     moves.map(m =>
                         '<button class="move' + (m.extra ? ' extra' : '') +
                         '" data-move="' + esc(m.id) + '"' +
@@ -15505,16 +16303,17 @@ body.modal-cover #board * { animation-play-state: paused; }
            whole game and is meant to be. */
         const since = b.logFrom | 0;
         const battleLines = (S.log || []).filter(l => (l.n | 0) > since);
-        body += '<h3 style="margin-top:18px">Battle log</h3>' +
-            '<div class="log" style="max-height:150px">' +
+        body += '</div><div class="battle-logcol"><h3>Battle log</h3>' +
+            '<div class="log">' +
             (battleLines.length
                 ? battleLines.slice(-12).reverse()
                     .map(l => '<div class="t-' + esc(l.tone) + '">' + colourNames(l.t) + '</div>').join('')
                 : '<div class="t-muted">Nothing yet — the fight has not started.</div>') +
-            '</div>';
+            '</div></div></div>';
 
         showModal(body, false, 'battle');
 
+        bind('b-hide', () => tuckBattle(b.logFrom | 0));
         bind('b-roll', () => rollAct('an Attack', 'battleRoll', {}, missRule()));
         $$('#modal [data-move]').forEach(el =>
             el.addEventListener('click', () => act('battleAttack', { moveId: el.dataset.move })));
@@ -15890,6 +16689,60 @@ body.modal-cover #board * { animation-play-state: paused; }
         '</div>';
     }
 
+    /* ---- which Fenrirak --------------------------------------------
+       Asked at the arena door, every time, and only for the fight about
+       to start. The two stat cards stand side by side so the difference is
+       plain before anything is pressed, and the ORIGINAL one asks again
+       before it lets you in. */
+    function fenrirakCardHtml(original) {
+        const e = E.enemyStats(S, 'fenrirak', original);
+        const o = D.ENEMIES.fenrirak.original;
+        return statCardHtml({
+            name: original ? 'The ORIGINAL Fenrirak' : 'Fenrirak',
+            hp: e.hp, defence: e.defence, moves: e.moves,
+            svg: enemyPic(D.ENEMIES.fenrirak, 58),
+            foot: original
+                ? 'Every attack hits ' + o.damageBonus + ' harder than the ordinary Fenrirak.'
+                : 'The fight the game is balanced around.'
+        });
+    }
+
+    function fenrirakChoiceHtml() {
+        return '<h2>Fenrirak’s Arena</h2>' +
+            '<div class="sub">Which Fenrirak will you fight? You are asked every time you ' +
+                'reach the arena, and your answer is for this fight only.</div>' +
+            '<div class="fen-pick">' +
+                '<div class="fen-opt">' + fenrirakCardHtml(false) +
+                    '<button class="btn primary" data-choice="normal">Fight Fenrirak</button>' +
+                '</div>' +
+                '<div class="fen-opt original">' + fenrirakCardHtml(true) +
+                    '<button class="btn danger" data-choice="original">Fight the ORIGINAL</button>' +
+                '</div>' +
+            '</div>';
+    }
+
+    function confirmOriginalFenrirak() {
+        const e = E.enemyStats(S, 'fenrirak', true);
+        const base = D.ENEMIES.fenrirak;
+        overlay = { key: 'fenrirak-sure', draw: confirmOriginalFenrirak };
+        showModal('<h2>Fight the ORIGINAL Fenrirak?</h2>' +
+            '<div class="sub">He has <b>' + e.hp + ' health</b> (not ' + base.hp + '), <b>' +
+                e.defence + ' defence</b> (not ' + base.defence + ') and every attack hits <b>' +
+                base.original.damageBonus + ' harder</b>. It is a far harder fight. Lose and you ' +
+                'go back to the Start, the same as against the ordinary Fenrirak.</div>' +
+            '<div class="modal-actions">' +
+                '<button class="btn danger" id="orig-yes">Yes, fight the ORIGINAL</button>' +
+                '<button class="btn" id="orig-no">No, go back</button>' +
+            '</div>', false, 'fenrirak-sure');
+        bind('orig-yes', () => {
+            closeOverlay();
+            if (!(S.pending && S.pending.type === 'fenrirak_choice' &&
+                  S.pending.playerId === NET.PID)) { renderModal(); return; }
+            act('resolvePending', { choice: 'original' });
+        });
+        bind('orig-no', () => { closeOverlay(); renderModal(); });
+    }
+
     /* ---- pending square choices ---- */
 
     function renderPendingModal() {
@@ -15954,10 +16807,17 @@ body.modal-cover #board * { animation-play-state: paused; }
         } else if (pend.type === 'steak_roll') {
             // Nothing is thrown until the button is pressed, so there is
             // deliberately no die shown here yet.
+            // Pressing End turn is not the point of no return; throwing this
+            // die is. Until then the player can step back into their turn.
             body = '<h2>The hunt</h2>' +
                 '<div class="sub">' + esc(pend.prompt) + '</div>' +
                 '<div class="modal-actions" style="justify-content:center">' +
-                '<button class="btn primary" data-choice="roll">Go hunting</button></div>';
+                '<button class="btn primary" data-choice="roll">Go hunting</button>' +
+                '<button class="btn" data-choice="cancel" id="hunt-back">Back to my turn</button></div>' +
+                '<div class="muted hunt-note">Not finished? Going back cancels ending your turn. ' +
+                'Press <b>End turn</b> again when you are ready.</div>';
+        } else if (pend.type === 'fenrirak_choice') {
+            body = fenrirakChoiceHtml();
         } else if (pend.type === 'optional_stop') {
             body = '<h2>Optional stop</h2><div class="sub">' + esc(pend.prompt) + '</div>' +
                 '<div class="modal-actions">' +
@@ -15967,7 +16827,8 @@ body.modal-cover #board * { animation-play-state: paused; }
         } else if (pend.type === 'pot') {
             body = '<h2>The Pot</h2><div class="sub">' + esc(pend.prompt) + '</div>' +
                 '<div class="sub">You have ' + p.steaks.raw + ' raw steak' +
-                (p.steaks.raw === 1 ? '' : 's') + '. Seared steak heals 10 HP instead of 5.</div>' +
+                (p.steaks.raw === 1 ? '' : 's') + '. Seared steak heals ' + D.RULES.searedSteakHeal +
+                ' HP instead of ' + D.RULES.rawSteakHeal + '.</div>' +
                 '<div class="modal-actions">' +
                 '<button class="btn primary" data-choice="' + p.steaks.raw + '">Cook all ' +
                     p.steaks.raw + '</button>' +
@@ -16105,7 +16966,11 @@ body.modal-cover #board * { animation-play-state: paused; }
                 const n = parseInt(c, 10);
                 c = n === 0 ? false : n;
             }
-            if (pend.type === 'steak_roll') {
+            // The far harder fight is never one press away: it asks first.
+            if (pend.type === 'fenrirak_choice' && c === 'original') {
+                return confirmOriginalFenrirak();
+            }
+            if (pend.type === 'steak_roll' && c !== 'cancel') {
                 return rollAct('the Hunt', 'resolvePending', { choice: c },
                                'A ' + D.RULES.steakRolls.join(', ') +
                                ' and something comes past.');
@@ -16656,6 +17521,9 @@ body.modal-cover #board * { animation-play-state: paused; }
         NET = SOLO;
         initHome();
         initLobby();
+        initShortcuts();
+        initSquareTips();
+        initLogFilter();
 
         $('#modal-back').addEventListener('click', (e) => {
             if (e.target === $('#modal-back') &&

@@ -900,6 +900,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .home-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .home-cards .wide { grid-column: 1 / -1; }
 .home-cards .btn { width: 100%; }
+#btn-rejoin { margin-top: 8px; }
 .solo-buttons { display: flex; gap: 10px; }
 .solo-buttons .btn { flex: 1; }
 .code-input { text-transform: uppercase; letter-spacing: 6px; text-align: center; }
@@ -981,15 +982,163 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .roster img { width: 34px; height: 34px; border-radius: 50%; background: var(--paper); border: 2px solid var(--seat, #888); }
 .roster .rname { flex: 1; }
 .roster .tag { font-size: 11.5px; color: var(--muted); }
-.bot-count { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; }
+.bot-level { margin: 8px 0 12px; }
+.bot-level .bm-head { font-size: 14px; margin-bottom: 6px; }
+.bot-level .seg { display: flex; gap: 6px; }
+.bot-level .seg .btn { flex: 1; }
+.bot-level .bl-note { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.bot-mix { margin: 8px 0 12px; }
+.bot-mix .bm-head { font-size: 14px; margin-bottom: 6px; }
+.bot-mix .bm-head b { color: var(--gold-bright); }
+.bot-mix .bm-head span { display: block; font-size: 12px; color: var(--muted); }
+.bot-count { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; }
+.bot-count img { width: 28px; height: 28px; border-radius: 50%; background: var(--paper); flex: none; }
+.bot-count span { flex: 1; font-size: 14px; }
 .bot-count .btn { font-size: 18px; width: 36px; height: 32px; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
 .bot-count b { font-size: 20px; color: var(--gold-bright); min-width: 22px; text-align: center; }
 .mods-summary { font-size: 13px; margin: 6px 0 10px; }
-.mods-summary .mtag { display: inline-block; margin: 2px 4px 2px 0; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
-.mtag.deadly { background: rgba(176, 36, 44, .35); border: 1px solid #b0443c; }
-.mtag.relaxed { background: rgba(80, 160, 90, .25); border: 1px solid #5fa46a; }
+.mods-summary .mtag {
+    display: inline-flex; align-items: center; gap: 6px; margin: 2px 4px 2px 0; padding: 3px 10px;
+    border-radius: 999px; font-size: 12px; color: var(--cream);
+    background: rgba(255, 255, 255, .05); border: 1px solid var(--line);
+}
+.mtag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.mtag.deadly::before { background: var(--bad); }
+.mtag.relaxed::before { background: var(--good); }
 #lobby-hint { font-size: 13.5px; margin: 10px 0; }
 #btn-start { width: 100%; }
+
+/* ---- living pictures (art.js live()) -----------------------------------
+   Fire flickers, smoke drifts, sparks and bubbles rise, trees, grass and
+   hops sway, flags wave, signs swing, stars twinkle and drift, water
+   shimmers, eyes blink in the dark, rocks fall off the Cliff of Doom, birds
+   cross the sky, and every so often the Wild Brewery's tankard is carried
+   off and a fresh one filled at the tap. How much is the graphics setting's
+   business (the html.gfx-* rules below). Each moving part is its own group,
+   pivoting on its own foot (fill-box). */
+[class^="an-"] { transform-box: fill-box; }
+.an-flame { transform-origin: 50% 100%; animation: an-flame 1.3s ease-in-out infinite alternate; }
+@keyframes an-flame {
+    0%   { transform: scale(1, .88) skewX(-4deg); }
+    50%  { transform: scale(.95, 1.05) skewX(2deg); }
+    100% { transform: scale(1.04, 1.1) skewX(4deg); }
+}
+.an-smoke { transform-origin: 50% 100%; animation: an-smoke 4.6s ease-in-out infinite; }
+@keyframes an-smoke {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: .95; }
+    55%      { transform: translate(1.2px, -2.6px) scale(1.14); opacity: .5; }
+}
+.an-spark { animation: an-spark 1.7s ease-out infinite; }
+@keyframes an-spark { 0% { transform: translate(0, 2px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(1px, -5px); opacity: 0; } }
+.an-bubble { transform-origin: 50% 50%; animation: an-bubble 2.2s ease-in infinite; }
+@keyframes an-bubble { 0% { transform: translate(0, 3px) scale(.5); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(0, -4px) scale(1.1); opacity: 0; } }
+.an-sway { transform-origin: 50% 100%; animation: an-sway 5.4s ease-in-out infinite alternate; }
+@keyframes an-sway { from { transform: rotate(-1.8deg); } to { transform: rotate(1.8deg); } }
+.an-sway-soft { transform-origin: 50% 100%; animation: an-sway-soft 6.8s ease-in-out infinite alternate; }
+@keyframes an-sway-soft { from { transform: rotate(-1deg) scaleY(.99); } to { transform: rotate(1deg) scaleY(1.01); } }
+.an-grass { transform-origin: 50% 100%; animation: an-grass 3.2s ease-in-out infinite alternate; }
+@keyframes an-grass { from { transform: skewX(-9deg); } to { transform: skewX(9deg); } }
+.an-flag { transform-origin: 0 50%; animation: an-flag 2.3s ease-in-out infinite alternate; }
+@keyframes an-flag { from { transform: skewY(-5deg) scaleX(.96); } to { transform: skewY(4deg) scaleX(1.02); } }
+.an-swing { transform-origin: 50% 0; animation: an-swing 3.6s ease-in-out infinite alternate; }
+@keyframes an-swing { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+.an-twinkle { transform-origin: 50% 50%; animation: an-twinkle 3.4s ease-in-out infinite; }
+@keyframes an-twinkle { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 45% { transform: scale(.5) rotate(30deg); opacity: .5; } }
+.an-drift { animation: an-drift 9s ease-in-out infinite alternate; }
+@keyframes an-drift { from { transform: translate(-1px, .5px); } to { transform: translate(1px, -.5px); } }
+.an-water { animation: an-water 1.4s ease-in-out infinite alternate; }
+@keyframes an-water { from { opacity: 1; } to { opacity: .5; } }
+.an-float { transform-origin: 50% 50%; animation: an-float 3.8s ease-in-out infinite; }
+@keyframes an-float { 0% { transform: translateY(1.5px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-4.5px); opacity: 0; } }
+.an-wisp { transform-origin: 50% 100%; animation: an-wisp 3.4s ease-in-out infinite alternate; }
+@keyframes an-wisp { from { transform: translateY(0) skewX(-7deg); opacity: .75; } to { transform: translateY(-1.6px) skewX(7deg); opacity: 1; } }
+.an-blink { transform-origin: 50% 50%; animation: an-blink 6.5s linear infinite; }
+@keyframes an-blink { 0%, 90%, 96%, 100% { transform: scaleY(1); } 93% { transform: scaleY(.1); } }
+.an-fall { transform-origin: 50% 50%; animation: an-fall 6s ease-in infinite; }
+@keyframes an-fall {
+    0%, 50% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    80%     { transform: translate(2px, 16px) rotate(110deg); opacity: 0; }
+    81%, 90% { transform: translate(0, -3px); opacity: 0; }
+    100%    { transform: translate(0, 0); opacity: 1; }
+}
+.an-comet { animation: an-comet 9s ease-in-out infinite; }
+@keyframes an-comet {
+    0%, 62% { transform: translate(0, 0); opacity: 1; }
+    74%     { transform: translate(-7px, 3px); opacity: 0; }
+    75%     { transform: translate(9px, -4px); opacity: 0; }
+    88%, 100% { transform: translate(0, 0); opacity: 1; }
+}
+.an-glide { animation: an-glide 14s linear infinite; }
+@keyframes an-glide {
+    0%   { transform: translate(-34px, 3px); opacity: 0; }
+    4%   { opacity: 1; }
+    40%  { transform: translate(14px, -2px); opacity: 1; }
+    44%, 100% { transform: translate(20px, -3px); opacity: 0; }
+}
+.an-flap { transform-origin: 50% 50%; animation: an-flap .45s ease-in-out infinite alternate; }
+@keyframes an-flap { from { transform: scaleY(1); } to { transform: scaleY(.3); } }
+.an-flock { animation: an-flock 38s linear infinite; }
+@keyframes an-flock {
+    0%        { transform: translate(-90px, 150px); }
+    30%, 100% { transform: translate(1330px, 70px); }
+}
+/* The brewery's tankard: full, carried off, a fresh one set under the
+   tap, the ale running into it and its head of foam rising. Still, it is
+   simply full under a running tap. */
+.an-mug { animation: an-mug 16s ease-in-out infinite; }
+@keyframes an-mug {
+    0%, 58% { transform: translateX(0); opacity: 1; }
+    64%     { transform: translateX(13px); opacity: 0; }
+    65%     { transform: translateX(-11px); opacity: 0; }
+    71%, 100% { transform: translateX(0); opacity: 1; }
+}
+.an-foam { transform-origin: 50% 100%; animation: an-foam 16s ease-in-out infinite; }
+@keyframes an-foam { 0%, 58% { transform: scale(1, 1); } 64%, 73% { transform: scale(.8, 0); } 90%, 100% { transform: scale(1, 1); } }
+.an-pour { animation: an-pour 16s linear infinite; }
+@keyframes an-pour { 0%, 71% { opacity: 0; } 72%, 89% { opacity: 1; } 90%, 100% { opacity: 0; } }
+
+/* ---- the graphics setting (ui.js GFX), asked at the start of every game ---
+   Potato: nothing moves but the Pendant (pendantfx.js) and the shield (its
+   dome, and shieldfx.js); no embers, no transitions.
+   Regular: everything moves, in small steps rather than every frame, so the
+   board is redrawn far less often (the battery's friend), and the birds come
+   by less often.
+   Make my GPU Hurt: everything at the screen's own rate, more embers, the
+   birds more often, the turn timer's ring sweeping rather than ticking. */
+html.gfx-potato *:not(.dome-lit):not(.dome-pulse),
+html.gfx-potato *::before, html.gfx-potato *::after { animation: none !important; transition: none !important; }
+html.gfx-potato .an-flock, html.gfx-potato .embers i { display: none; }
+html.gfx-potato .an-pour { opacity: 1; }
+
+html.gfx-regular .an-flame { animation-timing-function: steps(9, jump-none); }
+html.gfx-regular .an-smoke, html.gfx-regular .an-float { animation-timing-function: steps(24, jump-none); }
+html.gfx-regular .an-sway, html.gfx-regular .an-sway-soft { animation-timing-function: steps(28, jump-none); }
+html.gfx-regular .an-grass, html.gfx-regular .an-flag, html.gfx-regular .an-swing, html.gfx-regular .an-wisp { animation-timing-function: steps(18, jump-none); }
+html.gfx-regular .an-twinkle, html.gfx-regular .an-water { animation-timing-function: steps(14, jump-none); }
+html.gfx-regular .an-drift { animation-timing-function: steps(30, jump-none); }
+html.gfx-regular .an-flock { animation-duration: 56s; }
+html.gfx-regular .an-flap { animation-timing-function: steps(4, jump-none); }
+
+html.gfx-ultra .an-flock { animation-duration: 20s; }
+html.gfx-ultra .an-flame { animation-duration: 1.05s; }
+html.gfx-ultra .timer .ring circle:last-of-type { transition: stroke-dashoffset 1s linear, stroke .3s ease; }
+html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; }
+
+/* the question itself */
+.gfx-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.gfx-pick button {
+    display: flex; flex-direction: column; gap: 6px; text-align: left; cursor: pointer;
+    padding: 12px 14px; border-radius: 12px; color: var(--text); font: inherit;
+    background: rgba(0, 0, 0, .28); border: 1px solid rgba(255, 255, 255, .08);
+    transition: border-color .15s ease, background .15s ease;
+}
+.gfx-pick button:hover, .gfx-pick button:focus-visible { border-color: var(--accent-soft); outline: none; }
+.gfx-pick button.on { border-color: var(--line); background: color-mix(in srgb, var(--accent) 18%, rgba(0, 0, 0, .28)); }
+.gfx-pick b { color: var(--cream); font-size: 15px; }
+.gfx-pick button.on b { color: var(--gold-bright); }
+.gfx-pick span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.gfx-pick i { font-style: normal; font-size: 11.5px; color: var(--accent-soft); }
+@media (max-width: 520px) { .gfx-pick { grid-template-columns: 1fr; } }
 
 /* ---- the game screen --------------------------------------------------
    Laid out the way "UI Layout.jpeg" draws it: the board top left; what is
@@ -1043,8 +1192,6 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     user-select: none;
 }
 .board-scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.board-scene .flicker { animation: flicker 1.4s ease-in-out infinite alternate; transform-origin: 50% 100%; transform-box: fill-box; }
-@keyframes flicker { from { transform: scaleY(.9) skewX(-3deg); } to { transform: scaleY(1.08) skewX(3deg); } }
 .board-scene .lava { animation: lava 3s linear infinite; }
 @keyframes lava { to { stroke-dashoffset: -48; } }
 /* The shield's dome (art.js domeBack, domeFront): a few of its panels light
@@ -1190,13 +1337,26 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .happening .clock span { font-size: 11px; color: var(--muted); }
 .happening.paused { border-color: var(--oblivion); box-shadow: 0 0 0 2px rgba(155, 92, 255, .4); }
 
+.g-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.g-col .timer { flex: 1; padding: 9px 10px; }
 .timer { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.timer .ring { position: relative; width: 78px; height: 78px; }
+.timer .ring { position: relative; width: 62px; height: 62px; }
 .timer .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .timer .ring b {
     position: absolute; inset: 0; display: grid; place-items: center;
-    font-size: 17px; color: var(--cream); font-variant-numeric: tabular-nums;
+    font-size: 15px; color: var(--cream); font-variant-numeric: tabular-nums;
 }
+.mods-mini { cursor: pointer; padding: 10px 11px !important; transition: border-color .15s ease; }
+.mods-mini:hover, .mods-mini:focus-visible { border-color: var(--accent-soft); outline: none; }
+.mods-mini h3 { margin: 0 0 6px; font-size: 13px; }
+.mods-mini .mm-list { display: flex; flex-direction: column; gap: 4px; }
+.mods-mini .mm { display: flex; gap: 6px; align-items: baseline; font-size: 12px; line-height: 1.25; color: var(--cream); }
+.mods-mini .mm i { flex: none; width: 7px; height: 7px; border-radius: 50%; transform: translateY(-1px); }
+.mods-mini .mm.deadly i { background: var(--bad); }
+.mods-mini .mm.relaxed i { background: var(--good); }
+.mods-mini .mm-more, .mods-mini .mm-none { font-size: 12px; color: var(--muted); }
+.mods-mini .mm-hint { font-size: 11px; color: var(--accent-soft); margin-top: 6px; }
+.mods-mini.none { cursor: default; }
 .timer .tlabel { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
 .timer.low .ring b { color: var(--bad); }
 .timer.untimed .ring b { font-size: 16px; color: var(--muted); letter-spacing: 1px; }
@@ -1715,16 +1875,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
     background: rgba(0, 0, 0, .28); border: 1px solid rgba(255, 255, 255, .06);
     border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
 }
+.mod-toggle:hover { border-color: var(--line); }
 .mod-toggle b { display: block; color: var(--cream); margin-bottom: 3px; }
 .mod-toggle span { font-size: 12px; color: var(--muted); line-height: 1.4; }
-.mod-toggle.on.deadly { border-color: #e0574a; background: rgba(176, 36, 44, .2); }
-.mod-toggle.on.relaxed { border-color: #6fbf73; background: rgba(80, 160, 90, .16); }
-.switch { width: 44px; height: 24px; border-radius: 12px; background: #2a2430; position: relative; border: 1px solid #000; flex: none; }
+.mod-toggle.on { background: color-mix(in srgb, var(--accent) 18%, rgba(0, 0, 0, .28)); border-color: var(--line); }
+.mod-toggle.on b { color: var(--gold-bright); }
+.mod-toggle.on span { color: var(--text); }
+.switch { width: 44px; height: 24px; border-radius: 12px; background: #2a2430; position: relative; border: 1px solid #000; flex: none; transition: background .15s ease; }
 .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #8a7f96; transition: left .15s ease, background .15s ease; }
-.on .switch { background: color-mix(in srgb, var(--accent) 35%, #1a1010); }
-.on .switch::after { left: 22px; background: var(--btn-top); }
+.on .switch::after { left: 22px; background: var(--cream); }
+.on.deadly .switch { background: color-mix(in srgb, var(--bad) 60%, #1a1010); }
+.on.relaxed .switch { background: color-mix(in srgb, var(--good) 55%, #101a10); }
 .mod-toggle.readonly { cursor: default; }
+.mod-toggle.readonly:hover { border-color: var(--line); }
+.mods-cols.one { grid-template-columns: 1fr; }
 
 /* ---- the rules ---- */
 
@@ -2055,6 +2221,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     .g-row { grid-template-columns: 1fr; }
     .timer { flex-direction: row; gap: 12px; justify-content: flex-start; padding: 8px 14px !important; }
     .timer .ring { width: 54px; height: 54px; }
+    .g-col .timer { flex: none; }
     .timer .ring b { font-size: 14px; }
     .timer.untimed .ring b { font-size: 13px; }
     .stats { grid-template-columns: 1fr 1fr; }
@@ -2229,7 +2396,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                     <h2>Join a room</h2>
                     <input type="text" id="inp-code" class="code-input" maxlength="5" placeholder="ABCDE" autocomplete="off">
                     <button class="btn" id="btn-join">Join</button>
-                    <p class="muted note">Ask the host for their room code, or open their invite link.</p>
+                    <button class="btn primary" id="btn-rejoin" style="display:none"></button>
+                    <p class="muted note">Ask the host for their room code, or open their invite link. A game that has
+                        already started can still be joined: you start from the beginning. Left a game? Come back to
+                        it from this browser with its code, and everything you had is still there.</p>
                 </div>
 
                 <div class="card wide">
@@ -2239,8 +2409,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                         <button class="btn" id="btn-resume" style="display:none">Carry on your last game</button>
                     </div>
                     <p class="muted note">
-                        You choose your class first, then how many computer players join you (1 to 5).
-                        They play by exactly the same rules you do.
+                        You choose your class first, then which classes the computer plays (1 to 5 of them)
+                        and how well: Easy, Medium or Hard. They play by exactly the same rules you do.
                     </p>
                 </div>
             </div>
@@ -2306,7 +2476,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             <aside class="g-side">
                 <div class="card happening" id="happening"></div>
                 <div class="g-row">
-                    <div class="card timer" id="turn-timer"></div>
+                    <div class="g-col">
+                        <div class="card mods-mini" id="mods-mini" role="button" tabindex="0"></div>
+                        <div class="card timer" id="turn-timer"></div>
+                    </div>
                     <div class="card actions" id="actions"></div>
                 </div>
                 <div class="card log-card" id="log-card">
@@ -2409,7 +2582,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             ],
             ability: {
                 id: 'agile_footwork', name: 'Agile Footwork', inBattle: false,
-                text: 'Add up to 2 to your movement roll. This stacks with other ' +
+                text: 'Add up to 1 to your movement roll. This stacks with other ' +
                       'items/potions that increase your movement roll.'
             },
             colour: '#e0574a'
@@ -3118,9 +3291,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         { id: 'oblivionInfluence', side: 'deadly', name: 'Oblivion Influence',
           text: 'All monsters now have 30 extra HP, and do 20 additional damage on all their attacks.' },
         { id: 'rawOblivionShield', side: 'deadly', name: 'Raw Oblivion Shield',
-          text: 'After using the 5 Pendant Fragments to enter Fenrirak’s Arena, roll a die, if ' +
-                'you get numbers 1-5 you lose those respective Pendant Fragments, if you roll a 6, ' +
-                'nothing happens. (e.g. if you rolled a 1, lose Pendant Fragment #1)' },
+          text: 'After your battle in Fenrirak’s Arena, roll a die, if you get numbers 1-5 you lose ' +
+                'those respective Pendant Fragments, if you roll a 6, nothing happens. (e.g. if you ' +
+                'rolled a 1, lose Pendant Fragment #1)' },
         { id: 'liveliness', side: 'relaxed', name: 'Liveliness',
           text: 'All characters now have 20 more HP and deal 15 more damage.' },
         { id: 'fleeingMerchant', side: 'relaxed', name: 'Fleeing Merchant',
@@ -4070,6 +4243,16 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#4a7a3a', .5, leaves);
     }
 
+    // A part of a picture that moves (style.css, "Living pictures"): fire
+    // flickers, smoke drifts, trees and grass sway, flags wave, stars
+    // twinkle, water shimmers. The outer group carries the animation, so a
+    // transform the part already has is left alone; `delay` (seconds,
+    // negative) starts it out of step with its neighbours. How much moves is
+    // the graphics setting's business (html.gfx-*).
+    function live(kind, body, delay) {
+        return '<g class="an-' + kind + '"' + (delay ? ' style="animation-delay:' + delay + 's"' : '') + '>' + body + '</g>';
+    }
+
     const SQUARE_ART = {
         // The Start: a stone gateway with the road running out through it,
         // a red banner flying over the arch and a torch burning either side.
@@ -4083,11 +4266,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M12 31.5h10M12 38h10M42 31.5h10M42 38h10M22 25.4 13.4 21.8M25.4 18.6 21.2 15M38.6 18.6 42.8 15M42 25.4l8.6-3.6', '#7c746a', 1.3) +
             grpW('#c9c2b4', 1.6, P('M29.4 9.8h5.2l-.8 6.8h-3.6z')) +
             line('M32 10V1', INK, 1.8) +
-            grpW(CRIMSON, 1.6, P('M33 1.4c4.4-1.6 7.4 1.6 12 0v7c-4.6 1.6-7.6-1.6-12 0z')) +
-            dot(39, 5, 1.4, GOLD) +
+            live('flag', grpW(CRIMSON, 1.6, P('M33 1.4c4.4-1.6 7.4 1.6 12 0v7c-4.6 1.6-7.6-1.6-12 0z')) +
+            dot(39, 5, 1.4, GOLD)) +
             line('M7.4 30h4.6M56.6 30H52', INK, 1.8) + line('M7.4 30v-4M56.6 30v-4', '#6a4a2e', 2.4) +
-            grpW('#ff8c2a', 1.2, P('M7.4 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6zM56.6 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6z')) +
-            dot(7.6, 23.6, 1, '#ffd04a') + dot(56.8, 23.6, 1, '#ffd04a'),
+            live('flame', grpW('#ff8c2a', 1.2, P('M7.4 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6z')) + dot(7.6, 23.6, 1, '#ffd04a')) +
+            live('flame', grpW('#ff8c2a', 1.2, P('M56.6 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6z')) + dot(56.8, 23.6, 1, '#ffd04a'), -.7),
 
         potion: flask(32, 30, 1.25, '#d23a3a'),
         potions: flask(22, 30, 1.05, '#d23a3a') + flask(42, 32, 1, '#3a7fd2'),
@@ -4106,7 +4289,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M32.6 13.2c-2.6-1.6-3.2-5.4-1-8.2M37.6 14.4c2.8-1 4.2-4.6 2.6-7.8', GOLD, 1.6) +
             '<circle cx="35.4" cy="8.6" r="4.4" fill="#9b5cff" stroke="' + INK + '" stroke-width="1.6"/>' +
             '<ellipse cx="34" cy="7.2" rx="1.4" ry="1" fill="#e6d4ff"/>' +
-            '<path d="M44 4.6l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7zM25.6 7l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" fill="#c79bff" stroke="' + INK + '" stroke-width=".6"/>' +
+            live('twinkle', '<path d="M44 4.6l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z" fill="#c79bff" stroke="' + INK + '" stroke-width=".6"/>') +
+            live('twinkle', '<path d="M25.6 7l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" fill="#c79bff" stroke="' + INK + '" stroke-width=".6"/>', -1.7) +
             sword(51, 27, 28, .85),
 
         key:
@@ -4142,7 +4326,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         smugglers:
             grp('#24304a', P('M14 0h36v20H14z')) +
             '<path d="M33.4 5a3.4 3.4 0 1 0 2.6 5.8 2.7 2.7 0 1 1-2.6-5.8z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".9"/>' +
-            dot(27, 6, .6, '#f4e38a') + dot(38.4, 14.6, .5, '#f4e38a') + dot(25.6, 14, .5, '#f4e38a') +
+            live('drift', live('twinkle', dot(27, 6, .6, '#f4e38a')) + live('twinkle', dot(38.4, 14.6, .5, '#f4e38a'), -1.2) +
+                live('twinkle', dot(25.6, 14, .5, '#f4e38a'), -2.3)) +
             grpW('#4a4038', 1.4, P('M22 20h20v22H22z')) +
             grpW('#1b1418', 1.4, P('M27.4 42V31.6c0-5 9.2-5 9.2 0V42z')) +
             grpW('#6a5a48', 1.4, P('M16 48l6-6h20l6 6z')) +
@@ -4176,8 +4361,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             gemShape(52, 24, 1.15, '#d6365c'),
 
         darkwood:
-            pine(14, 34, .95, '#1c3226') + pine(48, 34, .9, '#1c3226') + pine(31, 38, 1.15, '#22392b') +
-            dot(28, 30, 1.2, '#f4d23c') + dot(33, 30, 1.2, '#f4d23c'),
+            live('sway', pine(14, 34, .95, '#1c3226'), -1.4) + live('sway', pine(48, 34, .9, '#1c3226'), -3.1) +
+            live('sway', pine(31, 38, 1.15, '#22392b')) +
+            live('blink', dot(28, 30, 1.2, '#f4d23c') + dot(33, 30, 1.2, '#f4d23c')),
 
         // The Thieves' Guild: a crooked dark house, a lamp in the window
         // and eyes in the doorway, crossed daggers over the door, and the
@@ -4192,7 +4378,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M14 17.4 31.4 16.8M18.6 12.8l13 .2', '#2a2428', 1) +
             '<circle cx="31.6" cy="27.6" r="2.8" fill="#f4c84a" stroke="' + INK + '" stroke-width="1.3"/>' + line('M31.6 24.8v5.6M28.8 27.6h5.6', '#5a3a22', .8) +
             grpW('#1b1418', 1.6, P('M16.4 44V33c0-4.2 8.8-4.2 8.8 0v11z')) +
-            dot(19.4, 36.4, .9, '#f4d23c') + dot(22.2, 36.4, .9, '#f4d23c') +
+            live('blink', dot(19.4, 36.4, .9, '#f4d23c') + dot(22.2, 36.4, .9, '#f4d23c'), -2.6) +
             '<g transform="translate(20.8 25.6)">' + line('M-4.4-3.4 4.4 3.4M4.4-3.4-4.4 3.4', STEEL_L, 1.4) + line('M-4.4-3.4-2.6-2M4.4-3.4 2.6-2', INK, 1.4) + '</g>' +
             grpW('#8a6a3a', 1.4, P('M1.6 44c-1-6 1.6-9.4 5-9.6l-1.2-2.4h5.6l-1.2 2.4c3.4.2 6 3.6 5 9.6z')) + line('M5.4 32.4h5.6', '#5a3a22', 1.2) +
             '<circle cx="8.2" cy="39.4" r="2" fill="none" stroke="' + GOLD + '" stroke-width="1.2"/>' +
@@ -4209,15 +4395,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // and smoke from its chimney, and a table of fresh loaves beside it.
         bakery:
             grp('#6a5238', P('M0 44h64v4H0z')) +
-            grpW('#c9c2b4', 1.2, P('M17.6 8.6c-2.4-1.6-.6-4.6 1.8-3.6.6-2.4 4.4-2.4 4.8 0 2.2-.6 3.4 2 1.6 3.4z')) +
+            live('smoke', grpW('#c9c2b4', 1.2, P('M17.6 8.6c-2.4-1.6-.6-4.6 1.8-3.6.6-2.4 4.4-2.4 4.8 0 2.2-.6 3.4 2 1.6 3.4z'))) +
             grpW('#8a4a2a', 1.6, P('M16.4 11h5.2v10h-5.2z')) +
             grpW('#a39b8f', 1.6, P('M1.6 35.4h34v8.6h-34z')) + line('M1.6 39.6h34M10 35.4v4.2M20 35.4v4.2M28 35.4v4.2M6 39.6V44M15 39.6V44M24 39.6V44M32 39.6V44', '#7c746a', .9) +
             grpW('#b5653a', 1.8, P('M3.6 35.4C3.6 16.4 34 16.4 34 35.4z')) +
             line('M6.6 29.6c4-7.4 20.4-7.4 24.4 0M10.6 23.8c4.6-3.4 11.8-3.4 16.4 0', '#8a4a2a', 1.1) +
             line('M12.6 29.6l-1.2-5.4M24.8 29.6l1.2-5.4M18.8 22.4v-2.4', '#8a4a2a', 1) +
             grpW('#2a1206', 1.6, P('M11.6 35.4v-3.6c0-6.2 14.4-6.2 14.4 0v3.6z')) +
-            grpW('#ff8c2a', .9, P('M13.4 35.4c-.6-2.4 1.2-3.2 1.8-5 1 1.4 1.6 2.2 2 3.4.6-1.6 1.8-2.6 2.6-3.8.8 1.8 2.2 2.6 2 4.2 1-.8 1.6-1.6 1.8-2.6 1.2 1.6 1.4 2.8.6 3.8z')) +
-            grp('#ffd04a', P('M16.4 35.4c0-1.4.8-2 1.2-3 .6 1 1.4 1.6 1.2 3zM20.6 35.4c0-1.2.8-1.8 1.2-2.6.6.8 1.2 1.4 1 2.6z')) +
+            live('flame', grpW('#ff8c2a', .9, P('M13.4 35.4c-.6-2.4 1.2-3.2 1.8-5 1 1.4 1.6 2.2 2 3.4.6-1.6 1.8-2.6 2.6-3.8.8 1.8 2.2 2.6 2 4.2 1-.8 1.6-1.6 1.8-2.6 1.2 1.6 1.4 2.8.6 3.8z')) +
+            grp('#ffd04a', P('M16.4 35.4c0-1.4.8-2 1.2-3 .6 1 1.4 1.6 1.2 3zM20.6 35.4c0-1.2.8-1.8 1.2-2.6.6.8 1.2 1.4 1 2.6z'))) +
             grpW('#8a5a32', 1.4, P('M36 33.4h27v3H36z')) + line('M38.6 36.4V44M60.4 36.4V44', INK, 2.6) + line('M38.6 36.4V44M60.4 36.4V44', '#8a5a32', 1.2) +
             grpW('#c98a3a', 1.4, P('M37.6 33.4c0-6.4 10.6-6.4 10.6 0z')) + line('M40.4 29.8l5 2.4M45.4 29.8l-5 2.4', '#8a5a22', 1) +
             grpW('#e0a85a', 1.4, P('M48.4 33.4c-.6-2.4 1-4 3.4-4.4l7.6-1.4c2.6-.4 3.8 1.4 3 3.6-.6 1.6-2 2.2-3.6 2.2z')) +
@@ -4233,8 +4419,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#8a8278', 1.8, P('M2.6 22h31v22h-31z')) +
             line('M2.6 28.6h4.4M29.2 28.6h4.4M2.6 36.4h4.4M29.2 36.4h4.4M7 22v6.6M29.2 22v6.6M15.4 2v12M20.6 8v6', '#6a645c', 1) +
             grpW('#2a1206', 1.6, P('M7 40.4V30.6c0-5.6 22.2-5.6 22.2 0v9.8z')) +
-            grpW('#ff6a1a', 1, P('M8.6 40.4c-.6-3.6 1.8-4.6 2.6-7.4 1.2 2 2 3.2 2.4 5 .8-2.8 2.6-4.6 3.8-6.6 1.2 2.8 3 4.4 2.6 7.2 1.2-1.2 2-2.6 2.2-4.2 1.8 2.4 2.2 4.4 1 6 1-.6 1.6-1.4 1.8-2.4 1.2 1.6 1.4 2.4.6 2.4z')) +
-            grp('#ffd04a', P('M12.8 40.4c0-1.8 1-2.6 1.6-4 .8 1.4 1.8 2.2 1.6 4zM18.4 40.4c-.2-2.4 1.4-3.6 2.2-5.4 1 2 2 3 1.6 5.4z')) +
+            live('flame', grpW('#ff6a1a', 1, P('M8.6 40.4c-.6-3.6 1.8-4.6 2.6-7.4 1.2 2 2 3.2 2.4 5 .8-2.8 2.6-4.6 3.8-6.6 1.2 2.8 3 4.4 2.6 7.2 1.2-1.2 2-2.6 2.2-4.2 1.8 2.4 2.2 4.4 1 6 1-.6 1.6-1.4 1.8-2.4 1.2 1.6 1.4 2.4.6 2.4z')) +
+            grp('#ffd04a', P('M12.8 40.4c0-1.8 1-2.6 1.6-4 .8 1.4 1.8 2.2 1.6 4zM18.4 40.4c-.2-2.4 1.4-3.6 2.2-5.4 1 2 2 3 1.6 5.4z'))) +
             grpW('#3a3238', 1.2, P('M6.4 40.4h23.4v3.6H6.4z')) + dot(10, 42.2, 1, '#ff8c2a') + dot(15.4, 42.2, 1, '#ff6a1a') + dot(21, 42.2, 1, '#ff8c2a') + dot(26.4, 42.2, 1, '#ff6a1a') +
             grpW('#7a5232', 1.6, P('M42 35.6h14V44H42z')) + line('M45 37.6v6M49 36.6v7.4M53 37.6v6', '#5a3a22', 1) +
             grpW('#4a4e55', 1.8, P('M36.4 26.6h23.2v3.6h-3.8l-1.8 2.6h-9.6l-1.6-2.6h-2c-3.6 0-4.8-1.6-4.4-3.6z')) +
@@ -4243,7 +4429,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M39 25.6h17', INK, 2.8) + line('M39 25.6h11.4', STEEL_L, 1.4) + line('M50.4 25.6H56', '#ff8c2a', 1.4) +
             line('M57.8 44 61.8 32.4', INK, 2.6) + line('M57.8 44 61.8 32.4', '#8a5a32', 1.2) +
             grpW('#5a5f66', 1.2, P('M58.6 31.4l6 2-1.2 3-6-2z')) +
-            dot(47, 21.6, .8, '#ffd04a') + dot(52.4, 20.4, .7, '#ff8c2a') + dot(55.6, 22.6, .8, '#ffd04a') + dot(44, 19.4, .6, '#ff8c2a'),
+            live('spark', dot(47, 21.6, .8, '#ffd04a')) + live('spark', dot(52.4, 20.4, .7, '#ff8c2a'), -.5) +
+            live('spark', dot(55.6, 22.6, .8, '#ffd04a'), -1.1) + live('spark', dot(44, 19.4, .6, '#ff8c2a'), -.8),
 
         // The Orc Training Camp: a patched hide tent with a skull over its
         // door, a straw dummy with a target on it, hacked about, and
@@ -4275,9 +4462,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M33.8 42.4l-1.8-.6M45.6 42l2-.8M47 43.2l1.6.2', '#b8902a', .9) +
             line('M53 44V6.6', INK, 3) + line('M53 44V6.6', '#8a6a44', 1.4) +
             grpW(STEEL_L, 1, P('M51.8 7 53 2.4 54.2 7z')) +
-            grpW('#4a7a2e', 1.4, P('M53.8 6.8h9.4l-2.8 4.6 2.8 4.6h-9.4z')) +
+            live('flag', grpW('#4a7a2e', 1.4, P('M53.8 6.8h9.4l-2.8 4.6 2.8 4.6h-9.4z')) +
             dot(57.6, 10.8, 2, '#f4f0e2') + dot(56.9, 10.6, .5) + dot(58.3, 10.6, .5) +
-            '<path d="M56.5 12.3h2.2v1.6h-2.2z" fill="#f4f0e2"/>' + line('M57.2 12.4v1.4M58 12.4v1.4', INK, .4) +
+            '<path d="M56.5 12.3h2.2v1.6h-2.2z" fill="#f4f0e2"/>' + line('M57.2 12.4v1.4M58 12.4v1.4', INK, .4), -.9) +
             '<circle cx="56.6" cy="39.2" r="4.6" fill="#8a6a44" stroke="' + INK + '" stroke-width="1.6"/>' +
             line('M54.2 35.4v7.6M59 35.4v7.6', '#6a4a2e', .8) +
             '<circle cx="56.6" cy="39.2" r="1.5" fill="' + STEEL + '" stroke="' + INK + '" stroke-width="1"/>',
@@ -4289,7 +4476,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // fallen in, a gravestone leaning, a skull, and Gold in the dirt.
         ruins:
             grp('#5a4a48', P('M0 44h64v4H0z')) +
-            wisp(33.6, 15.8, 12, false, 22) + wisp(37.6, 19.6, 7.4, true, 30) + wisp(19.8, 14.6, 7, false, 14) +
+            live('wisp', wisp(33.6, 15.8, 12, false, 22)) + live('wisp', wisp(37.6, 19.6, 7.4, true, 30), -1.3) +
+            live('wisp', wisp(19.8, 14.6, 7, false, 14), -2.2) +
             grp('#8a8278', P('M38 44V26.6l2.4-1.4 1.6 1.8 2.6-2.6 1.8 2.2 2.4-1.2 1.6 2.4 2.2-.8V44z')) +
             line('M39.4 31.4h3.6M47.4 30.6h4M39.4 38.6h11.6M41.6 31.4v7.2', '#6d665c', .9) +
             grpW('#2a1f30', 1.4, P('M45 36.4v-3.8c0-2.4 3.8-2.4 3.8 0v3.8z')) +
@@ -4309,11 +4497,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<g transform="rotate(8 57 44)">' + grpW('#a39b8f', 1.4, P('M53.6 44v-7.6c0-2.8 6.8-2.8 6.8 0V44z')) +
             line('M55.4 38.8h3.2M55.6 40.8h2.8', '#6d665c', .8) + '</g>' +
             grpW('#f4f0e2', .9, P('M3.4 43.8c-.4-2.6.6-3.8 2.2-3.8s2.6 1.2 2.2 3.8z')) + dot(4.8, 42, .5) + dot(6.4, 42, .5) +
-            line('M1.2 44l-.4-1.6M1.9 44l.1-1.9M2.6 44l.6-1.3M50.6 44l-.4-1.5M51.3 44l.1-1.8M52 44l.6-1.2', '#8a8a5a', .8) +
+            live('grass', line('M1.2 44l-.4-1.6M1.9 44l.1-1.9M2.6 44l.6-1.3', '#8a8a5a', .8)) +
+            live('grass', line('M50.6 44l-.4-1.5M51.3 44l.1-1.8M52 44l.6-1.2', '#8a8a5a', .8), -1.4) +
             flatCoin(33.6, 44.8) + flatCoin(17.6, 45) + flatCoin(46.4, 45.4, 1.6) +
             crowAt(27.4, 10.4, .62) +
-            line('M47 8.6c.8-1 1.8-1.2 2.6-.2.8-1 1.8-.8 2.6.2', INK, 1.1) +
-            line('M55 12.6c.5-.7 1.2-.8 1.7-.1.5-.7 1.2-.6 1.7.1', INK, .9),
+            live('glide', live('flap', line('M47 8.6c.8-1 1.8-1.2 2.6-.2.8-1 1.8-.8 2.6.2', INK, 1.1)) +
+            live('flap', line('M55 12.6c.5-.7 1.2-.8 1.7-.1.5-.7 1.2-.6 1.7.1', INK, .9), -.25)),
 
         // The Vault of Comets: a round steel vault door in a stone wall,
         // its locking wheel at the middle under a plain keystone, and a
@@ -4334,9 +4523,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M32 26v10.8M26.6 31.4h10.8M28.2 27.6l7.6 7.6M35.8 27.6l-7.6 7.6', INK, 1.5) +
             dot(32, 31.4, 1.6, GOLD) +
             grpW('#b8b0a2', 1.4, P('M28 16.6h8l-1.2 3.2h-5.6z')) +
-            '<path d="M39 9.6 56.4 2.8M40.6 12.2 57.4 6.4M42 7.6 52 2.4" fill="none" stroke="#f4e38a" stroke-width="1.3" stroke-linecap="round"/>' +
-            grpW('#ffe27a', 1.2, P('M38.4 7.6l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z')) +
-            '<path d="M25.4 3.6l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5zM61 12.6l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>',
+            live('comet', '<path d="M39 9.6 56.4 2.8M40.6 12.2 57.4 6.4M42 7.6 52 2.4" fill="none" stroke="#f4e38a" stroke-width="1.3" stroke-linecap="round"/>' +
+            grpW('#ffe27a', 1.2, P('M38.4 7.6l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z'))) +
+            live('twinkle', '<path d="M25.4 3.6l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>') +
+            live('twinkle', '<path d="M61 12.6l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>', -1.9),
 
         // The Cliff of Doom: a sheer cliff with a skull warning on its
         // edge, its lip crumbling and rocks tumbling down off it into the
@@ -4346,16 +4536,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M1 22.6h16M21 23.4h6M3 29.4h11M17.6 29h12M1 36h20M24 36.4h7M5 42.4h22', '#5f5246', 1) +
             line('M27.8 16.4l-1.4 3 1 2.4-1.2 2.6M30.2 30.6l-2 1.8.4 2.4', INK, .9) +
             grpW('#6a8a3a', 1.2, P('M-2 13.8h31.2l.8 2.4-2.2.6-1.2-1.2-1.6 1.6-1.6-1.4H-2z')) +
-            line('M3 13.8l-.6-2.2M4.4 13.8l.4-2.4M13.6 13.8l-.6-2M14.8 13.8l.6-2.2M23.6 13.8l.2-2.2', '#4a7a2e', 1) +
+            live('grass', line('M3 13.8l-.6-2.2M4.4 13.8l.4-2.4', '#4a7a2e', 1)) +
+            live('grass', line('M13.6 13.8l-.6-2M14.8 13.8l.6-2.2', '#4a7a2e', 1), -1.1) +
+            live('grass', line('M23.6 13.8l.2-2.2', '#4a7a2e', 1), -2) +
             line('M17 13.8V3.4', INK, 2.8) + line('M17 13.8V3.4', '#8a6a44', 1.2) +
             grpW('#c8a060', 1.2, P('M11.4 3.2h11.2v6.4H11.4z')) +
             grpW('#f4f0e2', .7, P('M15.2 6c0-2.4 3.6-2.4 3.6 0 0 .8-.4 1.2-.8 1.6v.8h-2v-.8c-.4-.4-.8-.8-.8-1.6z')) +
             dot(16.3, 6, .45) + dot(17.7, 6, .45) +
             line('M13 4.6l1.6 1.6M14.6 4.6 13 6.2M19.4 7.2l1.6 1.6M21 7.2l-1.6 1.6', INK, .7) +
             line('M36.4 4.6v4M38.8 3.4v4.4M46.6 16v4M49 15v4.6M40.4 29.6v3.4M42.6 28.8v3.6', '#b8ae9e', 1) +
-            grpW('#8a7a6a', 1.4, P('M35 10.6l3.4-1.6 3.2 1.4.6 3.4-2.8 2-3.6-.8z')) + grpW('#a39686', .6, P('M38.4 9l3.2 1.4-1.6 1.6-2-.8z')) +
-            grpW('#8a7a6a', 1.4, P('M45.4 21.6l3-1.2 2.6 1.6-.4 3-2.8 1.2-2.6-1.6z')) + grpW('#a39686', .6, P('M48.4 20.4l2.6 1.6-1.4 1-1.6-.8z')) +
-            grpW('#8a7a6a', 1.2, P('M39.6 34.6l2.4-1 2 1.2-.4 2.4-2.2.8-2-1.2z')) +
+            live('fall', grpW('#8a7a6a', 1.4, P('M35 10.6l3.4-1.6 3.2 1.4.6 3.4-2.8 2-3.6-.8z')) + grpW('#a39686', .6, P('M38.4 9l3.2 1.4-1.6 1.6-2-.8z'))) +
+            live('fall', grpW('#8a7a6a', 1.4, P('M45.4 21.6l3-1.2 2.6 1.6-.4 3-2.8 1.2-2.6-1.6z')) + grpW('#a39686', .6, P('M48.4 20.4l2.6 1.6-1.4 1-1.6-.8z')), -2.6) +
+            live('fall', grpW('#8a7a6a', 1.2, P('M39.6 34.6l2.4-1 2 1.2-.4 2.4-2.2.8-2-1.2z')), -4.1) +
             dot(33.6, 22, .8, '#7a6a5a') + dot(35.4, 26.8, .7, '#7a6a5a') + dot(33.2, 30.6, .6, '#7a6a5a'),
 
         // The Forsaken Road: a rutted road winding away over bare hills,
@@ -4372,14 +4564,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#c8a060', 1.2, P('M6.6 23.4l11.4-1.2 2.6 2.4-2.2 2.6-11.2 1.2z')) +
             line('M9.6 24.8l6-.6', '#8a6a2a', .8) +
             grpW('#c8a060', 1.2, P('M7 31l-5.4 3.6-1.6-1.6 1.4-2.8 4-2.6z')) +
-            line('M47 44c.4-5 .2-10-1.4-14.6', INK, 3.6) + line('M47 44c.4-5 .2-10-1.4-14.6', '#5a4a3a', 2) +
+            live('sway', line('M47 44c.4-5 .2-10-1.4-14.6', INK, 3.6) + line('M47 44c.4-5 .2-10-1.4-14.6', '#5a4a3a', 2) +
             line('M45.8 30.4c-2.4-3.4-5.6-5-8.6-5.4M38.8 25.6l-2-3.4M45.6 30c1-4 4-7 7.4-8.4M51 22.6l1-3.6M49.6 23.8c2 .2 3.6 1 4.8 2.4M46 36c2.4-1.4 4.2-1.6 6-.6', INK, 2.6) +
             line('M45.8 30.4c-2.4-3.4-5.6-5-8.6-5.4M38.8 25.6l-2-3.4M45.6 30c1-4 4-7 7.4-8.4M51 22.6l1-3.6M49.6 23.8c2 .2 3.6 1 4.8 2.4M46 36c2.4-1.4 4.2-1.6 6-.6', '#5a4a3a', 1.2) +
             grp('#2a2228', P('M38.6 22.6c.4-1.8 1.8-2.6 3.2-2.2l1.4-.8-.4 1.2c.6.8.4 2-.6 2.6l1.8 1.6-3.2-.6c-.8.2-1.8 0-2.2-.6z'), 'stroke-width=".8"') +
-            dot(41.8, 21.2, .4, '#f4d23c') + line('M43.2 20.4l1.2.2', '#c8a040', .7) +
+            dot(41.8, 21.2, .4, '#f4d23c') + line('M43.2 20.4l1.2.2', '#c8a040', .7), -2.2) +
             grpW('#f4f0e2', .9, P('M54.6 43.8c-.4-2.6.6-3.8 2.2-3.8s2.6 1.2 2.2 3.8z')) + dot(56, 42, .5) + dot(57.6, 42, .5) +
             line('M59.4 43.6l3-1.4', '#f4f0e2', 1.2) +
-            line('M33.6 45.6l-.6-1.8M34.6 45.6l.4-2M60.6 37.6l-.4-1.8M61.6 37.6l.6-1.8', '#7a6a3a', .9),
+            live('grass', line('M33.6 45.6l-.6-1.8M34.6 45.6l.4-2', '#7a6a3a', .9)) +
+            live('grass', line('M60.6 37.6l-.4-1.8M61.6 37.6l.6-1.8', '#7a6a3a', .9), -1.6),
 
         // The Chest of Majesties: a royal chest bound in gold, a crown on
         // its lid and a keyhole in its lock plate, a Chest Key stood up
@@ -4406,7 +4599,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M56.6 34.6V43.4M56.6 41.4h2.8M56.6 38.6h2.2', INK, 3.2) + line('M56.6 34.6V43.4M56.6 41.4h2.8M56.6 38.6h2.2', GOLD, 1.4) +
             '</g>' +
             gemShape(6.6, 38.8, .55, '#3a9ad8') +
-            twinkle(4.4, 30.6, 1.8, '#f4e38a') + twinkle(45, 8.4, 1.8, '#f4e38a') + twinkle(20, 9.4, 1.3, '#f4e38a'),
+            live('twinkle', twinkle(4.4, 30.6, 1.8, '#f4e38a')) + live('twinkle', twinkle(45, 8.4, 1.8, '#f4e38a'), -1.3) +
+            live('twinkle', twinkle(20, 9.4, 1.3, '#f4e38a'), -2.5),
 
         // The orcs' outpost: a rough log watchtower on four legs, a lookout
         // under a hide roof, a ladder up the middle, their green banner with
@@ -4420,8 +4614,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#8a6a44', P('M19 16h26v4H19z')) +
             grp('#a07a50', P('M21 9h22v7H21z')) + line('M25.4 9v7M29.8 9v7M34.2 9v7M38.6 9v7', '#6a4a2e', 1.1) +
             grp('#7a5a3a', P('M18 9.5 32 1.5l14 8z')) +
-            line('M46 9V1', INK, 1.6) + grp('#4a7a2e', P('M46 1h11l-3 3.6 3 3.6H46z')) +
-            dot(50.6, 4.4, 1.7, '#f4f0e2') + dot(50, 4.1, .45) + dot(51.2, 4.1, .45) +
+            line('M46 9V1', INK, 1.6) + live('flag', grp('#4a7a2e', P('M46 1h11l-3 3.6 3 3.6H46z')) +
+            dot(50.6, 4.4, 1.7, '#f4f0e2') + dot(50, 4.1, .45) + dot(51.2, 4.1, .45)) +
             grp('#a07a50', P('M3 46l2-9 2 9zM8 46l2-11 2 11zM13 46l2-8 2 8zM47 46l2-8 2 8zM52 46l2-11 2 11zM57 46l2-9 2 9z')),
 
         // Tip & Tap's Trip Traps: an iron jaw-trap set open among the
@@ -4487,7 +4681,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#8a8278', P('M18 44V12h26v32z')) + grp('#9e968a', P('M16 6h30v8H16z')) +
             line('M16 6v-3h5v3M27 6v-3h5v3M38 6v-3h5v3', INK, 1.6) +
             line('M26 20v6M36 20v6M31 30v6', INK, 2) +
-            line('M46 10V0', INK, 1.6) + grp(CRIMSON, P('M46 0h10l-3 3 3 3H46z')),
+            line('M46 10V0', INK, 1.6) + live('flag', grp(CRIMSON, P('M46 0h10l-3 3 3 3H46z'))),
 
         // Astrix's Alchemy: a shelf of bottles, the cauldron bubbling green
         // over its fire, a spell book open on the left and a retort of
@@ -4501,13 +4695,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#e0a030', 1.2, P('M41.6 13.6v-5c0-1 .8-1.6 1.6-1.6h4.8c.8 0 1.6.6 1.6 1.6v5z')) + grpW('#8a5a32', .8, P('M42.8 5.6h4.8V7h-4.8z')) +
             grpW('#9b5cff', 1.2, P('M52 13.6V7.2c0-1.4 1-2 1.4-2.6V2.8h2v1.8c.4.6 1.4 1.2 1.4 2.6v6.4z')) +
             grpW('#4ac0b0', 1.1, P('M59.6 13.6c-1.8 0-2.6-1-2.6-2.4s1-2.4 2.6-2.4 2.6 1 2.6 2.4-.8 2.4-2.6 2.4z')) +
-            '<path d="M24.6 22.4c-2.6-2.6 1.6-4.4-.6-7.2M32 21c2.6-3.2-1.8-5 1-8.4M39.2 22.4c2-2.4-1.4-4 .8-6.8" fill="none" stroke="#7aec8a" stroke-width="1.4" stroke-linecap="round"/>' +
-            grpW('#ff8c2a', 1, P('M25 44c-.8-2.6 1.2-3.4 1.8-5.2 1 1.6 1.8 2.4 2 3.8.8-1.6 1.8-2.8 2.6-4 1 2 2.4 3 2.2 4.6 1-.8 1.6-1.8 1.8-2.8 1.4 1.8 1.6 3 .8 3.6z')) +
+            live('smoke', '<path d="M24.6 22.4c-2.6-2.6 1.6-4.4-.6-7.2M32 21c2.6-3.2-1.8-5 1-8.4M39.2 22.4c2-2.4-1.4-4 .8-6.8" fill="none" stroke="#7aec8a" stroke-width="1.4" stroke-linecap="round"/>') +
+            live('flame', grpW('#ff8c2a', 1, P('M25 44c-.8-2.6 1.2-3.4 1.8-5.2 1 1.6 1.8 2.4 2 3.8.8-1.6 1.8-2.8 2.6-4 1 2 2.4 3 2.2 4.6 1-.8 1.6-1.8 1.8-2.8 1.4 1.8 1.6 3 .8 3.6z'))) +
             line('M22.6 38.4 21 44M41.4 38.4 43 44', INK, 2) +
             grpW('#2e2a30', 1.8, P('M18.4 25.4h27.2c0 9.4-5.8 14.2-13.6 14.2s-13.6-4.8-13.6-14.2z')) +
             grpW('#3a3640', 1.6, P('M16.6 23h30.8v3.2H16.6z')) +
             grpW('#5adc6a', 1.2, P('M18.6 23c1.8-2 4.4-2 6.2 0 1.8-2 4.4-2 6.4 0 1.8-2 4.4-2 6.2 0 1.8-2 4.4-2 6 0z')) +
-            dot(24, 19.6, 1.6, '#7aec8a') + dot(37.4, 18.6, 1.3, '#7aec8a') + dot(31, 17.4, 1, '#7aec8a') +
+            live('bubble', dot(24, 19.6, 1.6, '#7aec8a')) + live('bubble', dot(37.4, 18.6, 1.3, '#7aec8a'), -.8) +
+            live('bubble', dot(31, 17.4, 1, '#7aec8a'), -1.5) +
             grpW('#6a4a2e', 1.2, P('M3 44l2.6-6.6h10.2L18.4 44z')) +
             grpW('#efe2c0', 1.2, P('M3.6 37.6c2-1.4 4.2-1.4 6.6 0 2.4-1.4 4.6-1.4 6.6 0l-1.4-6.8c-2-1-3.8-1-5.2.4-1.4-1.4-3.2-1.4-5.2-.4z')) +
             line('M10.2 31.2v6.4', '#9a8a6a', .9) + line('M5.8 33h2.8M5.6 35h2.8M11.8 33h2.8M12 35h2.8', '#9a8a6a', .7) +
@@ -4578,9 +4773,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#6a4a2e', 1.6, P('M16.6 44v-7.6c0-4.4 10.8-4.4 10.8 0V44z')) + line('M22 32.4V44', '#4a3220', 1) + dot(25.4, 39.4, .8, GOLD) +
             grpW('#a07a50', 1.2, P('M5.6 32.2h9v8h-9z')) +
             grpW('#f4f0e2', .7, P('M6.6 33.2h3.4v3.4H6.6zM10.6 33.6h3v2.8h-3zM7.4 37.2h3.2v2.4H7.4zM11 36.8h2.6v2.8H11z')) + dot(8.3, 33.6, .5, CRIMSON) + dot(12.1, 34, .5, CRIMSON) +
-            line('M39 12.4h17M42 12.4l3-3.4', INK, 1.8) + line('M47.4 12.4v2.6M54.4 12.4v2.6', INK, 1) +
+            line('M39 12.4h17M42 12.4l3-3.4', INK, 1.8) +
+            live('swing', line('M47.4 12.4v2.6M54.4 12.4v2.6', INK, 1) +
             grpW('#8a5a32', 1.6, P('M45.6 15h11v8.4c0 4.4-5.5 6.6-5.5 6.6s-5.5-2.2-5.5-6.6z')) +
-            line('M47.6 16.8l7 9M54.6 16.8l-7 9', STEEL_L, 1.5) + line('M46.8 19.4l2.4-1.2M55.4 19.4 53 18.2', GOLD, 1.3) +
+            line('M47.6 16.8l7 9M54.6 16.8l-7 9', STEEL_L, 1.5) + line('M46.8 19.4l2.4-1.2M55.4 19.4 53 18.2', GOLD, 1.3)) +
             grpW('#8a5a32', 1.6, P('M49.6 33.6h10.6c1 3.4 1 7 0 10.4H49.6c-1-3.4-1-7 0-10.4z')) +
             line('M49.2 36.6h11.4M49.2 41h11.4', '#4a4e55', 1.3),
 
@@ -4589,7 +4785,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // from the chimney, and its sign -- a crescent moon -- hung out over
         // the road.
         inn:
-            grp('#c9c2b4', P('M39 4c-2-3 2-5 4-3 1-2 5-2 5 1 2 0 3 2 1 3z'), 'stroke-width="1.2"') +
+            live('smoke', grp('#c9c2b4', P('M39 4c-2-3 2-5 4-3 1-2 5-2 5 1 2 0 3 2 1 3z'), 'stroke-width="1.2"'), -1.5) +
             grp('#6a6a72', P('M37 6h5v9h-5z'), 'stroke-width="1.6"') +
             grp('#2e4a6a', P('M3 17 25 3l22 14z')) + line('M10 13h30M16 9h18', '#24384f', 1) +
             grp('#efe2c0', P('M5 17h40v11H5z')) +
@@ -4600,10 +4796,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#5a3a22', P('M21 44V37c0-4.5 8-4.5 8 0v7z'), 'stroke-width="1.6"') + dot(27.4, 40.6, .8, '#f4d23c') +
             grp('#f4d23c', P('M9.6 33h6v6h-6zM34.4 33h6v6h-6z'), 'stroke-width="1.6"') +
             line('M12.6 33v6M9.6 36h6M37.4 33v6M34.4 36h6', '#5a3a22', 1) +
-            line('M45 23h15M48 23v4M57 23v4', INK, 1.5) +
+            line('M45 23h15', INK, 1.5) +
+            live('swing', line('M48 23v4M57 23v4', INK, 1.5) +
             grp('#8a5a32', P('M46 27h13v10H46z'), 'stroke-width="1.6"') +
-            '<path d="M52.6 28.8a3.6 3.6 0 1 0 3.2 5.6 2.9 2.9 0 1 1-3.2-5.6z" fill="#f4e38a" stroke="' + INK + '" stroke-width="1"/>' +
-            dot(56, 7, 1, '#f4e38a') + dot(61.5, 13, .9, '#f4e38a') + dot(52, 12, .8, '#f4e38a'),
+            '<path d="M52.6 28.8a3.6 3.6 0 1 0 3.2 5.6 2.9 2.9 0 1 1-3.2-5.6z" fill="#f4e38a" stroke="' + INK + '" stroke-width="1"/>', -1.2) +
+            live('drift', live('twinkle', dot(56, 7, 1, '#f4e38a')) + live('twinkle', dot(61.5, 13, .9, '#f4e38a'), -1.4) +
+                live('twinkle', dot(52, 12, .8, '#f4e38a'), -2.6)),
 
         // The Golden Dice: a gold die with 1 to the front, 2 on top and 3 on
         // the side, numbered as a real die is (opposite faces make 7).
@@ -4638,7 +4836,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M23 18.6h5M36 18.6h5', '#7c746a', 1) +
             '<path d="M31.2 16.2h1.6v4.6h-1.6z" fill="' + INK + '"/>' +
             line('M32 10V1.4', INK, 1.4) +
-            grpW(CRIMSON, 1.1, P('M32.6 1.6h9.6l-2.4 3.2 2.4 3.2h-9.6z')) + smallSigil(36.6, 4.8, .3) +
+            live('flag', grpW(CRIMSON, 1.1, P('M32.6 1.6h9.6l-2.4 3.2 2.4 3.2h-9.6z')) + smallSigil(36.6, 4.8, .3)) +
             '<path d="M25.2 44V30c0-5.4 13.6-5.4 13.6 0V44" fill="none" stroke="' + INK + '" stroke-width="4.6"/>' +
             '<path d="M25.2 44V30c0-5.4 13.6-5.4 13.6 0V44" fill="none" stroke="#b8b0a2" stroke-width="2.4"/>' +
             grpW('#6a4a2e', 1.4, P('M26.6 44V30c0-3.8 10.8-3.8 10.8 0V44z')) +
@@ -4669,16 +4867,18 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M41.8 20.4l-1.6 2.8 1.2 1.6-.8 2.2', '#6a645a', .9) +
             grpW('#5a8a3a', .8, P('M20 20.8c1.4-1.6 4-1.4 5 .2.8-.6 1.8-.2 1.8.6-1.2 0-1.6 1.6-2.6 1.4-.6 1.4-1.8 1.4-2.2.2-.8.6-1.6.2-2-.4z')) +
             grpW('#5a8a3a', .8, P('M44 34.8c1-1.2 3.2-1 3.8.2.8-.4 1.8 0 2.2.8-1.2.2-1.4 1.4-2.4 1.2-.8 1-2 .8-2.2-.2-.6.2-1.2 0-1.4-.4z')) +
-            line('M12.4 44l-.8-2.4M13.4 44l.2-2.8M51.6 44l-.2-2.8M52.6 44l.8-2.4', '#5a8a3a', 1) +
+            live('grass', line('M12.4 44l-.8-2.4M13.4 44l.2-2.8', '#5a8a3a', 1)) +
+            live('grass', line('M51.6 44l-.2-2.8M52.6 44l.8-2.4', '#5a8a3a', 1), -1.3) +
             [17, 47].map(x =>
                 grpW('#f4ecd8', 1, P('M' + (x - 1.2) + ' 34v-5.4h2.4V34z')) +
                 line('M' + (x + .5) + ' 28.8v1.6', '#d8ccb0', .8) +
                 line('M' + x + ' 28.6v-1', INK, .7) +
-                grpW('#ffb43a', .7, P('M' + x + ' 27.6c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4z'))).join('') +
+                live('flame', grpW('#ffb43a', .7, P('M' + x + ' 27.6c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4z')), x > 30 ? -.6 : 0)).join('') +
             grpW(GOLD, 1.2, P('M27.4 16.6l.6-2.4 1.6 2.4zM36.6 16.6l-.6-2.4-1.6 2.4z')) +
             grpW(GOLD, 1.3, P('M26.6 16.6h10.8L35.6 20h-7.2z')) +
             line('M28 18.2h8', '#b8862a', .8) +
-            twinkle(21.6, 8.4, 2.2, '#bfe6ff') + twinkle(43, 6, 1.8, '#bfe6ff') + twinkle(45.2, 14.6, 1.3, '#bfe6ff') + twinkle(19.4, 15, 1.2, '#bfe6ff') +
+            live('twinkle', twinkle(21.6, 8.4, 2.2, '#bfe6ff')) + live('twinkle', twinkle(43, 6, 1.8, '#bfe6ff'), -1.1) +
+            live('twinkle', twinkle(45.2, 14.6, 1.3, '#bfe6ff'), -2.2) + live('twinkle', twinkle(19.4, 15, 1.2, '#bfe6ff'), -2.9) +
             flask(7.6, 39.8, .45, '#d23a3a') +
             coin(55.2, 42, 2) + coin(59.6, 42, 2) + coin(57.4, 39.4, 2),
 
@@ -4687,7 +4887,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         brewery:
             grp('#6a5238', P('M0 44h64v4H0z')) +
             line('M3 44c-1.6-9 .4-19 4.6-26C12 10.6 18 5.6 26 4.6c8.4-1 15 2.6 19.6 9 3.6 5 5.8 12 6.6 20M45.6 13.6c4.4-3 9.2-2.6 12.4 1', '#2f5a24', 1.6) +
-            hopLeaf(4.2, 32, -20) + hopLeaf(8.6, 17, 10) + hopLeaf(51.6, 25, 30) + hopLeaf(56.4, 13.6, 60) +
+            live('sway', hopLeaf(4.2, 32, -20)) + live('sway', hopLeaf(8.6, 17, 10), -1.7) + live('sway', hopLeaf(51.6, 25, 30), -2.9) +
+            live('sway', hopLeaf(56.4, 13.6, 60), -.9) +
             grpW('#6a4a2e', 1.6, P('M7 44 11.4 32H28.6L33 44z')) + line('M14 44l3-8M26 44l-3-8', '#4a3220', 1.2) +
             '<circle cx="20" cy="19.4" r="14" fill="#3a3238" stroke="' + INK + '" stroke-width="2"/>' +
             '<circle cx="20" cy="19.4" r="10.6" fill="#b07a44" stroke="' + INK + '" stroke-width="1.4"/>' +
@@ -4695,19 +4896,20 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             '<circle cx="20" cy="19.4" r="1.6" fill="#5a3a22"/>' +
             dot(20, 6.6, .9, '#8a8f96') + dot(32.8, 19.4, .9, '#8a8f96') + dot(7.2, 19.4, .9, '#8a8f96') +
             grpW(GOLD, 1.2, P('M31.6 25.4h6.4v3h-6.4zM35.2 28.4h2.6v3.2h-2.6zM33.4 25.4v-2.6h2.4v2.6z')) +
-            line('M36.5 32v3.4', '#f0a530', 1.5) +
-            grpW('#a0703a', 1.4, P('M31.4 36.6h10.6V44H31.4z')) +
+            live('pour', line('M36.5 32v3.4', '#f0a530', 1.5)) +
+            live('mug', grpW('#a0703a', 1.4, P('M31.4 36.6h10.6V44H31.4z')) +
             line('M31.4 39h10.6M31.4 42h10.6', '#6a4a2e', .9) +
             '<path d="M42 37.8h2.2c1.6 0 2.2 1 2.2 2.4v.6c0 1.4-.6 2.2-2.2 2.2H42" fill="none" stroke="' + INK + '" stroke-width="2.6"/>' +
             '<path d="M42 37.8h2.2c1.6 0 2.2 1 2.2 2.4v.6c0 1.4-.6 2.2-2.2 2.2H42" fill="none" stroke="#a0703a" stroke-width="1.2"/>' +
-            grpW('#f8f4ea', 1.1, P('M30.6 37.4c-.8-2.2 1.2-3.6 3-2.6.8-1.8 4-2 5 0 1.8-1 3.8.4 3.4 2.4.6 1-.2 1.8-1.2 1.6v1.4c0 .9-1.4.9-1.4 0v-1.4h-6.6c-1.4 0-2.4-.4-2.2-1.4z')) +
+            live('foam', grpW('#f8f4ea', 1.1, P('M30.6 37.4c-.8-2.2 1.2-3.6 3-2.6.8-1.8 4-2 5 0 1.8-1 3.8.4 3.4 2.4.6 1-.2 1.8-1.2 1.6v1.4c0 .9-1.4.9-1.4 0v-1.4h-6.6c-1.4 0-2.4-.4-2.2-1.4z')))) +
             line('M3 44c-1.6-9 .4-19 4.6-26C12 10.6 18 5.6 26 4.6', '#3f7d3a', .9) +
-            hop(6.2, 22.6) + hop(15.2, 6.4) + hop(46.6, 15.6) + hop(52.2, 28) + hop(57.6, 15.4) +
-            hopLeaf(25, 5.6, -70) + hopLeaf(40, 7.6, 90),
+            live('sway', hop(6.2, 22.6), -.6) + live('sway', hop(15.2, 6.4), -2.1) + live('sway', hop(46.6, 15.6), -1.2) +
+            live('sway', hop(52.2, 28), -3.3) + live('sway', hop(57.6, 15.4), -2.6) +
+            live('sway', hopLeaf(25, 5.6, -70), -1.5) + live('sway', hopLeaf(40, 7.6, 90), -.3),
 
         royal_patrol:
-            line('M22 46V4', INK, 3) + grp(ROYAL_RED, P('M23 6h26v24l-13-5-13 5z')) + line('M23 6h26', GOLD, 2) +
-            crown(36, 16, .75) + at(54, 0, .62, halberd(0, 14, 74)),
+            line('M22 46V4', INK, 3) + live('flag', grp(ROYAL_RED, P('M23 6h26v24l-13-5-13 5z')) + line('M23 6h26', GOLD, 2) +
+            crown(36, 16, .75)) + at(54, 0, .62, halberd(0, 14, 74)),
 
         // The Palace Gates: a gatehouse between two round-roofed towers,
         // royal banners on the towers and a crown over the arch, and the
@@ -4745,15 +4947,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#8a8278', P('M12 42v-7h40v7z')) + grp('#7ad4ff', P('M14 35h36l-1.6 2.4H15.6z'), 'stroke-width="1.4"') +
             grp('#a39b8f', P('M29 35V25h6v10z')) +
             grp('#a39b8f', P('M23 23h18c0 3.6-4.4 5.6-9 5.6S23 26.6 23 23z')) +
-            line('M23.6 25c-2.4 3-3.2 6-3.2 10M40.4 25c2.4 3 3.2 6 3.2 10', '#7ad4ff', 1.5) +
+            live('water', line('M23.6 25c-2.4 3-3.2 6-3.2 10M40.4 25c2.4 3 3.2 6 3.2 10', '#7ad4ff', 1.5)) +
             grp('#7ad4ff', P('M24 23h16l-1.2 1.6H25.2z'), 'stroke-width="1"') +
             grp('#a39b8f', P('M30.4 23V15.6h3.2V23z')) +
             grp('#a39b8f', P('M26 14.6h12c0 2.6-2.8 4.2-6 4.2s-6-1.6-6-4.2z')) +
             grp('#7ad4ff', P('M26.6 14.6h10.8l-.9 1.2h-9z'), 'stroke-width=".9"') +
-            line('M26.6 16c-1.6 2-2.2 4.2-2.2 7M37.4 16c1.6 2 2.2 4.2 2.2 7', '#7ad4ff', 1.3) +
+            live('water', line('M26.6 16c-1.6 2-2.2 4.2-2.2 7M37.4 16c1.6 2 2.2 4.2 2.2 7', '#7ad4ff', 1.3), -.5) +
             grp('#a39b8f', P('M30.8 14.6v-3.4h2.4v3.4z')) +
             '<circle cx="32" cy="10" r="1.9" fill="#a39b8f" stroke="' + INK + '" stroke-width="1.4"/>' +
-            line('M32 8.1V4.4', '#7ad4ff', 1.4) + line('M32 4.6c-1.6.2-2.8 1.8-3.2 4M32 4.6c1.6.2 2.8 1.8 3.2 4', '#7ad4ff', 1),
+            live('water', line('M32 8.1V4.4', '#7ad4ff', 1.4) + line('M32 4.6c-1.6.2-2.8 1.8-3.2 4M32 4.6c1.6.2 2.8 1.8 3.2 4', '#7ad4ff', 1), -.9),
 
         // The Royal Watchtower: a tall stone tower, a little narrower at the
         // top, its gallery out on corbels with the battlements round it,
@@ -4762,7 +4964,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // two torches.
         watchtower:
             grp('#6a5238', P('M0 44h64v4H0z')) +
-            line('M12 44l-.6-2.2M13.2 44l.4-2.4M50.8 44l-.4-2.4M52 44l.6-2.2', '#5a8a3a', 1) +
+            live('grass', line('M12 44l-.6-2.2M13.2 44l.4-2.4', '#5a8a3a', 1)) +
+            live('grass', line('M50.8 44l-.4-2.4M52 44l.6-2.2', '#5a8a3a', 1), -1.5) +
             grp('#8a8278', P('M21 44l1.6-27h18.8L43 44z')) +
             line('M22.4 23h19.2M22 29h20M21.6 35h20.8M21.4 40h21.2', '#6d665c', 1) +
             line('M28 17.4V23M36 17.4V23M25.4 23v6M33 23v6M39.4 23v6M27.4 29v6M36.6 29v6M24.4 35v5M30.6 35v5M38 35v5M26.6 40v4M37.4 40v4', '#6d665c', 1) +
@@ -4771,13 +4974,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             line('M19 14.8h26', GOLD, 1.2) +
             grp('#9e968a', P('M18 12.6V9h3.6v3.6zM24.4 12.6V9H28v3.6zM36 12.6V9h3.6v3.6zM42.4 12.6V9H46v3.6z')) +
             line('M32 12.6V1.6', INK, 1.6) + dot(32, 1.4, 1, GOLD) +
-            grpW(ROYAL_RED, 1.2, P('M32.8 1.8h11l-2.6 3.2 2.6 3.2h-11z')) +
-            crown(37.4, 5.6, .3) +
+            live('flag', grpW(ROYAL_RED, 1.2, P('M32.8 1.8h11l-2.6 3.2 2.6 3.2h-11z')) +
+            crown(37.4, 5.6, .3)) +
             grp(ROYAL_RED, P('M27.8 17.4h8.4v11L32 25.8l-4.2 2.6z'), 'stroke-width="1.6"') +
             line('M27.4 17.6h9.2', GOLD, 1.4) + crown(32, 22.6, .42) +
             '<path d="M24.6 21h1.4v4.4h-1.4zM38 21h1.4v4.4H38z" fill="' + INK + '"/>' +
             line('M25 39.8v-2.6M39 39.8v-2.6', INK, 1.6) +
-            grpW('#ffb43a', .7, P('M25 36.8c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4zM39 36.8c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4z')) +
+            live('flame', grpW('#ffb43a', .7, P('M25 36.8c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4z'))) +
+            live('flame', grpW('#ffb43a', .7, P('M39 36.8c-1.4-1.2-.6-3 0-4 .6 1 1.4 2.8 0 4z')), -.5) +
             grpW('#f4d23c', 1.4, P('M30 35.6v-2.8c0-2.6 4-2.6 4 0v2.8z')) + line('M32 30.8v4.8', '#5a3a22', .8) +
             grpW('#5a3a22', 1.6, P('M28.6 44v-4.2c0-3.8 6.8-3.8 6.8 0V44z')) + line('M32 37v7', '#3a2618', .8) +
             dot(30.2, 40.6, .5, STEEL_L) + dot(33.8, 40.6, .5, STEEL_L) + dot(30.2, 42.8, .5, STEEL_L) + dot(33.8, 42.8, .5, STEEL_L),
@@ -4788,9 +4992,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grp('#6a4a2e', P('M0 44h64v4H0z')) +
             grp('#2f5a2e', P('M2 44V30c0-6 16-6 16 0v14z')) +
             flower(6.4, 32.4, 2.6, '#d23a5a') + flower(13.4, 35.4, 2.6, '#d23a5a') + flower(7.6, 39.6, 2.4, '#d23a5a') +
-            grp('#3a6a34', '<circle cx="31" cy="20" r="10"/>') + grp('#6a4a2e', P('M29 30h4v14h-4z')) +
-            flower(26.6, 16.4, 2.2, '#f7c6d6') + flower(34.6, 21.6, 2.2, '#f7c6d6') + flower(31, 13.4, 1.9, '#f7c6d6') +
-            tulip(21, 44, 4.6, '#e2b13c') + tulip(24.4, 44, 5.4, '#d23a5a') + tulip(37.6, 44, 5.4, '#9b5cff') + tulip(41, 44, 4.6, '#d23a5a') +
+            live('sway', grp('#3a6a34', '<circle cx="31" cy="20" r="10"/>') + grp('#6a4a2e', P('M29 30h4v14h-4z')) +
+            flower(26.6, 16.4, 2.2, '#f7c6d6') + flower(34.6, 21.6, 2.2, '#f7c6d6') + flower(31, 13.4, 1.9, '#f7c6d6')) +
+            live('grass', tulip(21, 44, 4.6, '#e2b13c'), -.4) + live('grass', tulip(24.4, 44, 5.4, '#d23a5a'), -1.6) +
+            live('grass', tulip(37.6, 44, 5.4, '#9b5cff'), -2.4) + live('grass', tulip(41, 44, 4.6, '#d23a5a'), -1) +
             hopLeaf(47.6, 29.6, -40) + hopLeaf(60.2, 30, 40) +
             grpW('#a39b8f', 1.6, P('M49 44h10l-1.4-4h-7.2zM52.2 40V37h3.6v3z')) +
             grpW('#a39b8f', 1.8, P('M45.6 30h16.8c0 4.6-3.6 7-8.4 7s-8.4-2.4-8.4-7z')) +
@@ -4816,11 +5021,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             grpW('#f2ece0', 1.1, P('M31 35.8v-4.8h2v4.8z')) +
             grpW('#f2ece0', 1.2, P('M27.4 31h9.2c0 2-2 3-4.6 3s-4.6-1-4.6-3z')) +
             '<ellipse cx="32" cy="31" rx="4.6" ry=".9" fill="#5ab8f0" stroke="' + INK + '" stroke-width="1"/>' +
-            grpW('#8fd0f5', .65, P('M27.5 31.3c-1.2.6-1.9 2.2-1.9 4.7H27c0-1.8.4-3.3 1.2-4.2zM36.5 31.3c1.2.6 1.9 2.2 1.9 4.7H37c0-1.8-.4-3.3-1.2-4.2z' +
+            live('water', grpW('#8fd0f5', .65, P('M27.5 31.3c-1.2.6-1.9 2.2-1.9 4.7H27c0-1.8.4-3.3 1.2-4.2zM36.5 31.3c1.2.6 1.9 2.2 1.9 4.7H37c0-1.8-.4-3.3-1.2-4.2z' +
                 'M31.3 30.9c-.3-1.6-.1-3.6.7-5.2.8 1.6 1 3.6.7 5.2z')) +
             '<circle cx="30.1" cy="26.4" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
-            '<circle cx="33.9" cy="26.4" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>' +
-            heartAt(27.4, 27, .08, null, .45) + heartAt(36.8, 26.4, .07, null, .45) +
+            '<circle cx="33.9" cy="26.4" r=".5" fill="#8fd0f5" stroke="' + INK + '" stroke-width=".4"/>') +
+            live('float', heartAt(27.4, 27, .08, null, .45)) + live('float', heartAt(36.8, 26.4, .07, null, .45), -1.9) +
             grpW('#f8f4ea', 1.2, P('M11 40.2V23h3.2v17.2zM20.8 41V23.8h3.2v17.2zM40 41V23.8h3.2v17.2zM49.8 40.2V23H53v17.2z')) +
             line('M12.6 24.6v14.4M22.4 25.4v14.4M41.6 25.4v14.4M51.4 24.6v14.4', '#d8cdb8', .8) +
             grpW('#f2ece0', .9, P('M10.2 24.4V23h4.8v1.4zM10.2 40.2v-1.4h4.8v1.4zM20 25.2v-1.4h4.8v1.4zM20 41v-1.4h4.8V41z' +
@@ -5055,13 +5260,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function deadTree(x, y, s) {
-        return at(x, y, s, line('M0 0V-40M0-22-14-34M0-30 12-42M-14-34l-6 2M12-42l4-8M0-40l-4-8', '#3a2c22', 5));
+        return live('sway', at(x, y, s, line('M0 0V-40M0-22-14-34M0-30 12-42M-14-34l-6 2M12-42l4-8M0-40l-4-8', '#3a2c22', 5)), -(x % 7) * .4);
     }
 
     function brazier(x, y, s) {
         return at(x, y, s,
             grp('#3a3238', P('M-12-14h24l-4 10h-16z')) + line('M-6-4-10 14M6-4l4 18', INK, 3) +
-            '<g class="flicker">' + grp('#ff6a1a', P('M-9-14c-2-10 6-14 4-24 6 4 10 10 8 16 3-2 4-6 4-8 4 6 2 14-6 16z')) +
+            '<g class="an-flame">' + grp('#ff6a1a', P('M-9-14c-2-10 6-14 4-24 6 4 10 10 8 16 3-2 4-6 4-8 4 6 2 14-6 16z')) +
             grp('#ffd04a', P('M-3-15c-1-5 2-8 2-12 3 3 5 6 3 10z'), 'stroke-width="1.6"') + '</g>');
     }
 
@@ -5561,10 +5766,23 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         // the Merchant's humble stall, near the Start
         s += '<g transform="translate(940 454) scale(.95)">' + merchantHut() + '</g>';
 
-        // thorn bushes dotted about Thornwick
+        // thorn bushes dotted about Thornwick, stirring in the wind
         [[628, 150, 1.5], [878, 166, 1.3], [1040, 250, 1.4], [700, 580, 1.4], [850, 600, 1.2],
          [560, 640, 1.1], [1150, 520, .9], [990, 360, 1], [470, 50, .8], [300, 100, 1.2],
-         [60, 520, 1], [1120, 160, 1.1]].forEach(b => { s += thornBush(b[0], b[1], b[2]); });
+         [60, 520, 1], [1120, 160, 1.1]].forEach((b, i) => { s += live('sway-soft', thornBush(b[0], b[1], b[2]), -i * .7); });
+
+        // tufts of the meadow's grass swaying (the grass painted on the
+        // ground stays still: these are drawn over it)
+        [[548, 168], [700, 128], [812, 136], [955, 150], [1066, 196], [968, 238], [552, 556], [648, 534],
+         [772, 552], [928, 560], [1048, 548], [1058, 432], [536, 330], [560, 446], [1012, 470], [618, 270]].forEach((t, i) => {
+            s += live('grass', '<path d="M' + t[0] + ' ' + t[1] + 'l-3-11M' + (t[0] + 3) + ' ' + t[1] + 'l1-13M' + (t[0] + 6) + ' ' + t[1] +
+                'l4-10" fill="none" stroke="#7aa34c" stroke-width="2.4" stroke-linecap="round"/>', -(i % 5) * .6);
+        });
+
+        // now and then a few birds cross the sky
+        const bird = (x, y, k) => '<g transform="translate(' + x + ' ' + y + ') scale(' + k + ')">' +
+            live('flap', '<path d="M-9-2c3-4 6-4 9 0 3-4 6-4 9 0" fill="none" stroke="#1b1418" stroke-width="2.6" stroke-linecap="round"/>', -(x % 3) * .15) + '</g>';
+        s += live('flock', bird(0, 0, 1.2) + bird(-26, 12, 1) + bird(-18, -16, .9) + bird(-46, 4, .8));
 
         return '<svg class="board-scene" viewBox="0 0 1200 700" preserveAspectRatio="none" aria-hidden="true">' + s + '</svg>';
     }
@@ -6151,6 +6369,50 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return ok();
     }
 
+    // Everything a player starts the game with: full health, the class's
+    // starter weapon and armour, no Gold, and a Special Potion.
+    function kitOut(state, p) {
+        const cls = classOf(p);
+        p.maxHp = maxHpFor(state, p);
+        p.hp = p.maxHp;
+        p.bonusHp = 0;
+        p.gold = R.startingGold;
+        const w = newItem(cls.starterWeapon);
+        const a = newItem(cls.starterArmour);
+        p.inventory = [w, a];
+        p.weaponUid = w.uid;
+        p.armourUid = a.uid;
+        p.potions = [];
+        // Every time a player lands on Start, including at the beginning
+        // of the game, they get a Special Potion.
+        giveSpecialPotion(state, p);
+        p.orderRoll = null;
+        p.orderRolls = [];
+    }
+
+    // Joining a game already under way: a fresh start on the Start square,
+    // exactly as everybody began, and a place at the back of the turn order
+    // (or a roll for it, if the order is still being rolled). The class is
+    // chosen first, two of a class at most as ever.
+    function joinLate(state, pid, name, clsId) {
+        if (state.phase !== 'order' && state.phase !== 'playing') return fail('This game is not running.');
+        if (player(state, pid)) return ok();
+        if (state.players.length >= R.maxPlayers) return fail('This room is full (6 players).');
+        if (!D.CLASSES[clsId]) return fail('Choose a class first.');
+        if (state.players.filter(x => x.cls === clsId).length >= R.maxPerClass) {
+            return fail('There are already two ' + D.CLASSES[clsId].name + 's.');
+        }
+        const p = newPlayer(pid, name, false);
+        p.cls = clsId;
+        p.ready = true;
+        state.players.push(p);
+        kitOut(state, p);
+        if (state.phase === 'playing') state.turnOrder.push(p.id);
+        log(state, p.name + ' joins the game late as ' + (/^[AEIOU]/.test(classOf(p).name) ? 'an ' : 'a ') + classOf(p).name + ', starting from the Start square' +
+            (state.phase === 'playing' ? ', last in the turn order.' : '.'), 'system');
+        return ok();
+    }
+
     function startGame(state, pid) {
         if (state.phase !== 'lobby') return fail('Already started.');
         if (pid !== state.hostId) return fail('Only the host can start the game.');
@@ -6159,68 +6421,68 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
         state.barbarian = freshBarbarian(state);
         state.decks = freshDecks();
-        state.players.forEach(p => {
-            const cls = classOf(p);
-            p.maxHp = maxHpFor(state, p);
-            p.hp = p.maxHp;
-            p.bonusHp = 0;
-            p.gold = R.startingGold;
-            const w = newItem(cls.starterWeapon);
-            const a = newItem(cls.starterArmour);
-            p.inventory = [w, a];
-            p.weaponUid = w.uid;
-            p.armourUid = a.uid;
-            p.potions = [];
-            // Every time a player lands on Start, including at the beginning
-            // of the game, they get a Special Potion.
-            giveSpecialPotion(state, p);
-            p.orderRoll = null;
-        });
+        state.players.forEach(p => kitOut(state, p));
         state.phase = 'order';
         log(state, 'Everyone rolls for turn order. Highest goes first.', 'system');
         return ok();
     }
 
+    // "A, B and C"
+    function listNames(names) {
+        return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+    }
+
+    // Everybody rolls; highest goes first, then in descending order. Ties
+    // roll again -- only the tied players, and they roll it themselves --
+    // until nobody is level, so a reroll can never jump anybody past someone
+    // who beat them. Each player's rolls are kept in order (orderRolls) and
+    // compared one by one.
     function rollForOrder(state, pid) {
         if (state.phase !== 'order') return fail('Not rolling for order right now.');
         const p = player(state, pid);
         if (!p) return fail('You are not in this room.');
-        if (p.orderRoll !== null) return fail('You have already rolled.');
+        if (p.orderRoll !== null) {
+            return fail(state.players.some(x => x.orderRoll === null && (x.orderRolls || []).length)
+                ? 'Only the tied players roll again.' : 'You have already rolled.');
+        }
 
         p.orderRoll = throwDie(state, p.name, 'order');
-        log(state, p.name + ' rolled a ' + p.orderRoll + ' for turn order.', 'roll');
+        p.orderRolls = (p.orderRolls || []).concat([p.orderRoll]);
+        log(state, p.name + (p.orderRolls.length > 1 ? ' rolls again: ' : ' rolled a ') + p.orderRoll +
+            (p.orderRolls.length > 1 ? '.' : ' for turn order.'), 'roll');
 
-        if (state.players.every(x => x.orderRoll !== null)) {
-            // Ties reroll, as the rules say -- only among the tied players, so
-            // a reroll can never jump anybody past someone who beat them.
-            // Settled here rather than making everybody press again and
-            // again with six at the table.
-            const key = {};
-            state.players.forEach(x => { key[x.id] = x.orderRoll; });
-            let rounds = 0;
-            while (rounds < 50) {
-                const count = {};
-                state.players.forEach(x => { count[key[x.id]] = (count[key[x.id]] || 0) + 1; });
-                const tied = state.players.filter(x => count[key[x.id]] > 1);
-                if (!tied.length) break;
-                rounds += 1;
-                state.players.forEach(x => {
-                    key[x.id] = key[x.id] * 10 + (count[key[x.id]] > 1 ? d6() : 0);
-                });
-            }
-            if (rounds) log(state, 'Tied rolls were rerolled.', 'muted');
+        if (!state.players.every(x => x.orderRoll !== null)) return ok();
 
-            state.turnOrder = state.players.slice()
-                .sort((a, b) => key[b.id] - key[a.id])
-                .map(x => x.id);
-            state.phase = 'playing';
-            state.turnIndex = 0;
-            state.turnNo = 1;
-            state.playStartedAt = Date.now();
-            log(state, 'Turn order: ' + state.turnOrder.map(id => player(state, id).name).join(', ') + '.',
-                'system');
-            beginTurn(state);
+        const key = x => (x.orderRolls || [x.orderRoll]).join('.');
+        const groups = {};
+        state.players.forEach(x => { (groups[key(x)] = groups[key(x)] || []).push(x); });
+        const tied = Object.keys(groups).map(k => groups[k]).filter(g => g.length > 1);
+        if (tied.length) {
+            tied.forEach(g => {
+                g.forEach(x => { x.orderRoll = null; });
+                log(state, listNames(g.map(x => x.name)) + ' tied with a ' + g[0].orderRolls[g[0].orderRolls.length - 1] +
+                    '. They roll again.', 'system');
+            });
+            dieSays(state, 'A tie: roll again');
+            return ok();
         }
+
+        const rolls = x => x.orderRolls || [x.orderRoll];
+        const before = (a, b) => {
+            const ra = rolls(a), rb = rolls(b);
+            for (let i = 0; i < Math.max(ra.length, rb.length); i++) {
+                if ((ra[i] || 0) !== (rb[i] || 0)) return (rb[i] || 0) - (ra[i] || 0);
+            }
+            return 0;
+        };
+        state.turnOrder = state.players.slice().sort(before).map(x => x.id);
+        state.phase = 'playing';
+        state.turnIndex = 0;
+        state.turnNo = 1;
+        state.playStartedAt = Date.now();
+        log(state, 'Turn order: ' + state.turnOrder.map(id => player(state, id).name).join(', ') + '.',
+            'system');
+        beginTurn(state);
         return ok();
     }
 
@@ -6281,8 +6543,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (!isMyTurn(state, pid)) return fail('It is not your turn.');
         if (state.battle) return fail('Finish the battle first.');
         if (state.pending) return fail('Finish what your square asks first.');
+        // You need not roll: ending the turn first just leaves you where you
+        // are, and nothing happens.
         const p = player(state, pid);
-        if (!p.hasMoved) return fail('Roll to move before you end your turn.');
+        if (!p.hasMoved) {
+            // How many turns in a row: a computer player only waits so long.
+            p.stayStreak = (p.stayStreak | 0) + 1;
+            p.stayedAt = p.turnsTaken;
+            log(state, p.name + ' stays put and ends their turn.', 'muted');
+        }
         return advanceTurn(state);
     }
 
@@ -6358,6 +6627,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
         const raw = throwDie(state, p.name, 'move');
         p.hasMoved = true;
+        p.stayStreak = 0;
         p.path = [p.pos];
         log(state, p.name + ' rolled a ' + raw + '.', 'roll');
 
@@ -6494,15 +6764,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return land(state, p);
     }
 
+    // Raw Oblivion Shield is rolled after the battle, not before it (the
+    // user's call, 2026-10-09): see loseBattle. Winning ends the game.
     function enterArena(state, p) {
-        if (mod(state, 'rawOblivionShield')) {
-            state.pending = {
-                type: 'shield', playerId: p.id,
-                prompt: 'Raw Oblivion Shield: roll a die. 1–5 and you lose that Pendant ' +
-                        'Fragment; 6 and nothing happens.'
-            };
-            return ok();
-        }
         return startBoss(state, p);
     }
 
@@ -6873,7 +7137,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                             ' has no Fragment #' + roll + ' to lose.', 'roll');
                     }
                 }
-                return startBoss(state, p);
+                return ok();
             }
 
             default:
@@ -7833,6 +8097,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         state.battle = null;
         cleanUpAfter(state, p);
         sendToStart(state, p);
+        // Raw Oblivion Shield: the shield's magic tears at the fragments that
+        // were carried through it, once the battle is over.
+        if (b.kind === 'boss' && mod(state, 'rawOblivionShield')) {
+            state.pending = {
+                type: 'shield', playerId: p.id,
+                prompt: 'Raw Oblivion Shield: the shield’s magic tears at the Pendant Fragments you carried through it. ' +
+                        'Roll a die. 1 to 5 and you lose that Pendant Fragment; 6 and nothing happens.'
+            };
+        }
     }
 
     function winPvp(state, winner, loser) {
@@ -7922,7 +8195,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const roll = throwDie(state, p.name, ab.name);
         dieSays(state, roll % 2 !== 0 ? 'Odd: ' + ab.name + ' fails' :
             'Even: ' + ({ runed_relic: '+10 DMG for 2 attacks', iron_body: 'no minimum damage for 2 attacks',
-                agile_footwork: 'add up to 2 to your move' }[ab.id] || ab.name + ' works'));
+                agile_footwork: 'add up to 1 to your move' }[ab.id] || ab.name + ' works'));
         if (roll % 2 !== 0) {
             log(state, p.name + ' tries ' + ab.name + ' and rolls a ' + roll + ': odd, so it fails. ' +
                 'They can try again next turn.', 'muted');
@@ -7937,8 +8210,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             p.buffs.push({ kind: 'ignoreMin', value: 0, uses: 2, from: 'Iron Body', keep: true });
             log(state, p.name + ' ignores minimum damage for the next 2 enemy attacks.', 'item');
         } else if (ab.id === 'agile_footwork') {
-            p.agile = 2;
-            log(state, p.name + ' may add up to 2 to this movement roll.', 'item');
+            p.agile = 1;
+            log(state, p.name + ' may add up to 1 to this movement roll.', 'item');
         }
         return ok();
     }
@@ -8528,7 +8801,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     global.LOF_ENGINE = {
         ACTIONS,
-        makeRoomCode, createGame, addPlayer, removePlayer, chooseClass, setMods, startGame,
+        makeRoomCode, createGame, addPlayer, joinLate, removePlayer, chooseClass, setMods, startGame,
         rollForOrder, currentPlayer, isMyTurn, advanceTurn, checkTimeout, turnLimit,
         player, square, previewWalk, moveOffer, isOptionalStop, fragmentsNeeded, hasFragments,
         weaponOf, armourOf, itemDef, ownedItem, suits, hasBarbarian, hasFought, guardOf,
@@ -8536,7 +8809,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         controllerOf, opponents, defaultTarget, movesOf, chooseEnemyMove, enemyTarget, isPlural,
         attackParts, defenceParts, body, buffsOf, oblivionControlOn, tranquil,
         canUsePotion, canUseAbility, abilityWait, merchantPrice, priceFor, payout, halve,
-        playTimeMs, tutorialExemptMs, uid, d6, enemyMaxHp, maxHpFor, barbarianMaxHp
+        playTimeMs, tutorialExemptMs, uid, d6, enemyMaxHp, maxHpFor, barbarianMaxHp,
+        // For a computer player playing a fight out in its head (bot.js), on
+        // a copy of the game: never on the real one.
+        startPve, startBoss
     };
 
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -8551,15 +8827,28 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
    decide(state, pid) looks at the game from one computer player's seat and
    answers with the single next thing it wants to do -- { action, args } out
    of engine.js's action table -- or null if it is waiting on somebody else.
-   solo.js asks again after every step, so a bot never plans more than one
-   move ahead, and it is bound by exactly the same rules as you: everything
-   it asks for goes through the same engine and can be refused.
+   solo.js asks again after every step. A bot is bound by exactly the same
+   rules as you: everything it asks for goes through the same engine and
+   can be refused.
 
-   It plays to win: it equips its best gear, shops when it can afford to,
-   picks its landing square from everything the die (and its bonuses) allow,
-   weighs up whether a fight is one it can win, and in a fight saves up for
-   its heavy attack, drinks when it is in trouble and finishes things off
-   with the cheapest blow that does the job.
+   Three levels, chosen in the single-player lobby (each bot's botLevel):
+
+   Easy    keeps out of the other players' way and does not plan: it walks
+           as far as the die lets it, fights whatever it lands on, drinks
+           when it is hurt and keeps a healing potion in the pack.
+   Medium  plays to win: equips its best gear, picks its landing square from
+           everything the die allows, weighs up whether a fight is one it
+           can win, stocks up on healing and buys a set of good potions
+           before the final fight. It will stay put for a turn rather than
+           walk into a fight it expects to lose.
+   Hard    plans ahead: it plays each fight out in its head, on a copy of
+           the game, before choosing where to land; saves up for Astrix's
+           potions and a Tranquility; drinks movement potions to dodge bad
+           squares; times its potions round Annihilation Void; keeps the
+           means to finish Helen before Obliviate; and, when the final fight
+           cannot be won yet, keeps its potions for the next try. It sees no
+           more than you do: the dice it imagines are not the dice that fall,
+           and it waits at most two turns in a row.
    ========================================================================= */
 
 (function (global) {
@@ -8571,6 +8860,24 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     function act(action, args) { return { action: action, args: args || {} }; }
     function mod(state, id) { return !!(state.mods && state.mods[id]); }
+
+    /* ------------------------------------------------------------------ */
+    /* The three levels                                                    */
+    /*                                                                     */
+    /* thinks      weighs squares and fights up before choosing             */
+    /* dodgesPvp   keeps off squares where another player stands            */
+    /* staysPut    turns in a row it will wait rather than walk into trouble */
+    /* kit         what it buys for the final fight: 0 nothing, 1 some good */
+    /*             potions, 2 everything it can                             */
+    /* sharp       plays fights out in its head, and the final one to a plan */
+    /* ------------------------------------------------------------------ */
+
+    const LEVELS = {
+        easy:   { id: 'easy',   thinks: false, dodgesPvp: true,  staysPut: 0, kit: 0, sharp: false },
+        medium: { id: 'medium', thinks: true,  dodgesPvp: false, staysPut: 1, kit: 1, sharp: false },
+        hard:   { id: 'hard',   thinks: true,  dodgesPvp: false, staysPut: 2, kit: 2, sharp: true }
+    };
+    function levelOf(p) { return LEVELS[p && p.botLevel] || LEVELS.medium; }
 
     /* ------------------------------------------------------------------ */
     /* How strong am I?                                                    */
@@ -8687,16 +8994,152 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return E.fragmentsNeeded(state).indexOf(n) >= 0 && p.fragments.indexOf(n) < 0;
     }
 
+    /* ---- the pack ------------------------------------------------------ */
+
+    function count(p, id) { return p.potions.filter(x => x.id === id).length; }
+    // Healing in the pack, the Special Potion left out.
+    function healPoints(p) {
+        return p.potions.reduce((n, x) => {
+            const d = D.POTIONS[x.id];
+            return n + (d.group === 'heal' && !d.special ? d.heal : 0);
+        }, 0);
+    }
+    function shopEntry(id) { return D.MERCHANT_POTIONS.find(x => x.id === id); }
+
+    /* ------------------------------------------------------------------ */
+    /* Playing a fight out in its head (Hard)                              */
+    /*                                                                     */
+    /* On a copy of the game, never the real one: the copy is played to the  */
+    /* end of the fight with the bot's own choices and thrown away. Inside   */
+    /* one of these nothing is imagined again, and what was worked out is   */
+    /* kept, so asking twice costs nothing.                                 */
+    /* ------------------------------------------------------------------ */
+
+    let imagining = false;
+    let memo = {};
+    let memoSize = 0;
+    function remember(key, work) {
+        if (Object.prototype.hasOwnProperty.call(memo, key)) return memo[key];
+        if (memoSize > 400) { memo = {}; memoSize = 0; }
+        memoSize += 1;
+        memo[key] = work();
+        return memo[key];
+    }
+
+    function copyOf(state) {
+        const s = JSON.parse(JSON.stringify(state, (k, v) => (k === 'log' || k === 'lastBattle') ? undefined : v));
+        s.log = [];
+        s.paused = false;
+        return s;
+    }
+
+    // Plays the fight on the copy to its end. The copy, or null if it stuck.
+    function playOut(s) {
+        for (let i = 0; i < 600 && s.battle; i++) {
+            const b = s.battle;
+            let who, job;
+            if (b.phase === 'enemy') { who = b.moverId; job = act('enemyAct'); }
+            else if (b.phase === 'ask') { who = b.ask.pid; job = act('battleAnswer', { choice: b.ask.options[0].key }); }
+            else {
+                who = E.battleActorId(s);
+                job = who ? decide(s, who) : null;
+                if (!job) return null;
+            }
+            const r = E.ACTIONS[job.action](s, who, job.args);
+            if (!r || !r.ok) {
+                // Refused: the light attack instead, so the fight goes on.
+                const u = E.curUnit(s.battle);
+                const m = u && E.availableMoves(s, u.key).filter(x => x.usable)[0];
+                if (!m || !E.ACTIONS.battleAttack(s, who, { moveId: m.id }).ok) return null;
+            }
+        }
+        return s.battle ? null : s;
+    }
+
+    // How a fight with `enemyId` ('fenrirak' for the final one) would go,
+    // played out `tries` times: the share won, health left on average, and
+    // potions drunk on average.
+    function fightOdds(state, p, enemyId, tries) {
+        const bar = state.barbarian && state.barbarian.ownerId === p.id ? state.barbarian : null;
+        const key = ['f', enemyId, p.id, p.hp, p.bonusHp | 0, p.maxHp, p.weaponUid, p.armourUid, p.gold < 15 ? p.gold : 'g',
+            p.potions.map(x => x.id).sort().join('.'), (p.buffs || []).map(x => x.kind + x.uses).join('.'),
+            bar ? [bar.hp, bar.bonusHp | 0, bar.weapon && bar.weapon.id, bar.armour && bar.armour.id].join('/') : '-',
+            E.abilityWait(state, p)].join('|');
+        return remember(key, () => {
+            let won = 0, left = 0, drunk = 0;
+            const was = imagining;
+            imagining = true;
+            try {
+                for (let i = 0; i < tries; i++) {
+                    const s = copyOf(state);
+                    const q = E.player(s, p.id);
+                    s.pending = null;
+                    s.battle = null;
+                    s.turnIndex = Math.max(0, s.turnOrder.indexOf(q.id));
+                    const deaths = q.deaths, potions = q.potions.length;
+                    if (enemyId === 'fenrirak') E.startBoss(s, q);
+                    else E.startPve(s, q, enemyId, q.pos);
+                    const end = playOut(s);
+                    if (!end) continue;
+                    const win = enemyId === 'fenrirak' ? (end.phase === 'over' && end.winner === q.id) : q.deaths === deaths;
+                    if (win) { won += 1; left += totalHp(q); }
+                    drunk += Math.max(0, potions - q.potions.length);
+                }
+            } finally { imagining = was; }
+            return { win: won / tries, hpLeft: left / tries, potions: drunk / tries };
+        });
+    }
+
+    // The fight going on now, played to its end from here.
+    function oddsFromHere(state, p, tries) {
+        let won = 0;
+        const was = imagining;
+        imagining = true;
+        try {
+            for (let i = 0; i < tries; i++) {
+                const end = playOut(copyOf(state));
+                if (end && end.phase === 'over' && end.winner === p.id) won += 1;
+            }
+        } finally { imagining = was; }
+        return won / tries;
+    }
+
     /* ------------------------------------------------------------------ */
     /* Where would I like to land?                                         */
     /* ------------------------------------------------------------------ */
 
-    function squareValue(state, p, id, outcome) {
-        if (outcome === 'shield') return -500;
-        if (outcome === 'arena') {
-            const sim = simBoss(state, p);
-            return sim.win ? 1000 : -200;
+    function arenaValue(state, p, L) {
+        if (L.sharp) {
+            const f = fightOdds(state, p, 'fenrirak', 3);
+            return f.win >= 0.5 ? 1000 : -200 + 800 * f.win;
         }
+        return simBoss(state, p).win ? 1000 : -200;
+    }
+
+    function fightValue(state, p, enemyId, L) {
+        const e = D.ENEMIES[enemyId];
+        let loot = 8 + (e.loot.gold || 0) / 3;
+        if (e.loot.fragment && needsFragment(state, p, e.loot.fragment)) loot += 70;
+        if (e.loot.keys) loot += 10;
+        if (e.loot.joins) loot += 25;
+        if (L.sharp) {
+            const f = fightOdds(state, p, enemyId, 2);
+            if (f.win < 0.5) return -80 * (1 - f.win) - 10;
+            let v = loot * f.win - f.potions * 6;
+            v -= (totalHp(p) - f.hpLeft / Math.max(f.win, 0.01)) / 4;
+            if (f.hpLeft / Math.max(f.win, 0.01) < p.maxHp * 0.25) v -= 25;
+            return v;
+        }
+        const sim = simFight(state, p, enemyId, { ally: E.hasBarbarian(state, p) });
+        if (!sim.win) return -80;
+        let v = loot - (totalHp(p) - sim.hpLeft) / 4;
+        if (sim.hpLeft < p.maxHp * 0.25) v -= 25;
+        return v;
+    }
+
+    function squareValue(state, p, id, outcome, L) {
+        if (outcome === 'shield') return -500;
+        if (outcome === 'arena') return arenaValue(state, p, L);
         const sq = E.square(id);
         const missing = p.maxHp - p.hp;
 
@@ -8715,19 +9158,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             case 'draw_item': return 14 * sq.count;
             case 'keys': return 12 * sq.count;
             case 'split': return 2;
-            case 'battle': {
+            case 'battle':
                 if (sq.enemy === 'barbarian' && state.barbarian && state.barbarian.ownerId) return 0;
-                const e = D.ENEMIES[sq.enemy];
-                const sim = simFight(state, p, sq.enemy, { ally: E.hasBarbarian(state, p) });
-                if (!sim.win) return -80;
-                let v = 8 + (e.loot.gold || 0) / 3;
-                if (e.loot.fragment && needsFragment(state, p, e.loot.fragment)) v += 70;
-                if (e.loot.keys) v += 10;
-                if (e.loot.joins) v += 25;
-                v -= (totalHp(p) - sim.hpLeft) / 4;
-                if (sim.hpLeft < p.maxHp * 0.25) v -= 25;
-                return v;
-            }
+                return fightValue(state, p, sq.enemy, L);
             case 'pay_heal': return Math.min(missing, sq.heal) / 3;
             case 'pay_draw': return p.gold >= sq.price ? 6 : 0;
             case 'key_swap': return p.keys ? 12 * sq.gems : 0;
@@ -8752,44 +9185,96 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         }
     }
 
-    function bestTotal(state, p, pend) {
+    // The best of the totals from min to max: { t, v }. `calm` counts the
+    // shield and the arena as nothing, for asking whether waiting a turn
+    // would help (it never changes those).
+    function bestChoice(state, p, min, max, L, calm) {
         let best = null;
-        for (let t = pend.min; t <= pend.max; t++) {
+        for (let t = min; t <= max; t++) {
             let v;
             if (t === 0) v = 0;
             else {
                 const w = E.previewWalk(state, p, t, null);
-                if (w.outcome === 'split') v = 5 + routeValue(state, p);
+                if (calm && (w.outcome === 'shield' || w.outcome === 'arena')) v = 0;
+                else if (w.outcome === 'split') v = 5 + routeValue(state, p, L);
                 else if (w.outcome === 'optional') v = optionalValue(state, p, w.pos);
-                else v = squareValue(state, p, w.pos, w.outcome);
+                else v = squareValue(state, p, w.pos, w.outcome, L);
                 // Progress is worth a little for its own sake.
                 v += t * 1.5;
             }
             if (!best || v > best.v) best = { t: t, v: v };
         }
-        return best ? best.t : pend.max;
+        return best || { t: max, v: 0 };
     }
 
-    function routeChoice(state, p) {
+    // What rolling is worth before the die is thrown: every face, each
+    // played the best way. `up` and `down` try a movement potion on top.
+    function rollValue(state, p, L, up, down, calm) {
+        const o = E.moveOffer(state, p);
+        let sum = 0;
+        for (let d = 1; d <= 6; d++) {
+            const min = Math.max(0, d + o.fixed - o.down - (down | 0));
+            const max = Math.max(0, d + o.fixed + o.up + (up | 0));
+            sum += bestChoice(state, p, min, max, L, calm).v;
+        }
+        return sum / 6;
+    }
+
+    // Easy: as far as the die allows, but never onto somebody else's square
+    // or into the shield if a shorter walk avoids it.
+    function easyTotal(state, p, pend) {
+        for (let t = pend.max; t >= pend.min; t--) {
+            if (t === 0) return 0;
+            const w = E.previewWalk(state, p, t, null);
+            if (w.outcome === 'shield') continue;
+            if ((w.outcome === 'landed' || w.outcome === 'stop') && w.pos !== D.START &&
+                state.players.some(x => x.id !== p.id && x.cls && x.pos === w.pos)) continue;
+            return t;
+        }
+        return pend.max;
+    }
+
+    function pyriteGain(state, p) {
+        let gain = 0;
+        D.PYRITE_GEAR.forEach(id => {
+            const d = D.ITEMS[id];
+            if (d.cls !== p.cls) return;
+            const cur = E.itemDef(d.kind === 'weapon' ? E.weaponOf(p) : E.armourOf(p));
+            gain = Math.max(gain, d.score - (cur ? cur.score : 0));
+        });
+        return gain;
+    }
+
+    function routeChoice(state, p, L) {
         // The main route is the only way to Pendant Fragment #1.
         if (needsFragment(state, p, 1)) return 'main';
+        if (!L.thinks) return Math.random() < 0.5 ? 'main' : 'long';
         if (p.hp < p.maxHp * 0.6) return 'main';
+        if (L.sharp) {
+            // The long road is for Astrix's potions and the Pyrite's gear,
+            // and only if its fights can be won.
+            if (!(p.gold >= 75 || p.gems >= 1 || pyriteGain(state, p) > 8)) return 'main';
+            return fightOdds(state, p, 'thieves', 2).win >= 0.5 ? 'long' : 'main';
+        }
         const w = E.itemDef(E.weaponOf(p));
         return (w && w.tier >= 3) ? 'long' : 'main';
     }
-    function routeValue(state, p) { return routeChoice(state, p) === 'long' ? 4 : 2; }
+    function routeValue(state, p, L) { return routeChoice(state, p, L) === 'long' ? 4 : 2; }
 
     function optionalValue(state, p, id) {
         if (id === D.TEMPLE) return E.hasFragments(state, p) ? 60 : 40;
         return 10;
     }
 
-    function stopAtOptional(state, p, pend) {
+    function stopAtOptional(state, p, pend, L) {
         const id = pend.squareId;
+        const rival = state.players.find(x => x.id !== p.id && x.cls && x.pos === id);
         if (id === D.TEMPLE) {
             // Passing the temple means walking into the shield: only with the
             // fragments, and only healthy.
             if (!E.hasFragments(state, p)) return true;
+            if (!L.thinks) return !rival && p.hp < p.maxHp * 0.75;
+            if (L.sharp) return totalHp(p) < p.maxHp;
             if (p.hp < p.maxHp * 0.9) return true;
             return !simBoss(state, p).win;
         }
@@ -8797,9 +9282,54 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (sq.action === 'battle') {
             const e = D.ENEMIES[sq.enemy];
             if (!e.loot.fragment || !needsFragment(state, p, e.loot.fragment)) return false;
+            if (!L.thinks) return !rival;
+            if (L.sharp) return fightOdds(state, p, sq.enemy, 2).win >= 0.5;
             return simFight(state, p, sq.enemy, { ally: E.hasBarbarian(state, p) }).win;
         }
         return false;
+    }
+
+    /* ---- before the die ------------------------------------------------- */
+
+    // Medium and Hard: rather than walk into a fight it expects to lose,
+    // stay where it is for a turn (Hard: up to two). Waiting never changes
+    // the shield or the arena, so those do not count.
+    function shouldStay(state, p, L) {
+        if (!L.staysPut || (p.stayStreak | 0) >= L.staysPut) return false;
+        // Not again for a while once it has moved on.
+        if (!p.stayStreak && p.stayedAt !== undefined && p.turnsTaken - p.stayedAt <= 3) return false;
+        if (p.pos === D.START || p.pos === D.TEMPLE) return false;
+        return rollValue(state, p, L, 0, 0, true) < -40;
+    }
+
+    // Hard: a movement potion from the pack when it makes the roll clearly
+    // better (dodging a bad square, reaching a good one).
+    function movePotionJob(state, p, L) {
+        const pots = p.potions.filter(x => D.POTIONS[x.id].group === 'move');
+        if (!pots.length) return null;
+        const base = rollValue(state, p, L, 0, 0, true);
+        let best = null;
+        const tried = {};
+        pots.forEach(x => {
+            if (tried[x.id]) return;
+            tried[x.id] = true;
+            const d = D.POTIONS[x.id];
+            const v = rollValue(state, p, L, d.up, d.down, true);
+            if (v - base > 12 && (!best || v > best.v)) best = { uid: x.uid, v: v };
+        });
+        return best ? act('usePotion', { uid: best.uid }) : null;
+    }
+
+    // Hard, on the temple and about to go in to win: a healing potion at
+    // full health stacks on top, so one or two go down before the fight.
+    function preDrinkJob(state, p) {
+        if (p.pos !== D.TEMPLE || !E.hasFragments(state, p)) return null;
+        if (p.hp < p.maxHp || (p.bonusHp | 0) >= 60) return null;
+        const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && !D.POTIONS[x.id].special)
+            .sort((a, b) => D.POTIONS[b.id].heal - D.POTIONS[a.id].heal);
+        if (heals.length < 4) return null;
+        if (fightOdds(state, p, 'fenrirak', 3).win === 0) return null;
+        return act('usePotion', { uid: heals[0].uid, target: 'self' });
     }
 
     /* ------------------------------------------------------------------ */
@@ -8838,7 +9368,26 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return null;
     }
 
-    function shopJob(state, p) {
+    // Gear it can do without: one spare of each kind is kept (Thieves and
+    // the nobles take what is worn), the rest can go to the Merchant.
+    function spareGear(state, p) {
+        const out = [];
+        const groups = {};
+        p.inventory.forEach(it => {
+            if (it.uid === p.weaponUid || it.uid === p.armourUid) return;
+            const d = E.itemDef(it);
+            if (!d) return;
+            if (d.cls !== p.cls && d.cls !== 'barbarian') { out.push(it); return; }
+            const k = d.cls + '/' + d.kind;
+            (groups[k] = groups[k] || []).push(it);
+        });
+        Object.keys(groups).forEach(k => {
+            groups[k].sort((a, b) => E.itemDef(b).score - E.itemDef(a).score).slice(1).forEach(it => out.push(it));
+        });
+        return out.sort((a, b) => E.itemDef(a).score - E.itemDef(b).score);
+    }
+
+    function gearShopJob(state, p) {
         // The Merchant's own piece for my class, if it beats what I wear.
         for (const id of D.MERCHANT_GEAR) {
             const d = D.ITEMS[id];
@@ -8855,38 +9404,82 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const have = Math.max(current ? current.score : 0, best ? E.itemDef(best).score : 0);
             if (d.score > have + 4) return act('buy', { kind: 'gear', id: id });
         }
+        return null;
+    }
+
+    /* What each level wants in the pack before the final fight, most
+       important first: { heal: N } is healing worth N HP (bought as
+       Potions of Awakening), { id, n } so many of a potion, { tranq } a
+       Tranquility of any kind (bought with Gemstones). Medium takes what it
+       can afford down the list; Hard saves up for the next thing on it. */
+    const KITS = {
+        1: [{ heal: 180 }, { id: 'rage_potion', n: 1 }, { id: 'potion_of_ironskin', n: 1 },
+            { heal: 240 }, { id: 'potion_of_adrenaline', n: 1 }],
+        2: [{ heal: 180 }, { id: 'rage_potion', n: 1 }, { tranq: true }, { heal: 300 },
+            { id: 'rage_potion', n: 2 }, { id: 'potion_of_energy', n: 1 }, { id: 'potion_of_ironskin', n: 2 },
+            { heal: 360 }]
+    };
+    const SAVING = { saving: true };
+
+    // Medium's set is ready when all but the last thing on its list is in.
+    function kitReady(p, L) {
+        const list = KITS[L.kit] || [];
+        return list.slice(0, Math.max(0, list.length - 1)).every(want => {
+            if (want.heal) return healPoints(p) >= want.heal;
+            if (want.tranq) return true;
+            return count(p, want.id) >= want.n;
+        });
+    }
+
+    function kitJob(state, p, L) {
+        for (const want of KITS[L.kit]) {
+            let id, pay = 'gold';
+            if (want.heal) {
+                if (healPoints(p) >= want.heal) continue;
+                id = 'potion_of_awakening';
+            } else if (want.tranq) {
+                if (p.potions.some(x => D.POTIONS[x.id].tranquility)) continue;
+                const tq = shopEntry('merchants_tranquility');
+                if (p.gems < tq.alt.gems) continue;
+                id = tq.id;
+                pay = 'alt';
+            } else {
+                if (count(p, want.id) >= want.n) continue;
+                id = want.id;
+            }
+            const entry = shopEntry(id);
+            const cost = E.merchantPrice(state, pay === 'alt' ? entry.alt.gold : entry.price);
+            if (p.gold >= cost) return act('buy', { kind: 'potion', id: id, pay: pay });
+            // Short: the spare gear goes to the Merchant if that covers it.
+            const spare = spareGear(state, p);
+            if (spare.length && p.gold + spare.length * D.SELL_PRICE >= cost) return act('sell', { uid: spare[0].uid });
+            if (L.sharp) return SAVING;
+        }
+        return null;
+    }
+
+    function shopJob(state, p, L) {
+        const g = gearShopJob(state, p);
+        if (g) return g;
+        const healCost = id => E.merchantPrice(state, shopEntry(id).price);
+        const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && !D.POTIONS[x.id].special).length;
+        if (!L.kit) {
+            // Easy: a healing potion in the pack, when it has the gold.
+            if (!heals && p.gold >= healCost('healing_potion') + 25) return act('buy', { kind: 'potion', id: 'healing_potion' });
+            return null;
+        }
         // Getting ready for the arena: the final fight is won or lost on
         // what is in the pack when you walk in.
-        const count = id => p.potions.filter(x => x.id === id).length;
-        const price = id => E.merchantPrice(state, D.MERCHANT_POTIONS.find(x => x.id === id).price);
-        const near = arenaNear(state, p);
-        if (near) {
-            if (!p.potions.some(x => D.POTIONS[x.id].tranquility)) {
-                const tq = D.MERCHANT_POTIONS.find(x => x.id === 'merchants_tranquility');
-                if (p.gems >= tq.alt.gems && p.gold >= E.merchantPrice(state, tq.alt.gold)) {
-                    return act('buy', { kind: 'potion', id: tq.id, pay: 'alt' });
-                }
-                if (p.gold >= price(tq.id)) return act('buy', { kind: 'potion', id: tq.id, pay: 'gold' });
-            }
-            if (count('potion_of_adrenaline') < 2 && p.gold >= price('potion_of_adrenaline') + 40) {
-                return act('buy', { kind: 'potion', id: 'potion_of_adrenaline' });
-            }
-            if (count('potion_of_awakening') < 4 && p.gold >= price('potion_of_awakening') + 20) {
-                return act('buy', { kind: 'potion', id: 'potion_of_awakening' });
-            }
-            if (count('rage_potion') < 3 && p.gold >= price('rage_potion') + 20) {
-                return act('buy', { kind: 'potion', id: 'rage_potion' });
-            }
-            if (count('potion_of_ironskin') < 2 && p.gold >= price('potion_of_ironskin') + 20) {
-                return act('buy', { kind: 'potion', id: 'potion_of_ironskin' });
-            }
+        if (arenaNear(state, p)) {
+            const k = kitJob(state, p, L);
+            if (k === SAVING) return null;
+            if (k) return k;
         }
-        // A healing potion or two in the pack.
-        const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && x.id !== 'special_potion').length;
-        if (heals < 3 && p.gold >= price('potion_of_awakening') + 60) {
+        // A healing potion or two in the pack at all times.
+        if (heals < 3 && p.gold >= healCost('potion_of_awakening') + 60) {
             return act('buy', { kind: 'potion', id: 'potion_of_awakening' });
         }
-        if (heals < 2 && p.gold >= price('healing_potion') + 20) {
+        if (heals < 2 && p.gold >= healCost('healing_potion') + 20) {
             return act('buy', { kind: 'potion', id: 'healing_potion' });
         }
         return null;
@@ -8899,10 +9492,14 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return need - have <= 1 || (D.PROGRESS[p.pos] || 0) >= D.PROGRESS['29'];
     }
 
-    function healJob(state, p, threshold) {
+    function healJob(state, p, threshold, L) {
         if (p.hp >= p.maxHp * threshold) return null;
-        const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal')
+        let heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal')
             .sort((a, b) => D.POTIONS[a.id].heal - D.POTIONS[b.id].heal);
+        // The big ones are for the final fight, unless things are bad.
+        if (L.kit && arenaNear(state, p) && p.hp >= p.maxHp * 0.3) {
+            heals = heals.filter(x => D.POTIONS[x.id].heal < 60);
+        }
         const missing = p.maxHp - p.hp;
         const pick = heals.find(x => D.POTIONS[x.id].heal <= missing) || heals[heals.length - 1];
         return pick ? act('usePotion', { uid: pick.uid, target: 'self' }) : null;
@@ -8912,25 +9509,120 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* In a fight                                                          */
     /* ------------------------------------------------------------------ */
 
-    function battleJob(state, p, b) {
+    function fightJob(state, p, b, L) {
+        if (b.phase === 'order') return (b.orderRolls && b.orderRolls[p.id] === null) ? act('battleOrderRoll') : null;
+        if (b.phase === 'ask') {
+            if (!b.ask || b.ask.pid !== p.id) return null;
+            // Give up the lesser piece.
+            const opts = b.ask.options.slice();
+            const worth = o => {
+                const inst = E.ownedItem(p, o.key);
+                if (inst) return E.itemDef(inst).score;
+                const bar = state.barbarian;
+                const bi = o.key === 'w' ? bar.weapon : bar.armour;
+                return bi ? E.itemDef(bi).score : 0;
+            };
+            opts.sort((x, y) => worth(x) - worth(y));
+            return act('battleAnswer', { choice: opts[0].key });
+        }
+        if (b.phase === 'enemy') return b.moverId === p.id ? act('enemyAct') : null;
         const u = E.curUnit(b);
+        if (!u || E.controllerOf(state, u) !== p.id) return null;
+        if (!L.thinks) return plainJob(state, p, b, u);
+        if (L.sharp && b.kind === 'boss') return bossJob(state, p, b, u);
+        return battleJob(state, p, b, u, L);
+    }
+
+    // The blow itself: the cheapest that finishes the target, else the
+    // heavy one if there is the energy, else the light one.
+    function blowJob(state, b, u, tgt) {
+        const moves = E.availableMoves(state, u.key);
+        let choice = null;
+        if (tgt) {
+            const killers = moves.filter(m => m.usable).filter(m => {
+                const calc = E.computeHit(state, b, u, redirect(b, tgt), m);
+                return calc.net >= E.body(state, redirect(b, tgt)).hp;
+            }).sort((x, y) => x.energy - y.energy);
+            if (killers.length) choice = killers[0];
+        }
+        const heavy = moves.filter(m => m.usable && m.energy >= 5).sort((x, y) => y.damage - x.damage)[0];
+        if (!choice) choice = heavy || moves.filter(m => m.usable && m.energy === 1)[0] || moves.filter(m => m.usable)[0];
+        return act('battleAttack', { moveId: choice.id, target: tgt ? tgt.key : null });
+    }
+
+    // Easy: drinks when badly hurt, uses its ability when it can, and hits.
+    function plainJob(state, p, b, u) {
+        const o = E.body(state, u);
+        if (o.hp + (o.bonusHp || 0) < (o.maxHp || 1) * 0.35) {
+            const heal = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && E.canUsePotion(state, p.id, x.uid).ok)
+                .sort((a, c) => D.POTIONS[c.id].heal - D.POTIONS[a.id].heal)[0];
+            if (heal) return act('usePotion', { uid: heal.uid });
+        }
+        if (u.kind === 'player') {
+            const ab = E.canUseAbility(state, p.id);
+            const pointless = D.CLASSES[p.cls].ability.id === 'iron_body' && b.kind === 'pvp';
+            if (ab.ok && !pointless) return act('useAbility');
+        }
+        return blowJob(state, b, u, pickTarget(state, b, u));
+    }
+
+    function liveEnemy(b, id) { return b.units.find(x => x.enemyId === id && !x.down) || null; }
+
+    // Fenrirak's next few attacks, as the engine will choose them.
+    function fenAhead(b, fen, n) {
+        const out = [];
+        let e = fen.energy;
+        for (let i = 0; i < (n || 4); i++) {
+            const m = E.chooseEnemyMove(b, { enemyId: 'fenrirak', energy: e });
+            out.push(m);
+            e = e - m.cost + 1;
+        }
+        return out;
+    }
+
+    // Will the potions be shut away on our next turn (Oblivion Control)?
+    function lockedNext(b) {
+        const fen = liveEnemy(b, 'fenrirak');
+        if (!fen || !liveEnemy(b, 'oblivion_mage') || E.tranquil(b, 'B')) return false;
+        return fenAhead(b, fen, 1)[0].id === 'annihilation_void';
+    }
+
+    function battleJob(state, p, b, u, L) {
         const isAlly = u.kind === 'ally';
         const o = E.body(state, u);
         const moves = E.availableMoves(state, u.key);
         const tgt = pickTarget(state, b, u);
+        const usable = x => E.canUsePotion(state, p.id, x.uid).ok;
+
+        // The final fight without the set of potions it shops for: fought
+        // without drinking, and the potions kept for the next try.
+        if (b.kind === 'boss') {
+            if (!b.botPlan) b.botPlan = kitReady(p, L) ? 'all' : 'keep';
+            if (b.botPlan === 'keep') {
+                if (!isAlly) {
+                    const ab = E.canUseAbility(state, p.id);
+                    if (ab.ok && D.CLASSES[p.cls].ability.id !== 'iron_body') return act('useAbility');
+                }
+                return blowJob(state, b, u, tgt);
+            }
+        }
 
         // Silence the bosses first: no Corrupted Arena, no Oblivion Control.
         if (b.kind === 'boss' && !b.pot.heal && !b.pot.other && !b.pot.astrix && !E.tranquil(b, 'B')) {
-            const tq = p.potions.find(x => D.POTIONS[x.id].tranquility && E.canUsePotion(state, p.id, x.uid).ok);
+            const tq = p.potions.find(x => D.POTIONS[x.id].tranquility && usable(x));
             if (tq) return act('usePotion', { uid: tq.uid });
         }
+        // Fenrirak down: Helen in one blow, before Obliviate, if it can be done.
+        if (b.kind === 'boss' && !liveEnemy(b, 'fenrirak') && liveEnemy(b, 'oblivion_mage')) {
+            const fin = finishHelen(state, p, b, u, liveEnemy(b, 'oblivion_mage'), true);
+            if (fin) return fin;
+        }
 
-        // In trouble: drink. In the arena, earlier -- Annihilation Void can
-        // shut the potions away for a turn.
-        const low = b.kind === 'boss' ? 0.6 : 0.35;
+        // In trouble: drink. In the arena, earlier -- and earlier still when
+        // Annihilation Void is coming, which shuts the potions away a turn.
+        const low = b.kind === 'boss' ? (lockedNext(b) ? 0.85 : 0.6) : 0.35;
         if (o.hp + (o.bonusHp || 0) < (o.maxHp || 1) * low) {
-            const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' &&
-                E.canUsePotion(state, p.id, x.uid).ok)
+            const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && usable(x))
                 .sort((a, b2) => D.POTIONS[b2.id].heal - D.POTIONS[a.id].heal);
             if (heals.length) return act('usePotion', { uid: heals[0].uid });
         }
@@ -8942,49 +9634,212 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (ab.ok && !pointless) return act('useAbility');
         }
 
+        // Hard: a defence potion before a monster's heavy blow lands on us.
+        if (L.sharp && b.kind === 'pve' && b.pot.other < R.potionsOtherPerTurn && !b.pot.astrix) {
+            const foe = b.units.find(x => x.kind === 'enemy' && !x.down);
+            const aim = foe && E.enemyTarget(b, foe);
+            if (aim && aim.key === u.key) {
+                const m = E.chooseEnemyMove(b, foe);
+                if (m.damage && E.computeHit(state, b, foe, aim, m).net >= 40) {
+                    const dp = p.potions.filter(x => D.POTIONS[x.id].def && D.POTIONS[x.id].group === 'battle' && usable(x))
+                        .sort((a, c) => D.POTIONS[c.id].def - D.POTIONS[a.id].def)[0];
+                    if (dp) return act('usePotion', { uid: dp.uid });
+                }
+            }
+        }
+
         const heavy = moves.filter(m => m.usable && m.energy >= 5).sort((x, y) => y.damage - x.damage)[0];
         const big = b.kind === 'boss' || (tgt && tgt.kind === 'enemy' && (tgt.maxHp || 0) >= 130) || b.kind === 'pvp';
 
         // Energy to reach the heavy attack a turn early.
         if (!heavy && (u.energy >= 3 || b.kind === 'boss') && big) {
             const en = p.potions.find(x => D.POTIONS[x.id].energy && D.POTIONS[x.id].group === 'battle' &&
-                u.energy + D.POTIONS[x.id].energy >= 5 && E.canUsePotion(state, p.id, x.uid).ok);
+                u.energy + D.POTIONS[x.id].energy >= 5 && usable(x));
             if (en) return act('usePotion', { uid: en.uid });
         }
 
         // Astrix's best, once, on the heavy blow in a fight that matters.
         if (heavy && big && !b.pot.heal && !b.pot.other && !b.pot.astrix) {
             const astrix = p.potions.filter(x => D.POTIONS[x.id].group === 'astrix' &&
-                (D.POTIONS[x.id].dmgMul || D.POTIONS[x.id].pierce || D.POTIONS[x.id].tranquility) &&
-                E.canUsePotion(state, p.id, x.uid).ok);
+                (D.POTIONS[x.id].dmgMul || D.POTIONS[x.id].pierce || D.POTIONS[x.id].tranquility) && usable(x));
             const pick = astrix.find(x => D.POTIONS[x.id].dmgMul) || astrix[0];
             if (pick && (b.kind === 'boss' || D.POTIONS[pick.id].dmgMul)) return act('usePotion', { uid: pick.uid });
         }
         // A damage potion on a heavy blow.
         if (heavy && big && b.pot.other < R.potionsOtherPerTurn && !b.pot.astrix) {
-            const dp = p.potions.find(x => D.POTIONS[x.id].dmg && D.POTIONS[x.id].group === 'battle' &&
-                E.canUsePotion(state, p.id, x.uid).ok);
+            const dp = p.potions.find(x => D.POTIONS[x.id].dmg && D.POTIONS[x.id].group === 'battle' && usable(x));
             if (dp) return act('usePotion', { uid: dp.uid });
         }
-        // Tranquility at the start of the final fight.
-        if (b.kind === 'boss' && !b.pot.heal && !b.pot.other && !b.pot.astrix) {
-            const tq = p.potions.find(x => D.POTIONS[x.id].tranquility && D.POTIONS[x.id].group === 'battle' &&
-                E.canUsePotion(state, p.id, x.uid).ok);
+
+        return blowJob(state, b, u, tgt);
+    }
+
+    /* ---- the final fight, Hard ------------------------------------------ */
+
+    // What this unit must have in it to reach its next turn on which a
+    // potion can be drunk: Fenrirak's blows that land on it until then (a
+    // Barbarian standing in front takes them first), and the Corrupted
+    // Arena's 5 each turn. With Fenrirak down, Helen's next blow.
+    function dangerTo(state, b, u) {
+        const fen = liveEnemy(b, 'fenrirak');
+        const helen = liveEnemy(b, 'oblivion_mage');
+        const me = u.kind === 'ally' ? b.units.find(x => x.kind === 'player' && x.side === u.side) : u;
+        const ally = b.units.find(x => x.kind === 'ally' && x.side === u.side && !x.down);
+        if (!fen) {
+            if (!helen) return 0;
+            const m = E.chooseEnemyMove(b, helen);
+            const aim = ally || me;
+            return m.damage && aim.key === u.key ? E.computeHit(state, b, helen, aim, m).net : 0;
+        }
+        const quiet = E.tranquil(b, 'B');
+        let wall = ally ? E.body(state, ally).hp + (E.body(state, ally).bonusHp || 0) : 0;
+        let need = 0;
+        for (const m of fenAhead(b, fen, 4)) {
+            const aim = wall > 0 ? ally : me;
+            const dmg = E.computeHit(state, b, fen, aim, m).net;
+            if (aim.key === u.key) need += dmg;
+            if (wall > 0) wall -= dmg;
+            if (!quiet) need += 5;
+            if (quiet || !helen || m.id !== 'annihilation_void') break;
+        }
+        return need;
+    }
+
+    // The healing potion for this body: one that fills it to full if it is
+    // hurt (no further: the rest would be lost), the biggest if it is full.
+    function healFor(state, p, o) {
+        const list = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && E.canUsePotion(state, p.id, x.uid).ok)
+            .sort((a, c) => D.POTIONS[a.id].heal - D.POTIONS[c.id].heal);
+        if (!list.length) return null;
+        const missing = o.maxHp - o.hp;
+        if (missing > 0) return list.find(x => D.POTIONS[x.id].heal >= missing) || list[list.length - 1];
+        return list[list.length - 1];
+    }
+
+    // One blow on Helen now, before Obliviate: potions to make it happen if
+    // that is what it takes. Null when it cannot be done this turn.
+    function finishHelen(state, p, b, u, helen, drink) {
+        const moves = E.movesOf(state, u);
+        const net = m => E.computeHit(state, b, u, helen, m).net;
+        const now = moves.filter(m => u.energy >= m.energy && net(m) >= helen.hp).sort((x, y) => x.energy - y.energy)[0];
+        if (now) return act('battleAttack', { moveId: now.id, target: helen.key });
+        if (!drink) return null;
+        const usable = x => E.canUsePotion(state, p.id, x.uid).ok;
+        if (!b.pot.astrix && b.pot.other < R.potionsOtherPerTurn) {
+            // Energy for a bigger blow that would do it.
+            const en = p.potions.filter(x => D.POTIONS[x.id].energy && D.POTIONS[x.id].group === 'battle' && usable(x))
+                .sort((a, c) => D.POTIONS[a.id].energy - D.POTIONS[c.id].energy);
+            for (const m of moves.slice().sort((x, y) => x.energy - y.energy)) {
+                if (u.energy >= m.energy || net(m) < helen.hp) continue;
+                const pot = en.find(x => u.energy + D.POTIONS[x.id].energy >= m.energy);
+                if (pot) return act('usePotion', { uid: pot.uid });
+            }
+            // A damage potion (or two) on the best blow there is.
+            const best = moves.filter(m => u.energy >= m.energy).sort((x, y) => net(y) - net(x))[0];
+            const dmg = p.potions.filter(x => D.POTIONS[x.id].dmg && D.POTIONS[x.id].group === 'battle' && usable(x))
+                .sort((a, c) => D.POTIONS[c.id].dmg - D.POTIONS[a.id].dmg);
+            if (best && dmg.length) {
+                const room = R.potionsOtherPerTurn - b.pot.other;
+                const top = dmg.slice(0, room).reduce((n, x) => n + D.POTIONS[x.id].dmg, 0);
+                if (net(best) + top >= helen.hp) return act('usePotion', { uid: dmg[0].uid });
+            }
+        }
+        // Astrix's x2 or no-defence, if nothing else has been drunk.
+        if (!b.pot.heal && !b.pot.other && !b.pot.astrix) {
+            const ax = p.potions.find(x => { const d = D.POTIONS[x.id]; return d.group === 'astrix' && (d.dmgMul || d.dmg || d.pierce) && usable(x); });
+            if (ax) return act('usePotion', { uid: ax.uid });
+        }
+        return null;
+    }
+
+    function bossJob(state, p, b, u) {
+        const fen = liveEnemy(b, 'fenrirak');
+        const helen = liveEnemy(b, 'oblivion_mage');
+        const o = E.body(state, u);
+        const usable = x => E.canUsePotion(state, p.id, x.uid).ok;
+        const nothingYet = !b.pot.heal && !b.pot.other && !b.pot.astrix;
+
+        // Can this fight be won? If not even with every potion, it is fought
+        // without them, and they are kept for the next try.
+        if (!b.botPlan) b.botPlan = imagining ? 'all' : (oddsFromHere(state, p, 3) > 0 ? 'all' : 'keep');
+        const drink = b.botPlan === 'all';
+
+        // Silence them: no Corrupted Arena, no Oblivion Control.
+        if (drink && fen && !E.tranquil(b, 'B') && nothingYet) {
+            const tq = p.potions.find(x => D.POTIONS[x.id].tranquility && usable(x));
             if (tq) return act('usePotion', { uid: tq.uid });
         }
 
-        // Choose the blow.
-        let choice = null;
-        if (tgt) {
-            const killers = moves.filter(m => m.usable).filter(m => {
-                const calc = E.computeHit(state, b, u, redirect(b, tgt), m);
-                return calc.net >= E.body(state, redirect(b, tgt)).hp;
-            }).sort((x, y) => x.energy - y.energy);
-            if (killers.length) choice = killers[0];
+        // Helen alone: finish her before Obliviate if it can be done.
+        if (!fen && helen) {
+            const fin = finishHelen(state, p, b, u, helen, drink);
+            if (fin) return fin;
         }
-        if (!choice) choice = heavy || moves.filter(m => m.usable && m.energy === 1)[0] ||
-            moves.filter(m => m.usable)[0];
-        return act('battleAttack', { moveId: choice.id, target: tgt ? tgt.key : null });
+
+        // Live to the next turn a potion can be drunk. The Barbarian's own
+        // turn only takes from a pack with plenty in it.
+        if (drink) {
+            const need = dangerTo(state, b, u);
+            const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal').length;
+            if (o.hp + (o.bonusHp || 0) <= need + 10 && (u.kind === 'player' || heals > 3)) {
+                const pick = healFor(state, p, o);
+                if (pick) return act('usePotion', { uid: pick.uid });
+            }
+        }
+
+        if (u.kind === 'player') {
+            const ab = E.canUseAbility(state, p.id);
+            if (ab.ok && D.CLASSES[p.cls].ability.id !== 'iron_body') return act('useAbility');
+        }
+
+        const target = fen || helen;
+        if (!target) return blowJob(state, b, u, pickTarget(state, b, u));
+        const moves = E.availableMoves(state, u.key);
+        const kills = moves.filter(m => m.usable && E.computeHit(state, b, u, target, m).net >= target.hp);
+        if (kills.length || !drink) return blowJob(state, b, u, target);
+
+        // Kept back for Helen while Fenrirak stands: the best damage potion
+        // and the best energy potion.
+        const worth = x => { const d = D.POTIONS[x.id]; return (d.dmg || 0) + (d.energy || 0) * 10; };
+        const best = test => p.potions.filter(x => test(D.POTIONS[x.id])).sort((a, c) => worth(c) - worth(a))[0];
+        const keepDmg = fen ? best(d => d.dmg && d.group === 'battle') : null;
+        const keepEn = fen ? best(d => d.energy && d.group === 'battle') : null;
+        const spare = x => usable(x) && x !== keepDmg && x !== keepEn;
+        const room = !b.pot.astrix && b.pot.other < R.potionsOtherPerTurn;
+        const heavy = moves.filter(m => m.usable && m.energy >= 5)[0];
+
+        // Astrix's potions, each the only one that turn: no-defence first,
+        // then a doubled heavy blow while Fenrirak has plenty left.
+        if (nothingYet && fen) {
+            const pierced = (E.buffsOf(state, u) || []).some(x => x.kind === 'pierce');
+            const tr = !pierced && p.potions.find(x => D.POTIONS[x.id].pierce && usable(x));
+            if (tr) return act('usePotion', { uid: tr.uid });
+            const mul = p.potions.find(x => D.POTIONS[x.id].dmgMul && usable(x));
+            if (mul && fen.hp > 150 && u.energy + (D.POTIONS[mul.id].energy || 0) >= 5) return act('usePotion', { uid: mul.uid });
+        }
+        // Energy to reach the heavy blow now.
+        if (!heavy && room) {
+            const en = p.potions.find(x => D.POTIONS[x.id].energy && D.POTIONS[x.id].group === 'battle' &&
+                u.energy + D.POTIONS[x.id].energy >= 5 && spare(x));
+            if (en) return act('usePotion', { uid: en.uid });
+        }
+        // A damage potion on the heavy blow.
+        if (heavy && room) {
+            const dp = p.potions.find(x => D.POTIONS[x.id].dmg && D.POTIONS[x.id].group === 'battle' && spare(x));
+            if (dp) return act('usePotion', { uid: dp.uid });
+        }
+        // A defence potion before a big blow lands on this one.
+        if (fen && room) {
+            const ally = b.units.find(x => x.kind === 'ally' && x.side === u.side && !x.down);
+            const aim = ally || b.units.find(x => x.kind === 'player' && x.side === u.side);
+            const m = fenAhead(b, fen, 1)[0];
+            if (aim && aim.key === u.key && E.computeHit(state, b, fen, aim, m).net >= 35) {
+                const dp = p.potions.filter(x => D.POTIONS[x.id].def && D.POTIONS[x.id].group === 'battle' && usable(x))
+                    .sort((a, c) => D.POTIONS[c.id].def - D.POTIONS[a.id].def)[0];
+                if (dp) return act('usePotion', { uid: dp.uid });
+            }
+        }
+        return blowJob(state, b, u, target);
     }
 
     function redirect(b, tgt) {
@@ -9046,11 +9901,12 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* Questions                                                           */
     /* ------------------------------------------------------------------ */
 
-    function answer(state, p, pend) {
+    function answer(state, p, pend, L) {
         switch (pend.type) {
-            case 'move': return act('resolvePending', { choice: bestTotal(state, p, pend) });
-            case 'route': return act('resolvePending', { choice: routeChoice(state, p) });
-            case 'optional': return act('resolvePending', { choice: stopAtOptional(state, p, pend) ? 'stop' : 'go' });
+            case 'move':
+                return act('resolvePending', { choice: L.thinks ? bestChoice(state, p, pend.min, pend.max, L).t : easyTotal(state, p, pend) });
+            case 'route': return act('resolvePending', { choice: routeChoice(state, p, L) });
+            case 'optional': return act('resolvePending', { choice: stopAtOptional(state, p, pend, L) ? 'stop' : 'go' });
             case 'offer': {
                 const sq = E.square(pend.squareId);
                 let yes = false;
@@ -9062,7 +9918,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             case 'choose': return act('resolvePending', { choice: chooseOption(state, p, pend) });
             case 'chest': return act('resolvePending', { choice: p.keys > 0 ? 'open' : 'leave' });
             case 'astrix': {
-                const buyIt = astrixPick(state, p);
+                const buyIt = L.sharp ? astrixPlan(state, p) : (L.kit ? astrixPick(state, p) : null);
                 if (buyIt) return act('buyAstrix', buyIt);
                 return act('resolvePending', { choice: 'done' });
             }
@@ -9124,6 +9980,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return null;
     }
 
+    // Hard at Astrix's: a Tranquility if it has none, then Transcendence,
+    // then the doubling ones; Gemstones first, so the Gold goes further.
+    function astrixPlan(state, p) {
+        if (p.potions.filter(x => D.POTIONS[x.id].group === 'astrix').length >= 4) return null;
+        const order = [];
+        if (!p.potions.some(x => D.POTIONS[x.id].tranquility)) order.push('tranquility');
+        order.push('transcendence', 'euphoria', 'wonder');
+        for (const id of order) {
+            if (id !== 'tranquility' && count(p, id) >= 1) continue;
+            const entry = D.ASTRIX_POTIONS.find(x => x.id === id);
+            if (entry.alt && p.gems >= entry.alt.gems && p.gold >= entry.alt.gold) return { id: id, pay: 'alt' };
+            if (p.gold >= entry.price + 60) return { id: id, pay: 'gold' };
+        }
+        return null;
+    }
+
     /* ------------------------------------------------------------------ */
     /* The one question                                                    */
     /* ------------------------------------------------------------------ */
@@ -9131,6 +10003,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function decide(state, pid) {
         const p = E.player(state, pid);
         if (!p) return null;
+        const L = levelOf(p);
 
         if (state.phase === 'order') return p.orderRoll === null ? act('rollForOrder') : null;
         if (state.phase !== 'playing' || state.paused) return null;
@@ -9138,51 +10011,40 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const t = tradeJob(state, p);
         if (t) return t;
 
-        const b = state.battle;
-        if (b) {
-            if (b.phase === 'order') return (b.orderRolls && b.orderRolls[pid] === null) ? act('battleOrderRoll') : null;
-            if (b.phase === 'ask') {
-                if (!b.ask || b.ask.pid !== pid) return null;
-                // Give up the lesser piece.
-                const opts = b.ask.options.slice();
-                const worth = o => {
-                    const inst = E.ownedItem(p, o.key);
-                    if (inst) return E.itemDef(inst).score;
-                    const bar = state.barbarian;
-                    const bi = o.key === 'w' ? bar.weapon : bar.armour;
-                    return bi ? E.itemDef(bi).score : 0;
-                };
-                opts.sort((x, y) => worth(x) - worth(y));
-                return act('battleAnswer', { choice: opts[0].key });
-            }
-            if (b.phase === 'enemy') return b.moverId === pid ? act('enemyAct') : null;
-            const u = E.curUnit(b);
-            if (u && E.controllerOf(state, u) === pid) return battleJob(state, p, b);
-            return null;
-        }
+        if (state.battle) return fightJob(state, p, state.battle, L);
 
         if (state.pending) {
-            return state.pending.playerId === pid ? answer(state, p, state.pending) : null;
+            return state.pending.playerId === pid ? answer(state, p, state.pending, L) : null;
         }
 
         if (!E.isMyTurn(state, pid)) return null;
 
         const g = gearJob(state, p);
         if (g) return g;
-        const h = healJob(state, p, p.hasMoved ? 0.5 : 0.6);
+        const h = healJob(state, p, p.hasMoved ? 0.5 : 0.6, L);
         if (h) return h;
-        const s = shopJob(state, p);
+        const s = shopJob(state, p, L);
         if (s) return s;
 
         if (!p.hasMoved) {
+            if (L.sharp) {
+                const pre = preDrinkJob(state, p);
+                if (pre) return pre;
+            }
             const ab = E.canUseAbility(state, pid);
             if (ab.ok && D.CLASSES[p.cls].ability.id === 'agile_footwork') return act('useAbility');
+            if (L.sharp) {
+                const mp = movePotionJob(state, p, L);
+                if (mp) return mp;
+            }
+            // Ending the turn before rolling is staying put.
+            if (shouldStay(state, p, L)) return act('endTurn');
             return act('rollMove');
         }
         return act('endTurn');
     }
 
-    global.LOF_BOT = { decide: decide, simFight: simFight, simBoss: simBoss };
+    global.LOF_BOT = { decide: decide, simFight: simFight, simBoss: simBoss, LEVELS: LEVELS };
 
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -9233,19 +10095,19 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     /* The other seats                                                  */
     /* ---------------------------------------------------------------- */
 
+    // The first computer player of a class, then the second.
     const BOT_NAMES = {
-        knight: ['Sir Aldric', 'Dame Rowena'],
-        archer: ['Wren', 'Fletcher'],
-        mage: ['Ilyana', 'Corvin']
+        knight: ['Sir Aldric', 'Harwin'],
+        archer: ['Wren', 'Lex'],
+        mage: ['Ilyana', 'Sylvia']
     };
     // For when one of those is already somebody's name at the table.
     const SPARE_NAMES = ['Tamsin', 'Oswin', 'Maelis', 'Brannoc'];
     const MAX_BOTS = D.RULES.maxBots;
     function isBotId(id) { return /^bot_\d$/.test(id || ''); }
 
-    /* Which classes the computer takes. At most two of each class at the
-       table, counting yours, and spread out so that two bots never share a
-       class while another class is empty. */
+    /* Which classes the computer takes when you have not said: spread out
+       so that two bots never share a class while another class is empty. */
     function botClasses(n, mine) {
         const count = {};
         D.CLASS_ORDER.forEach(c => { count[c] = c === mine ? 1 : 0; });
@@ -9258,15 +10120,63 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return out;
     }
 
+    /* How many computer players of each class: { knight, archer, mage }.
+       You choose these in the lobby. At most two of each class at the
+       table, counting yours, so your class has room for one computer
+       player at most; one pushed out by your pick moves to the class with
+       the most room. Never fewer than one computer player, nor more than
+       MAX_BOTS. */
+    function roomFor(c, mine) { return D.RULES.maxPerClass - (c === mine ? 1 : 0); }
+    function mixTotal(mix) { return D.CLASS_ORDER.reduce((s, c) => s + (mix[c] | 0), 0); }
+    function settleMix(mix, mine) {
+        const out = {};
+        let spill = 0;
+        D.CLASS_ORDER.forEach(c => {
+            const want = Math.max(0, mix[c] | 0);
+            out[c] = Math.min(want, roomFor(c, mine));
+            spill += want - out[c];
+        });
+        const roomiest = () => D.CLASS_ORDER.slice().sort((a, b) =>
+            (roomFor(b, mine) - out[b]) - (roomFor(a, mine) - out[a]))[0];
+        for (; spill > 0 && mixTotal(out) < MAX_BOTS; spill--) {
+            const c = roomiest();
+            if (out[c] >= roomFor(c, mine)) break;
+            out[c] += 1;
+        }
+        while (mixTotal(out) > MAX_BOTS) {
+            const c = D.CLASS_ORDER.slice().reverse().find(x => out[x] > 0);
+            out[c] -= 1;
+        }
+        if (!mixTotal(out)) out[roomiest()] = 1;
+        return out;
+    }
+    function mixOf(classes) {
+        const mix = {};
+        D.CLASS_ORDER.forEach(c => { mix[c] = classes.filter(x => x === c).length; });
+        return mix;
+    }
+    // One of each class first, then the seconds, so the seats take turns.
+    function mixClasses(mix) {
+        const out = [];
+        for (let round = 0; round < D.RULES.maxPerClass; round++) {
+            D.CLASS_ORDER.forEach(c => { if (mix[c] > round) out.push(c); });
+        }
+        return out;
+    }
+
     // Called after anything that happens in the lobby: the seats are laid
     // out afresh round whatever class you have picked.
     function fillSeats(state) {
         if (!state || state.phase !== 'lobby') return;
         const you = E.player(state, PID);
         const mine = you ? you.cls : null;
-        const n = Math.max(1, Math.min(MAX_BOTS, state.soloBots || 2));
-        state.soloBots = n;
-        const classes = botClasses(n, mine);
+        // Until you choose their classes yourself, the computer players
+        // spread out round yours.
+        const asked = state.soloMixChosen && state.soloMix ? state.soloMix
+            : mixOf(botClasses(Math.max(1, Math.min(MAX_BOTS, state.soloBots || 2)), mine));
+        state.soloMix = settleMix(asked, mine);
+        state.soloBots = mixTotal(state.soloMix);
+        const classes = mixClasses(state.soloMix);
         state.players = state.players.filter(p => !isBotId(p.id));
         // No two players with one name: a bot never takes yours.
         const taken = {};
@@ -9277,6 +10187,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             taken[name.toLowerCase()] = true;
             E.addPlayer(state, id, name, true);
             E.chooseClass(state, id, cls);
+            E.player(state, id).botLevel = state.soloLevel || 'medium';
         });
         // The narrator does not need a line for every reshuffle.
         state.log = state.log.filter(l => !/takes a seat at the table/.test(l.t));
@@ -9442,9 +10353,10 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         state = E.createGame(CODE, PID, name, opts);
         state.solo = true;
         state.soloBots = 2;
+        state.soloLevel = 'medium';
         state.log = [{
-            t: 'A game against the computer. Choose your class and how many computer players ' +
-               'you want at the table.', tone: 'muted', at: Date.now(), n: 1
+            t: 'A game against the computer. Choose your class, and which classes the computer ' +
+               'plays.', tone: 'muted', at: Date.now(), n: 1
         }];
         state.logSeq = 1;
         fillSeats(state);
@@ -9473,9 +10385,28 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         return Promise.resolve(CODE);
     }
 
-    function setBotCount(n) {
+    // One more or one fewer computer player of a class (step +1 or -1).
+    // Asking for one the rules have no room for does nothing.
+    function setBotClass(cls, step) {
+        if (!state || state.phase !== 'lobby' || !D.CLASSES[cls]) return;
+        const you = E.player(state, PID);
+        const mine = you ? you.cls : null;
+        const mix = Object.assign({}, state.soloMix);
+        mix[cls] = (mix[cls] | 0) + (step > 0 ? 1 : -1);
+        if (mix[cls] < 0 || mix[cls] > roomFor(cls, mine)) return;
+        const n = mixTotal(mix);
+        if (n < 1 || n > MAX_BOTS) return;
+        state.soloMix = mix;
+        state.soloMixChosen = true;
+        fillSeats(state);
+        emit();
+    }
+
+    // How well the computer plays: 'easy', 'medium' or 'hard' (bot.js).
+    function setBotLevel(level) {
         if (!state || state.phase !== 'lobby') return;
-        state.soloBots = Math.max(1, Math.min(MAX_BOTS, n | 0));
+        if (!global.LOF_BOT || !global.LOF_BOT.LEVELS[level]) return;
+        state.soloLevel = level;
         fillSeats(state);
         emit();
     }
@@ -9488,13 +10419,17 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             if (!state) return reject(new Error('There is no game running.'));
             const fn = E.ACTIONS[action];
             if (!fn) return reject(new Error('Unknown action: ' + action));
+            // Your pick comes first: the computer players stand up while you
+            // choose, and fillSeats sits them back down round it.
+            const picking = action === 'chooseClass' && state.phase === 'lobby';
+            if (picking) state.players = state.players.filter(p => !isBotId(p.id));
             const res = fn(state, PID, args || {}) || { ok: true };
+            if (picking) fillSeats(state);
             if (!res.ok) {
                 const err = new Error(res.error || 'That is not allowed.');
                 err.silent = !!res.silent;
                 return reject(err);
             }
-            if (action === 'chooseClass') fillSeats(state);
             state.updatedAt = Date.now();
             emit();
             resolve(state);
@@ -9537,7 +10472,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         PID: PID, solo: true, localName: localName, setLocalName: setLocalName,
         createRoom: createRoom, resumeRoom: resumeRoom, hasGame: hasGame, joinRoom: joinRoom,
         roomExists: roomExists, act: act, subscribe: subscribe, closeRoom: closeRoom,
-        setBusyCheck: function (fn) { busyCheck = fn; }, setBotCount: setBotCount, isBotId: isBotId,
+        setBusyCheck: function (fn) { busyCheck = fn; }, setBotClass: setBotClass, setBotLevel: setBotLevel, isBotId: isBotId,
         detach: detach,
         poke: schedule
     };
@@ -9896,7 +10831,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const reduced = !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
         const seed = o.seed || ((Math.random() * 1e9) | 0);
         last = { o: o, seed: seed };
-        dpr = Math.min(2, global.devicePixelRatio || 1);
+        const gfx = global.document && global.document.documentElement.classList;
+        dpr = Math.min(gfx && gfx.contains('gfx-ultra') ? 3 : (gfx && gfx.contains('gfx-potato') ? 1 : 2), global.devicePixelRatio || 1);
         canvas.width = Math.round(vw * dpr);
         canvas.height = Math.round(vh * dpr);
         canvas.classList.add('on');
@@ -10551,7 +11487,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const reduced = !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
         const seed = o.seed || ((Math.random() * 1e9) | 0);
         last = { o: o, seed: seed };
-        dpr = Math.min(2, global.devicePixelRatio || 1);
+        const gfx = global.document && global.document.documentElement.classList;
+        dpr = Math.min(gfx && gfx.contains('gfx-ultra') ? 3 : (gfx && gfx.contains('gfx-potato') ? 1 : 2), global.devicePixelRatio || 1);
         canvas.width = Math.round(vw * dpr);
         canvas.height = Math.round(vh * dpr);
         canvas.classList.add('on');
@@ -11467,6 +12404,19 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         boardFor = ROOM;
     }
 
+    // A square's description as this game's modifiers leave it: the
+    // temple is no Optional Stop under Oblivion Cloak, and Foresight makes
+    // the Soldier Garrison and the Royal Guards optional stops.
+    function sqText(sq) {
+        if (!sq) return '';
+        let t = sq.text;
+        if (!S) return t;
+        const optional = E.isOptionalStop(S, sq);
+        if (sq.optional && !optional) t = t.replace(/\s*OPTIONAL STOP\.?/, '').trim() + ' Not an Optional Stop in this game (Oblivion Cloak).';
+        else if (!sq.optional && optional) t = t + ' OPTIONAL STOP in this game (Foresight).';
+        return t;
+    }
+
     // Hovering a square (with a mouse) shows what it does in a small card
     // beside it, so you need not click to find out. The full card with the
     // monster's numbers is still a click away.
@@ -11483,7 +12433,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         }
         const el = sqEl(id);
         const sq = D.SQUARES[id];
-        if (!on || !el || !sq || panel) { tipEl.classList.remove('show'); return; }
+        // Fenrirak's Arena has no preview: click it for the full card.
+        if (!on || !el || !sq || panel || sq.arena) { tipEl.classList.remove('show'); return; }
         const tags = [];
         if (sq.stop) tags.push('<span class="chip bad">STOP</span>');
         if (S && E.isOptionalStop(S, sq)) tags.push('<span class="chip">Optional stop</span>');
@@ -11493,7 +12444,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             tags.push('<span class="chip purple">Needs fragments: ' + (need.length ? need.map(n => '#' + n).join(' ') : 'none') + '</span>');
         }
         let h = '<div class="num">' + (sq.id === '0' ? 'The Start' : 'Square ' + esc(sq.id)) + '</div><b>' + esc(sq.name) + '</b>' +
-            (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '<p>' + esc(sq.text) + '</p>';
+            (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') + '<p>' + esc(sqText(sq)) + '</p>';
         const here = S ? S.players.filter(p => p.cls && p.pos === id) : [];
         if (here.length) h += '<p class="here">Here: ' + here.map(p => '<b style="color:' + seatColour(p.id) + '">' + esc(p.name) + '</b>').join(', ') + '</p>';
         h += '<i>Click for the full card</i>';
@@ -11750,8 +12701,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function whatIsHappening() {
         if (!S) return '';
         if (S.phase === 'order') {
-            const left = S.players.filter(p => p.orderRoll === null).map(p => p.name);
-            return left.length ? 'Rolling for turn order. Waiting on ' + left.join(', ') : 'Turn order settled.';
+            const left = S.players.filter(p => p.orderRoll === null);
+            if (left.length && left.every(p => (p.orderRolls || []).length)) {
+                return 'A tie! ' + left.map(p => p.name).join(', ') + (left.length === 1 ? ' rolls' : ' roll') + ' again for turn order.';
+            }
+            return left.length ? 'Rolling for turn order. Waiting on ' + left.map(p => p.name).join(', ') : 'Turn order settled.';
         }
         if (S.paused) return 'The host has paused the game.';
         const cur = E.currentPlayer(S);
@@ -11865,7 +12819,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const wait = E.abilityWait(S, p);
         if (wait > 0) return { ready: false, text: 'Ready in ' + plural(wait, 'turn') };
         if (p.abilityTriedAt === p.turnsTaken) return { ready: false, text: 'Tried this turn' };
-        if (ab.id === 'agile_footwork' && p.agile) return { ready: false, text: 'Active: up to +2' };
+        if (ab.id === 'agile_footwork' && p.agile) return { ready: false, text: 'Active: up to +1' };
         return { ready: true, text: 'Ready' };
     }
 
@@ -11880,7 +12834,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const p = me();
         let h = '<h3>Actions</h3><div class="act-grid">';
         if (S.phase === 'order') {
-            h += btn('a-order', 'Roll for turn order', 'primary span2', !p || p.orderRoll !== null);
+            const again = p && p.orderRoll === null && (p.orderRolls || []).length;
+            h += btn('a-order', again ? 'Roll again (a tie)' : 'Roll for turn order', 'primary span2', !p || p.orderRoll !== null);
         } else if (p) {
             const mine = myTurn();
             const free = mine && !S.battle && !S.pending && !S.paused;
@@ -11890,16 +12845,17 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             const can = E.canUseAbility(S, p.id);
             h += btn('a-ability', esc(ab.name), '', !can.ok, can.ok ? ab.text : can.why, st.text);
             h += btn('a-merchant', 'Merchant', '', E.inBattle(S, p.id), 'Buy potions and gear, or sell gear (shortcut: M)', 'any time');
-            h += btn('a-trade', 'Trade', '', !(free), 'Offer another player a trade', 'your turn');
+            h += btn('a-trade', 'Trade', '', !(free), 'Offer another player a trade (shortcut: T)', 'your turn');
             h += btn('a-guide', 'How to play', 'ghost', false);
-            h += btn('a-end', 'End turn', 'primary span2', !(free && p.hasMoved), p.hasMoved ? 'Shortcut: Backspace' : 'Roll to move first');
+            h += btn('a-end', p.hasMoved ? 'End turn' : 'Stay put', 'primary span2', !free, p.hasMoved ? 'Shortcut: Backspace' : 'End your turn without moving: you stay where you are (shortcut: Backspace)');
         } else h += btn('a-guide', 'How to play', 'ghost', false);
         h += '</div><div class="act-row">';
+        h += btn('a-gfx', 'Graphics', 'small', false, 'How much on the screen moves');
         if (isHost() && !isSolo()) {
-            h += btn('a-pause', S.paused ? 'Resume' : 'Pause', 'small', false);
+            h += btn('a-pause', S.paused ? 'Resume' : 'Pause', 'small', false, 'Shortcut: P');
             h += btn('a-close', 'End game', 'small danger', false);
         } else if (isSolo()) {
-            h += btn('a-pause', S.paused ? 'Resume' : 'Pause', 'small', false);
+            h += btn('a-pause', S.paused ? 'Resume' : 'Pause', 'small', false, 'Shortcut: P');
             h += btn('a-quit', 'Save &amp; quit', 'small', false, 'Your game is saved. Carry it on from the front page');
         } else {
             h += btn('a-leave', 'Leave game', 'small danger', false);
@@ -11914,6 +12870,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         bind('a-trade', () => openTrade());
         bind('a-end', () => act('endTurn'));
         bind('a-guide', () => openGuide());
+        bind('a-gfx', () => askGfx(true));
         bind('a-pause', () => act('setPaused', { on: !S.paused }));
         bind('a-close', confirmClose);
         bind('a-quit', () => backHome('Your game is saved. Carry it on from here whenever you like.', true));
@@ -12121,7 +13078,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 const sq = D.SQUARES[o.pos];
                 return '<div class="other' + (cur && cur.id === o.id ? ' turn' : '') + '" style="--seat:' + seatColour(o.id) +
                     '" data-pos="' + o.pos + '">' + portrait(o) + '<div><div class="on" style="color:' + seatColour(o.id) + '">' +
-                    esc(o.name) + (o.bot ? ' <span class="muted" style="font-size:11px">(computer)</span>' : '') +
+                    esc(o.name) + (o.bot ? ' <span class="muted" style="font-size:11px">(' + botLabel(o) + ')</span>' : '') +
                     (!o.connected ? ' <span class="muted" style="font-size:11px">(left)</span>' : '') + '</div>' +
                     '<div class="sub">' + className(o.cls) + ' · on ' + esc(sq ? sq.name : '') + '</div>' +
                     hpBarHtml(o) +
@@ -12254,6 +13211,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     function renderGame() {
         renderBoard();
         renderHappening();
+        renderModsMini();
         renderTimer();
         renderActions();
         renderLog();
@@ -12797,8 +13755,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             }
             case 'optional': {
                 const w = E.previewWalk(Object.assign({}, S), Object.assign({}, p, { pos: pend.squareId }), pend.remaining, null);
-                h += sqPicHtml(pend.squareId) + '<h2>' + esc(sq.name) + '</h2><div class="sub">' + esc(sq.text) + '</div>' +
-                    '<div class="choice-grid"><button class="choice-btn primary" data-opt="stop"><b>Stop here</b><span>' + esc(sq.text) +
+                h += sqPicHtml(pend.squareId) + '<h2>' + esc(sq.name) + '</h2><div class="sub">' + esc(sqText(sq)) + '</div>' +
+                    '<div class="choice-grid"><button class="choice-btn primary" data-opt="stop"><b>Stop here</b><span>' + esc(sqText(sq)) +
                     '</span></button><button class="choice-btn" data-opt="go"><b>Carry on ' + plural(pend.remaining, 'space') + '</b><span>' +
                     esc(walkLabel(w)) + '</span></button></div>';
                 break;
@@ -12808,7 +13766,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 if (sq.action === 'pay_heal') yes = 'Pay ' + sq.price + ' Gold, heal ' + sq.heal + ' HP';
                 if (sq.action === 'pay_draw') yes = 'Pay ' + sq.price + ' Gold, draw ' + plural(sq.count, sq.deck === 'item' ? 'item card' : 'potion card');
                 if (sq.action === 'key_swap') yes = 'Spend 1 Chest Key for ' + plural(sq.gems, 'Gemstone');
-                h += sqPicHtml(sq.id) + '<h2>' + esc(sq.name) + '</h2><div class="sub">' + esc(sq.text) + '</div>' +
+                h += sqPicHtml(sq.id) + '<h2>' + esc(sq.name) + '</h2><div class="sub">' + esc(sqText(sq)) + '</div>' +
                     '<div class="purse">' + A.ICONS.gold(18) + p.gold + ' ' + A.ICONS.gem(18) + p.gems + ' ' + A.ICONS.key(18) + p.keys + '</div>' +
                     '<div class="modal-actions"><button class="btn" data-offer="no">No thanks</button><button class="btn primary" data-offer="yes">' + esc(yes) + '</button></div>';
                 break;
@@ -12834,7 +13792,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             case 'fate':
             case 'shield': {
                 const title = pend.type === 'fate' ? 'Fate’s Roll' : (pend.type === 'shield' ? 'Raw Oblivion Shield' : sq.name);
-                h += (pend.type === 'roll' ? sqPicHtml(sq.id) : '') + '<h2>' + esc(title) + '</h2><div class="sub">' + esc(pend.type === 'roll' ? sq.text : pend.prompt) + '</div>' +
+                h += (pend.type === 'roll' ? sqPicHtml(sq.id) : '') + '<h2>' + esc(title) + '</h2><div class="sub">' + esc(pend.type === 'roll' ? sqText(sq) : pend.prompt) + '</div>' +
                     '<div class="modal-actions" style="justify-content:center"><button class="btn primary" data-roll="1">Roll the die</button></div>';
                 break;
             }
@@ -12940,7 +13898,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
     $('#panel-back').addEventListener('click', e => { if (e.target.id === 'panel-back') closePanel(); });
     // Keys: R rolls (for turn order, or to move), Backspace ends your turn,
-    // M opens the Merchant, Escape closes the window that is open. They
+    // M opens the Merchant, T offers a trade, P pauses (or carries on),
+    // Escape closes the window that is open. They
     // press the real buttons, so they do nothing a button would not. Not
     // while you are typing, nor during the walk-through, which asks you to
     // press the buttons yourself.
@@ -12960,6 +13919,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (k === 'r') { if (press('a-roll') || press('a-order')) e.preventDefault(); }
         else if (e.key === 'Backspace') { e.preventDefault(); press('a-end'); }
         else if (k === 'm') { if (press('a-merchant')) e.preventDefault(); }
+        else if (k === 't') { if (press('a-trade')) e.preventDefault(); }
+        else if (k === 'p') { if (press('a-pause')) e.preventDefault(); }
     });
 
     // On a phone the main buttons are also on a bar along the bottom of the
@@ -12971,7 +13932,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         const twin = id => document.getElementById(id);
         const roll = twin('a-roll') || twin('a-order');
         const items = [[roll, roll && roll.id === 'a-order' ? 'Roll for order' : 'Roll &amp; move', 'primary'],
-            [twin('a-merchant'), 'Merchant', ''], [twin('a-end'), 'End turn', 'primary']].filter(x => x[0]);
+            [twin('a-merchant'), 'Merchant', ''], [twin('a-end'), twin('a-end') ? twin('a-end').textContent : 'End turn', 'primary']].filter(x => x[0]);
         bar.innerHTML = items.map(x => '<button class="btn ' + x[2] + '" data-twin="' + x[0].id + '"' + (x[0].disabled ? ' disabled' : '') + '>' + x[1] + '</button>').join('');
         bar.classList.toggle('empty', !items.length);
         bar.querySelectorAll('[data-twin]').forEach(b => b.addEventListener('click', () => {
@@ -13038,7 +13999,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             let h = '<div class="sq-detail"><div class="pic">' + (sq.arena ? A.castleSvg() : A.squareSvg(sq.pic)) + '</div><div>' +
                 '<div class="num">' + (sq.id === '0' ? 'THE START' : 'SQUARE ' + esc(sq.id)) + '</div>' +
                 '<h2>' + esc(sq.name) + '</h2><div class="tags">' + tags.join('') + '</div>' +
-                '<div class="text">' + esc(sq.text) + '</div>';
+                '<div class="text">' + esc(sqText(sq)) + '</div>';
             if (sq.action === 'battle' && sq.enemy === 'barbarian' && S && S.barbarian && S.barbarian.ownerId) {
                 h += '<div class="chip">The Barbarian is away, following ' + esc(E.player(S, S.barbarian.ownerId).name) + '.</div>';
             }
@@ -13288,7 +14249,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     function confirmLeave() {
         openPanel('leave', () => {
-            setPanel('<h2>Leave the game?</h2><div class="sub">Your turns will be skipped by the clock. You can come back with the same browser and the invite link.</div>' +
+            setPanel('<h2>Leave the game?</h2><div class="sub">Your turns are skipped by the clock while you are gone, and everything you have ' +
+                'is kept. Come back whenever you like from this browser: <b>Back to room ' + esc(ROOM || '') + '</b> on the front page, or the room code.</div>' +
                 '<div class="modal-actions"><button class="btn" id="cl-no">Stay</button><button class="btn danger" id="cl-yes">Leave</button></div>');
             bind('cl-no', closePanel);
             bind('cl-yes', () => { closePanel(); act('leave'); backHome(''); });
@@ -13325,19 +14287,76 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         }, true);
     }
 
+    // In a game: the modifiers that are on, over the turn timer. Clicking it
+    // shows what each one does in full.
+    function modsOn() { return D.MODIFIERS.filter(x => S && S.mods && S.mods[x.id]); }
+    function renderModsMini() {
+        const el = $('#mods-mini');
+        if (!el) return;
+        const on = modsOn();
+        const shown = on.slice(0, 4);
+        el.classList.toggle('none', !on.length);
+        el.innerHTML = '<h3>Modifiers</h3>' + (on.length
+            ? '<div class="mm-list">' + shown.map(x => '<div class="mm ' + x.side + '"><i></i><span>' + esc(x.name) + '</span></div>').join('') +
+              (on.length > shown.length ? '<div class="mm-more">and ' + (on.length - shown.length) + ' more</div>' : '') + '</div>' +
+              '<div class="mm-hint">Click to read them</div>'
+            : '<div class="mm-none">None in this game</div>');
+        el.title = on.length ? 'What the modifiers in this game do' : 'No modifiers are on in this game';
+    }
+    function openModsInfo() {
+        if (!S) return;
+        openPanel('mods-info', () => {
+            const on = modsOn();
+            const col = side => {
+                const list = on.filter(x => x.side === side);
+                if (!list.length) return '';
+                return '<div class="mods-col ' + side + '"><h3>' + (side === 'deadly' ? A.ICONS.skull(20) + 'More deadly' : A.ICONS.heart(20) + 'More relaxed') + '</h3>' +
+                    list.map(x => '<div class="mod-toggle readonly on ' + side + '"><div><b>' + esc(x.name) + '</b><span>' + esc(x.text) + '</span></div></div>').join('') + '</div>';
+            };
+            const halved = on.some(x => /\*$/.test(x.text));
+            setPanel('<h2>' + A.ICONS.gear(24) + ' Modifiers in this game</h2>' +
+                (on.length ? '<div class="sub">Chosen by the host before the game began.</div><div class="mods-cols' + (on.some(x => x.side === 'deadly') && on.some(x => x.side === 'relaxed') ? '' : ' one') + '">' +
+                    col('deadly') + col('relaxed') + '</div>' + (halved ? '<div class="sub" style="margin-top:8px">' + esc(D.HALVING_NOTE) + '</div>' : '')
+                    : '<div class="sub">No modifiers are on in this game: every rule is as printed.</div>') +
+                '<div class="modal-actions"><button class="btn primary" id="mods-info-done">Done</button></div>', on.length ? 'wide' : '');
+            bind('mods-info-done', closePanel);
+        });
+    }
+    (function () {
+        const el = $('#mods-mini');
+        if (!el) return;
+        el.addEventListener('click', openModsInfo);
+        el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModsInfo(); } });
+    })();
+
     /* ------------------------------------------------------------------ */
     /* The lobby                                                           */
     /* ------------------------------------------------------------------ */
 
+    // The single-player difficulty, as the lobby shows it (bot.js plays it).
+    const BOT_LEVELS = {
+        easy: { name: 'Easy', text: 'Keeps out of your way and does not plan ahead.' },
+        medium: { name: 'Medium', text: 'Plays to win, and stocks up on good potions before facing Fenrirak.' },
+        hard: { name: 'Hard', text: 'Plans every move ahead and does everything it can to win.' }
+    };
+    function botLabel(p) {
+        const l = BOT_LEVELS[p.botLevel];
+        return l ? l.name + ' computer' : 'computer';
+    }
+
+    // In single player the computer makes way for you, so no class is ever
+    // shut to you; the card says how many computer players have it.
     function classCardHtml(cls, taken, mineCls) {
         const c = D.CLASSES[cls];
-        const full = taken >= D.RULES.maxPerClass && mineCls !== cls;
+        const full = !isSolo() && taken >= D.RULES.maxPerClass && mineCls !== cls;
+        const label = mineCls === cls ? 'Your class' : isSolo() ? (taken ? plural(taken, 'computer player') : 'Open')
+            : taken + ' / ' + D.RULES.maxPerClass + ' taken';
         return '<div class="paper class-card' + (mineCls === cls ? ' mine' : '') + (full ? ' full' : '') + '" data-cls="' + cls + '" role="button" tabindex="0">' +
             '<div class="p-name"><span>' + c.name + '</span><img class="p-art" src="' + artFor(cls) + '" alt=""></div>' +
             '<div class="p-row"><span>HP: ' + (c.hp + (S && S.mods && S.mods.liveliness ? 20 : 0)) + '</span><span>Defence: ' + c.defence + '</span></div>' +
             '<div class="p-sec">Moves</div>' + c.moves.map(m => moveLine(m)).join('') +
             '<div class="p-sec">Ability: ' + esc(c.ability.name) + '</div><div class="p-small">' + esc(c.ability.text) + '</div>' +
-            '<div class="taken">' + (mineCls === cls ? 'Your class' : taken + ' / ' + D.RULES.maxPerClass + ' taken') + '</div></div>';
+            '<div class="taken">' + label + '</div></div>';
     }
 
     function renderLobby() {
@@ -13365,20 +14384,44 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         $('#roster').innerHTML = S.players.map(x =>
             '<li style="--seat:' + seatColour(x.id) + '">' + (x.cls ? '<img src="' + artFor(x.cls) + '" alt="">' : '<img alt="">') +
             '<span class="rname" style="color:' + seatColour(x.id) + '">' + esc(x.name) + '</span><span class="tag">' +
-            (x.cls ? className(x.cls) : 'choosing…') + (x.id === S.hostId ? ' · host' : '') + (x.bot ? ' · computer' : '') + '</span></li>').join('');
+            (x.cls ? className(x.cls) : 'choosing…') + (x.id === S.hostId ? ' · host' : '') + (x.bot ? ' · ' + botLabel(x) : '') + '</span></li>').join('');
 
+        // Single player: how many computer players of each class. At most
+        // two of a class at the table counting you, one to five of them.
         const bc = $('#bot-count');
         if (solo) {
-            const n = S.soloBots || 2;
-            bc.innerHTML = '<div class="bot-count"><span>Computer players</span><button class="btn small" id="bot-minus"' + (n <= 1 ? ' disabled' : '') + '>−</button>' +
-                '<b>' + n + '</b><button class="btn small" id="bot-plus"' + (n >= D.RULES.maxBots ? ' disabled' : '') + '>+</button></div>';
-            bind('bot-minus', () => SOLO.setBotCount(n - 1));
-            bind('bot-plus', () => SOLO.setBotCount(n + 1));
+            const mix = S.soloMix || {};
+            const n = S.soloBots || 0;
+            const mine = p && p.cls;
+            const lvl = S.soloLevel || 'medium';
+            bc.innerHTML = '<div class="bot-level"><div class="bm-head">How well the computer plays</div><div class="seg">' +
+                Object.keys(BOT_LEVELS).map(k => '<button class="btn small' + (k === lvl ? ' primary' : '') + '" data-level="' + k + '" aria-pressed="' +
+                    (k === lvl) + '">' + BOT_LEVELS[k].name + '</button>').join('') + '</div>' +
+                '<div class="bl-note">' + esc(BOT_LEVELS[lvl].text) + '</div></div>' +
+                '<div class="bot-mix"><div class="bm-head">Computer players: <b>' + n + '</b>' +
+                '<span>1 to ' + D.RULES.maxBots + ', at most ' + D.RULES.maxPerClass + ' of a class counting you</span></div>' +
+                D.CLASS_ORDER.map(cls => {
+                    const k = mix[cls] | 0;
+                    const room = D.RULES.maxPerClass - (mine === cls ? 1 : 0);
+                    const why = k >= room ? (mine === cls ? 'You are one of the two ' + className(cls) + 's' : 'Two ' + className(cls) + 's already')
+                        : n >= D.RULES.maxBots ? 'The table is full' : 'One more ' + className(cls);
+                    return '<div class="bot-count"><img src="' + artFor(cls) + '" alt=""><span>' + className(cls) + 's</span>' +
+                        '<button class="btn small" data-bot="' + cls + '" data-step="-1"' + (k <= 0 || n <= 1 ? ' disabled' : '') +
+                        ' title="' + (k <= 0 ? 'None to take away' : n <= 1 ? 'At least one computer player' : 'One fewer ' + className(cls)) + '">−</button>' +
+                        '<b>' + k + '</b><button class="btn small" data-bot="' + cls + '" data-step="1"' +
+                        (k >= room || n >= D.RULES.maxBots ? ' disabled' : '') + ' title="' + esc(why) + '">+</button></div>';
+                }).join('') + '</div>';
+            $$('#bot-count [data-bot]').forEach(b => b.addEventListener('click', () =>
+                SOLO.setBotClass(b.getAttribute('data-bot'), Number(b.getAttribute('data-step')))));
+            $$('#bot-count [data-level]').forEach(b => b.addEventListener('click', () => SOLO.setBotLevel(b.getAttribute('data-level'))));
         } else bc.innerHTML = '';
+        $('#class-note').textContent = solo
+            ? 'At most two of each class at the table. Your pick comes first: a computer player moves over if it has to.'
+            : 'First come, first served. At most two of each class.';
 
         const on = D.MODIFIERS.filter(x => S.mods && S.mods[x.id]);
         $('#mods-summary').innerHTML = on.length ? '<span class="muted">Modifiers: </span>' + on.map(x =>
-            '<span class="mtag ' + x.side + '">' + esc(x.name) + '</span>').join('') :
+            '<span class="mtag ' + x.side + '" title="' + (x.side === 'deadly' ? 'More deadly' : 'More relaxed') + '">' + esc(x.name) + '</span>').join('') :
             (isHost() ? '<span class="muted">No modifiers. Press the gear to toggle some.</span>' : '');
 
         const ready = S.players.length >= D.RULES.minPlayers && S.players.every(x => x.cls);
@@ -13404,7 +14447,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 .catch(() => notice('Invite link: ' + url));
         });
         $('#btn-leave-lobby').addEventListener('click', () => {
-            if (!isSolo()) act('leave');
+            if (!isSolo()) { act('leave'); forgetRoom(ROOM); }
             else SOLO.closeRoom();
             backHome('');
         });
@@ -13479,7 +14522,8 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             'Special Potion. Everybody rolls a die; highest goes first, then in descending order. Ties reroll.</p>' +
             '<h3>Movement</h3><p>Roll a die and move the full number of spaces. Potions and abilities that change a movement roll must be used ' +
             '<b>before</b> you roll. Once the die lands you choose how much of any “add up to” bonus to take; a minus on your armour, and ' +
-            'Forsaken Road’s −3, always apply. A roll can never go below 0.</p>' +
+            'Forsaken Road’s −3, always apply. A roll can never go below 0. You need not roll at all: end your turn without ' +
+            'rolling and you stay where you are, and nothing happens.</p>' +
             '<p><b>Click any square on the board to read exactly what it does.</b> The board only shows each square’s name and picture; ' +
             'with a mouse, resting the pointer on a square shows a short card of what it does.</p>' +
             '<h3>Squares and stops</h3><p>Land on a square and do what it says. Damage done directly by a square cannot be reduced by defence or ' +
@@ -13524,7 +14568,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             'must agree. The Merchant is open any time except during your battles (click his stall on the board), and he buys any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold a piece. Astrix’s Alchemy only sells ' +
             'to whoever is standing on it.</p>' +
             '<h3>Keyboard shortcuts</h3><p><b>R</b> rolls the die (for turn order, or to move). <b>Backspace</b> ends your turn. ' +
-            '<b>M</b> opens the Merchant. <b>Escape</b> closes the window that is open. They do just what the buttons do, so a key does ' +
+            '<b>M</b> opens the Merchant. <b>T</b> offers a trade. <b>P</b> pauses the game, or carries it on (the host, or you on your own). <b>Escape</b> closes the window that is open. They do just what the buttons do, so a key does ' +
             'nothing while its button is greyed out.</p>' +
             '<h3>Characters</h3><table><tr><th>Class</th><th>HP</th><th>DEF</th><th>Moves</th><th>Ability</th></tr>' + clsRows + '</table></div>';
     }
@@ -13577,9 +14621,9 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
                 { id: 'log-card', title: 'The game log', body: 'Everything that has happened, the newest at the top. ' +
                     '<b>Just mine</b> shows only the lines about you.' },
                 { id: 'a-merchant', title: 'The Merchant', live: true, body: 'Open any time except during your battles, or click his stall on the board. Buy potions and gear, or sell him any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold. Shortcut: <b>M</b>.' },
-                { id: 'a-trade', title: 'Trade', live: true, body: 'Offer another player Gold, Fragments, Potions, Gemstones, Weapons or Armour.' },
-                { id: 'a-end', title: 'End turn', live: true, body: 'Press it when you are done. Shortcut: <b>Backspace</b>. ' +
-                    'All the keys: <b>R</b> roll, <b>M</b> Merchant, <b>Backspace</b> end turn, <b>Escape</b> close a window. ' +
+                { id: 'a-trade', title: 'Trade', live: true, body: 'Offer another player Gold, Fragments, Potions, Gemstones, Weapons or Armour. Shortcut: <b>T</b>.' },
+                { id: 'a-end', title: 'End turn', live: true, body: 'Press it when you are done. Before you roll it reads <b>Stay put</b>: press it then and you end your turn where you are. Shortcut: <b>Backspace</b>. ' +
+                    'All the keys: <b>R</b> roll, <b>M</b> Merchant, <b>T</b> trade, <b>P</b> pause, <b>Backspace</b> end turn, <b>Escape</b> close a window. ' +
                     'This is the last stop of the tour.' }
             ].filter(s => document.getElementById(s.id));
         }
@@ -13774,6 +14818,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         resetWatchers(null);
         if (!isSolo()) {
             try { history.replaceState(null, '', location.pathname + '?room=' + code); } catch (e) { }
+            rememberRoom(code);
         }
         if (unsub) unsub();
         let first = true;
@@ -13782,6 +14827,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             onState(state);
         }, err => {
             if (err && err.roomGone) {
+                forgetRoom(code);
                 if (S && S.phase === 'over') return;
                 backHome('The host ended the game and closed the room.');
                 return;
@@ -13826,7 +14872,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 
     function onState(state) {
         S = state;
-        if (state.phase === 'closed') { backHome('The host ended the game and closed the room.'); return; }
+        if (state.phase === 'closed') { forgetRoom(ROOM); backHome('The host ended the game and closed the room.'); return; }
         DICE.saw(state);
         ZAP.saw(state);
         DRAW.saw(state);
@@ -13845,9 +14891,11 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
             // Let the last blow and the banner play before the curtain.
             whenSettled(() => setTimeout(() => { if (S && S.phase === 'over') { showScreen('screen-over'); renderOver(); } }, 500));
             reapFinishedRoom();
+            forgetRoom(ROOM);
         } else {
             showScreen('screen-game');
             renderGame();
+            askGfx(false);
         }
     }
 
@@ -13862,12 +14910,67 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         ROOM = null;
         S = null;
         reaped = false;
+        gfxAskedFor = null;
         if (isSolo()) { if (keep) SOLO.detach(); else SOLO.closeRoom(); }
         NET = SOLO;
         try { history.replaceState(null, '', location.pathname); } catch (e) { }
         showScreen('screen-home');
         $('#btn-resume').style.display = SOLO.hasGame() ? '' : 'none';
+        showRejoin();
         if (msg) notice(msg);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Graphics: how much on the screen moves (style.css html.gfx-*)       */
+    /*                                                                     */
+    /* Asked at the start of every game, and kept in this browser for the   */
+    /* next. Potato stops everything but the Pendant and the shield; Regular */
+    /* moves it all in easy steps; Make my GPU Hurt moves it all at full    */
+    /* speed with more of it.                                               */
+    /* ------------------------------------------------------------------ */
+
+    const GFX_KEY = 'lof_obl_gfx';
+    const GFX = {
+        potato: { name: 'Potato', note: 'Lightest',
+            text: 'Nothing moves but the Pendant and the shield. For older machines, or to save the battery.' },
+        regular: { name: 'Regular', note: 'Balanced',
+            text: 'The kingdom comes alive (fire, trees, flags, stars, birds), drawn in easy steps so it goes gently on the battery.' },
+        ultra: { name: 'Make my GPU Hurt', note: 'Smoothest',
+            text: 'Everything moving as smoothly as your screen can go, with more embers, more birds and a sweeping turn timer.' }
+    };
+    let gfxAskedFor = null;
+    function gfxLevel() {
+        let v = null;
+        try { v = localStorage.getItem(GFX_KEY); } catch (e) { }
+        return GFX[v] ? v : 'regular';
+    }
+    function applyGfx(level) {
+        const root = document.documentElement;
+        Object.keys(GFX).forEach(k => root.classList.toggle('gfx-' + k, k === level));
+        embers(true);
+    }
+    function setGfx(level) {
+        if (!GFX[level]) return;
+        try { localStorage.setItem(GFX_KEY, level); } catch (e) { }
+        applyGfx(level);
+    }
+    // `force`: from the Graphics button. Otherwise once a game, as it begins.
+    function askGfx(force) {
+        if (!force && (gfxAskedFor === ROOM || panel)) return;
+        gfxAskedFor = ROOM;
+        openPanel('gfx', () => {
+            const cur = gfxLevel();
+            setPanel('<h2>How good do you want your graphics?</h2><div class="sub">You can change it any time with the ' +
+                '<b>Graphics</b> button under the actions.</div><div class="gfx-pick">' +
+                Object.keys(GFX).map(k => '<button type="button" data-level="' + k + '"' + (k === cur ? ' class="on"' : '') + '><b>' +
+                    GFX[k].name + '</b><span>' + GFX[k].text + '</span><i>' + GFX[k].note + (k === cur ? ', chosen last time' : '') + '</i></button>').join('') +
+                '</div>', 'wide');
+            $$('.gfx-pick [data-level]').forEach(b => b.addEventListener('click', () => {
+                setGfx(b.getAttribute('data-level'));
+                closePanel();
+                if (S) renderGame();
+            }));
+        });
     }
 
     /* ------------------------------------------------------------------ */
@@ -13906,6 +15009,13 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         });
 
         $('#btn-join').addEventListener('click', joinFromInput);
+        $('#btn-rejoin').addEventListener('click', () => {
+            const code = lastRoom();
+            if (!code) return showRejoin();
+            $('#inp-code').value = code;
+            joinFromInput();
+        });
+        showRejoin();
         $('#inp-code').addEventListener('keydown', e => { if (e.key === 'Enter') joinFromInput(); });
         $('#inp-code').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5); });
         $('#btn-guide').addEventListener('click', openRules);
@@ -13927,8 +15037,58 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         NET = ONLINE;
         $('#btn-join').disabled = true;
         try { await NET.joinRoom(code, name); enterRoom(code); }
-        catch (err) { NET = SOLO; notice(onlineError(err, 'Could not join that room.')); }
+        catch (err) {
+            NET = SOLO;
+            if (err && err.late) openLateJoin(code, name, err.late);
+            else {
+                if (/No room with the code|has finished/.test((err && err.message) || '') && lastRoom() === code) forgetRoom(code);
+                notice(onlineError(err, 'Could not join that room.'));
+            }
+        }
         finally { $('#btn-join').disabled = false; }
+    }
+
+    // The online room you were last in, so the front page can offer the way
+    // back to it: everything you had is still in your seat.
+    const ROOM_KEY = 'lof_obl_room';
+    function lastRoom() { try { return localStorage.getItem(ROOM_KEY) || ''; } catch (e) { return ''; } }
+    function rememberRoom(code) { try { localStorage.setItem(ROOM_KEY, code); } catch (e) { } showRejoin(); }
+    function forgetRoom(code) {
+        try { if (!code || localStorage.getItem(ROOM_KEY) === code) localStorage.removeItem(ROOM_KEY); } catch (e) { }
+        showRejoin();
+    }
+    function showRejoin() {
+        const b = $('#btn-rejoin');
+        if (!b) return;
+        const code = lastRoom();
+        b.style.display = code ? '' : 'none';
+        b.textContent = code ? 'Back to room ' + code : '';
+    }
+
+    // Joining a game that has already started: choose a class (two of a
+    // class at most, as ever), and you start from the very beginning.
+    function openLateJoin(code, name, info) {
+        const taken = (info && info.taken) || {};
+        NET = ONLINE;
+        openPanel('late', () => {
+            setPanel('<h2>This game has already started</h2><div class="sub">You can still join it, starting from the very ' +
+                'beginning: on the Start square with your class’s starter weapon and armour, no Gold and a Special Potion. ' +
+                'You take your turns after everybody already playing. Choose your class.</div>' +
+                '<div class="class-picker late-picker">' + D.CLASS_ORDER.map(cls => classCardHtml(cls, taken[cls] || 0, null)).join('') + '</div>' +
+                '<div class="modal-actions"><button class="btn" id="late-no">Not now</button></div>', 'wide');
+            bind('late-no', () => { closePanel(); if (!ROOM) NET = SOLO; });
+            $$('.late-picker [data-cls]').forEach(el => {
+                if (el.classList.contains('full')) return;
+                const pick = async () => {
+                    closePanel();
+                    NET = ONLINE;
+                    try { await NET.joinRoom(code, name, el.getAttribute('data-cls')); enterRoom(code); }
+                    catch (err) { NET = SOLO; notice(onlineError(err, 'Could not join that game.')); }
+                };
+                el.addEventListener('click', pick);
+                el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+            });
+        });
     }
 
     // Firestore refusing everything means the rules for this game's rooms
@@ -13954,15 +15114,22 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
         if (q && /^[A-Za-z]{5}$/.test(q) && name && !ROOM) {
             NET = ONLINE;
             ONLINE.joinRoom(q.toUpperCase(), name).then(() => enterRoom(q.toUpperCase()))
-                .catch(err => { NET = SOLO; notice(err.message || 'Could not rejoin that room.'); });
+                .catch(err => {
+                    NET = SOLO;
+                    if (err && err.late) openLateJoin(q.toUpperCase(), name, err.late);
+                    else notice(err.message || 'Could not rejoin that room.');
+                });
         }
     }
 
-    function embers() {
+    // The embers drifting up the screen: none on Potato, a few on Regular,
+    // a great many when the GPU is to hurt. `again` lays them out afresh.
+    function embers(again) {
         const box = $('.embers');
-        if (!box || box.childElementCount) return;
+        if (!box || (box.childElementCount && !again)) return;
+        const count = { potato: 0, regular: 24, ultra: 80 }[gfxLevel()];
         let h = '';
-        for (let i = 0; i < 34; i++) {
+        for (let i = 0; i < count; i++) {
             const left = Math.random() * 100;
             const dur = 9 + Math.random() * 11;
             const delay = -Math.random() * dur;
@@ -13975,7 +15142,7 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
     }
 
     function boot() {
-        embers();
+        applyGfx(gfxLevel());
         initHome();
         initLobby();
         SOLO.setBusyCheck(() => tableBusy());
@@ -14146,7 +15313,11 @@ async function createRoom(name, opts) {
     throw new Error('Could not find a free room code. Please try again.');
 }
 
-async function joinRoom(code, name) {
+// Back to your own seat (everything you had is still there), a new seat in
+// the lobby, or -- once the game has started -- a late seat that starts from
+// the very beginning. A late seat needs a class: without `cls` this throws an
+// error with `late` set, saying which classes still have room.
+async function joinRoom(code, name, cls) {
     await ready;
     setLocalName(name);
     code = String(code || '').trim().toUpperCase();
@@ -14163,11 +15334,25 @@ async function joinRoom(code, name) {
             existing.name = name || existing.name;
             existing.connected = true;
             existing.lastSeen = Date.now();
-        } else {
+        } else if (state.phase === 'lobby') {
             const r = E.addPlayer(state, PID, name);
             if (!r.ok) throw new Error(r.error);
             const seated = E.player(state, PID);
             if (seated) seated.seat = hash;
+        } else if (state.phase === 'order' || state.phase === 'playing') {
+            if (state.players.length >= 6) throw new Error('This game is full (6 players).');
+            if (!cls) {
+                const late = new Error('This game has already started.');
+                late.late = { code: code, taken: {} };
+                state.players.forEach(p => { if (p.cls) late.late.taken[p.cls] = (late.late.taken[p.cls] || 0) + 1; });
+                throw late;
+            }
+            const r = E.joinLate(state, PID, name, cls);
+            if (!r.ok) throw new Error(r.error);
+            const seated = E.player(state, PID);
+            if (seated) seated.seat = hash;
+        } else {
+            throw new Error('That game has finished.');
         }
         state.updatedAt = Date.now();
         tx.set(ref, clean(state));
