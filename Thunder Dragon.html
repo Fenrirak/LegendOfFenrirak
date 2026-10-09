@@ -1448,8 +1448,7 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
         radial-gradient(circle 1.6px at 85% 84%, rgba(70,58,48,.85), transparent 70%);
 }
 .sq.scenery-bridge .sq-name,
-.sq.scenery-bridge .sq-text,
-.sq.scenery-bridge .tokens { position: relative; z-index: 2; }
+.sq.scenery-bridge .sq-text { position: relative; z-index: 2; }
 .sq.scenery-bridge .sq-name {
     color: #2e1c11;
     border-bottom-color: rgba(60,30,15,.5);
@@ -1525,16 +1524,19 @@ input:focus, select:focus { outline: none; border-color: var(--gold); }
     margin: 4px -8px 0;
     padding: 3px 8px;
 }
-.sq.scenery-broken_bridge .tokens { position: relative; z-index: 5; }
+.sq.scenery-broken_bridge .tokens { z-index: 5; }
 
 /* Tokens: the character's own picture, standing on the square. They shoulder
-   in against each other rather than wrapping onto a second line -- every row
-   of the board is the same height, so a square must not grow just because
-   three people are standing on it. */
+   in against each other rather than wrapping onto a second line. They are
+   laid over the square rather than in its flow: the rows are sized by what
+   is in them, so a piece arriving used to make its row taller and the whole
+   board jump about as characters walked. Now they stand on the bottom of the
+   square and may cover some of its writing while they are there. */
 .sq .tokens {
     display: flex; flex-wrap: nowrap; gap: 0;
-    margin-top: 4px;
-    position: relative; z-index: 3;
+    justify-content: center;
+    position: absolute; left: 0; right: 0; bottom: 4px;
+    z-index: 3;
 }
 .token {
     width: 46px; height: 46px;
@@ -2778,6 +2780,13 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
     .sq .sq-badge { display: none; }
     .token { width: 28px; height: 28px; }
     .token.turn { width: 36px; height: 36px; }
+    /* The gateway is a narrow strip of a square on a phone -- about 22px
+       across -- and its own larger pieces (above) hung out over its top.
+       Here they shrink to fit inside it and shoulder in tighter. */
+    .sq.gateway .tokens { bottom: 3px; }
+    .sq.gateway .token { width: 20px; height: 20px; border-width: 1.5px; }
+    .sq.gateway .token.turn { width: 24px; height: 24px; border-width: 2px; }
+    .sq.gateway .tokens .token + .token { margin-left: -12px; }
     /* There is no room for the second line on a phone, and the name goes
        over two lines instead of running off both sides of the arena. */
     .arena .arena-sub { display: none; }
@@ -5273,7 +5282,7 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
                 // two turns. See useAbility() in engine.js.
                 inBattle: true,
                 buffKind: 'damage',
-                text: 'Roll a die. On an even number, increase your attack by 15 ' +
+                text: 'Roll a die. On an even number, increase your attack by 10 ' +
                       'damage for two turns. Stacks with anything else that raises ' +
                       'your attack damage. May be used in the middle of a battle.'
             },
@@ -8419,8 +8428,8 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
             addBuff(p, 'defence', 15, 2, cls.ability.name);
             log(state, p.name + "'s Iron Body hardens them — +15 defence for 2 turns.", 'item');
         } else if (cls.ability.id === 'runed_relic') {
-            addBuff(p, 'damage', 15, 2, cls.ability.name);
-            log(state, p.name + ' calls on the Runed Relic — +15 damage for 2 turns.', 'item');
+            addBuff(p, 'damage', 10, 2, cls.ability.name);
+            log(state, p.name + ' calls on the Runed Relic — +10 damage for 2 turns.', 'item');
         }
         return ok();
     }
@@ -9904,7 +9913,7 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
             if (p.hasMoved) return null;
             return { action: 'useAbility', args: {} };
         }
-        // The Relic's +15 waits for your next two hits however long they
+        // The Relic's +10 waits for your next two hits however long they
         // take, so calling on it between fights loses nothing. Iron Body's
         // defence wears off as your turn ends, so it is kept for the fight
         // itself, where it is called on at the top of a turn (battleStep).

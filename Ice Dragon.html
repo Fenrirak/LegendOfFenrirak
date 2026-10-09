@@ -3274,7 +3274,7 @@ body.modal-cover #board * {
     border-color: rgba(228, 193, 74, .5);
     color: var(--gold-bright, #e4c14a);
 }
-.shop-item.not-yours .paper { opacity: .58; }
+.shop-item.not-yours .paper { opacity: .78; }
 
 
 /* ---- turned away at the Gate ------------------------------------------
@@ -5984,6 +5984,427 @@ kbd {
 .fg-sockets path:nth-child(4) { animation-delay: -1.95s; }
 @keyframes fg-socket { 50% { fill: #e6fdff; } }
 
+/* ---- the buttons pinned to the bottom -----------------------------------
+   Below 1080px the board takes the whole width and the Actions card falls
+   a long way under it, so Roll & move, Merchant and End turn are also on a
+   bar fixed to the bottom of the screen (renderPhoneBar in ui.js), as in
+   The Thunder Dragon. */
+.phone-bar { display: none; }
+@media (max-width: 1080px) {
+    .phone-bar {
+        display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px;
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 850;
+        padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(14, 14, 14, .96); border-top: 1px solid var(--panel-edge);
+    }
+    .phone-bar.empty { display: none; }
+    .phone-bar .btn { padding: 10px 6px; font-size: 14px; }
+    .phone-bar .btn.end-turn {
+        font-weight: bold; color: #ffffff;
+        background: linear-gradient(180deg, #4a86d8, #2c5ea8);
+        border-color: #a9caf6;
+    }
+    .phone-bar .btn.end-turn:disabled { opacity: .45; }
+    /* Room underneath, so the bar never sits over the last of the page. */
+    body:has(#screen-game.active) { padding-bottom: 66px; }
+    /* The walkthrough's waiting note sits above the bar, not behind it. */
+    body:has(#screen-game.active) .spot-wait-badge { bottom: 80px; }
+}
+
+/* ---- The fight, in columns ----------------------------------------------
+   The fight panel used to be one long stack at 820px: the two fighters,
+   the monster's card, its four attacks, and only then the attacks you
+   actually had to choose from -- below the bottom of a laptop screen. It
+   is wider now, and below the fighters it splits into columns: what you
+   can do (under you), what the monster can do to you (under it), and its
+   card with the fight's own log. Two columns on a narrower window, with
+   the card and the log sharing a row underneath; one on a phone, your
+   attacks first. Each column is a panel of its own so the three never
+   run together. */
+#modal-back[data-key="battle"] .modal {
+    max-width: 1240px;
+    max-height: 94vh;
+    padding: 22px 26px 24px;
+}
+.battle-head {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 10px 18px;
+}
+.battle-head h2 { margin: 0; }
+.battle-head .turn-flag { flex: 1 1 320px; margin: 0; }
+#modal-back[data-key="battle"] .modal .sub { margin: 9px 0 14px; }
+
+/* Bars and numbers kept to a sensible length under each portrait, rather
+   than stretched across half of a very wide panel. */
+#modal-back[data-key="battle"] .battle-side .bar,
+#modal-back[data-key="battle"] .battle-side .barlabel {
+    max-width: 380px;
+    margin-left: auto; margin-right: auto;
+}
+
+.battle-lower {
+    display: grid;
+    gap: 18px;
+    align-items: start;
+    margin-top: 18px;
+}
+.battle-lower.cols-3 { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.1fr) minmax(0, .9fr); }
+.battle-lower.cols-2 { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+.battle-lower.cols-1 { grid-template-columns: minmax(0, 1fr); }
+
+.battle-col {
+    min-width: 0;
+    padding: 14px 16px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .025);
+    border: 1px solid rgba(255, 255, 255, .07);
+}
+.battle-col h3 { margin: 0 0 10px; font-size: 15px; }
+.battle-col h3:not(:first-child) { margin-top: 18px; }
+
+/* Your column: one attack to a row, so each has room for its sum. */
+.battle-do { border-color: rgba(217, 163, 92, .28); }
+.battle-do .moves { grid-template-columns: minmax(0, 1fr); }
+.battle-do .enemy-acting { margin: 0; max-width: none; }
+.battle-do .enemy-acting.waiting {
+    color: #d9cfba;
+    background: rgba(255, 255, 255, .04);
+    border-color: rgba(255, 255, 255, .14);
+}
+.battle-do .enemy-acting.waiting .spinner { border-color: rgba(217, 207, 186, .3); border-top-color: #d9cfba; }
+.battle-do .modal-actions { margin-top: 0; }
+
+/* The monster's column, in the colour of the monster's bar. */
+.battle-foe { border-color: rgba(210, 99, 90, .22); }
+.battle-foe h3 { color: #e6b9a8; }
+.battle-foe .foe-move:last-child { margin-bottom: 0; }
+
+.battle-info .battle-statcard { margin: 0; max-width: 320px; }
+.battle-info .battle-logbox { margin-top: 18px; }
+.battle-info .battle-logbox:first-child { margin-top: 0; }
+.battle-info .log { max-height: 220px; }
+
+@media (max-width: 1180px) {
+    .battle-lower.cols-3 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .battle-lower.cols-3 .battle-info {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+    }
+    .battle-lower.cols-3 .battle-info .battle-logbox { margin-top: 0; }
+}
+@media (max-width: 760px) {
+    #modal-back[data-key="battle"] .modal { padding: 18px 14px 18px; }
+    .battle-lower.cols-3,
+    .battle-lower.cols-2 { grid-template-columns: minmax(0, 1fr); }
+    .battle-lower.cols-3 .battle-info { grid-column: auto; display: block; }
+    .battle-lower.cols-3 .battle-info .battle-logbox { margin-top: 18px; }
+    .battle-info .battle-statcard { margin-inline: auto; }
+    .battle-col { padding: 12px 12px 14px; }
+}
+
+/* ---- the narrator's All / Just mine switch ------------------------------
+   As in The Thunder Dragon: two buttons at the top of the narrator. Just
+   mine shows only the lines your name appears in. */
+.log-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.log-head h3 { margin: 0; }
+.log-filter { display: inline-flex; flex: none; border: 1px solid var(--panel-edge); border-radius: 999px; overflow: hidden; }
+.log-filter button {
+    font-family: inherit; font-size: 12px; color: #9a9a9a; cursor: pointer;
+    background: transparent; border: 0; padding: 4px 11px;
+}
+.log-filter button:hover:not(.on) { color: var(--cream); }
+.log-filter button.on { color: var(--cream); background: rgba(217, 163, 92, .3); }
+.log-filter button:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: -2px; }
+
+/* ---- what a square says, in full ----------------------------------------
+   The card that comes up beside a square you point at (or tap, on a touch
+   screen) -- see squareTipHtml in ui.js. As in The Thunder Dragon. */
+.sq-tip {
+    position: fixed; z-index: 880; pointer-events: none;
+    width: max-content; max-width: 280px;
+    background: linear-gradient(180deg, #1f1f1f, #151515);
+    border: 1px solid rgba(164, 194, 244, .45); border-radius: 12px;
+    padding: 10px 13px 11px; color: #d9d6d0; font-size: 13px; line-height: 1.45;
+    box-shadow: 0 12px 26px -8px #000;
+    opacity: 0; transition: opacity .12s ease;
+}
+.sq-tip.show { opacity: 1; }
+.sq-tip > b { display: block; font-size: 15px; color: #eef4ff; }
+.sq-tip p { margin: 5px 0 0; }
+.sq-tip .tip-tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0 1px; }
+.sq-tip .tip-tag {
+    font-size: 10.5px; letter-spacing: .4px; padding: 1px 7px; border-radius: 999px;
+    border: 1px solid rgba(164, 194, 244, .55); color: #a4c2f4;
+}
+.sq-tip .tip-tag.hard { border-color: #d2635a; color: #ffffff; background: #b8463c; }
+.sq-tip .tip-tag.route { border-color: rgba(255, 255, 255, .2); color: #a0a0a0; }
+.sq-tip .tip-stop {
+    font-size: 12px; color: #f0c4bc;
+    padding: 6px 8px; margin-top: 7px;
+    border-radius: 6px;
+    background: rgba(184, 70, 60, .16);
+    border: 1px solid rgba(210, 99, 90, .35);
+}
+.sq-tip .tip-foe {
+    margin-top: 8px; padding-top: 7px;
+    border-top: 1px dashed rgba(255, 255, 255, .14);
+}
+.sq-tip .tip-foe-head { color: var(--cream); }
+.sq-tip .tip-foe-stats { color: #a0a0a0; font-size: 12px; margin-bottom: 3px; }
+.sq-tip .tip-move { display: flex; justify-content: space-between; gap: 14px; font-size: 12.5px; }
+.sq-tip .tip-move span:last-child { color: #a0a0a0; font-size: 12px; white-space: nowrap; }
+.sq-tip .tip-drops { font-size: 12px; color: var(--gold-bright); }
+.sq-tip .tip-mine { font-size: 12px; color: #c6d6ef; }
+.sq-tip .tip-here { font-size: 12px; color: #a0a0a0; }
+
+.board-hint { display: none; }
+@media (hover: none) {
+    .board-hint {
+        display: block;
+        margin: 8px 0 0; text-align: center;
+        font-size: 12.5px; color: #8fa3bd;
+    }
+}
+
+/* ---- the modifiers chip in the banner -----------------------------------
+   Beside the timer on every turn, so nobody forgets the game is not being
+   played as printed. It takes the timer's place at the right-hand end and
+   the timer sits beside it. Red for harder, green for easier. */
+.turn-banner .mods-chip {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 4px 12px 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(164, 194, 244, .45);
+    background: rgba(164, 194, 244, .1);
+    color: #dce8fb;
+    font-family: inherit; font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color .15s ease, background .15s ease;
+}
+.turn-banner .mods-chip:hover { border-color: #a4c2f4; background: rgba(164, 194, 244, .18); }
+.turn-banner .mods-chip:focus-visible { outline: 2px solid #a4c2f4; outline-offset: 2px; }
+.turn-banner .mods-chip svg { width: 18px; height: 18px; color: #a4c2f4; flex: none; }
+.turn-banner .mods-chip i {
+    font-style: normal; font-size: 11.5px; letter-spacing: .3px;
+    padding: 1px 7px; border-radius: 999px;
+}
+.turn-banner .mods-chip .mc-bad { color: #ffd9d4; background: rgba(184, 70, 60, .55); }
+.turn-banner .mods-chip .mc-good { color: #d9f2da; background: rgba(80, 160, 90, .5); }
+.turn-banner .mods-chip + .timer { margin-left: 0; }
+.mods-cols.single { grid-template-columns: 1fr; }
+@media (max-width: 720px) {
+    .turn-banner .mods-chip { margin-left: 0; }
+}
+
+/* ---- STOP: the sign that drops when a piece reaches a STOP square --------
+   A red octagon on a white card in the middle of the screen, over a light
+   dim, with the square's name, who has to stop and what happens there --
+   and the square itself flashes red on the board. STOP_FX in ui.js puts it
+   up and takes it down; with reduced motion it simply appears and goes. */
+.stop-fx {
+    position: fixed; inset: 0; z-index: 4790;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: opacity .3s ease, visibility 0s linear .3s;
+}
+.stop-fx.on {
+    opacity: 1; visibility: visible;
+    transition: opacity .18s ease, visibility 0s;
+}
+.stop-dim {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 65% at 50% 50%, rgba(40, 6, 4, .18), rgba(40, 6, 4, .5));
+}
+.stop-card {
+    position: relative;
+    width: min(400px, calc(100vw - 32px));
+    padding: 20px 26px 20px;
+    text-align: center;
+    border-radius: 18px;
+    color: #2a0f0c;
+    background: #fffaf7;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 4px #c8302a, 0 30px 70px -20px rgba(20, 0, 0, .9);
+}
+.stop-fx.on .stop-card { animation: stop-slam .42s cubic-bezier(.2, 1.4, .4, 1) both; }
+@keyframes stop-slam {
+    from { opacity: 0; transform: scale(1.4) rotate(-4deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0); }
+}
+.stop-sign {
+    display: block; width: 84px; height: 84px; margin: 0 auto 8px;
+    filter: drop-shadow(0 6px 10px rgba(80, 10, 6, .35));
+}
+.stop-fx.on .stop-sign { animation: stop-sign-drop .5s cubic-bezier(.3, 1.5, .5, 1) .05s both; }
+@keyframes stop-sign-drop {
+    from { transform: translateY(-26px) scale(.7); }
+    to   { transform: translateY(0) scale(1); }
+}
+.stop-name {
+    font-family: 'Cutive Mono', 'Courier New', monospace;
+    font-size: 27px; font-weight: bold; letter-spacing: 1px;
+    color: #2a0f0c; line-height: 1.15;
+}
+.stop-who { margin-top: 6px; font-size: 17px; font-weight: bold; color: #b0261f; }
+.stop-sub { margin-top: 6px; font-size: 13.5px; line-height: 1.45; color: #5d3a33; }
+/* Your own stop is a little louder. */
+.stop-fx.mine .stop-card { box-shadow: 0 0 0 6px #c8302a, 0 30px 70px -20px rgba(20, 0, 0, .9); }
+.stop-fx.mine .stop-dim { background: radial-gradient(ellipse 70% 65% at 50% 50%, rgba(60, 8, 4, .26), rgba(60, 8, 4, .62)); }
+
+/* The square on the board, flashing red as the piece arrives. */
+.sq.stop-hit { animation: stop-hit 2.4s ease-out both; z-index: 4; }
+@keyframes stop-hit {
+    0%   { box-shadow: 0 0 0 0 rgba(200, 48, 42, 0); }
+    12%  { box-shadow: 0 0 0 4px #c8302a, 0 0 18px 6px rgba(200, 48, 42, .55); }
+    30%  { box-shadow: 0 0 0 3px #c8302a, 0 0 10px 3px rgba(200, 48, 42, .35); }
+    48%  { box-shadow: 0 0 0 4px #c8302a, 0 0 18px 6px rgba(200, 48, 42, .55); }
+    100% { box-shadow: 0 0 0 0 rgba(200, 48, 42, 0); }
+}
+
+/* STOP squares wear a red badge on the board; optional stops keep the
+   pale blue one, so the two can be told apart at a glance. */
+.board .sq .sq-badge.hard {
+    background: #c8302a !important;
+    color: #ffffff !important;
+    border-color: #8e2019 !important;
+    font-weight: bold;
+    letter-spacing: .8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stop-fx.on .stop-card,
+    .stop-fx.on .stop-sign,
+    .sq.stop-hit { animation: none; }
+    .sq.stop-hit { box-shadow: 0 0 0 3px #c8302a; }
+}
+
+/* ---- what is in play: item cards, poison, Tail Slam ----------------------
+   Small chips under each side of a fight and on the profile, so a card
+   drunk two turns ago, or a poison ticking on the monster, is never a
+   secret. Green is working for that side, red against it. */
+.fx-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 8px; }
+.me-stats .fx-row { justify-content: flex-start; margin-top: 4px; }
+.fx {
+    font-size: 11.5px; line-height: 1.3;
+    padding: 2px 9px; border-radius: 999px;
+    border: 1px solid; white-space: normal; text-align: center;
+}
+.fx.good { color: #d9f2da; background: rgba(80, 160, 90, .2); border-color: rgba(111, 191, 115, .5); }
+.fx.bad  { color: #ffd9d4; background: rgba(184, 70, 60, .2); border-color: rgba(210, 99, 90, .5); }
+
+/* Why a card cannot be played just now. */
+.pu-why { font-size: 12px; color: #a6b4c6; margin-top: 7px; line-height: 1.4; }
+
+/* Frozen, with a Warmth Potion in hand. */
+.btn.warmth-now {
+    width: 100%; margin-top: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: #1a1108; font-weight: bold;
+    background: linear-gradient(180deg, #f3c27a, #e09a45);
+    border-color: #f6d39c;
+}
+.btn.warmth-now:hover:not(:disabled) { background: linear-gradient(180deg, #f7cf92, #e8a752); }
+.btn.warmth-now .flake-icon { font-size: 18px; }
+
+/* The fight's chips on a phone: one strip across the panel, a line for each
+   side, instead of a tall stack in each narrow column. */
+.fx-strip { display: none; }
+@media (max-width: 560px) {
+    .battle-side .fx-row { display: none; }
+    .fx-strip {
+        display: grid; gap: 6px;
+        margin-top: 12px; padding: 9px 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, .03);
+        border: 1px solid rgba(255, 255, 255, .08);
+    }
+    .fx-who { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+    .fx-who > b { font-size: 12px; color: var(--cream); margin-right: 2px; }
+    .fx-who .fx-row { margin: 0; justify-content: flex-start; }
+}
+
+/* ---- The frost turned away ------------------------------------------------
+   When something a player wears stops a freeze. The fire, light or thaw is
+   drawn on the canvas by ward-fx.js; this is the dimmed room behind it, the
+   warm edge and the card that says whose gear did it. The card comes in
+   once the effect has had its moment (--ward-card-at, set by the script). */
+.ward-fx {
+    position: fixed; inset: 0; z-index: 4800;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: opacity .4s ease, visibility 0s linear .4s;
+}
+.ward-fx.on {
+    opacity: 1; visibility: visible;
+    transition: opacity .18s ease, visibility 0s;
+}
+.ward-dim {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 75% at 50% 50%, rgba(18, 12, 10, .46), rgba(10, 6, 6, .7));
+}
+.ward-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ward-edge {
+    position: absolute; inset: 0; opacity: 0;
+    background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%,
+                rgba(255, 150, 60, .2) 80%, rgba(255, 196, 120, .42) 100%);
+    box-shadow: inset 0 0 0 3px rgba(255, 214, 160, .5), inset 0 0 90px 20px rgba(255, 160, 80, .3);
+}
+.ward-fx.on .ward-edge { animation: ward-edge-in .7s ease-out var(--ward-card-at, 1s) both; }
+@keyframes ward-edge-in { from { opacity: 0; } to { opacity: 1; } }
+.ward-fx.mine .ward-edge {
+    box-shadow: inset 0 0 0 4px rgba(255, 224, 176, .75), inset 0 0 130px 40px rgba(255, 168, 84, .42);
+}
+.ward-card {
+    position: relative;
+    min-width: min(380px, calc(100vw - 32px));
+    max-width: min(460px, calc(100vw - 32px));
+    padding: 20px 28px 20px;
+    text-align: center;
+    border-radius: 18px;
+    color: #3a1d0a;
+    background: linear-gradient(180deg, rgba(255, 251, 242, .97), rgba(255, 228, 190, .97));
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 4px rgba(236, 146, 64, .55), 0 30px 70px -20px rgba(24, 8, 0, .9);
+    opacity: 0;
+}
+.ward-fx.on .ward-card {
+    animation: ward-card-in .55s cubic-bezier(.2, 1.35, .4, 1) var(--ward-card-at, 1s) both;
+}
+@keyframes ward-card-in {
+    from { opacity: 0; transform: translateY(16px) scale(.9); }
+    to   { opacity: 1; transform: none; }
+}
+.ward-fx.mine .ward-card { box-shadow: 0 0 0 5px #e48a3c, 0 30px 70px -20px rgba(24, 8, 0, .9); }
+.ward-icon { width: 58px; height: 58px; display: block; margin: 0 auto 6px; }
+.ward-fx.on .ward-icon { animation: ward-icon-in .8s ease-out var(--ward-card-at, 1s) both; }
+@keyframes ward-icon-in {
+    from { transform: scale(.4) rotate(-20deg); }
+    60%  { transform: scale(1.12) rotate(4deg); }
+    to   { transform: none; }
+}
+.ward-word {
+    font-family: 'Cutive Mono', 'Courier New', monospace;
+    font-size: 34px; font-weight: bold; letter-spacing: 4px; text-transform: uppercase;
+    color: #b24a17;
+    line-height: 1.1;
+}
+.ward-who { margin-top: 8px; font-size: 19px; font-weight: bold; color: #3a1d0a; }
+.ward-sub { margin-top: 4px; font-size: 14px; color: #7a4a24; line-height: 1.4; }
+@media (max-width: 480px) {
+    .ward-card { padding: 18px 18px; }
+    .ward-word { font-size: 26px; letter-spacing: 3px; }
+    .ward-who { font-size: 17px; }
+}
+/* Reduced motion: no fire or flying ice, just the card and the warm edge. */
+.ward-fx.calm .ward-card, .ward-fx.calm .ward-edge, .ward-fx.calm .ward-icon { animation: none; opacity: 1; }
+
     </style>
 
     <script type="application/ld+json">
@@ -6272,6 +6693,8 @@ kbd {
             <div class="game-grid">
                 <div>
                     <div class="board" id="board"></div>
+                    <!-- Only on a touch screen, where there is no pointing at a square. -->
+                    <p class="board-hint">Tap any square to read it in full.</p>
 
                     <div class="action-log-row" style="margin-top:16px">
                         <div class="card">
@@ -6279,7 +6702,12 @@ kbd {
                             <div id="side-actions"></div>
                         </div>
                         <div class="card">
-                            <h3>The narrator</h3>
+                            <div class="log-head">
+                                <h3>The narrator</h3>
+                                <div class="log-filter" role="group" aria-label="Which lines to show">
+                                    <button id="log-all" class="on" aria-pressed="true">All</button><button id="log-mine" aria-pressed="false">Just mine</button>
+                                </div>
+                            </div>
                             <div class="log" id="log"></div>
                         </div>
                     </div>
@@ -6294,6 +6722,8 @@ kbd {
                 </div>
             </div>
         </div>
+        <!-- On narrower screens the main buttons are pinned along the bottom too. -->
+        <div class="phone-bar empty" id="phone-bar"></div>
     </section>
 
     <!-- ================= GAME OVER ================= -->
@@ -6349,7 +6779,7 @@ kbd {
             starterArmour: 'tin_armour',
             moves: [
                 {
-                    id: 'light_swing', name: 'Light Swing', damage: 10, energy: 1,
+                    id: 'light_swing', name: 'Light Swing', damage: 15, energy: 1,
                     roll: { odd: 10, even: 5 },
                     text: 'Roll a die. Odd: 10 more damage. Even: 5 more damage.'
                 },
@@ -6453,7 +6883,7 @@ kbd {
                 {
                     id: 'ancient_tribe_dance', name: 'Ancient Tribe Dance', damage: 0,
                     energy: 5, spend: 2, selfBuff: { kind: 'damage', value: 30, uses: 2 },
-                    text: 'No damage. You do 30 extra damage for 2 turns.'
+                    text: 'No damage. The Barbarian does 30 extra damage on his next 2 attacks.'
                 },
                 {
                     id: 'knock_out', name: 'Knock Out', damage: 120, energy: 8, spend: 6,
@@ -6945,20 +7375,20 @@ kbd {
             },
             moves: [
                 {
-                    id: 'eternal_frost_breath', name: 'Eternal Frost Breath', damage: 50,
+                    id: 'eternal_frost_breath', name: 'Eternal Frost Breath', damage: 40,
                     energy: 1, rollEach: { count: 4, parity: 'odd', each: 10 },
                     text: 'Roll a die 4 times. For every odd number this attack does ' +
                           '10 extra damage.'
                 },
-                { id: 'claws_of_ice', name: 'Claws of Ice', damage: 65, energy: 3 },
+                { id: 'claws_of_ice', name: 'Claws of Ice', damage: 55, energy: 3 },
                 {
-                    id: 'tail_slam', name: 'Tail Slam', damage: 90, energy: 5, spend: 3,
+                    id: 'tail_slam', name: 'Tail Slam', damage: 80, energy: 5, spend: 3,
                     rot: { weaken: 15, tick: 10, turns: 4 },
                     text: 'The opponent does 15 less damage and takes 10 damage after ' +
                           'every turn — both sides — for 4 turns.'
                 },
                 {
-                    id: 'glacial_annihilation', name: 'Glacial Annihilation', damage: 180,
+                    id: 'glacial_annihilation', name: 'Glacial Annihilation', damage: 170,
                     energy: 8, spend: 5, freeze: { always: true },
                     text: 'The opponent is frozen.'
                 }
@@ -7224,30 +7654,31 @@ kbd {
         fire_ruby_bracelet: {
             id: 'fire_ruby_bracelet', name: 'Fire Ruby Bracelet', kind: 'special',
             rubyRoll: true,
-            text: 'Every time you attack an enemy, roll a die. On a 1 the damage is ' +
-                  'doubled. On anything else it does nothing.'
+            text: 'Every time you attack, roll a die. On a 1 your move does double ' +
+                  'damage. On anything else it does nothing.'
         },
         pendant_of_life: {
             id: 'pendant_of_life', name: 'Pendant of Life', kind: 'special',
             healAfterBattle: 5,
-            text: 'Heal 5 HP at the end of every battle.'
+            text: 'Heal 5 HP at the end of every battle, win or lose.'
         },
         lucky_charm: {
             id: 'lucky_charm', name: 'Lucky Charm', kind: 'special',
             luckyRoll: 10,
-            text: 'Every time you attack you may roll a die. If it lands on an even ' +
+            text: 'Every time you attack, roll a die. If it lands on an even ' +
                   'number, do 10 more damage.'
         },
         flint_necklace: {
             id: 'flint_necklace', name: 'Flint Necklace', kind: 'special',
             standsForFlint: true,
             text: 'If you land on a campfire logs square you may use this instead of ' +
-                  'a flint.'
+                  'a flint. It is never used up.'
         },
         rock_of_warmth: {
             id: 'rock_of_warmth', name: 'Rock of Warmth', kind: 'special',
             noFreeze: true,
-            text: 'You cannot be frozen.'
+            text: 'You cannot be frozen (except by Fenrirak, whose Chilling Aura ' +
+                  'gets through).'
         }
     };
 
@@ -7324,16 +7755,16 @@ kbd {
         },
         defence_potion: {
             id: 'defence_potion', name: 'Defence Potion', effect: 'defence',
-            value: 10, uses: 2, text: 'Take 10 less damage for 2 turns.'
+            value: 10, uses: 2, text: 'Take 10 less damage from the next 2 hits you take.'
         },
         supreme_defence_potion: {
             id: 'supreme_defence_potion', name: 'Supreme Defence Potion',
             effect: 'defence', value: 30, uses: 1,
-            text: 'Take 30 less damage for 1 round.'
+            text: 'Take 30 less damage from the next hit you take.'
         },
         strength_potion: {
             id: 'strength_potion', name: 'Strength Potion', effect: 'damage',
-            value: 10, uses: 2, text: 'Do 10 extra damage for 2 turns.'
+            value: 10, uses: 2, text: 'Do 10 extra damage on your next 2 attacks.'
         },
         energising_potion: {
             id: 'energising_potion', name: 'Energising Potion', effect: 'energy',
@@ -7347,41 +7778,43 @@ kbd {
         fire_blast_potion: {
             id: 'fire_blast_potion', name: 'Fire Blast Potion', effect: 'double',
             uses: 1, battleOnly: true,
-            text: 'Double the damage done to enemies for 1 turn.'
+            text: 'Your next attack’s move does double damage (your weapon and other ' +
+                  'bonuses are added after). Only usable in battle.'
         },
         freeze_liquid: {
             id: 'freeze_liquid', name: 'Freeze Liquid', effect: 'freeze',
             battleOnly: true, withAttack: true,
-            text: 'Your opponent is now frozen. You may only use this in addition ' +
-                  'to an attack.'
+            text: 'Play it with an attack: your next attack also freezes your opponent, ' +
+                  'so they lose their next turn. Only usable in battle.'
         },
         warmth_potion: {
             id: 'warmth_potion', name: 'Warmth Potion', effect: 'unfreeze',
             battleOnly: true,
-            text: 'Unfreeze yourself and remove all debuffs you got from being frozen.'
+            text: 'Unfreeze yourself: drink it any time in a fight and a turn the cold ' +
+                  'has taken (or is about to take) from you is yours again. Only usable in battle.'
         },
         rage_liquid: {
             id: 'rage_liquid', name: 'Rage Liquid', effect: 'rage', battleOnly: true,
-            text: 'Do triple damage this turn, but do 50% less damage the next time ' +
-                  'you attack (rounded down).'
+            text: 'Your next attack’s move does triple damage, but the attack after that ' +
+                  'does 50% less (rounded down). Only usable in battle.'
         },
         potion_of_reflex: {
             id: 'potion_of_reflex', name: 'Potion of Reflex', effect: 'reflex',
             uses: 5, battleOnly: true,
-            text: 'Prevents your opponent taking 2 turns in a row (by special ' +
-                  'abilities) for 5 turns. Does not prevent freezing.'
+            text: 'For the next 5 turns of the fight (yours and theirs), your opponent ' +
+                  'cannot take 2 turns in a row by stunning you. Does not prevent freezing.'
         },
         bursting_potion_of_decay: {
             id: 'bursting_potion_of_decay', name: 'Bursting Potion of Decay',
             effect: 'dot', value: 15, uses: 2, battleOnly: true,
-            text: 'Does 15 damage every turn (including the monster’s turn) ' +
-                  'during a battle for 2 turns.'
+            text: 'Your opponent takes 15 damage after each of the next 2 turns of the ' +
+                  'fight (yours and theirs).'
         },
         bursting_vial_of_poison: {
             id: 'bursting_vial_of_poison', name: 'Bursting Vial of Poison',
             effect: 'dot', value: 5, uses: 3, battleOnly: true,
-            text: 'Does 5 damage every turn (including the monster’s turn) ' +
-                  'during a battle for 3 turns.'
+            text: 'Your opponent takes 5 damage after each of the next 3 turns of the ' +
+                  'fight (yours and theirs).'
         },
         vial_of_red_liquid: {
             id: 'vial_of_red_liquid', name: 'Vial of Red Liquid', effect: 'gamble',
@@ -7435,7 +7868,7 @@ kbd {
         knowledge: {
             id: 'knowledge', name: 'Knowledge',
             text: 'You may add up to 2 to your dice roll when rolling to use a ' +
-                  'special equipment or equipment card.'
+                  'special equipment card, so the Lucky Charm always lands its 10.'
         }
     };
 
@@ -8366,6 +8799,547 @@ kbd {
 
     </script>
     <script>
+/* ==== game-ice/ward-fx.js ==== */
+/* ======================================================================
+   The frost turned away
+
+   Played when something a player wears -- the Rock of Warmth, or armour
+   that keeps the cold off -- stops a freeze: a monster's freezing move, a
+   rival's in a duel, or a Freeze Liquid. Being frozen has its own moment
+   over the whole table (FREEZE in ui.js); being saved from it now has one
+   too, so the item is seen doing its job instead of earning one muted line
+   in the narrator.
+
+   It is drawn on a canvas over the screen, as a thaw: frost creeps in
+   from the edges and a snowflake starts to form, as if the cold is about
+   to take hold; then a flame catches at the flake's heart, it bursts into
+   embers, and the warmth rolls out and melts the frost away. It ends on a
+   card saying whose gear turned the frost away. ui.js decides when it
+   plays and what the card says; this file only draws.
+
+     LOF_WARD_FX.play({ mine, who, sub })
+     LOF_WARD_FX.busy()
+
+   With reduced motion asked for, only the card is shown.
+   ====================================================================== */
+
+(function () {
+    'use strict';
+
+    const TOTAL_MS = 3000;          // from the first frame to the fade starting
+    const FADE_MS = 400;
+    const CARD_AT = 1.45;           // seconds in, once the frost has melted back
+
+    /* ---- small maths --------------------------------------------------- */
+
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+    const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
+    const ramp = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+    const easeOut = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+    const easeInOut = t => {
+        t = clamp(t, 0, 1);
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
+
+    /* ---- the card's little pictures ------------------------------------- */
+
+    const FLAME_SVG =
+        '<path d="M32 3C35 14 48 20 48 37c0 12-7 21-16 21s-16-9-16-20c0-9 5-14 8-20 ' +
+            '1 6 3 9 6 10-2-9-1-17 4-25z" fill="#e2602a"/>' +
+        '<path d="M32 24c2 8 9 12 9 21 0 6-4 10-9 10s-9-4-9-9c0-5 3-8 5-12 1 3 2 4 4 5' +
+            '-1-5-1-10 0-15z" fill="#ffb53d"/>' +
+        '<ellipse cx="32" cy="48" rx="4.5" ry="6" fill="#fff3c8"/>';
+
+    const ICON_SVG =
+        '<svg class="ward-icon" viewBox="0 0 64 64" aria-hidden="true">' +
+            '<g fill="none" stroke="#8ec3ec" stroke-width="3" stroke-linecap="round" opacity=".75">' +
+                '<path d="M32 4v56M7.8 18l48.4 28M7.8 46l48.4-28"/></g>' +
+            '<g transform="translate(12 13) scale(.62)">' + FLAME_SVG + '</g>' +
+        '</svg>';
+
+    /* ---- soft round sprites, drawn once --------------------------------- */
+
+    function sprite(size, stops) {
+        const c = document.createElement('canvas');
+        c.width = c.height = size;
+        const g = c.getContext('2d');
+        const grd = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+        stops.forEach(s => grd.addColorStop(s[0], s[1]));
+        g.fillStyle = grd;
+        g.fillRect(0, 0, size, size);
+        return c;
+    }
+
+    let SPR = null;
+    function sprites() {
+        if (SPR) return SPR;
+        SPR = {
+            core:  sprite(64, [[0, 'rgba(255,255,242,1)'], [0.25, 'rgba(255,236,170,.9)'],
+                               [0.6, 'rgba(255,170,60,.35)'], [1, 'rgba(255,120,20,0)']]),
+            fire:  sprite(64, [[0, 'rgba(255,216,124,.95)'], [0.35, 'rgba(255,142,42,.6)'],
+                               [0.7, 'rgba(222,62,12,.18)'], [1, 'rgba(160,20,0,0)']]),
+            deep:  sprite(64, [[0, 'rgba(255,112,32,.7)'], [0.5, 'rgba(190,40,6,.3)'],
+                               [1, 'rgba(90,10,0,0)']]),
+            ember: sprite(16, [[0, 'rgba(255,252,226,1)'], [0.3, 'rgba(255,192,82,.9)'],
+                               [1, 'rgba(255,90,0,0)']]),
+            steam: sprite(64, [[0, 'rgba(242,247,252,.6)'], [0.5, 'rgba(226,235,245,.3)'],
+                               [1, 'rgba(220,230,240,0)']]),
+            warm:  sprite(128, [[0, 'rgba(255,192,104,.55)'], [0.45, 'rgba(255,132,52,.2)'],
+                                [1, 'rgba(255,90,20,0)']])
+        };
+        return SPR;
+    }
+
+    /* ---- particles ------------------------------------------------------ */
+    /* layer 1 fire (added light), 2 steam and meltwater (normal), 3 embers  */
+    /* and flashes (added light), drawn in that order over the frost.        */
+
+    const MAX_PARTS = 1800;
+
+    function part(o) {
+        return Object.assign({
+            x: 0, y: 0, vx: 0, vy: 0, ax: 0, ay: 0, drag: 0, turb: 0,
+            age: 0, life: 1, size: 10, grow: 0, spr: 'fire', layer: 1, a: 1,
+            fadeIn: 0.08, kind: 'sprite', cool: 0,
+            seed: Math.random() * 100
+        }, o);
+    }
+
+    // Embers drifting up from the bottom of the screen, thinning out
+    // towards `until`.
+    function ambientEmbers(st, t, dt, until, rate) {
+        if (t > until) return;
+        st.acc.ember = (st.acc.ember || 0) + rate * dt * (1 - ramp(t, until - 0.6, until));
+        while (st.acc.ember >= 1) {
+            st.acc.ember -= 1;
+            st.add(part({ x: rnd(0, st.W), y: st.H + 10, vx: gauss() * 30,
+                          vy: -rnd(60, 170) * st.s, turb: 90 * st.s,
+                          spr: 'ember', layer: 3, size: rnd(4, 8) * st.s,
+                          life: rnd(1.6, 2.8), a: rnd(0.55, 1) }));
+        }
+    }
+
+    /* ---- the thaw --------------------------------------------------------- */
+    /* Made fresh for each showing and handed the stage (its size, scale,    */
+    /* and add() for particles). step() moves it on; back() draws the frost, */
+    /* the flake and the warmth, under the particles.                        */
+
+    function thawStyle(st) {
+        const W = st.W, H = st.H, s = st.s, dpr = st.dpr;
+        const cx = W / 2, cy = H / 2;
+        const minD = Math.min(W, H);
+        const diag = Math.hypot(W, H);
+
+        // The frost is grown on a canvas of its own, then melted off it.
+        const F = document.createElement('canvas');
+        F.width = Math.round(W * dpr);
+        F.height = Math.round(H * dpr);
+        const f = F.getContext('2d');
+        f.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const v = f.createRadialGradient(cx, cy, minD * 0.26, cx, cy, diag * 0.56);
+        v.addColorStop(0, 'rgba(200,230,255,0)');
+        v.addColorStop(0.5, 'rgba(206,233,255,.34)');
+        v.addColorStop(1, 'rgba(240,249,255,.86)');
+        f.fillStyle = v;
+        f.fillRect(0, 0, W, H);
+
+        // Ferns of frost, growing in from every edge.
+        const segs = [];
+        const maxLen = minD * 0.32;
+        const GROW = 0.6;
+        function branch(x, y, ang, len, t0, depth, w) {
+            let d = 0, k = 0, a = ang;
+            while (d < len) {
+                const stepLen = rnd(6, 11) * Math.max(0.8, s);
+                a += gauss() * 0.08;
+                const nx = x + Math.cos(a) * stepLen, ny = y + Math.sin(a) * stepLen;
+                d += stepLen;
+                segs.push({ x1: x, y1: y, x2: nx, y2: ny,
+                            t: t0 + (d / maxLen) * GROW, w: w * (1 - (d / len) * 0.6) });
+                k += 1;
+                if (depth < 2 && k % 3 === 0 && len - d > 14) {
+                    const side = (k / 3) % 2 ? 1 : -1;
+                    const tt = t0 + (d / maxLen) * GROW;
+                    branch(nx, ny, a + side * rnd(0.98, 1.1), (len - d) * rnd(0.3, 0.48),
+                           tt, depth + 1, w * 0.68);
+                    if (depth === 0 && Math.random() < 0.5) {
+                        branch(nx, ny, a - side * rnd(0.98, 1.1), (len - d) * rnd(0.2, 0.4),
+                               tt, depth + 1, w * 0.68);
+                    }
+                }
+                x = nx; y = ny;
+            }
+        }
+        function seedEdge(x0, y0, x1, y1) {
+            const L = Math.hypot(x1 - x0, y1 - y0);
+            for (let d = rnd(0, 30); d < L; d += rnd(40, 72) * Math.max(0.8, s)) {
+                const x = x0 + (x1 - x0) * d / L, y = y0 + (y1 - y0) * d / L;
+                const corner = Math.min(d, L - d) < minD * 0.18 ? 1.25 : 1;
+                const ang = Math.atan2(cy - y, cx - x) + gauss() * 0.4;
+                branch(x, y, ang, maxLen * rnd(0.4, 1) * corner, rnd(0, 0.14), 0,
+                       rnd(1.0, 1.7) * Math.max(0.85, s));
+            }
+        }
+        seedEdge(0, 0, W, 0);
+        seedEdge(W, 0, W, H);
+        seedEdge(W, H, 0, H);
+        seedEdge(0, H, 0, 0);
+        segs.sort((p, q) => p.t - q.t);
+        let drawn = 0;
+
+        // The snowflake that tries to form in the middle.
+        const arm = minD * 0.11;
+        const IGNITE = 0.8;
+        let flakeAlpha = 0, front = 0, heat = 0, frost = 0, burst = false;
+        let flameAcc = 0;
+
+        function flake(ctx, grow, hot) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.lineCap = 'round';
+            // white-blue ice, going gold as the flame catches in it
+            const col = 'rgba(' + Math.round(236 + 19 * hot) + ',' + Math.round(248 - 90 * hot) +
+                        ',' + Math.round(255 - 195 * hot) + ',.95)';
+            const halo = hot > 0 ? 'rgba(255,150,60,' + (0.25 + 0.25 * hot).toFixed(2) + ')'
+                                 : 'rgba(140,200,255,.25)';
+            [[7 * s, halo], [2.6 * s, col]].forEach(k => {
+                ctx.lineWidth = k[0];
+                ctx.strokeStyle = k[1];
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const a = i * Math.PI / 3 - Math.PI / 2;
+                    const L = arm * grow;
+                    const ex = Math.cos(a) * L, ey = Math.sin(a) * L;
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(ex, ey);
+                    // the little barbs on each arm
+                    [0.45, 0.72].forEach(p => {
+                        if (grow < p) return;
+                        const bx = Math.cos(a) * arm * p, by = Math.sin(a) * arm * p;
+                        const bl = arm * 0.22 * Math.min(1, (grow - p) * 4);
+                        ctx.moveTo(bx, by);
+                        ctx.lineTo(bx + Math.cos(a + 0.8) * bl, by + Math.sin(a + 0.8) * bl);
+                        ctx.moveTo(bx, by);
+                        ctx.lineTo(bx + Math.cos(a - 0.8) * bl, by + Math.sin(a - 0.8) * bl);
+                    });
+                }
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+
+        return {
+            step(t, dt) {
+                frost = easeOut(ramp(t, 0, 0.5));
+                // grow the ferns that are due
+                f.lineCap = 'round';
+                while (drawn < segs.length && segs[drawn].t <= t) {
+                    const g = segs[drawn++];
+                    f.strokeStyle = 'rgba(160,212,255,.16)';
+                    f.lineWidth = g.w * 3.2;
+                    f.beginPath(); f.moveTo(g.x1, g.y1); f.lineTo(g.x2, g.y2); f.stroke();
+                    f.strokeStyle = 'rgba(246,252,255,.8)';
+                    f.lineWidth = g.w;
+                    f.beginPath(); f.moveTo(g.x1, g.y1); f.lineTo(g.x2, g.y2); f.stroke();
+                }
+
+                flakeAlpha = ramp(t, 0.12, 0.3) * (1 - ramp(t, IGNITE + 0.12, IGNITE + 0.32));
+                heat = ramp(t, IGNITE - 0.06, IGNITE + 0.12);
+
+                // the flame catches at its heart and the flake bursts
+                if (t >= IGNITE + 0.14 && !burst) {
+                    burst = true;
+                    for (let i = 0; i < 6; i++) {
+                        const a = i * Math.PI / 3 - Math.PI / 2;
+                        for (let j = 0; j < 7; j++) {
+                            const r = arm * rnd(0.1, 1);
+                            st.add(part({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r,
+                                          vx: Math.cos(a) * rnd(60, 220) * s,
+                                          vy: Math.sin(a) * rnd(60, 220) * s - 60 * s,
+                                          drag: 1.6, turb: 120 * s, spr: 'ember', layer: 3,
+                                          size: rnd(4, 9) * s, life: rnd(0.8, 1.6) }));
+                        }
+                    }
+                    st.add(part({ x: cx, y: cy, spr: 'core', layer: 3, size: 240 * s,
+                                  grow: 0.6, life: 0.4, fadeIn: 0.01 }));
+                    st.shake = Math.max(st.shake, 3 * s);
+                }
+
+                // a small fire at the middle, while the warmth rolls out
+                const flame = ramp(t, IGNITE, IGNITE + 0.15) * (1 - ramp(t, 1.5, 2.1));
+                flameAcc += 560 * flame * dt * clamp(W / 900, 0.6, 1);
+                while (flameAcc >= 1) {
+                    flameAcc -= 1;
+                    const hot = Math.random() < 0.3;
+                    st.add(part({ x: cx + gauss() * 22 * s, y: cy + 26 * s + gauss() * 8 * s,
+                                  vx: gauss() * 24 * s, vy: -rnd(110, 260) * s, turb: 120 * s,
+                                  spr: hot ? 'core' : 'fire', cool: hot ? 0 : 0.45,
+                                  layer: 1, size: (hot ? rnd(24, 42) : rnd(34, 70)) * s,
+                                  grow: -0.65, life: rnd(0.32, 0.66), a: hot ? 0.6 : 0.5 }));
+                }
+
+                // the warmth rolling out, melting the frost as it goes
+                const was = front;
+                front = easeInOut(ramp(t, IGNITE + 0.08, IGNITE + 1.05)) * diag * 0.62;
+                if (front > 0) {
+                    f.globalCompositeOperation = 'destination-out';
+                    const m = f.createRadialGradient(cx, cy, 0, cx, cy, front + 1);
+                    m.addColorStop(0, 'rgba(0,0,0,1)');
+                    m.addColorStop(0.8, 'rgba(0,0,0,1)');
+                    m.addColorStop(1, 'rgba(0,0,0,0)');
+                    f.fillStyle = m;
+                    f.fillRect(0, 0, W, H);
+                    f.globalCompositeOperation = 'source-over';
+                }
+                // steam and meltwater where the warmth meets the frost
+                if (front > minD * 0.24 && front < diag * 0.6 && front > was) {
+                    const n = Math.ceil(10 * clamp(W / 900, 0.5, 1));
+                    for (let i = 0; i < n; i++) {
+                        const a = rnd(0, Math.PI * 2);
+                        const x = cx + Math.cos(a) * front * 0.9, y = cy + Math.sin(a) * front * 0.9;
+                        if (x < -20 || x > W + 20 || y < -20 || y > H + 20) continue;
+                        if (Math.random() < 0.55) {
+                            st.add(part({ x: x, y: y, vx: gauss() * 30 * s, vy: -rnd(40, 120) * s,
+                                          turb: 40 * s, drag: 0.8, spr: 'steam', layer: 2,
+                                          size: rnd(40, 70) * s, grow: 2.2,
+                                          life: rnd(0.8, 1.3), a: 0.32, fadeIn: 0.2 }));
+                        } else {
+                            st.add(part({ kind: 'drop', x: x, y: y, vx: gauss() * 10,
+                                          vy: rnd(30, 120) * s, ay: 700 * s, layer: 2,
+                                          size: rnd(2, 3.4) * s, life: rnd(0.5, 0.9),
+                                          fadeIn: 0.02 }));
+                        }
+                    }
+                }
+                ambientEmbers(st, t, dt, 3.0, 14);
+            },
+            back(ctx, t) {
+                const SP = sprites();
+                // the frost itself, settling in from a touch further out
+                if (frost > 0) {
+                    const k = 1.05 - 0.05 * frost;
+                    ctx.globalAlpha = frost;
+                    ctx.drawImage(F, cx - W * k / 2, cy - H * k / 2, W * k, H * k);
+                    ctx.globalAlpha = 1;
+                }
+                // the snowflake
+                if (flakeAlpha > 0.01) {
+                    ctx.globalAlpha = flakeAlpha;
+                    flake(ctx, easeOut(ramp(t, 0.12, 0.7)), heat);
+                    ctx.globalAlpha = 1;
+                }
+                // the warmth: a glow at the middle and a soft ring at its edge
+                if (front > 0) {
+                    const k = 1 - ramp(t, 1.7, 2.3);
+                    ctx.globalCompositeOperation = 'lighter';
+                    ctx.globalAlpha = 0.6 * k;
+                    const R = Math.min(front * 1.5, diag * 0.7);
+                    ctx.drawImage(SP.warm, cx - R / 2, cy - R / 2, R, R);
+                    ctx.globalAlpha = 0.8 * k * (1 - ramp(front, diag * 0.4, diag * 0.62));
+                    [[54 * s, 'rgba(255,130,40,.22)'], [20 * s, 'rgba(255,176,90,.38)'],
+                     [4 * s, 'rgba(255,238,200,.75)']].forEach(r => {
+                        ctx.lineWidth = r[0];
+                        ctx.strokeStyle = r[1];
+                        ctx.beginPath(); ctx.arc(cx, cy, front, 0, Math.PI * 2); ctx.stroke();
+                    });
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.globalAlpha = 1;
+                }
+            }
+        };
+    }
+
+    /* ======================================================================
+       The stage
+       ====================================================================== */
+
+    let back = null, canvas = null, ctx = null, card = null;
+    let raf = 0, hideT = 0, clearT = 0, showing = false, dueAt = 0;
+    let stage = null;
+
+    function build() {
+        if (back) return;
+        back = document.createElement('div');
+        back.className = 'ward-fx';
+        back.setAttribute('aria-hidden', 'true');
+        back.innerHTML =
+            '<div class="ward-dim"></div>' +
+            '<canvas class="ward-canvas"></canvas>' +
+            '<div class="ward-edge"></div>' +
+            '<div class="ward-card">' +
+                '<div class="ward-icon-wrap"></div>' +
+                '<div class="ward-word">Frost blocked</div>' +
+                '<div class="ward-who"></div>' +
+                '<div class="ward-sub"></div>' +
+            '</div>';
+        document.body.appendChild(back);
+        canvas = back.querySelector('.ward-canvas');
+        ctx = canvas.getContext('2d');
+        card = back.querySelector('.ward-card');
+    }
+
+    function reducedMotion() {
+        try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+        catch (e) { return false; }
+    }
+
+    function frame(now) {
+        raf = 0;
+        if (!stage) return;
+        const dt = (now - stage.last) / 1000;
+        stage.last = now;
+        advance(stage, dt > 0 ? Math.min(dt, 0.05) : 0);
+        render(stage);
+        if (showing) raf = requestAnimationFrame(frame);
+    }
+
+    function advance(st, dt) {
+        st.t += dt;
+        st.style.step(st.t, dt);
+        const parts = st.parts;
+        let w = 0;
+        for (let i = 0; i < parts.length; i++) {
+            const p = parts[i];
+            p.age += dt;
+            if (p.age >= p.life) continue;
+            if (p.turb) p.vx += Math.sin(p.age * 9 + p.seed) * p.turb * dt;
+            p.vx += p.ax * dt;
+            p.vy += p.ay * dt;
+            if (p.drag) { const k = Math.exp(-p.drag * dt); p.vx *= k; p.vy *= k; }
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            parts[w++] = p;
+        }
+        parts.length = w;
+        st.shake *= Math.exp(-dt * 14);
+    }
+
+    function render(st) {
+        const c = ctx;
+        c.setTransform(st.dpr, 0, 0, st.dpr, 0, 0);
+        c.clearRect(0, 0, st.W, st.H);
+        if (st.shake > 0.3) c.translate(gauss() * st.shake, gauss() * st.shake);
+        st.style.back(c, st.t);
+        drawLayer(c, st, 1);
+        drawLayer(c, st, 2);
+        drawLayer(c, st, 3);
+    }
+
+    function drawLayer(c, st, layer) {
+        const SP = sprites();
+        const add = layer === 1 || layer === 3;
+        c.globalCompositeOperation = add ? 'lighter' : 'source-over';
+        const parts = st.parts;
+        for (let i = 0; i < parts.length; i++) {
+            const p = parts[i];
+            if (p.layer !== layer) continue;
+            const t = p.age / p.life;
+            const a = p.a * Math.min(1, t / p.fadeIn) * (1 - t) * (add ? 1 : (1 - t * 0.3));
+            if (a <= 0.004) continue;
+            c.globalAlpha = Math.min(1, a);
+            const size = Math.max(0.5, p.size * (1 + p.grow * t));
+            if (p.kind === 'drop') {
+                c.strokeStyle = 'rgba(196,228,255,.9)';
+                c.lineWidth = size;
+                c.lineCap = 'round';
+                c.beginPath();
+                c.moveTo(p.x, p.y);
+                c.lineTo(p.x - p.vx * 0.03, p.y - p.vy * 0.03);
+                c.stroke();
+            } else {
+                const img = p.cool && t > p.cool ? SP.deep : SP[p.spr];
+                c.drawImage(img, p.x - size / 2, p.y - size / 2, size, size);
+            }
+        }
+        c.globalCompositeOperation = 'source-over';
+        c.globalAlpha = 1;
+    }
+
+    function done() {
+        clearTimeout(hideT);
+        if (back) back.classList.remove('on');
+        showing = false;
+        clearTimeout(clearT);
+        clearT = setTimeout(() => {
+            if (showing) return;
+            if (raf) cancelAnimationFrame(raf);
+            raf = 0;
+            stage = null;
+            if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }, FADE_MS + 40);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden || !showing) return;
+        if (Date.now() >= dueAt) done();
+    });
+
+    function play(info) {
+        build();
+        info = info || {};
+
+        card.querySelector('.ward-icon-wrap').innerHTML = ICON_SVG;
+        card.querySelector('.ward-word').textContent = info.word || 'Frost blocked';
+        card.querySelector('.ward-who').textContent = info.who || '';
+        card.querySelector('.ward-sub').textContent = info.sub || '';
+        back.classList.toggle('mine', !!info.mine);
+
+        const calm = reducedMotion();
+        back.classList.toggle('calm', calm);
+        back.style.setProperty('--ward-card-at', (calm ? 0 : CARD_AT) + 's');
+
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        stage = null;
+        clearTimeout(clearT);
+
+        if (!calm) {
+            const W = window.innerWidth, H = window.innerHeight;
+            const dpr = Math.min(2, window.devicePixelRatio || 1);
+            canvas.width = Math.round(W * dpr);
+            canvas.height = Math.round(H * dpr);
+            const st = {
+                W: W, H: H, dpr: dpr, s: clamp(Math.min(W, H) / 800, 0.6, 1.25),
+                t: 0, last: performance.now(), parts: [], shake: 0, acc: {}
+            };
+            st.add = p => { if (st.parts.length < MAX_PARTS) st.parts.push(p); };
+            st.style = thawStyle(st);
+            stage = st;
+        } else if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        back.classList.remove('on');
+        void back.offsetWidth;
+        back.classList.add('on');
+        showing = true;
+        const total = calm ? 2400 : TOTAL_MS;
+        dueAt = Date.now() + total;
+        clearTimeout(hideT);
+        hideT = setTimeout(done, total);
+        if (stage) raf = requestAnimationFrame(frame);
+    }
+
+    window.LOF_WARD_FX = {
+        play: play,
+        busy() { return showing; },
+        stop: done,
+        // For looking at one moment of it while working on it: runs the
+        // effect on to t seconds and holds it there until stop().
+        _seek(t) {
+            if (!stage) return;
+            if (raf) cancelAnimationFrame(raf);
+            raf = 0;
+            clearTimeout(hideT);
+            while (stage.t < t) advance(stage, 1 / 60);
+            render(stage);
+        }
+    };
+})();
+
+    </script>
+    <script>
 /* ==== game-ice/engine.js ==== */
 /* =========================================================================
    Legend of Fenrirak™, The Ice Dragon — Online Version
@@ -8471,7 +9445,25 @@ kbd {
         return p.armourUid ? ownedItem(p, p.armourUid) : null;
     }
 
+    // Special equipment is worn in a slot of its own, one piece at a time,
+    // and never instead of a weapon or a suit of armour.
+    function equippedSpecial(p) {
+        return p.specialUid ? ownedItem(p, p.specialUid) : null;
+    }
+
     function defOf(inst) { return inst ? D.ITEMS[inst.id] : null; }
+
+    // Whatever this player is wearing that keeps the frost off -- a suit of
+    // armour that says so, or the Rock of Warmth -- or null. Inside a fight
+    // with Fenrirak his Chilling Aura sees straight through it (guardFor).
+    function freezeWard(p) {
+        if (!p) return null;
+        const a = defOf(equippedArmour(p));
+        if (a && a.noFreeze) return a;
+        const sp = defOf(equippedSpecial(p));
+        if (sp && sp.noFreeze) return sp;
+        return null;
+    }
 
     /* ------------------------------------------------------------------ */
     /* Modifiers                                                           */
@@ -8676,6 +9668,10 @@ kbd {
     /* Decks                                                               */
     /* ------------------------------------------------------------------ */
 
+    // Whether a piece of gear was cut for this player's class. Only that gear
+    // can be wielded or worn (special equipment suits everyone), and it is
+    // the pile a class draws from. Anyone may still buy another class's gear
+    // from the Merchant or pick it up at the Amethyst Harbour, and trade it on.
     function suitsClass(p, itemId) {
         const it = D.ITEMS[itemId];
         const cls = D.CLASSES[p.cls];
@@ -8683,6 +9679,13 @@ kbd {
         if (it.kind === 'weapon') return it.subtype === cls.weaponType;
         if (it.kind === 'armour') return it.subtype === 'any' || it.subtype === cls.armourType;
         return true;
+    }
+
+    // Axes and Barbarian armour (and armour for any class): what the
+    // Barbarian can be handed by whoever he rides with.
+    function barbarianCanUse(itemId) {
+        const def = D.ITEMS[itemId];
+        return !!def && def.kind !== 'special' && suitsClass({ cls: 'barbarian' }, itemId);
     }
 
     // Equipment cards (weapons/armour) — the white cards — dealt one at a
@@ -8745,12 +9748,17 @@ kbd {
 
     // The Amethyst Harbour's own deck. Its cards are still equipment (kind
     // weapon/armour/special in ITEMS) — only where they come from differs.
+    // Six pieces, one of each, and once they are gone they are gone: the
+    // deck is never shuffled back together, so there is only ever one
+    // Phantom Blade at the table.
     function drawHarbour(state, p, count) {
         const drawn = [];
         for (let n = 0; n < count; n++) {
-            if (!state.decks.harbour.length) {
-                state.decks.harbour = shuffle(D.HARBOUR_DECK.slice());
-                log(state, 'The Amethyst Harbour deck was reshuffled.', 'muted');
+            if (!state.decks.harbour || !state.decks.harbour.length) {
+                if (!drawn.length) {
+                    log(state, 'There is nothing left to pick up at the Amethyst Harbour.', 'muted');
+                }
+                break;
             }
             const id = state.decks.harbour.shift();
             const inst = { uid: uid('it'), id: id, uses: D.ITEMS[id].uses || null };
@@ -8874,6 +9882,7 @@ kbd {
             fragments: [],
             weaponUid: null,
             armourUid: null,
+            specialUid: null,
             buffs: [],
             orderRoll: null,
             turnsTaken: 0,
@@ -9024,6 +10033,7 @@ kbd {
         p.movesLeft = 0;
         p.weaponSwaps = 0;
         p.armourSwaps = 0;
+        p.specialSwaps = 0;
         p.path = [];
         state.turnStartedAt = Date.now();
         // A tutorial pause from the turn that just ended has nothing left to
@@ -9079,7 +10089,9 @@ kbd {
     function advanceTurn(state) {
         const p = currentPlayer(state);
         if (p) {
-            p.buffs = (p.buffs || []).filter(b => b.kind !== 'defence');
+            // A game saved before defence cards counted hits stored them as
+            // 99 uses, meant to run out with the turn. They still do.
+            p.buffs = (p.buffs || []).filter(x => !(x.kind === 'defence' && x.uses >= 99));
             p.turnsTaken += 1;
             p.energy = R.startingEnergy;
         }
@@ -9152,14 +10164,8 @@ kbd {
             return winPvp(state, other, p);
         }
         if (b && b.kind === 'pve' && b.aId === p.id) {
-            log(state, p.name + ' collapses' + (reason ? ' from ' + reason : '') +
-                       ' and the fight is lost.', 'death');
-            const wasIllusion = b.illusion;
-            restoreGateFragments(state, p, b);
-            state.battle = null;
-            sendToStart(state, p, true, true);
-            if (wasIllusion) advanceTurn(state);
-            return ok();
+            return losePve(state, p, p.name + ' collapses' + (reason ? ' from ' + reason : '') +
+                                     ' and the fight is lost. Back to the Start.');
         }
         log(state, p.name + ' collapses and returns to the Start.', 'death');
         sendToStart(state, p, true, true);
@@ -9349,7 +10355,14 @@ kbd {
             if (res.ok && !state.battle && !state.pending && p.movesLeft > 0) {
                 const left = p.movesLeft;
                 p.movesLeft = 0;
-                return walk(state, p, left);
+                // One move, so one path: the walk on from here is added to
+                // the squares already walked, not put in their place, or
+                // the board would show the piece jumping straight to Eagle's
+                // Descent and only walking from there.
+                const before = p.path.slice();
+                const res2 = walk(state, p, left);
+                p.path = before.concat(p.path.slice(1));
+                return res2;
             }
             return res;
         }
@@ -9433,10 +10446,8 @@ kbd {
             // A campfire is also where the pot sits (see DECOR): pay a
             // flint for the printed heal.
             case 'campfire': {
-                const necklace = p.inventory.some(it => {
-                    const def = defOf(it);
-                    return def && def.standsForFlint;
-                });
+                const worn = defOf(equippedSpecial(p));
+                const necklace = !!(worn && worn.standsForFlint);
                 state.pending = {
                     type: 'campfire', playerId: p.id, value: sq.value,
                     canAfford: p.flint > 0 || necklace,
@@ -9471,7 +10482,8 @@ kbd {
                 // is nothing equipped either, when they take what Gold there is).
                 const cost = mod(state, 'payUp') ? 50 : 25;
                 const options = p.inventory
-                    .filter(it => it.uid === p.weaponUid || it.uid === p.armourUid)
+                    .filter(it => it.uid === p.weaponUid || it.uid === p.armourUid ||
+                                  it.uid === p.specialUid)
                     .map(it => ({ uid: it.uid, id: it.id, name: D.ITEMS[it.id].name }));
                 state.pending = {
                     type: 'bandit_outpost', playerId: p.id,
@@ -9555,7 +10567,12 @@ kbd {
         } else if (row.kind === 'heal') {
             p.hp = Math.min(p.maxHp, p.hp + row.value);
         } else if (row.kind === 'advance') {
-            return walk(state, p, row.value || 1);
+            // Added on to the walk that brought them here, as at Eagle's
+            // Descent, so the board shows the whole of it.
+            const before = (p.path || [p.pos]).slice();
+            const res = walk(state, p, row.value || 1);
+            if (before[before.length - 1] === p.path[0]) p.path = before.concat(p.path.slice(1));
+            return res;
         }
         return ok();
     }
@@ -9637,6 +10654,7 @@ kbd {
             rot: null
         };
         state.turnStartedAt = Date.now();
+        if (state.barbarian) state.barbarian.buffs = [];
         log(state, p.name + ' faces ' + D.foeName(e) + '!', 'battle');
         state.battle.logFrom = state.logSeq | 0;
 
@@ -9685,6 +10703,7 @@ kbd {
             rot: null
         };
         state.turnStartedAt = Date.now();
+        if (state.barbarian) state.barbarian.buffs = [];
         log(state, a.name + ' and ' + b.name + ' clash on ' + square(a.pos).name + '!', 'battle');
         state.battle.logFrom = state.logSeq | 0;
         return ok();
@@ -9766,7 +10785,10 @@ kbd {
        one die that spoilt an all-even set. */
     function parityOf(r) { return r % 2 === 1 ? 'odd' : 'even'; }
 
-    function resolveMoveEffects(state, actorName, move, status, nudge) {
+    /* `guard` (from guardFor) is the side being hit: its name, whatever it
+       wears that keeps the frost off, and whether a Potion of Reflex is
+       standing between it and a stun. */
+    function resolveMoveEffects(state, actorName, move, status, nudge, guard) {
         let damage = move.damage || 0;
         const lines = [];
         let spare = nudge ? 1 : 0;           // the Attack card's +1, unspent
@@ -9842,7 +10864,10 @@ kbd {
                 lines.push(actorName + "'s " + move.name + ' freeze roll: ' + r +
                            (hit ? ' — frozen!' : ' — no freeze.'));
             }
-            if (froze) {
+            if (froze && guard && guard.ward) {
+                lines.push(guard.name + '’s ' + guard.ward.name + ' keeps the frost off.');
+                noteWarded(state, guard, actorName, move.name);
+            } else if (froze) {
                 status.skipTurns += 1;
                 status.skipWhy = 'frozen';
                 lines.push('Frozen solid — their next turn is lost.');
@@ -9850,9 +10875,13 @@ kbd {
         }
 
         if (move.stun) {
-            status.skipTurns += move.stun;
-            if (!status.skipWhy) status.skipWhy = 'stunned';
-            lines.push('Stunned — ' + move.stun + ' turn' + (move.stun === 1 ? '' : 's') + ' lost.');
+            if (guard && guard.reflex) {
+                lines.push(guard.name + '’s Potion of Reflex shrugs off the stun.');
+            } else {
+                status.skipTurns += move.stun;
+                if (!status.skipWhy) status.skipWhy = 'stunned';
+                lines.push('Stunned — ' + move.stun + ' turn' + (move.stun === 1 ? '' : 's') + ' lost.');
+            }
         }
 
         if (move.weaken) {
@@ -9922,8 +10951,8 @@ kbd {
     function blowRange(state, who, move, target) {
         const b = state.battle;
         if (!b || !move) return null;
-        const out = { lo: 0, hi: 0, base: { lo: 0, hi: 0 }, plus: [], minus: [],
-                      floor: 0, blind: false, none: !(move.damage > 0) };
+        const out = { lo: 0, hi: 0, base: { lo: 0, hi: 0 }, plus: [], minus: [], mult: [],
+                      chance: [], floor: 0, blind: false, none: !(move.damage > 0) };
         if (out.none) return out;
 
         // Which side of the fight the blow comes from.
@@ -9939,10 +10968,24 @@ kbd {
                 if (b.kind === 'pve' && b.playerAttackMod) {
                     out.plus.push({ label: 'Thick Fur', value: b.playerAttackMod });
                 }
+                (p.buffs || []).filter(x => x.kind === 'mult').forEach(x =>
+                    out.mult.push({ label: x.from || 'an item card', value: x.value }));
+                const sp = defOf(equippedSpecial(p));
+                if (sp && sp.rubyRoll) out.ruby = sp.name;
+                if (sp && sp.luckyRoll) {
+                    if (hasSkill(p, 'knowledge')) {
+                        out.plus.push({ label: sp.name, value: sp.luckyRoll });
+                    } else {
+                        out.lucky = { label: sp.name, value: sp.luckyRoll };
+                    }
+                }
+                if (hasBuff(p, 'freezeNext')) out.chance.push('and it freezes them (Freeze Liquid)');
             }
         } else if (who.kind === 'barbarian') {
-            const bonus = barbarianAttackBonus(state);
-            if (bonus) out.plus.push({ label: 'his gear', value: bonus });
+            const gear = barbarianGearBonus(state);
+            const dance = barbarianDanceBonus(state);
+            if (gear) out.plus.push({ label: 'his gear', value: gear });
+            if (dance) out.plus.push({ label: 'Ancient Tribe Dance', value: dance });
         }
         out.base = moveDamageRange(move, nudge);
 
@@ -9953,8 +10996,7 @@ kbd {
             const e = D.ENEMIES[b.enemyId];
             if (target.kind === 'player' && e && e.passive && e.passive.extraDamageUnlessWarm) {
                 const p = player(state, target.id);
-                const armour = p ? defOf(equippedArmour(p)) : null;
-                if (!(armour && armour.noFreeze)) {
+                if (!freezeWard(p)) {
                     out.plus.push({ label: e.passive.name, value: e.passive.extraDamageUnlessWarm });
                 }
             }
@@ -9988,9 +11030,13 @@ kbd {
 
         const plus = out.plus.reduce((n, x) => n + x.value, 0);
         const minus = out.minus.reduce((n, x) => n + x.value, 0);
-        const land = raw => Math.max(Math.max(0, raw + plus - minus), out.floor);
-        out.lo = land(out.base.lo);
-        out.hi = land(out.base.hi);
+        const times = out.mult.reduce((n, x) => n * x.value, 1);
+        const land = (raw, extra) => Math.max(Math.max(0, raw + plus + (extra || 0) - minus), out.floor);
+        out.lo = land(Math.floor(out.base.lo * times));
+        out.hi = land(Math.floor(out.base.hi * times * (out.ruby ? 2 : 1)),
+                      out.lucky ? out.lucky.value : 0);
+        if (out.ruby) out.chance.unshift('×2 on the move if the ' + out.ruby + ' rolls a 1');
+        if (out.lucky) out.chance.unshift('+' + out.lucky.value + ' if the ' + out.lucky.label + ' rolls even');
         if (out.blind) out.lo = 0;
         return out;
     }
@@ -10020,6 +11066,61 @@ kbd {
 
     function statusFor(b, side) { return side === 'a' ? b.status.a : b.status.b; }
 
+    // Which side of the fight a player is on, or null if they are not in it.
+    function sideOf(b, pid) {
+        if (!b) return null;
+        if (b.aId === pid) return 'a';
+        if (b.kind === 'pvp' && b.bId === pid) return 'b';
+        return null;
+    }
+
+    function playerOnSide(state, b, side) {
+        if (b.kind === 'pve' && side === 'b') return null;
+        return player(state, side === 'a' ? b.aId : b.bId);
+    }
+
+    /* The side about to be hit, as resolveMoveEffects needs it. A monster
+       wears nothing. A player is kept from freezing by armour that says so
+       or by the Rock of Warmth -- except against Fenrirak, whose Chilling
+       Aura breaks every such item. A Potion of Reflex keeps a stun off. */
+    function guardFor(state, b, side) {
+        const reflex = !!(b.reflex && b.reflex[side] > 0);
+        const p = playerOnSide(state, b, side);
+        if (!p) {
+            return { name: D.foeName(D.ENEMIES[b.enemyId]), side: side, playerId: null,
+                     ward: null, reflex: reflex };
+        }
+        const e = b.kind === 'pve' ? D.ENEMIES[b.enemyId] : null;
+        const aura = !!(e && e.passive && e.passive.breaksFreezeWards);
+        return { name: p.name, side: side, playerId: p.id,
+                 ward: aura ? null : freezeWard(p), reflex: reflex };
+    }
+
+    // Stamped on the fight every time something a player wears turns a
+    // freeze away -- a move that would have frozen them, or a Freeze Liquid
+    // -- so the screens of the two fighters can show the frost being turned
+    // aside, once. Numbered within the fight (the fight's own number,
+    // state.battleSeq, tells one fight's from the next's).
+    function noteWarded(state, guard, byName, what) {
+        const b = state.battle;
+        if (!b || !guard || !guard.ward) return;
+        b.wardSeq = (b.wardSeq | 0) + 1;
+        b.warded = {
+            n: b.wardSeq, side: guard.side || null, who: guard.name,
+            playerId: guard.playerId || null, item: guard.ward.name,
+            by: byName || null, what: what || null
+        };
+    }
+
+    // Frozen or stunned right now: a lost turn still owed, or the other side
+    // in the middle of taking the turn the cold has just cost them.
+    function chilledNow(b, side) {
+        if (!b || !side) return false;
+        const st = statusFor(b, side);
+        return !!(st && st.skipTurns > 0) ||
+               !!(b.skipped && b.skipped.side === side && b.turn !== side);
+    }
+
     // True when the Barbarian is actually able to take part on ownerId's
     // side of *this* battle: freed, alive, riding with this player, and
     // this is one of the two fights he joins (PvP, or Fenrirak).
@@ -10040,12 +11141,22 @@ kbd {
         return D.CLASSES.barbarian.defence + (armour && armour.defence ? armour.defence : 0);
     }
 
-    function barbarianAttackBonus(state) {
+    function barbarianGearBonus(state) {
         const bb = state.barbarian;
         if (!bb) return 0;
         const inst = bb.weaponUid ? (bb.inventory || []).find(i => i.uid === bb.weaponUid) : null;
         const weapon = inst ? D.ITEMS[inst.id] : null;
         return ((weapon && weapon.attack) ? weapon.attack : 0) + (bb.modDamage | 0);
+    }
+
+    // What his Ancient Tribe Dance still has to give, on his next blows.
+    function barbarianDanceBonus(state) {
+        const bb = state.barbarian;
+        return bb ? (bb.buffs || []).reduce((n, x) => n + (x.kind === 'damage' ? x.value : 0), 0) : 0;
+    }
+
+    function barbarianAttackBonus(state) {
+        return barbarianGearBonus(state) + barbarianDanceBonus(state);
     }
 
     // Same shape as availableMoves, for the Barbarian's own move picker.
@@ -10058,6 +11169,62 @@ kbd {
             usable: (bb.energy === undefined ? R.startingEnergy : bb.energy) >= m.energy
         }));
     }
+
+    /* What a player's special equipment does to a blow, rolled as it is
+       struck: the Fire Ruby Bracelet doubles the move's own damage on a 1,
+       the Lucky Charm adds 10 on an even number. The Knowledge card adds up
+       to 2 to those rolls -- which always turns the Lucky Charm's odd number
+       even, and can never make the Ruby's 1. Returns { mult, add }. */
+    function specialRolls(state, p) {
+        const out = { mult: 1, add: 0 };
+        const sp = defOf(equippedSpecial(p));
+        if (!sp) return out;
+        if (sp.rubyRoll) {
+            const r = throwDie(state, p.name, sp.name);
+            if (r === 1) {
+                out.mult = 2;
+                log(state, p.name + "'s " + sp.name + ' rolled a 1 — the move does double damage!', 'roll');
+            } else {
+                log(state, p.name + "'s " + sp.name + ' rolled a ' + r + ' — no effect.', 'muted');
+            }
+        }
+        if (sp.luckyRoll) {
+            let r = throwDie(state, p.name, sp.name);
+            if (r % 2 === 1 && hasSkill(p, 'knowledge')) {
+                log(state, 'The Knowledge card adds 1: the ' + r + ' counts as a ' + (r + 1) + '.', 'roll');
+                r += 1;
+            }
+            if (r % 2 === 0) {
+                out.add = sp.luckyRoll;
+                log(state, p.name + "'s " + sp.name + ' rolled a ' + r + ' — +' + sp.luckyRoll +
+                           ' damage.', 'roll');
+            } else {
+                log(state, p.name + "'s " + sp.name + ' rolled a ' + r + ' — no luck.', 'muted');
+            }
+        }
+        return out;
+    }
+
+    // Fire Blast and Rage Liquid, on the move's own damage only.
+    function multOf(p) {
+        return (p.buffs || []).reduce((n, x) => x.kind === 'mult' ? n * x.value : n, 1);
+    }
+
+    // A multiplier is used up by the attack it was on. Rage Liquid then
+    // leaves its half behind for the attack after.
+    function consumeMult(p) {
+        const follow = [];
+        p.buffs = (p.buffs || []).filter(x => {
+            if (x.kind !== 'mult') return true;
+            x.uses -= 1;
+            if (x.uses > 0) return true;
+            if (x.then) follow.push({ kind: 'mult', value: x.then.value, uses: 1, from: x.then.from });
+            return false;
+        });
+        follow.forEach(f => p.buffs.push(f));
+    }
+
+    function hasBuff(p, kind) { return (p.buffs || []).some(x => x.kind === kind); }
 
     // Tail Slam's chill: "the opponent does 15 less damage ... for 4 turns".
     function rotWeaken(b, side) {
@@ -10086,11 +11253,41 @@ kbd {
 
         const incoming = applyIncomingStatus(state, p.name, myStatus);
         const bonus = totalAttackBonus(p) + (b.playerAttackMod || 0);
+        const guard = guardFor(state, b, theirSide);
         const eff = resolveMoveEffects(state, p.name, move, theirStatus,
-                                       hasSkill(p, 'attack') ? 1 : 0);
+                                       hasSkill(p, 'attack') ? 1 : 0, guard);
         eff.lines.forEach(l => log(state, l, 'roll'));
 
-        let raw = move.damage > 0 ? eff.damage + bonus : eff.damage;
+        // Item cards and special equipment on this blow. A multiplier works
+        // on the move's own damage only; the weapon and every other bonus
+        // are added after it.
+        let own = eff.damage;
+        let luck = 0;
+        if (move.damage > 0) {
+            const gear = specialRolls(state, p);
+            const mult = multOf(p) * gear.mult;
+            if (mult !== 1) {
+                const was = own;
+                own = Math.floor(own * mult);
+                log(state, (mult === 0.5 ? 'Half' : '×' + mult) + ' on the move itself: ' +
+                           move.name + ' does ' + own + ' instead of ' + was + '.', 'roll');
+            }
+            luck = gear.add;
+        }
+        // Freeze Liquid, played with this attack.
+        if (hasBuff(p, 'freezeNext')) {
+            if (guard.ward) {
+                log(state, guard.name + '’s ' + guard.ward.name +
+                           ' keeps the Freeze Liquid’s frost off.', 'muted');
+                noteWarded(state, guard, p.name, 'Freeze Liquid');
+            } else {
+                theirStatus.skipTurns += 1;
+                theirStatus.skipWhy = 'frozen';
+                log(state, 'The Freeze Liquid freezes ' + guard.name + ' solid — their next turn is lost.', 'roll');
+            }
+        }
+
+        let raw = move.damage > 0 ? own + bonus + luck : own;
         raw = Math.max(0, raw - incoming.reduce - (move.damage > 0 ? rotWeaken(b, mySide) : 0));
         if (incoming.voided) raw = 0;
 
@@ -10120,12 +11317,6 @@ kbd {
                 }
                 afterAttack(state, p, move);
             } else {
-                const armour = defOf(equippedArmour(other));
-                if (armour && armour.noFreeze && theirStatus.skipTurns > 0) {
-                    theirStatus.skipTurns = 0;
-                    theirStatus.skipWhy = null;
-                    log(state, other.name + '’s ' + armour.name + ' keeps the frost off.', 'muted');
-                }
                 const dealt = damagePlayer(state, other, raw);
                 log(state, p.name + ' used ' + move.name + ' on ' + other.name +
                            ' for ' + dealt + ' damage.', 'hit');
@@ -10136,7 +11327,7 @@ kbd {
             }
         }
 
-        tickRot(state);
+        afterBlow(state);
         if (!state.battle) return ok();
 
         // Your own barbarian, if he rides with you and this is one of the
@@ -10186,13 +11377,30 @@ kbd {
         const theirStatus = statusFor(b, theirSide);
         b.phase = 'barb_act';
 
-        const eff = resolveMoveEffects(state, 'The Barbarian', move, theirStatus);
+        const eff = resolveMoveEffects(state, 'The Barbarian', move, theirStatus, 0,
+                                       guardFor(state, b, theirSide));
         eff.lines.forEach(l => log(state, l, 'roll'));
         const raw = move.damage > 0 ? eff.damage + barbarianAttackBonus(state) : eff.damage;
 
         if (move.spend) bb.energy = Math.max(0, energy - move.spend);
         else if (move.energy > R.startingEnergy) bb.energy = R.startingEnergy;
         else bb.energy = energy + 1;
+
+        // Ancient Tribe Dance: no blow at all, but his next two land 30
+        // harder. Any other attack uses up one of those two.
+        if (move.selfBuff) {
+            bb.buffs = [{ kind: move.selfBuff.kind, value: move.selfBuff.value,
+                          uses: move.selfBuff.uses, from: move.name }];
+            log(state, 'The Barbarian performs the ' + move.name + ': +' + move.selfBuff.value +
+                       ' damage on his next ' + move.selfBuff.uses + ' attacks.', 'item');
+            afterBlow(state);
+            if (!state.battle) return ok();
+            passBattleTurn(state);
+            return ok();
+        }
+        if (bb.buffs && bb.buffs.length) {
+            bb.buffs = bb.buffs.filter(x => { x.uses -= 1; return x.uses > 0; });
+        }
 
         if (b.kind === 'pve') {
             const dealt = Math.max(0, raw - foeStats(state, b.enemyId).defence);
@@ -10203,7 +11411,7 @@ kbd {
             // player's own attack -- the tick could otherwise end the fight
             // first and leave nothing to win.
             if (b.enemyHp <= 0) return winPve(state, player(state, pid));
-            tickRot(state);
+            afterBlow(state);
         } else {
             const otherId = pid === b.aId ? b.bId : b.aId;
             const other = player(state, otherId);
@@ -10213,12 +11421,62 @@ kbd {
             noteBlow(b, 'The Barbarian', move.name, dealt);
             damageArmour(state, other);
             if (other.hp <= 0) return winPvp(state, player(state, pid), other);
-            tickRot(state);
+            afterBlow(state);
         }
 
         if (!state.battle) return ok();
         passBattleTurn(state);
         return ok();
+    }
+
+    /* After every blow, from either side: any poison laid on the other side,
+       the count on a Potion of Reflex, and Tail Slam's cold. Any one of
+       them can end the fight, so the caller looks at state.battle after. */
+    function afterBlow(state) {
+        tickDots(state);
+        if (!state.battle) return;
+        tickReflex(state.battle);
+        tickRot(state);
+    }
+
+    // The Bursting Potion of Decay and the Bursting Vial of Poison: so much
+    // damage to the other side after every blow, for so many blows.
+    function tickDots(state) {
+        const b = state.battle;
+        if (!b || !b.dots || !b.dots.length) return;
+        const dots = b.dots.slice();
+        for (let n = 0; n < dots.length; n++) {
+            const d = dots[n];
+            if (state.battle !== b) return;
+            d.left -= 1;
+            const victim = playerOnSide(state, b, d.side);
+            if (!victim) {
+                const e = D.ENEMIES[b.enemyId];
+                const dealt = Math.min(b.enemyHp, d.tick);
+                b.enemyHp -= dealt;
+                log(state, D.foeName(e, true) + ' takes ' + dealt + ' from the ' + d.from + '.', 'hit');
+                if (b.enemyHp <= 0) {
+                    b.dots = [];
+                    winPve(state, player(state, b.aId));
+                    return;
+                }
+            } else {
+                const dealt = Math.min(victim.hp, d.tick);
+                victim.hp -= dealt;
+                log(state, victim.name + ' takes ' + dealt + ' from the ' + d.from + '.', 'hit');
+                if (victim.hp <= 0) {
+                    b.dots = [];
+                    winPvp(state, playerOnSide(state, b, d.side === 'a' ? 'b' : 'a'), victim);
+                    return;
+                }
+            }
+        }
+        b.dots = b.dots.filter(d => d.left > 0);
+    }
+
+    function tickReflex(b) {
+        if (!b.reflex) return;
+        ['a', 'b'].forEach(side => { if (b.reflex[side] > 0) b.reflex[side] -= 1; });
     }
 
     // Passive damage tick from Fenrirak's Tail Slam, applied once per
@@ -10267,6 +11525,8 @@ kbd {
         let dealt = Math.max(0, raw - totalDefence(state, target));
         if (minDamage && dealt < minDamage) dealt = minDamage;
         if (dealt) target.hp = Math.max(0, target.hp - dealt);
+        // Every hit taken counts against a Defence Potion's hits.
+        consumeBuffs(target, 'defence');
         return dealt;
     }
 
@@ -10293,6 +11553,18 @@ kbd {
             p.energy += 1;
         }
         consumeBuffs(p, 'damage');
+        consumeMult(p);
+        consumeBuffs(p, 'freezeNext');
+
+        // Fenrirak's Scales Tunic: 5 HP back every time you attack.
+        const tunic = defOf(equippedArmour(p));
+        if (tunic && tunic.healOnAttack) {
+            const before = p.hp;
+            p.hp = Math.min(p.maxHp, p.hp + tunic.healOnAttack);
+            if (p.hp > before) {
+                log(state, 'The ' + tunic.name + ' knits ' + (p.hp - before) + ' HP back.', 'heal');
+            }
+        }
 
         const weaponInst = equippedWeapon(p);
         const weapon = defOf(weaponInst);
@@ -10383,7 +11655,8 @@ kbd {
         b.phase = 'enemy_act';
 
         const incoming = applyIncomingStatus(state, D.foeName(e, true), b.status.b);
-        const eff = resolveMoveEffects(state, D.foeName(e, true), move, b.status.a);
+        const eff = resolveMoveEffects(state, D.foeName(e, true), move, b.status.a, 0,
+                                       guardFor(state, b, 'a'));
         eff.lines.forEach(l => log(state, l, 'roll'));
 
         const extra = foeStats(state, b.enemyId).dmg + (b.spite || 0);
@@ -10408,23 +11681,15 @@ kbd {
             if (bb.hp <= 0) {
                 log(state, 'The Barbarian is knocked out for the rest of this fight.', 'death');
             }
-            tickRot(state);
+            afterBlow(state);
             if (!state.battle) return ok();
             passBattleTurn(state);
             return ok();
         }
 
-        const armour = defOf(equippedArmour(p));
-        if (armour && armour.noFreeze && !(e.passive && e.passive.breaksFreezeWards) &&
-            b.status.a.skipTurns > 0) {
-            b.status.a.skipTurns = 0;
-            b.status.a.skipWhy = null;
-            log(state, p.name + '’s ' + armour.name + ' keeps the frost off.', 'muted');
-        }
         // Frozen Territory (Ice Golem): every hit costs 5 more, unless the
-        // player is warded against freezing.
-        if (e.passive && e.passive.extraDamageUnlessWarm &&
-            !(armour && armour.noFreeze)) {
+        // player is wearing something that prevents freezing.
+        if (e.passive && e.passive.extraDamageUnlessWarm && !freezeWard(p)) {
             raw += e.passive.extraDamageUnlessWarm;
         }
 
@@ -10435,7 +11700,7 @@ kbd {
         damageArmour(state, p);
 
         if (p.hp <= 0) { losePve(state, p); return ok(); }
-        tickRot(state);
+        afterBlow(state);
         if (!state.battle) return ok();
 
         passBattleTurn(state);
@@ -10461,6 +11726,33 @@ kbd {
             state.barbarian.battlesSinceReset = 0;
             log(state, p.name + ' ' + verb + '.', 'system');
         }
+    }
+
+    // His rider can hand him an axe or a piece of armour he can wear, out of
+    // their own pack, on their own turn and outside a fight. He takes it up
+    // at once; whatever he had in that hand stays in his pack, and all of it
+    // is left behind when he goes home.
+    function giveToBarbarian(state, pid, itemUid) {
+        const p = player(state, pid);
+        if (!p) return fail('Unknown player.');
+        const bb = state.barbarian;
+        if (!bb || bb.ownerId !== pid) return fail('The Barbarian is not travelling with you.');
+        if (!isMyTurn(state, pid)) return fail('You can only hand the Barbarian gear on your turn.');
+        if (state.battle) return fail('You cannot hand over gear during a battle.');
+        const inst = ownedItem(p, itemUid);
+        if (!inst) return fail('You do not have that item.');
+        const def = D.ITEMS[inst.id];
+        if (!barbarianCanUse(inst.id)) return fail('The Barbarian cannot use the ' + def.name + '.');
+
+        p.inventory = p.inventory.filter(it => it.uid !== inst.uid);
+        if (p.weaponUid === inst.uid) p.weaponUid = null;
+        if (p.armourUid === inst.uid) p.armourUid = null;
+        bb.inventory = (bb.inventory || []).concat([inst]);
+        if (def.kind === 'weapon') bb.weaponUid = inst.uid;
+        else bb.armourUid = inst.uid;
+        log(state, p.name + ' hands the Barbarian the ' + def.name + ', and he ' +
+                   (def.kind === 'weapon' ? 'takes it up' : 'puts it on') + ' at once.', 'item');
+        return ok();
     }
 
     function giveStarterGearTo(bb, cls) {
@@ -10570,6 +11862,7 @@ kbd {
         weaponsmithRoll(state, p);
         state.battle = null;
         p.energy = R.startingEnergy;
+        pendantHeal(state, p);
         if (wasIllusion) { advanceTurn(state); return ok(); }
 
         // Eagle's Ascent: the Hawk was the STOP, not the whole roll. Whatever
@@ -10583,10 +11876,21 @@ kbd {
         return ok();
     }
 
-    function losePve(state, p) {
+    // Pendant of Life: 5 HP back at the end of every fight, won or lost.
+    function pendantHeal(state, p) {
+        const sp = p ? defOf(equippedSpecial(p)) : null;
+        if (!sp || !sp.healAfterBattle || p.hp <= 0 || p.hp >= p.maxHp) return;
+        const before = p.hp;
+        p.hp = Math.min(p.maxHp, p.hp + sp.healAfterBattle);
+        log(state, p.name + "'s " + sp.name + ' heals ' + (p.hp - before) + ' HP.', 'heal');
+    }
+
+    // `line` says how it was lost, when it was not simply a monster's blow.
+    function losePve(state, p, line) {
         const b = state.battle;
         const e = D.ENEMIES[b.enemyId];
-        log(state, D.foeName(e, true) + ' strikes ' + p.name + ' down. Back to the Start.', 'death');
+        log(state, line || (D.foeName(e, true) + ' strikes ' + p.name + ' down. Back to the Start.'),
+            'death');
         const wasIllusion = b.illusion;
         noteBattleEnd(state, b, asEnemy(b.enemyId), asPlayer(p));
         if (!wasIllusion) noteBarbarianBattle(state, p.id);
@@ -10595,6 +11899,7 @@ kbd {
         state.battle = null;
         p.movesLeft = 0;
         sendToStart(state, p, true, true);
+        pendantHeal(state, p);
         if (wasIllusion) advanceTurn(state);
         return ok();
     }
@@ -10632,6 +11937,8 @@ kbd {
         loser.movesLeft = 0;
         sendToStart(state, loser, true, true);
         winner.energy = R.startingEnergy;
+        pendantHeal(state, winner);
+        pendantHeal(state, loser);
 
         const cur = currentPlayer(state);
         if (cur && cur.id === winner.id && winner.pos === fought) {
@@ -10664,33 +11971,119 @@ kbd {
     /* Consumables, abilities, gear                                        */
     /* ------------------------------------------------------------------ */
 
+    /* ---- item cards --------------------------------------------------
+       How long a card lasts, in a fight, is counted the way Tail Slam
+       counts its turns:
+
+         - a damage card: your own attacks (Strength Potion, your next 2)
+         - a defence card: the hits you take (Defence Potion, the next 2;
+           Supreme Defence, "1 round", the next 1)
+         - poison and the Potion of Reflex: every blow by either side
+
+       Fire Blast and Rage Liquid multiply the move's own damage only (its
+       printed number and its dice); the weapon and every other bonus are
+       added after. The Warmth Potion can be drunk at any point in a fight
+       and gives back a turn the cold has taken or is about to take.
+       ------------------------------------------------------------------ */
+
+    // Why an item card cannot be played right now, or null if it can. Asked
+    // before the card leaves the hand, so a card is never spent on nothing.
+    function cannotPlay(state, p, def) {
+        const b = state.battle;
+        const side = sideOf(b, p.id);
+        if (def.battleOnly && !side) return 'The ' + def.name + ' can only be used in a fight.';
+        if (def.effect === 'health' && p.hp >= p.maxHp) return 'You are already at full health.';
+        if (def.effect === 'unfreeze' && !chilledNow(b, side)) return 'You are not frozen or stunned.';
+        if (def.effect === 'freeze' && hasBuff(p, 'freezeNext')) return 'Your next attack already freezes.';
+        return null;
+    }
+
     function applyEffect(state, p, def) {
+        const b = state.battle;
+        const side = sideOf(b, p.id);
+        const n = def.uses || 1;
         switch (def.effect) {
             case 'energy':
                 p.energy += def.value;
                 log(state, p.name + ' gains ' + def.value + ' energy.', 'item');
                 break;
             case 'damage':
-                addBuff(p, 'damage', def.value, 1, def.name);
-                log(state, p.name + ' will do ' + def.value + ' more damage on their next move.', 'item');
+                addBuff(p, 'damage', def.value, n, def.name);
+                log(state, p.name + ' will do ' + def.value + ' more damage on ' +
+                           (n === 1 ? 'their next attack.' : 'their next ' + n + ' attacks.'), 'item');
                 break;
             case 'defence':
-                addBuff(p, 'defence', def.value, 99, def.name);
-                log(state, p.name + ' will take ' + def.value + ' less damage this turn.', 'item');
+                addBuff(p, 'defence', def.value, n, def.name);
+                log(state, p.name + ' will take ' + def.value + ' less damage from ' +
+                           (n === 1 ? 'the next hit.' : 'the next ' + n + ' hits.'), 'item');
                 break;
             case 'dice':
-                addBuff(p, 'dice', def.value, 1);
+                addBuff(p, 'dice', def.value, 1, def.name);
                 log(state, p.name + ' adds ' + def.value + ' to their next dice roll.', 'item');
                 break;
             case 'health': {
-                if (p.hp >= p.maxHp) {
-                    p.maxHp += def.value;
-                    p.hp += def.value;
-                    log(state, p.name + ' raises their maximum health to ' + p.maxHp + '.', 'heal');
-                } else {
+                const before = p.hp;
+                p.hp = Math.min(p.maxHp, p.hp + def.value);
+                log(state, p.name + ' heals ' + (p.hp - before) + ' HP.', 'heal');
+                break;
+            }
+            case 'double':
+                addBuff(p, 'mult', 2, 1, def.name);
+                log(state, p.name + '’s next attack does double damage.', 'item');
+                break;
+            case 'rage':
+                addBuff(p, 'mult', 3, 1, def.name);
+                p.buffs[p.buffs.length - 1].then = { value: 0.5, from: def.name + ' (after)' };
+                log(state, p.name + ' is enraged: triple damage on the next attack, half on the one after.',
+                    'item');
+                break;
+            case 'freeze':
+                addBuff(p, 'freezeNext', 1, 1, def.name);
+                log(state, p.name + '’s next attack will freeze their opponent.', 'item');
+                break;
+            case 'unfreeze': {
+                const st = statusFor(b, side);
+                st.skipTurns = 0;
+                st.skipWhy = null;
+                let back = false;
+                if (b.skipped && b.skipped.side === side && b.turn !== side) {
+                    // The other side was about to take the turn the cold cost
+                    // this player. It is theirs again.
+                    b.skipped = null;
+                    b.turn = side;
+                    b.phase = 'act';
+                    state.turnStartedAt = Date.now();
+                    back = true;
+                }
+                log(state, p.name + ' thaws out' + (back ? ' and takes their turn back.'
+                                                          : ' — no turn will be lost.'), 'heal');
+                break;
+            }
+            case 'reflex':
+                b.reflex = b.reflex || { a: 0, b: 0 };
+                b.reflex[side] = Math.max(b.reflex[side] | 0, n);
+                log(state, 'For the next ' + n + ' turns, nobody can stun ' + p.name + '.', 'item');
+                break;
+            case 'dot':
+                b.dots = b.dots || [];
+                b.dots.push({ side: side === 'a' ? 'b' : 'a', tick: def.value, left: n, from: def.name });
+                log(state, 'Their opponent will take ' + def.value + ' damage after each of the next ' +
+                           n + ' turns.', 'item');
+                break;
+            case 'gamble': {
+                const r = throwDie(state, p.name, def.name);
+                const even = r % 2 === 0;
+                const good = def.parity === 'even' ? even : !even;
+                if (good) {
                     const before = p.hp;
                     p.hp = Math.min(p.maxHp, p.hp + def.value);
-                    log(state, p.name + ' heals ' + (p.hp - before) + ' HP.', 'heal');
+                    log(state, p.name + ' rolled a ' + r + ' — the ' + def.name + ' heals ' +
+                               (p.hp - before) + ' HP.', 'heal');
+                } else {
+                    p.hp = Math.max(0, p.hp - def.value);
+                    log(state, p.name + ' rolled a ' + r + ' — the ' + def.name + ' does ' +
+                               def.value + ' damage.', 'death');
+                    if (p.hp <= 0) collapse(state, p, 'the ' + def.name);
                 }
                 break;
             }
@@ -10700,16 +12093,20 @@ kbd {
     function usePowerup(state, pid, cardUid) {
         const p = player(state, pid);
         if (!p) return fail('Unknown player.');
-        const inBattle = state.battle && (state.battle.aId === pid || state.battle.bId === pid);
+        const inBattle = !!sideOf(state.battle, pid);
         if (!isMyTurn(state, pid) && !inBattle) return fail('It is not your turn.');
 
         const idx = p.powerups.findIndex(c => c.uid === cardUid);
         if (idx < 0) return fail('You do not have that card.');
+        const def = D.POWERUPS[p.powerups[idx].id];
+        if (!def) return fail('Unknown card.');
+        const why = cannotPlay(state, p, def);
+        if (why) return fail(why);
+
         const card = p.powerups.splice(idx, 1)[0];
-        const def = D.POWERUPS[card.id];
         log(state, p.name + ' plays ' + def.name + '.', 'item');
-        applyEffect(state, p, def);
         state.decks.powerup.push(card.id);
+        applyEffect(state, p, def);
         return ok();
     }
 
@@ -10736,29 +12133,26 @@ kbd {
         const inst = ownedItem(p, itemUid);
         if (!inst) return fail('You do not have that item.');
         const def = D.ITEMS[inst.id];
-        const cls = D.CLASSES[p.cls];
-
-        if (def.kind === 'weapon' && def.subtype !== cls.weaponType) {
-            return fail('A ' + cls.name + ' cannot wield that.');
+        if (!suitsClass(p, inst.id)) {
+            const owner = D.SUBTYPE_OWNER[def.subtype] || 'another class';
+            const cls = D.CLASSES[p.cls];
+            return fail((/^[aeiou]/i.test(cls.name) ? 'An ' : 'A ') + cls.name + ' cannot ' +
+                        (def.kind === 'weapon' ? 'wield' : 'wear') +
+                        ' that. It is made for the ' + owner + ', so trade it to one.');
         }
-        if (def.kind === 'armour' && def.subtype !== 'any' && def.subtype !== cls.armourType) {
-            return fail('That armour is not made for a ' + cls.name + '.');
-        }
-
-        const slot = def.kind === 'weapon' ? 'weapon' : 'armour';
-        const spent = slot === 'weapon' ? (p.weaponSwaps | 0) : (p.armourSwaps | 0);
+        const slot = def.kind === 'weapon' ? 'weapon'
+                   : def.kind === 'special' ? 'special' : 'armour';
+        const SWAPS = { weapon: 'weaponSwaps', armour: 'armourSwaps', special: 'specialSwaps' };
+        const SLOTS = { weapon: 'weaponUid', armour: 'armourUid', special: 'specialUid' };
+        const spent = p[SWAPS[slot]] | 0;
         if (spent >= R.equipChangesPerTurn) {
-            return fail('You have already changed your ' + slot + ' this turn.');
+            return fail('You have already changed your ' +
+                        (slot === 'special' ? 'special equipment' : slot) + ' this turn.');
         }
-        const already = slot === 'weapon' ? p.weaponUid : p.armourUid;
-        if (already !== inst.uid) {
-            if (slot === 'weapon') p.weaponSwaps = spent + 1;
-            else p.armourSwaps = spent + 1;
-        }
-
-        if (slot === 'weapon') p.weaponUid = inst.uid;
-        else p.armourUid = inst.uid;
-        log(state, p.name + ' equips the ' + def.name + '.', 'item');
+        if (p[SLOTS[slot]] !== inst.uid) p[SWAPS[slot]] = spent + 1;
+        p[SLOTS[slot]] = inst.uid;
+        log(state, p.name + (slot === 'special' ? ' puts on the ' : ' equips the ') +
+                   def.name + '.', 'item');
         return ok();
     }
 
@@ -10945,6 +12339,7 @@ kbd {
                 p.inventory = p.inventory.filter(it => it.uid !== choice);
                 if (p.weaponUid === choice) p.weaponUid = null;
                 if (p.armourUid === choice) p.armourUid = null;
+                if (p.specialUid === choice) p.specialUid = null;
                 log(state, 'Bandits take ' + p.name + "'s " + D.ITEMS[inst.id].name + '.', 'death');
                 return ok();
             }
@@ -11079,6 +12474,7 @@ kbd {
                 const inst = from.inventory.splice(i, 1)[0];
                 if (from.weaponUid === u) from.weaponUid = null;
                 if (from.armourUid === u) from.armourUid = null;
+                if (from.specialUid === u) from.specialUid = null;
                 to.inventory.push(inst);
             }
         });
@@ -11201,6 +12597,7 @@ kbd {
         usePowerup:    (s, pid, a) => usePowerup(s, pid, a.uid),
         eatFood:       (s, pid, a) => eatFood(s, pid, a.uid),
         equip:         (s, pid, a) => equip(s, pid, a.uid),
+        giveBarbarian: (s, pid, a) => giveToBarbarian(s, pid, a.uid),
         useAbility:    (s, pid, a) => useAbility(s, pid, a),
         buy:           (s, pid, a) => buy(s, pid, a.kind, a.id),
         setPaused:     (s, pid, a) => setPaused(s, pid, a.on),
@@ -11258,10 +12655,10 @@ kbd {
         barbarianRoll, barbarianAttack, barbarianMoves, barbarianEligible,
         barbarianDefence, barbarianAttackBonus,
         startEnemyBattle, startPvp, availableMoves, battleActorId,
-        usePowerup, eatFood, equip, useAbility, buy,
+        usePowerup, eatFood, equip, giveToBarbarian, useAbility, buy,
         setPaused,
         proposeTrade, respondTrade, cancelTrade, collapse, closeGame,
-        fragmentsOf, suitsClass, turnLimit, hasSkill,
+        fragmentsOf, suitsClass, barbarianCanUse, turnLimit, hasSkill,
         totalDefence, totalAttackBonus, diceModifier, diceChoosable,
         equippedWeapon, equippedArmour, player, square, previewWalk, nextIndex,
         attackParts, defenceParts, uid, d6, expectedMoveDamage,
@@ -11270,6 +12667,8 @@ kbd {
         canPassGate, isOptionalStop, barbarianBattleLimit, classMaxHp,
         // what a blow can come to, for the battle panel and the bots
         moveDamageRange, blowRange, enemyNextMove,
+        // item cards and special equipment
+        equippedSpecial, freezeWard, cannotPlay, chilledNow, sideOf, barbarianDanceBonus,
         // the live tour's hold on the clock
         setTutorialPause, tutorialExemptMs
     };
@@ -11368,9 +12767,24 @@ kbd {
         return v;
     }
 
+    // Special equipment, roughly in damage (or health) a fight: the Lucky
+    // Charm's 10 lands half the time (every time with Knowledge), the Ruby
+    // doubles one blow in six.
+    function specialValue(def, p) {
+        if (!def) return -1;
+        let v = 0;
+        if (def.luckyRoll) v += def.luckyRoll * (p && E.hasSkill(p, 'knowledge') ? 1 : 0.5) + 2;
+        if (def.rubyRoll) v += 6;
+        if (def.healAfterBattle) v += def.healAfterBattle;
+        if (def.noFreeze) v += 7;
+        if (def.standsForFlint) v += (p && p.flint > 0) ? 2 : 6;
+        return v;
+    }
+
     function gearValue(def, p) {
         if (!def) return -1;
-        return def.kind === 'weapon' ? weaponValue(def) : armourValue(def, p);
+        return def.kind === 'weapon' ? weaponValue(def)
+             : def.kind === 'special' ? specialValue(def, p) : armourValue(def, p);
     }
 
     // The best thing of each kind this character owns and is allowed to hold.
@@ -11541,7 +12955,7 @@ kbd {
             // the danger.
             case 'bandit_outpost': {
                 const cost = E.mod(state, 'payUp') ? 50 : 25;
-                const equipped = [p.weaponUid, p.armourUid].map(u => p.inventory.find(i => i.uid === u))
+                const equipped = [p.weaponUid, p.armourUid, p.specialUid].map(u => p.inventory.find(i => i.uid === u))
                     .filter(Boolean);
                 const worst = equipped.reduce((n, it) => {
                     const v = gearValue(D.ITEMS[it.id], p);
@@ -11716,12 +13130,18 @@ kbd {
     // though it does raise the ceiling when they are already full.
     function bestHeal(p) {
         let best = null, bestV = 0;
+        const missing = p.maxHp - p.hp;
+        if (missing <= 0) return null;
         heldCards(p).forEach(c => {
             if (c.def.effect !== 'health') return;
-            const worth = p.hp >= p.maxHp ? c.def.value : Math.min(p.maxHp - p.hp, c.def.value);
+            const worth = Math.min(missing, c.def.value);
             if (worth > bestV) { bestV = worth; best = c; }
         });
         return best;
+    }
+
+    function cardWith(p, effect) {
+        return heldCards(p).find(c => c.def.effect === effect) || null;
     }
 
     function bestOf(p, effect) {
@@ -11745,6 +13165,40 @@ kbd {
 
     function shopKey(state, pid) { return state.turnNo + ':' + pid; }
 
+    /* ---- the Barbarian's gear ------------------------------------------
+       His rider can hand him axes and armour he can wear. What he has in
+       each hand, and the best thing in the rider's pack worth giving him:
+       better than what he has, and not 'any class' armour the bot would
+       rather wear itself. */
+    function barbarianHolds(state, kind) {
+        const bb = state.barbarian;
+        if (!bb) return null;
+        const uid = kind === 'weapon' ? bb.weaponUid : bb.armourUid;
+        const inst = uid ? (bb.inventory || []).find(i => i.uid === uid) : null;
+        return inst ? D.ITEMS[inst.id] : null;
+    }
+
+    function forBarbarianValue(def) {
+        return def.kind === 'weapon' ? weaponValue(def) : armourValue(def, null);
+    }
+
+    function barbarianGift(state, p) {
+        const bb = state.barbarian;
+        if (!bb || bb.ownerId !== p.id || state.battle) return null;
+        let best = null, bestGain = 0;
+        p.inventory.forEach(inst => {
+            if (inst.uid === p.weaponUid || inst.uid === p.armourUid) return;
+            if (!E.barbarianCanUse(inst.id)) return;
+            const def = D.ITEMS[inst.id];
+            if (E.suitsClass(p, inst.id) &&
+                armourValue(def, p) > armourValue(itemDef(E.equippedArmour(p)), p)) return;
+            const gain = forBarbarianValue(def) -
+                         forBarbarianValue(barbarianHolds(state, def.kind) || { kind: def.kind });
+            if (gain > bestGain) { bestGain = gain; best = inst.uid; }
+        });
+        return best;
+    }
+
     function goShopping(state, p) {
         const key = shopKey(state, p.id);
         if (shopping.key !== key) { shopping.key = key; shopping.bought = 0; }
@@ -11764,6 +13218,24 @@ kbd {
         if (pick && gain >= 5) {
             shopping.bought += 1;
             return { action: 'buy', args: { kind: 'gear', id: pick } };
+        }
+        // Nothing for itself: something for the Barbarian, if he rides along.
+        const bb = state.barbarian;
+        if (bb && bb.ownerId === p.id) {
+            let forHim = null, himGain = 0;
+            D.MERCHANT_GEAR.forEach(id => {
+                const def = D.ITEMS[id];
+                if (!def || !(state.merchant.gear[id] > 0)) return;
+                if (!E.barbarianCanUse(id) || E.suitsClass(p, id)) return;
+                if (p.coins < E.merchantPrice(state, def.price)) return;
+                const g = forBarbarianValue(def) -
+                          forBarbarianValue(barbarianHolds(state, def.kind) || { kind: def.kind });
+                if (g > himGain) { himGain = g; forHim = id; }
+            });
+            if (forHim && himGain >= 10) {
+                shopping.bought += 1;
+                return { action: 'buy', args: { kind: 'gear', id: forHim } };
+            }
         }
         // Ice Dragon's Merchant sells no potions — MERCHANT_POTIONS is empty.
         // Merchant Food is free, not bought; see pendingStep's merchant_food.
@@ -11882,6 +13354,10 @@ kbd {
         // The monster's blow. The bot is on the other side of the table, so
         // it plays the monster's turn exactly as a person's screen would.
         if (b.phase === 'enemy_roll' || b.phase === 'enemy_act') {
+            // Frozen, and the monster about to take the lost turn: a Warmth
+            // Potion gives it back.
+            const warm = E.chilledNow(b, 'a') && cardWith(p, 'unfreeze');
+            if (warm) return useCard(warm);
             return { action: 'enemyStrike', args: {} };
         }
 
@@ -11962,6 +13438,36 @@ kbd {
         if (would < left) {
             const punch = bestOf(p, 'damage');
             if (punch && would + punch.def.value >= left) return useCard(punch);
+        }
+
+        const boss = b.kind === 'pve' && D.ENEMIES[b.enemyId].boss;
+        if (would < left) {
+            // Poison is worth throwing whenever this blow will not end it.
+            const dot = cardWith(p, 'dot');
+            if (dot) return useCard(dot);
+            // Fire Blast or Rage on the blow it turns into a kill, or on a
+            // heavy blow against Fenrirak. Never a second one on top.
+            if (!(p.buffs || []).some(x => x.kind === 'mult')) {
+                for (const c of [cardWith(p, 'double'), cardWith(p, 'rage')]) {
+                    if (!c) continue;
+                    const m = c.def.effect === 'double' ? 2 : 3;
+                    const big = Math.max(0, move.damage * m + bonus - foeDefence);
+                    if (big >= left || (boss && move.damage >= 45)) return useCard(c);
+                }
+            }
+            // Freeze Liquid against Fenrirak, or a monster about to hit hard.
+            const ice = cardWith(p, 'freeze');
+            if (ice && !(p.buffs || []).some(x => x.kind === 'freezeNext') &&
+                (boss || threat >= 40)) return useCard(ice);
+        }
+        // Reflex, against a Knight whose Heavy Swing can stun.
+        if (b.kind === 'pvp') {
+            const side = E.sideOf(b, p.id);
+            const other = E.player(state, side === 'a' ? b.bId : b.aId);
+            const rf = cardWith(p, 'reflex');
+            if (rf && other && other.cls === 'knight' && !(b.reflex && b.reflex[side] > 0)) {
+                return useCard(rf);
+            }
         }
 
         return { action: 'battleAttack', args: { moveId: move.id } };
@@ -12118,7 +13624,17 @@ kbd {
                 armourValue(D.ITEMS[a.id], p) > armourValue(itemDef(E.equippedArmour(p)), p)) {
                 return { action: 'equip', args: { uid: a.uid } };
             }
+            const sp = bestOwned(state, p, 'special');
+            if (sp && sp.uid !== p.specialUid && (p.specialSwaps | 0) < D.RULES.equipChangesPerTurn &&
+                specialValue(D.ITEMS[sp.id], p) > specialValue(itemDef(E.equippedSpecial(p)), p)) {
+                return { action: 'equip', args: { uid: sp.uid } };
+            }
         }
+
+        // 1b. Riding with the Barbarian: hand him anything that beats what
+        //     he has.
+        const gift = barbarianGift(state, p);
+        if (gift) return { action: 'giveBarbarian', args: { uid: gift } };
 
         // 2. Patch yourself up before walking into something.
         if (p.hp < p.maxHp * 0.5) {
@@ -12196,8 +13712,7 @@ kbd {
         if (!def) return -1;
         if (!E.suitsClass(to, def.id)) return 1;
         const v = gearValue(def, to);
-        const slot = def.kind === 'weapon' ? 'weapon' : 'armour';
-        const already = bestOwned(state, to, slot);
+        const already = bestOwned(state, to, def.kind);
         const haveV = already ? gearValue(D.ITEMS[already.id], to) : -1;
         return v > haveV ? v : Math.min(2, v);
     }
@@ -13418,7 +14933,7 @@ kbd {
            answered once. */
         function whenTableClear(fn) {
             if (!DICE.onScreen() && !ROLL_CALL.busy() && !BATTLE_END.busy() &&
-                !FREEZE.busy()) {
+                !FREEZE.busy() && !WARD.busy()) {
                 fn(); return;
             }
             setTimeout(() => whenTableClear(fn), 140);
@@ -13695,9 +15210,12 @@ kbd {
             if (Date.now() >= dueAt) done();
         });
 
-        // Behind the die that froze them, and behind the fight's result.
+        // Behind the die that froze them, the fight's result, and a freeze
+        // just turned away (a stun can land with it, from the same blow).
         function whenClear(fn) {
-            if (!DICE.busy() && !ROLL_CALL.busy() && !BATTLE_END.busy()) { fn(); return; }
+            if (!DICE.busy() && !ROLL_CALL.busy() && !BATTLE_END.busy() && !WARD.busy()) {
+                fn(); return;
+            }
             setTimeout(() => whenClear(fn), 120);
         }
 
@@ -13747,6 +15265,172 @@ kbd {
     })();
 
     /* ------------------------------------------------------------------ */
+    /* Frost blocked                                                       */
+    /*                                                                     */
+    /* The other side of FREEZE: something a player wears (the Rock of     */
+    /* Warmth, or armour that keeps the cold off) has just turned a freeze */
+    /* away, and the frost is seen to thaw. The drawing is ward-fx.js's;   */
+    /* this decides when it plays and what its card says.                  */
+    /*                                                                     */
+    /* Driven off battle.warded, numbered within the fight (state.battleSeq */
+    /* tells one fight from the next), so each of the two fighters sees it */
+    /* once. As with FREEZE, a fight nobody here is in is left to the      */
+    /* narrator. It waits for the die that rolled the freeze to be read,   */
+    /* and a freeze shown in the same moment waits for it.                 */
+    /* ------------------------------------------------------------------ */
+
+    const WARD = (function () {
+        let primed = false, seen = '', pending = 0;
+
+        function fx() { return window.LOF_WARD_FX || null; }
+
+        function whenClear(fn) {
+            if (!DICE.busy() && !ROLL_CALL.busy() && !BATTLE_END.busy()) { fn(); return; }
+            setTimeout(() => whenClear(fn), 120);
+        }
+
+        function keyOf(state) {
+            const w = state && state.battle && state.battle.warded;
+            return w && typeof w.n === 'number' ? (state.battleSeq | 0) + ':' + w.n : '';
+        }
+
+        function cardFor(state, w) {
+            const mine = !!w.playerId && w.playerId === NET.PID;
+            const meNow = me();
+            const byMe = !!meNow && !!w.by && w.by === meNow.name && !mine;
+            const what = w.what || 'freeze';
+            const source = byMe ? 'Your ' + what
+                         : w.by ? w.by + '’s ' + what
+                         : 'The ' + what;
+            // Kept their turn, unless something else (a stun) took it anyway.
+            const b = state.battle;
+            const st = b && b.status && b.status[w.side];
+            const stillLoses = (st && st.skipTurns > 0) ||
+                               (b && b.skipped && b.skipped.side === w.side && b.turn !== w.side);
+            return {
+                mine: mine,
+                who: (mine ? 'Your ' : w.who + '’s ') + w.item + ' keeps the frost off',
+                sub: source + ' cannot freeze ' + (mine ? 'you.' : 'them.') +
+                     (stillLoses ? '' : mine ? ' You keep your turn.' : ' They keep their turn.')
+            };
+        }
+
+        return {
+            busy() { return pending > 0 || !!(fx() && fx().busy()); },
+            saw(state) {
+                const key = keyOf(state);
+                if (!primed) { primed = true; seen = key; return; }
+                if (!key || key === seen) return;
+                seen = key;
+                const b = state.battle;
+                const w = b.warded;
+                const inIt = b.aId === NET.PID || b.bId === NET.PID || w.playerId === NET.PID;
+                if (!inIt || !fx()) return;
+                const card = cardFor(state, w);
+                pending += 1;
+                whenClear(() => {
+                    pending = Math.max(0, pending - 1);
+                    fx().play(card);
+                });
+            }
+        };
+    })();
+
+    /* ------------------------------------------------------------------ */
+    /* STOP                                                                */
+    /*                                                                     */
+    /* Eagle's Ascent, Eagle's Descent, the Snowy Village, Snowbound Ridge */
+    /* and the Frozen Gate halt whoever reaches them, whatever they rolled.*/
+    /* That used to be one line in the narrator, so a piece simply came to */
+    /* rest short of where the die said and nobody could see why. Now, the */
+    /* moment a piece reaches one, a red STOP sign drops onto the screen    */
+    /* with the square's name and what happens there, and the square itself */
+    /* flashes red on the board.                                           */
+    /*                                                                     */
+    /* Driven off the walk on the board (see playWalks), not off the       */
+    /* state, so it lands exactly when the piece does -- including part   */
+    /* way through a move at Eagle's Descent, where the piece waits a beat  */
+    /* under the sign and then carries on -- and every screen at the table  */
+    /* sees it once, as the walk plays there.                              */
+    /* ------------------------------------------------------------------ */
+
+    const STOP_FX = (function () {
+        const SHOW_MS = 2100;
+        let back = null, nameEl = null, whoEl = null, subEl = null, hideT = null;
+        let dueAt = 0;              // when the sign is due down
+
+        const SIGN =
+            '<svg class="stop-sign" viewBox="0 0 120 120" aria-hidden="true">' +
+                '<path d="M35.1 4h49.8L116 35.1v49.8L84.9 116H35.1L4 84.9V35.1z" fill="#ffffff"/>' +
+                '<path d="M37.6 10h44.8L110 37.6v44.8L82.4 110H37.6L10 82.4V37.6z" fill="#c8302a"/>' +
+                '<text x="60" y="71" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" ' +
+                    'font-weight="900" font-size="31" letter-spacing="1" fill="#ffffff">STOP</text>' +
+            '</svg>';
+
+        function build() {
+            if (back) return;
+            back = document.createElement('div');
+            back.className = 'stop-fx';
+            back.setAttribute('aria-hidden', 'true');
+            back.innerHTML =
+                '<div class="stop-dim"></div>' +
+                '<div class="stop-card">' + SIGN +
+                    '<div class="stop-name"></div>' +
+                    '<div class="stop-who"></div>' +
+                    '<div class="stop-sub"></div>' +
+                '</div>';
+            document.body.appendChild(back);
+            nameEl = back.querySelector('.stop-name');
+            whoEl = back.querySelector('.stop-who');
+            subEl = back.querySelector('.stop-sub');
+        }
+
+        // The square's own card, without the "STOP." the sign already says.
+        function whatHappens(sq) {
+            return String(sq.text || '').replace(/\s*STOP\.?\s*$/i, '').trim();
+        }
+
+        function flashSquare(i) {
+            const el = document.querySelector('#board [data-sq="' + i + '"]');
+            if (!el) return;
+            el.classList.remove('stop-hit');
+            void el.offsetWidth;
+            el.classList.add('stop-hit');
+            setTimeout(() => el.classList.remove('stop-hit'), 2600);
+        }
+
+        return {
+            /* p: who reached it. sq: the square. carryOn: true when the walk
+               goes on past it (Eagle's Descent part way through a move). */
+            play(p, sq, carryOn) {
+                build();
+                const mine = p.id === NET.PID;
+                nameEl.textContent = sq.name;
+                whoEl.textContent = carryOn
+                    ? (mine ? 'You stop here, then carry on' : p.name + ' stops here, then carries on')
+                    : (mine ? 'You have to stop here' : p.name + ' has to stop here');
+                subEl.textContent = whatHappens(sq);
+                subEl.style.display = subEl.textContent ? '' : 'none';
+                back.classList.toggle('mine', mine);
+                back.classList.remove('on');
+                void back.offsetWidth;              // restart the animation
+                back.classList.add('on');
+                clearTimeout(hideT);
+                dueAt = Date.now() + SHOW_MS;
+                hideT = setTimeout(() => back.classList.remove('on'), SHOW_MS);
+                flashSquare(sq.i);
+            },
+
+            /* Up. Whatever the square does -- the fight, the question --
+               opens once the sign has come down, not underneath it, and the
+               computer players wait for it too (see HOLD). Read off the
+               clock rather than the timer, so a tab left in the background
+               can never be held by it. */
+            busy() { return Date.now() < dueAt; }
+        };
+    })();
+
+    /* ------------------------------------------------------------------ */
     /* Holding the table                                                   */
     /*                                                                     */
     /* One thing takes the screen over for a moment: the card saying whose */
@@ -13780,7 +15464,7 @@ kbd {
 
         function busyNow() {
             return TURN_ANNOUNCE.busy() || ROLL_CALL.busy() ||
-                   BATTLE_END.busy() || FREEZE.busy();
+                   BATTLE_END.busy() || FREEZE.busy() || WARD.busy() || STOP_FX.busy();
         }
 
         function pump() {
@@ -14270,6 +15954,7 @@ kbd {
         DICE.saw(state);
         ZAP.saw(state);
         BATTLE_END.saw(state);
+        WARD.saw(state);
         FREEZE.saw(state);
         retireAnsweredPanel();
         TURN_ANNOUNCE.saw(state);
@@ -14579,6 +16264,35 @@ kbd {
 
     function openMods() {
         overlay = { key: 'mods', draw: openMods };
+        // Once the game is under way they cannot change, so the list is only
+        // the ones this game is being played with.
+        if (S && S.phase !== 'lobby') {
+            const on = modsOn();
+            const group = side => {
+                const xs = on.filter(x => x.side === side);
+                if (!xs.length) return '';
+                return '<div class="mods-col ' + side + '"><h3>' +
+                    (side === 'bad' ? 'Harder / longer' : 'Easier / shorter') + '</h3>' +
+                    xs.map(x => '<div class="mod-toggle ' + side + ' on readonly">' +
+                        '<div><b>' + esc(x.name) + '</b><span>' + esc(x.text) + '</span></div>' +
+                    '</div>').join('') + '</div>';
+            };
+            const halving = on.some(x => x.id === 'winterSale');
+            const cols = group('bad') + group('good');
+            showModal('<div class="mods-panel"><h2>' + GEAR_ICON + ' Modifiers in this game</h2>' +
+                '<div class="sub">' + (on.length
+                    ? 'This game is being played with ' + (on.length === 1 ? 'this modifier'
+                        : 'these ' + on.length + ' modifiers') + '. They were chosen in the ' +
+                      'lobby and stay the same for the whole game.'
+                    : 'This game is being played as printed, with no modifiers.') + '</div>' +
+                (cols ? '<div class="mods-cols' +
+                    (on.every(x => x.side === on[0].side) ? ' single' : '') + '">' + cols + '</div>' : '') +
+                (halving ? '<div class="sub" style="margin-top:10px">' + esc(D.HALVING_NOTE) + '</div>' : '') +
+                '<div class="modal-actions"><button class="btn primary" id="mods-done">Done</button></div>' +
+                '</div>', true, 'mods');
+            bind('mods-done', closeMods);
+            return;
+        }
         const editable = !!S && S.phase === 'lobby' && S.hostId === NET.PID;
         const m = (S && S.mods) || {};
         const col = side =>
@@ -14732,7 +16446,8 @@ kbd {
             banner.innerHTML = '<span class="who">Rolling for turn order</span>' +
                 '<span class="muted">' +
                 (waiting.length ? 'Waiting on ' + esc(waiting.join(', ')) : 'Setting the order…') +
-                '</span>';
+                '</span>' + modsChipHtml();
+            bindModsChip();
             return;
         }
         const cur = E.currentPlayer(S);
@@ -14746,7 +16461,8 @@ kbd {
                     (cur ? ' on ' + esc(cur.name) + '\u2019s turn' : '') + '.</span>' +
                 (S.hostId === NET.PID
                     ? '<button class="btn small primary" id="banner-resume">Resume</button>'
-                    : '');
+                    : '') + modsChipHtml();
+            bindModsChip();
             const r = $('#banner-resume');
             if (r) r.addEventListener('click', () => act('setPaused', { on: false }));
             return;
@@ -14771,6 +16487,7 @@ kbd {
                 esc(doing.text) +
             '</span>' +
             '<span class="muted">Turn ' + S.turnNo + '</span>' +
+            modsChipHtml() +
             // The clock only exists to stop an absent player stalling everyone
             // else. On your own there is nobody to stall, so it says so rather
             // than counting -- but it is always there, so "How to play" can
@@ -14781,6 +16498,30 @@ kbd {
                           ' seconds; each go in a fight has ' +
                           Math.round(D.RULES.battleTimeoutMs / 1000) + '.') + '">' +
                 timerText() + '</span>';
+        bindModsChip();
+    }
+
+    /* ---- the modifiers, for the whole game -----------------------------
+       They are set in the lobby and then change prices, damage, gold and
+       freezing for the rest of the game, so the banner says so on every
+       turn: a chip beside the timer with how many are on, harder and
+       easier, which opens the list of just those. Nothing at all when the
+       game is being played as printed. */
+    function modsChipHtml() {
+        const on = modsOn();
+        if (!on.length) return '';
+        const bad = on.filter(x => x.side === 'bad').length;
+        const good = on.length - bad;
+        return '<button class="mods-chip" id="banner-mods" title="' +
+            esc('Modifiers on: ' + on.map(x => x.name).join(', ')) + '">' + GEAR_ICON +
+            '<span>' + on.length + ' modifier' + (on.length === 1 ? '' : 's') + '</span>' +
+            (bad ? '<i class="mc-bad">' + bad + ' harder</i>' : '') +
+            (good ? '<i class="mc-good">' + good + ' easier</i>' : '') +
+            '</button>';
+    }
+    function bindModsChip() {
+        const chip = $('#banner-mods');
+        if (chip) chip.addEventListener('click', openMods);
     }
 
     /* ---- what the game is waiting on -------------------------------------
@@ -14954,8 +16695,10 @@ kbd {
             if (first || path.length < 2) { shownPos[p.id] = p.pos; return; }
 
             let step = 0;
+            let rest = 0;           // beats left standing under a STOP sign
             shownPos[p.id] = path[0];
             walkTimers[p.id] = setInterval(() => {
+                if (rest > 0) { rest -= 1; return; }
                 step += 1;
                 if (step >= path.length) {
                     clearInterval(walkTimers[p.id]);
@@ -14966,6 +16709,16 @@ kbd {
                     shownPos[p.id] = p.pos;
                 } else {
                     shownPos[p.id] = path[step];
+                    // A STOP square: the sign goes up as the piece arrives.
+                    // Part way through a move (Eagle's Descent) the piece
+                    // stands under it for a beat before walking on. Thrown
+                    // off at the Gate is the lightning's to show, not this.
+                    const sq = D.BOARD[path[step]];
+                    if (sq && sq.stop && !(sq.action === 'gate' && p.pos !== sq.i)) {
+                        const carryOn = step < path.length - 1;
+                        STOP_FX.play(p, sq, carryOn);
+                        if (carryOn) rest = 4;
+                    }
                 }
                 renderBoard();
             }, 210);
@@ -16115,6 +17868,8 @@ kbd {
             if (sq.arena) {
                 // Bare brown card with the floor scored across it, as on the
                 // real board. Whoever is fighting stands in the middle.
+                // No square card here: what Fenrirak can do is not shown
+                // before you walk in.
                 return '<div class="arena' + (anyoneInArena ? ' lit' : '') +
                     '" style="' + place + '">' +
                     '<div class="arena-disc"></div>' +
@@ -16132,7 +17887,8 @@ kbd {
             const badge = sq.stop ? 'STOP' : (E.isOptionalStop(S, sq) ? 'OPTIONAL STOP' : '');
             return '<div class="sq kind-' + squareKind(sq) + ' key-' + esc(sq.key) +
                 (sq.gateway ? ' gateway' : '') +
-                (sq.scenery ? ' scenery-' + esc(sq.scenery) : '') + '" style="' + place + '">' +
+                (sq.scenery ? ' scenery-' + esc(sq.scenery) : '') + '" data-sq="' + sq.i +
+                '" style="' + place + '">' +
                 (sq.gateway ? GATE_ART : '') +
                 (sq.key === 'gate' ? '<div class="frost-gate-art">' + FROST_GATE_ART + '</div>' : '') +
                 (sq.scenery === 'broken_bridge' ? WHIRL_ART : '') +
@@ -16172,6 +17928,157 @@ kbd {
     // Starting or joining a game draws a board that is not the one on the
     // screen, so the next render has to be a full one.
     function forgetBoard() { boardBuilt = false; }
+
+    /* ---- what a square says, in full ----------------------------------
+       A square only has room for a line or two of its card, and on a phone
+       it has room for none of it -- the writing is hidden below 1080px. So
+       point at a square and the whole of it comes up in a small card beside
+       it, as in The Thunder Dragon: the full text, whether it is a stop and
+       what that means, the monster waiting there with what it hits for and
+       what it drops, and who is standing on it. With a mouse it follows the
+       pointer; on a touch screen a tap shows it and a tap anywhere else
+       puts it away.
+       ------------------------------------------------------------------ */
+    const HOVER_OK = !!(window.matchMedia &&
+        window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+    let tipEl = null;
+    let tipFor = null;
+
+    function hideSquareTip() {
+        tipFor = null;
+        if (tipEl) tipEl.classList.remove('show');
+    }
+
+    // What being made to stop here costs you, in one line.
+    function stopMeaning(sq) {
+        if (sq.diceMod) {
+            return 'Everyone who reaches it stops here, even part way through a move. ' +
+                'Once it is dealt with, they carry on with what is left of the roll, ' +
+                Math.abs(sq.diceMod) + (sq.diceMod > 0 ? ' more.' : ' less.');
+        }
+        return 'Everyone who reaches it stops here, whatever they rolled. ' +
+            'The rest of the roll is lost.';
+    }
+
+    function squareTipHtml(sq) {
+        const p = me();
+        const tags = [];
+        if (sq.stop) tags.push('<span class="tip-tag hard">STOP</span>');
+        if (E.isOptionalStop(S, sq)) tags.push('<span class="tip-tag">OPTIONAL STOP</span>');
+        if (sq.route) tags.push('<span class="tip-tag route">ROUTE ' + sq.route + '</span>');
+        let h = '<b>' + esc(sq.name) + '</b>' +
+            (tags.length ? '<div class="tip-tags">' + tags.join('') + '</div>' : '') +
+            '<p>' + esc(sq.text) + '</p>';
+
+        if (sq.stop) h += '<p class="tip-stop">' + esc(stopMeaning(sq)) + '</p>';
+        else if (E.isOptionalStop(S, sq)) {
+            h += '<p class="tip-mine">Passing through, you may choose to stop here.</p>';
+        }
+
+        // The monster, with the numbers the fight will actually use once the
+        // modifiers are in, and what beating it is worth.
+        if (sq.action === 'battle' && sq.enemy && D.ENEMIES[sq.enemy]) {
+            const e = D.ENEMIES[sq.enemy];
+            const st = E.foeStats(S, sq.enemy);
+            h += '<div class="tip-foe"><div class="tip-foe-head">' + esc(e.name) + '</div>' +
+                '<div class="tip-foe-stats">' + st.hp + ' HP · ' + st.defence + ' defence</div>' +
+                e.moves.map(m => '<div class="tip-move"><span>' + esc(m.name) + '</span><span>' +
+                    (m.damage ? Math.max(0, m.damage + st.dmg) + ' dmg · ' : '') +
+                    m.energy + ' energy</span></div>').join('') +
+                '</div>';
+            const drops = [];
+            if (sq.coins) drops.push(E.monsterGold(S, sq.coins) + ' gold');
+            if (sq.keyFragment) drops.push('Frost Gate Key ' + sq.keyFragment);
+            if (sq.skill && D.SKILLS[sq.skill]) drops.push('the ' + D.SKILLS[sq.skill].name + ' skill card');
+            if (sq.enemy === 'barbarian_foe' && !S.barbarian) drops.push('the Barbarian joins you');
+            if (drops.length) h += '<p class="tip-drops">Win: ' + esc(drops.join(' · ')) + '</p>';
+            if (p && sq.keyFragment && E.fragmentsOf(p).indexOf(sq.keyFragment) >= 0) {
+                h += '<p class="tip-mine">You already hold this key.</p>';
+            }
+        }
+        if (p && sq.action === 'gate') {
+            const need = E.gateNeeds(S);
+            const held = E.fragmentsOf(p).filter(n => need.indexOf(n) >= 0).length;
+            h += '<p class="tip-mine">' + (need.length
+                ? 'You hold ' + held + ' of the ' + need.length + ' keys it asks for.'
+                : 'With the Missing Gate modifier on, it asks for no keys.') + '</p>';
+        }
+        if (p && sq.action === 'campfire') {
+            const worn = E.equippedSpecial(p);
+            h += '<p class="tip-mine">You have ' + (p.flint | 0) + ' flint' +
+                 (worn && D.ITEMS[worn.id].standsForFlint ? ', and the Flint Necklace on' : '') +
+                 '.</p>';
+        }
+        if (sq.action === 'harbour' && S.decks && S.decks.harbour) {
+            const left = S.decks.harbour.length;
+            h += '<p class="tip-mine">' + (left ? left + ' of ' + D.HARBOUR_DECK.length +
+                 ' pieces left. Once they are gone, they are gone.' : 'Nothing left to pick up.') +
+                 '</p>';
+        }
+
+        const here = S.players.filter(x => x.cls && x.pos === sq.i);
+        if (here.length) {
+            h += '<p class="tip-here">Here: ' + esc(here.map(x => x.name).join(', ')) + '</p>';
+        }
+        return h;
+    }
+
+    function showSquareTip(el) {
+        if (!S || !el) return hideSquareTip();
+        const sq = D.BOARD[+el.getAttribute('data-sq')];
+        // Not over the top of a panel that is asking something.
+        const back = $('#modal-back');
+        const covered = back && back.classList.contains('show') && !back.classList.contains('dock');
+        if (!sq || covered) return hideSquareTip();
+
+        if (!tipEl) {
+            tipEl = document.createElement('div');
+            tipEl.className = 'sq-tip';
+            tipEl.setAttribute('role', 'tooltip');
+            document.body.appendChild(tipEl);
+        }
+        tipFor = el;
+        tipEl.innerHTML = squareTipHtml(sq);
+        tipEl.style.left = '0px';
+        tipEl.style.top = '0px';
+        tipEl.classList.add('show');
+
+        // Above the square if it fits, otherwise below it, and never off
+        // either side of the screen.
+        const r = el.getBoundingClientRect();
+        const w = tipEl.offsetWidth, t = tipEl.offsetHeight;
+        const vw = window.innerWidth, vh = window.innerHeight;
+        let x = r.left + r.width / 2 - w / 2;
+        x = Math.max(8, Math.min(vw - w - 8, x));
+        let y = r.top - t - 8;
+        if (y < 8) y = Math.min(vh - t - 8, r.bottom + 8);
+        tipEl.style.left = Math.round(x) + 'px';
+        tipEl.style.top = Math.round(Math.max(8, y)) + 'px';
+    }
+
+    function initSquareTips() {
+        const board = $('#board');
+        if (!board) return;
+        if (HOVER_OK) {
+            board.addEventListener('mouseover', e => {
+                const el = e.target.closest && e.target.closest('[data-sq]');
+                if (!el) hideSquareTip();
+                else if (el !== tipFor) showSquareTip(el);
+            });
+            board.addEventListener('mouseleave', hideSquareTip);
+        } else {
+            // A tap on a square, unless it was meant for something on it (one
+            // of the "how far?" marks answers that question instead).
+            document.addEventListener('click', e => {
+                const el = e.target.closest && e.target.closest('#board [data-sq]');
+                if (!el || e.target.closest('.landing, button')) return hideSquareTip();
+                if (el === tipFor) return hideSquareTip();
+                showSquareTip(el);
+            });
+        }
+        window.addEventListener('scroll', hideSquareTip, { passive: true });
+        window.addEventListener('resize', hideSquareTip);
+    }
 
     /* ------------------------------------------------------------------ */
     /* The stat block                                                      */
@@ -16215,6 +18122,8 @@ kbd {
         const armour = E.equippedArmour(x);
         const wDef = weapon ? D.ITEMS[weapon.id] : null;
         const aDef = armour ? D.ITEMS[armour.id] : null;
+        const special = E.equippedSpecial(x);
+        const sDef = special ? D.ITEMS[special.id] : null;
 
         return '' +
             '<div class="me-top">' +
@@ -16253,7 +18162,67 @@ kbd {
                     esc(aDef ? aDef.name : 'none') +
                     (armour && armour.uses != null ? ' (' + armour.uses + ')' : '') +
                     '</b></div>' +
+                '<div class="wide"><span>Special</span><b>' +
+                    esc(sDef ? sDef.name : 'none') + '</b></div>' +
+                (buffChips(x).length
+                    ? '<div class="wide"><span>In effect</span>' + fxRowHtml(buffChips(x)) + '</div>'
+                    : '') +
             '</div>' + barbarianBlockHtml(x);
+    }
+
+    /* What a player's item cards and abilities have left standing, as short
+       chips: [tone, words, the card it came from]. Shown on the profile and
+       under each side of a fight, so a Defence Potion drunk two turns ago
+       is not a secret. */
+    function buffChips(x) {
+        const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+        return (x.buffs || []).map(b => {
+            const from = b.from || 'A card';
+            if (b.kind === 'damage') {
+                return ['good', from + ': +' + b.value + ', ' + plural(b.uses, 'attack', 'attacks'), from];
+            }
+            if (b.kind === 'defence') {
+                return ['good', from + ': −' + b.value + ' taken, ' + plural(b.uses, 'hit', 'hits'), from];
+            }
+            if (b.kind === 'mult') {
+                return [b.value < 1 ? 'bad' : 'good',
+                        from + ': ' + (b.value < 1 ? 'half' : '×' + b.value) + ' next attack', from];
+            }
+            if (b.kind === 'freezeNext') return ['good', from + ': next attack freezes', from];
+            if (b.kind === 'dice') return ['good', from + ': +' + b.value + ' to the next roll', from];
+            return null;
+        }).filter(Boolean);
+    }
+
+    // Everything standing on one side of the fight that is on.
+    function fightChips(b, side) {
+        const chips = [];
+        const who = (b.kind === 'pve' && side === 'b') ? null
+                  : E.player(S, side === 'a' ? b.aId : b.bId);
+        if (who) buffChips(who).forEach(c => chips.push(c));
+        if (b.reflex && b.reflex[side] > 0) {
+            chips.push(['good', 'Potion of Reflex: no stuns, ' + b.reflex[side] + ' turns', 'Potion of Reflex']);
+        }
+        (b.dots || []).filter(d => d.side === side).forEach(d =>
+            chips.push(['bad', d.from + ': ' + d.tick + ' a turn, ' + d.left + ' left', d.from]));
+        if (b.rot && b.rot.turnsLeft > 0 && b.rot.targetSide === side) {
+            chips.push(['bad', 'Tail Slam: −' + b.rot.weaken + ' and ' + b.rot.tick + ' a turn, ' +
+                               b.rot.turnsLeft + ' left', 'Tail Slam']);
+        }
+        if (b.kind === 'pve' && side === 'a' && b.playerAttackMod) {
+            chips.push(['bad', 'Thick Fur: ' + b.playerAttackMod + ' damage this fight', 'Thick Fur']);
+        }
+        const st = b.status && b.status[side];
+        if (st && st.weakenNext) chips.push(['bad', 'Weakened: −' + st.weakenNext + ' next attack', 'Battle Roar']);
+        if (st && st.blindNext) chips.push(['bad', 'Blinded: must roll to hit', 'Orb of Light']);
+        return chips;
+    }
+
+    function fxRowHtml(chips) {
+        if (!chips.length) return '';
+        return '<div class="fx-row">' + chips.map(c =>
+            '<span class="fx ' + c[0] + '" title="' + esc(c[2] || '') + '">' + esc(c[1]) + '</span>'
+        ).join('') + '</div>';
     }
 
     // A little card of his own, under whoever currently has him: the
@@ -16326,7 +18295,7 @@ kbd {
     function renderActions() {
         const p = me();
         const box = $('#side-actions');
-        if (!p) { box.innerHTML = ''; return; }
+        if (!p) { box.innerHTML = ''; renderPhoneBar(); return; }
 
         if (S.phase === 'order') {
             /* The rules go here too. This is the first board anybody ever
@@ -16344,6 +18313,7 @@ kbd {
             if (b) b.addEventListener('click', () =>
                 rollAct('Turn Order', 'rollForOrder', {}, 'Highest goes first.'));
             bind('a-guide', openGuide);
+            renderPhoneBar();
             return;
         }
 
@@ -16405,10 +18375,6 @@ kbd {
                in front of something they do not recognise. */
             '<div class="actions-help">' +
             btn('a-guide', 'How to play', 'ghost', false) +
-            (modsOn().length
-                ? btn('a-mods', 'Modifiers on: ' + modsOn().length, 'ghost mods-on', false,
-                      modsOn().map(x => x.name).join(', '))
-                : '') +
             '</div>' +
             '<div class="actions-end">' +
             // Short, because all three share a row and "Resume the game" is
@@ -16453,10 +18419,35 @@ kbd {
         bind('a-end', () => act('endTurn', {}));
         bind('a-coinpay', () => { openPanel = 'purse'; renderModal(); });
         bind('a-guide', openGuide);
-        bind('a-mods', openMods);
         bind('a-close', confirmCloseGame);
         bind('a-leave', leaveRoom);
         bind('a-pause', () => act('setPaused', { on: !S.paused }));
+        renderPhoneBar();
+    }
+
+    /* On a narrower screen the board comes first and the Actions card is a
+       long way below it, so the three buttons a turn is made of are also
+       pinned along the bottom of the screen, as in The Thunder Dragon.
+       Each presses its twin in the Actions card, so it can do nothing that
+       button could not, and is greyed out whenever its twin is. */
+    function renderPhoneBar() {
+        const bar = $('#phone-bar');
+        if (!bar) return;
+        const twin = id => document.getElementById(id);
+        const roll = twin('a-move') || twin('a-order');
+        const items = [
+            [roll, roll && roll.id === 'a-order' ? 'Roll for turn order' : 'Roll &amp; move', 'primary'],
+            [twin('a-shop'), 'Merchant', ''],
+            [twin('a-end'), 'End turn', 'end-turn']
+        ].filter(x => x[0]);
+        bar.innerHTML = items.map(x =>
+            '<button class="btn ' + x[2] + '" data-twin="' + x[0].id + '"' +
+            (x[0].disabled ? ' disabled' : '') + '>' + x[1] + '</button>').join('');
+        bar.classList.toggle('empty', !items.length);
+        bar.querySelectorAll('[data-twin]').forEach(b => b.addEventListener('click', () => {
+            const t = document.getElementById(b.getAttribute('data-twin'));
+            if (t && !t.disabled) t.click();
+        }));
     }
 
     // Ending the game early. The room document is deleted rather than left
@@ -16532,9 +18523,42 @@ kbd {
     /* Game — log                                                          */
     /* ------------------------------------------------------------------ */
 
+    /* The narrator's "Just mine" switch, as in The Thunder Dragon and The
+       Oblivion Dragon: only the lines that name you. A line carries no
+       player id, only the words, so "yours" is any line your name appears
+       in as a whole word. */
+    let logMine = false;
+
+    function mineOnly(lines) {
+        const p = me();
+        if (!p || !p.name) return lines;
+        const re = new RegExp('(^|[^A-Za-z0-9])' +
+            p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^A-Za-z0-9])');
+        return lines.filter(l => re.test(String(l.t)));
+    }
+
+    function setLogMine(on) {
+        logMine = on;
+        $('#log-all').classList.toggle('on', !on);
+        $('#log-mine').classList.toggle('on', on);
+        $('#log-all').setAttribute('aria-pressed', String(!on));
+        $('#log-mine').setAttribute('aria-pressed', String(on));
+        $('#log').scrollTop = 0;
+        if (S && S.log) renderLog();
+    }
+
+    function initLogFilter() {
+        $('#log-all').addEventListener('click', () => setLogMine(false));
+        $('#log-mine').addEventListener('click', () => setLogMine(true));
+    }
+
     function renderLog() {
-        $('#log').innerHTML = (S.log || []).slice(-60).reverse()
-            .map(l => '<div class="t-' + esc(l.tone) + '">' + esc(l.t) + '</div>').join('');
+        const all = S.log || [];
+        const lines = logMine ? mineOnly(all) : all;
+        $('#log').innerHTML = lines.length
+            ? lines.slice(-60).reverse()
+                .map(l => '<div class="t-' + esc(l.tone) + '">' + esc(l.t) + '</div>').join('')
+            : '<div class="t-muted">' + (logMine ? 'Nothing about you yet.' : 'Nothing yet.') + '</div>';
     }
 
     /* ------------------------------------------------------------------ */
@@ -16546,7 +18570,7 @@ kbd {
         if (!p) return;
 
         $('#inv-tabs').innerHTML = [
-            ['gear', 'Weapons & armour (' + p.inventory.length + ')'],
+            ['gear', 'Gear (' + p.inventory.length + ')'],
             ['powerups', 'Item cards (' + p.powerups.length + ')'],
             ['foods', 'Food (' + p.foods.length + ')'],
             ['skills', 'Skills (' + p.skills.length + ')']
@@ -16568,23 +18592,41 @@ kbd {
             const per = D.RULES.equipChangesPerTurn;
             const swapsLeft = {
                 weapon: per - (p.weaponSwaps | 0),
-                armour: per - (p.armourSwaps | 0)
+                armour: per - (p.armourSwaps | 0),
+                special: per - (p.specialSwaps | 0)
             };
             html = p.inventory.map(inst => {
                 const d = D.ITEMS[inst.id];
-                const equipped = inst.uid === p.weaponUid || inst.uid === p.armourUid;
-                const usable = d.kind === 'weapon'
-                    ? d.subtype === cls.weaponType
-                    : (d.subtype === 'any' || d.subtype === cls.armourType);
-                const slot = d.kind === 'weapon' ? 'weapon' : 'armour';
+                // Weapons and armour are for the class they were made for;
+                // anyone else's is held to trade. Special equipment is worn
+                // in a slot of its own, one piece at a time, by any class.
+                const isSpecial = d.kind === 'special';
+                const equipped = inst.uid === p.weaponUid || inst.uid === p.armourUid ||
+                                 inst.uid === p.specialUid;
+                const usable = E.suitsClass(p, inst.id);
+                const owner = D.SUBTYPE_OWNER[d.subtype] || 'Anyone';
+                // His rider can hand the Barbarian anything he can use.
+                const ridesWithMe = !!S.barbarian && S.barbarian.ownerId === p.id;
+                const forHim = ridesWithMe && !equipped && E.barbarianCanUse(inst.id);
+                const slot = d.kind === 'weapon' ? 'weapon' : isSpecial ? 'special' : 'armour';
                 const spare = swapsLeft[slot] > 0;
-                const foot = (d.kind === 'weapon' ? 'Weapon' : 'Armour') + ' · ' +
-                    esc(d.subtype === 'any' ? 'any class' : d.subtype) +
-                    (inst.uses != null ? ' · ' + inst.uses + ' uses left' : '') +
-                    (equipped ? ' · equipped' : '') +
-                    (usable ? '' : '<br>A ' + esc(cls.name) + ' cannot use this — trade it away.') +
+                const foot = (isSpecial ? 'Special equipment · any class'
+                        : (d.kind === 'weapon' ? 'Weapon' : 'Armour') + ' · ' +
+                          (owner === 'Anyone' ? 'any class' : 'for the ' + esc(owner))) +
+                    (inst.uses != null ? ' · ' + inst.uses + (inst.uses === 1 ? ' use left' : ' uses left') : '') +
+                    (equipped ? (isSpecial ? ' · worn' : ' · equipped') : '') +
+                    (usable ? ''
+                        : owner === 'Barbarian'
+                            ? '<br>Only the Barbarian can use this. ' +
+                              (ridesWithMe ? 'He rides with you, so you can hand it to him.'
+                                           : 'Hand it to him while he travels with you, or ' +
+                                             'trade it to whoever he rides with.')
+                            : '<br>' + (article(cls.name) === 'an' ? 'An ' : 'A ') +
+                              esc(cls.name) + ' cannot use this. Trade it to ' +
+                              article(owner) + ' ' + esc(owner) + '.') +
                     (usable && !equipped && !spare
-                        ? '<br>You have already changed your ' + slot + ' this turn.' : '');
+                        ? '<br>You have already changed your ' +
+                          (isSpecial ? 'special equipment' : slot) + ' this turn.' : '');
                 return '<div class="item' + (equipped ? ' equipped' : '') +
                     (d.treasure || d.chest ? ' treasure' : '') + '">' +
                     paperCardHtml(d.chest ? 'orange' : 'yellow', d.name, d.text, foot) +
@@ -16601,17 +18643,31 @@ kbd {
                         : '') +
                     (equipped || !usable ? ''
                         : '<button class="btn small" data-equip="' + inst.uid + '"' +
-                          (spare && myTurn() && !S.battle ? '' : ' disabled') + '>Equip</button>') +
+                          (spare && myTurn() && !S.battle ? '' : ' disabled') + '>' +
+                          (isSpecial ? 'Wear' : 'Equip') + '</button>') +
+                    (forHim
+                        ? '<button class="btn small" data-give-barb="' + inst.uid + '"' +
+                          (myTurn() && !S.battle ? '' : ' disabled') + '>Give to the Barbarian</button>'
+                        : '') +
                     '</div>';
             }).join('') || '<div class="muted">Nothing yet.</div>';
         } else if (invTab === 'powerups') {
+            const inFight = !!E.sideOf(S.battle, NET.PID);
+            const turnOk = myTurn() || inFight;
             html = p.powerups.map(c => {
                 const d = D.POWERUPS[c.id];
+                const why = E.cannotPlay(S, p, d);
+                const block = why || (turnOk ? '' : 'Only on your turn, or in your own fight.');
+                // The "fights only" reason is already on the card's foot.
+                const say = block && !(d.battleOnly && !inFight) && turnOk ? block : '';
                 return '<div class="item powerup">' +
-                    paperCardHtml('pink', d.name, d.text) +
-                    '<button class="btn small" data-pu="' + c.uid + '">Play card</button>' +
+                    paperCardHtml('pink', d.name, d.text,
+                                  d.battleOnly ? 'Fights only' : 'On your turn or in a fight') +
+                    (say ? '<div class="pu-why">' + esc(say) + '</div>' : '') +
+                    '<button class="btn small" data-pu="' + c.uid + '"' +
+                        (block ? ' disabled title="' + esc(block) + '"' : '') + '>Play card</button>' +
                     '</div>';
-            }).join('') || '<div class="muted">No power-up cards.</div>';
+            }).join('') || '<div class="muted">No item cards.</div>';
         } else if (invTab === 'foods') {
             html = p.foods.map(f => {
                 const d = D.FOODS[f.id];
@@ -16632,10 +18688,27 @@ kbd {
         $('#inventory').innerHTML = '<div class="item-grid">' + html + '</div>';
         $$('#inventory [data-equip]').forEach(b =>
             b.addEventListener('click', () => act('equip', { uid: b.dataset.equip })));
+        $$('#inventory [data-give-barb]').forEach(b =>
+            b.addEventListener('click', () => act('giveBarbarian', { uid: b.dataset.giveBarb })));
         $$('#inventory [data-pu]').forEach(b =>
-            b.addEventListener('click', () => act('usePowerup', { uid: b.dataset.pu })));
+            b.addEventListener('click', () => playCard(b.dataset.pu)));
         $$('#inventory [data-food]').forEach(b =>
             b.addEventListener('click', () => act('eatFood', { uid: b.dataset.food })));
+    }
+
+    // Playing an item card. A vial throws a die, so it is announced first,
+    // like every other throw.
+    function playCard(cardUid) {
+        const p = me();
+        const c = p && p.powerups.find(x => x.uid === cardUid);
+        const d = c && D.POWERUPS[c.id];
+        if (d && d.effect === 'gamble') {
+            rollAct(d.name, 'usePowerup', { uid: cardUid },
+                    (d.parity === 'even' ? 'Even' : 'Odd') + ': heal ' + d.value +
+                    '. Otherwise take ' + d.value + ' damage.');
+            return;
+        }
+        act('usePowerup', { uid: cardUid });
     }
 
     /* ------------------------------------------------------------------ */
@@ -16755,7 +18828,9 @@ kbd {
                 'alongside them against Fenrirak (and in duels, with Rising Tensions on). ' +
                 'Whoever beats his rider in a duel wins him over instead, and after ' +
                 (words[stays] || stays) + ' of his rider’s fights he heads home and ' +
-                'has to be found again.</p>' +
+                'has to be found again. His rider can hand him axes and armour he can wear ' +
+                '(on their own turn, from their Gear). He takes them up at once, keeps them ' +
+                'if he changes sides, and leaves them all behind when he goes home.</p>' +
         '</div>';
     }
 
@@ -16800,8 +18875,11 @@ kbd {
             step(3, 'Anything else you fancy',
                  'On your own go you may also visit <b>the Merchant</b> (<b>M</b>), ' +
                  '<b>propose a trade</b>, or use your class <b>ability</b> — that one is once ' +
-                 'every ' + R.abilityCooldownTurns + ' of your turns. You may change one weapon ' +
-                 'and one armour a turn.') +
+                 'every ' + R.abilityCooldownTurns + ' of your turns. You may change one weapon, ' +
+                 'one armour and one piece of special equipment a turn. You can only use ' +
+                 'weapons and armour made for your class, but you may buy or pick up anyone’s ' +
+                 'and trade it to them. If the Barbarian rides with you, you can hand him axes ' +
+                 'and armour from your Gear.') +
             step(4, 'End your turn',
                  'Press <b>End turn</b> (or <b>Backspace</b>) to hand over.') +
         '</ol>' +
@@ -16851,15 +18929,32 @@ kbd {
             '<span><b>Frozen</b> or <b>stunned</b> means you lose your next turn. In a fight ' +
             'the other side simply strikes again; on the board your turn is passed by. The ' +
             'screen frosts over when it happens, and the ice stays on your portrait, your ' +
-            'profile and your piece until you thaw. Some armour stops freezing (but not in ' +
-            'Fenrirak’s arena).</span>' +
+            'profile and your piece until you thaw. Some armour, and the Rock of Warmth, stop ' +
+            'freezing (but not in Fenrirak’s arena). A Warmth Potion, drunk in a fight, ' +
+            'gives you back a turn the cold has taken.</span>' +
         '</div>' +
 
         '<h3 class="guide-h">Flint and food</h3>' +
         '<p class="guide-p">' +
-            'Campfires heal you for a flint, found scattered round the board. The Merchant ' +
-            'hands out a free dish to anyone who calls in, on top of whatever you buy from ' +
-            'the stall.' +
+            'Campfires heal you for a flint, found scattered round the board (or for nothing, ' +
+            'while you wear the Flint Necklace). The Merchant hands out a free dish to anyone ' +
+            'who calls in, on top of whatever you buy from the stall.' +
+        '</p>' +
+
+        '<h3 class="guide-h">Item cards and special equipment</h3>' +
+        '<p class="guide-p">' +
+            'Play item cards from <b>Your things</b>, or with <b>Play an item card</b> in a ' +
+            'fight. Some only work in a fight, and say so. A card that lasts for turns counts ' +
+            'your own attacks if it adds damage, the hits you take if it adds defence, and ' +
+            'every blow by either side if it is a poison or the Potion of Reflex. Fire Blast ' +
+            'and Rage Liquid multiply the move’s own damage; your weapon and other bonuses ' +
+            'are added after. What is in play shows on your profile and in the fight.' +
+        '</p>' +
+        '<p class="guide-p">' +
+            '<b>Special equipment</b> (the Fire Ruby Bracelet, Lucky Charm, Pendant of Life, ' +
+            'Flint Necklace and Rock of Warmth) is worn in a slot of its own, one piece at a ' +
+            'time, and only works while it is worn. When the Rock of Warmth or frost-proof ' +
+            'armour stops a freeze, you see the frost thaw away, and you keep your turn.' +
         '</p>' +
 
         '<h3 class="guide-h">The Snowy Village fork</h3>' +
@@ -16885,7 +18980,9 @@ kbd {
         '<p class="guide-p">' +
             'Before the game starts the host can press the <b>gear</b> on the class-choosing ' +
             'page and switch on modifiers that make the game harder or easier. ' +
-            (on.length ? 'This game has: <b>' + on.map(x => esc(x.name)).join(', ') + '</b>.'
+            (on.length ? 'This game has: <b>' + on.map(x => esc(x.name)).join(', ') + '</b>. ' +
+                         'Press the modifiers chip beside the turn timer, at the top, to read ' +
+                         'what each one does.'
                        : 'This game has none switched on.') +
         '</p>' +
 
@@ -16908,8 +19005,8 @@ kbd {
 
         '<h3 class="guide-h">Worth knowing</h3>' +
         '<ul class="guide-bullets">' +
-            '<li><b>Your things</b> sit under the board — weapons, armour, item cards, ' +
-                'food, skill cards, coins and flint. You equip and use them from there.</li>' +
+            '<li><b>Your things</b> sit under the board — gear, item cards, food and skill ' +
+                'cards. You equip gear, wear special equipment and play cards from there.</li>' +
             '<li><b>The host</b> may pause the game, and may end it for everybody.</li>' +
             '<li><b>The narrator</b> beside your actions says everything that happens. ' +
                 'If you missed something, it is in there.</li>' +
@@ -17069,8 +19166,9 @@ kbd {
                 { id: 'inventory', title: 'Your things', wrap: true,
                   body: 'Weapons, armour, item cards, food and skill cards. Equip and use ' +
                       'them from here.' },
-                { id: 'a-mods', title: 'Modifiers', live: true,
-                  body: 'This game is being played with modifiers. Press it to see which.' },
+                { id: 'banner-mods', title: 'Modifiers',
+                  body: 'This game is being played with modifiers, which change the ' +
+                      'numbers from the printed rules. Press here any time to see which.' },
                 { id: 'a-end', title: 'End turn', live: true,
                   body: 'Press it once you’re done (or press <b>Backspace</b>). All the ' +
                       'keys: <b>R</b> roll, <b>M</b> Merchant, <b>Backspace</b> end turn, ' +
@@ -17473,6 +19571,7 @@ kbd {
         const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || '') || t.isContentEditable;
         if (e.key === 'Escape') {
             if (SPOTLIGHT.isOpen() || typing) return;
+            hideSquareTip();
             closeOpenWindow();
             return;
         }
@@ -17590,7 +19689,7 @@ kbd {
         // there -- see "Nothing moves behind a closed door" in style.css. A
         // docked panel covers nothing, so the board keeps its life.
         document.body.classList.toggle('modal-cover', !dock);
-        if (!dock) clearLandings();
+        if (!dock) { clearLandings(); hideSquareTip(); }
         back.dataset.dismissable = dismissable ? '1' : '0';
         // Which panel this is, so the stylesheet can tell the fight -- the one
         // panel that stays up across a roll -- from the rest.
@@ -17732,11 +19831,17 @@ kbd {
             '<span class="sum-bit"><b>' + Math.abs(value) + '</b> ' + esc(label) + '</span>';
         let working = '<span class="sum-bit"><b>' + rangeText(r.base) + '</b> ' +
             (r.base.lo === r.base.hi ? 'base' : 'on the dice') + '</span>';
+        (r.mult || []).forEach(x => {
+            working += '<span class="sum-op">×</span>' +
+                '<span class="sum-bit"><b>' + (x.value === 0.5 ? '½' : x.value) + '</b> ' +
+                esc(x.label) + '</span>';
+        });
         r.plus.forEach(x => { working += bit(x.value < 0 ? '−' : '+', x.label, x.value); });
         r.minus.forEach(x => { working += bit('−', x.label, x.value); });
         const notes = [];
         if (r.floor && r.lo === r.floor) notes.push('never less than ' + r.floor);
         if (r.blind) notes.push('0 if the blindness roll is a 1 or 2');
+        (r.chance || []).forEach(c => notes.push(c));
         return '<div class="msum' + (opts.foe ? ' foe' : '') + '">' +
             '<div class="sum-working">' + working + '</div>' +
             '<div class="sum-total"><b>' + rangeText(r) + '</b> damage' +
@@ -17785,10 +19890,21 @@ kbd {
                 ? 'The Barbarian' + (strikerIsMe ? ' — your call' : '') + ': choose his attack'
                 : esc(striker) + (strikerIsMe ? ' — your go' : '') + ': choose an attack';
 
+        /* The panel, top to bottom: who is fighting and whose blow it is, the
+           two fighters face to face, the blow just struck -- and then three
+           columns side by side rather than one long stack. What you can do
+           on the left (under you), what the monster can do to you in the
+           middle (under it), and its card and the fight's own log on the
+           right. Stacked, the attacks you had to choose from sat below the
+           monster's card and its four attacks, off the bottom of a laptop
+           screen. The columns fold to two, then to one, as the window
+           narrows (see "The fight, in columns" in style.css). */
         let body =
-            '<h2>' + (isPvp ? 'Player Battle' : esc(foe.name)) + '</h2>' +
-            '<div class="turn-flag' + (strikerIsMe ? ' mine' : '') +
-                ((enemyPhase && frostA && frostA.now) ? ' frozen' : '') + '">' + flagText + '</div>' +
+            '<div class="battle-head">' +
+                '<h2>' + (isPvp ? 'Player Battle' : esc(foe.name)) + '</h2>' +
+                '<div class="turn-flag' + (strikerIsMe ? ' mine' : '') +
+                    ((enemyPhase && frostA && frostA.now) ? ' frozen' : '') + '">' + flagText + '</div>' +
+            '</div>' +
             '<div class="sub">' +
                 (b.illusion ? 'A Mage’s illusion — you will earn coins only. ' : '') +
                 (involved ? 'Every attack lands. One blow each, then it is the other side’s go.'
@@ -17797,12 +19913,23 @@ kbd {
             '<div class="battle-top">' +
                 sideHtml('<img src="' + esc(D.CLASSES[a.cls].art) + '" alt="' + esc(a.name) +
                          '">', a.hp, a.maxHp, a.name, 'hp', 'side-a', a.energy,
-                         frostA, a.id === NET.PID) +
+                         frostA, a.id === NET.PID, fightChips(b, 'a')) +
                 '<div class="battle-vs">VS</div>' +
                 sideHtml(foePortrait, foeHp, foeMax, foe.name, isPvp ? 'hp' : 'enemy',
                          'side-b', isPvp ? foe.energy : b.enemyEnergy,
-                         frostB, isPvp && foe.id === NET.PID) +
+                         frostB, isPvp && foe.id === NET.PID, fightChips(b, 'b')) +
             '</div>';
+
+        /* On a phone the two sides are too narrow for their chips, which
+           stacked up tall and pushed the attacks off the screen. There they
+           sit in one strip across the panel instead (see style.css). */
+        const chipsA = fightChips(b, 'a'), chipsB = fightChips(b, 'b');
+        if (chipsA.length || chipsB.length) {
+            body += '<div class="fx-strip">' +
+                (chipsA.length ? '<div class="fx-who"><b>' + esc(a.name) + '</b>' + fxRowHtml(chipsA) + '</div>' : '') +
+                (chipsB.length ? '<div class="fx-who"><b>' + esc(foe.name) + '</b>' + fxRowHtml(chipsB) + '</div>' : '') +
+            '</div>';
+        }
 
         // The blow that was just struck, in one line, so the bars dropping
         // never have to be worked out from the log.
@@ -17812,8 +19939,12 @@ kbd {
                 b.lastBlow.dealt + '</b></div>';
         }
 
-        // The monster's own stat card, as it is dealt on the table, with what
-        // each of its attacks would do to you right now.
+        let doHtml = '';       // your column
+        let foeHtml = '';      // the monster's attacks
+        let infoHtml = '';     // its card, and the log
+
+        // What each of the monster's attacks would do to you right now, and
+        // the card it is dealt on the table with.
         if (!isPvp) {
             const target = { kind: 'player', id: b.aId };
             const next = E.enemyNextMove(S);
@@ -17830,7 +19961,9 @@ kbd {
                     rangeSumHtml(r, { foe: true, to: a.id === NET.PID ? 'you' : a.name }) +
                 '</div>';
             }).join('');
-            body += '<div class="battle-cards">' +
+            foeHtml = '<h3>' + esc(foe.name) + '’s attacks on ' +
+                    (a.id === NET.PID ? 'you' : esc(a.name)) + '</h3>' + foeMoves;
+            infoHtml = '<div class="battle-cardbox"><h3>' + esc(foe.name) + '’s card</h3>' +
                 '<div class="battle-statcard">' + statCardHtml({
                     name: foe.name, hp: stats.hp, defence: stats.defence,
                     moves: foe.moves.map(m => ({ name: m.name,
@@ -17838,22 +19971,28 @@ kbd {
                         energy: m.energy })),
                     svg: enemyPic(foe, 58),
                     foot: foe.passive ? esc(foe.passive.name) + ': ' + esc(foe.passive.text) : ''
-                }) + '</div>' +
-                '<div class="foe-moves"><h3>Its attacks on ' +
-                    (a.id === NET.PID ? 'you' : esc(a.name)) + '</h3>' + foeMoves + '</div>' +
-            '</div>';
+                }) + '</div></div>';
         }
 
         // The monster takes its own turn. This line stands in for the
         // button that used to be here: it says what is about to happen.
-        if (!isPvp && enemyPhase) {
-            body += '<div class="enemy-acting' + (frostA && frostA.now ? ' frozen' : '') + '">' +
+        if (!isPvp && enemyPhase && involved) {
+            doHtml += '<div class="enemy-acting' + (frostA && frostA.now ? ' frozen' : '') + '">' +
                 '<span class="spinner"></span>' +
                 (frostA && frostA.now
                     ? (a.id === NET.PID ? 'You are' : esc(a.name) + ' is') +
                       ' frozen solid. ' + esc(foe.name) + ' strikes again…'
                     : esc(foe.name) + ' is about to strike…') +
                 '</div>';
+        }
+
+        /* Frozen or stunned, with a Warmth Potion in hand: the one moment it
+           is for, so it is offered right here rather than left in a list. */
+        const warmCard = involved && meSide && E.chilledNow(b, meSide)
+            ? warmthCardOf(p) : null;
+        if (warmCard) {
+            doHtml += '<button class="btn warmth-now" data-warmth="' + esc(warmCard.uid) + '">' +
+                FLAKE_ICON + ' Drink the Warmth Potion and take your turn back</button>';
         }
 
         // Whether *this* attack, right now, could go to an eligible
@@ -17875,7 +20014,7 @@ kbd {
         };
 
         if (involved && myMove && !enemyPhase && b.phase === 'auto') {
-            body += '<div class="enemy-acting">' +
+            doHtml += '<div class="enemy-acting">' +
                 '<span class="spinner"></span>' +
                 'Your ' + esc(autoSwingName(b)) + ' is still swinging…' +
                 '</div>';
@@ -17884,7 +20023,7 @@ kbd {
             const barbEnergy = S.barbarian.energy === undefined ? D.RULES.startingEnergy : S.barbarian.energy;
             const barbTarget = isPvp ? { kind: 'player', id: NET.PID === b.aId ? b.bId : b.aId }
                                      : { kind: 'enemy' };
-            body += '<h3 style="margin-top:18px">The Barbarian’s attack</h3><div class="moves">' +
+            doHtml += '<h3>The Barbarian’s attack</h3><div class="moves">' +
                 bMoves.map(m => {
                     const def = D.CLASSES.barbarian.moves.find(x => x.id === m.id);
                     return '<button class="move" data-barb-move="' + esc(m.id) + '"' +
@@ -17901,7 +20040,7 @@ kbd {
         } else if (involved && myMove && !enemyPhase) {
             if (canTargetBarb) {
                 const targetOwner = E.player(S, targetOwnerId);
-                body += '<h3 style="margin-top:18px">Attack</h3>' +
+                doHtml += '<h3>Attack</h3>' +
                     '<div class="modal-actions target-pick">' +
                     '<button class="btn small' + (battleTarget === 'player' ? ' active' : '') +
                         '" data-target="player">' + esc(targetOwner.name) + '</button>' +
@@ -17913,7 +20052,7 @@ kbd {
             const moves = E.availableMoves(S, NET.PID);
             const cls = D.CLASSES[p.cls];
             const skill = E.hasSkill(p, 'attack');
-            body += '<h3 style="margin-top:18px">Choose your attack</h3>' +
+            doHtml += '<h3>Choose your attack</h3>' +
                 (skill ? '<div class="skill-note">Your Attack card adds 1 to one of a ' +
                          'move’s dice whenever that turns it the better way.</div>' : '') +
                 '<div class="moves">' +
@@ -17935,6 +20074,13 @@ kbd {
                         rangeSumHtml(r) +
                         '</button>';
                 }).join('') + '</div>';
+        } else if (involved && !enemyPhase) {
+            // In the fight, but the blow is somebody else's to choose.
+            doHtml += '<div class="enemy-acting waiting">' +
+                '<span class="spinner"></span>' +
+                (barbPhase ? 'The Barbarian is choosing his attack…'
+                           : 'Waiting for ' + esc(striker) + ' to strike…') +
+                '</div>';
         }
 
         /* The one ability you may call on mid-fight -- the Knight's Strength
@@ -17947,7 +20093,7 @@ kbd {
                            (b.phase === 'act' || b.phase === 'roll') && inFightAbility.inBattle;
 
         if (involved) {
-            body += '<div class="modal-actions">' +
+            const extras =
                 (canAbility
                     ? '<button class="btn small" id="b-ability"' +
                       (abilityIsReady(p) ? '' : ' disabled') + '>' +
@@ -17959,21 +20105,32 @@ kbd {
                     ? '<button class="btn small" id="b-purse">' + esc(purseLabel(p)) +
                       '</button>' : '') +
                 (p.powerups.length ? '<button class="btn small" id="b-pu">Play an item card</button>' : '') +
-                (p.foods.length ? '<button class="btn small" id="b-food">Eat food</button>' : '') +
-                '</div>';
+                (p.foods.length ? '<button class="btn small" id="b-food">Eat food</button>' : '');
+            if (extras) {
+                doHtml += '<h3>Also on your turn</h3><div class="modal-actions battle-extras">' +
+                    extras + '</div>';
+            }
         }
 
         /* The fight's own log, and nothing else: each fight records the line
            number it began after, and this shows only what was written since. */
         const since = b.logFrom | 0;
         const battleLines = (S.log || []).filter(l => (l.n | 0) > since);
-        body += '<h3 style="margin-top:18px">Battle log</h3>' +
-            '<div class="log" style="max-height:150px">' +
+        infoHtml += '<div class="battle-logbox"><h3>Battle log</h3>' +
+            '<div class="log">' +
             (battleLines.length
                 ? battleLines.slice(-12).reverse()
                     .map(l => '<div class="t-' + esc(l.tone) + '">' + esc(l.t) + '</div>').join('')
                 : '<div class="t-muted">Nothing yet — the fight has not started.</div>') +
-            '</div>';
+            '</div></div>';
+
+        const cols = [
+            doHtml ? '<section class="battle-col battle-do">' + doHtml + '</section>' : '',
+            foeHtml ? '<section class="battle-col battle-foe">' + foeHtml + '</section>' : '',
+            '<section class="battle-col battle-info">' + infoHtml + '</section>'
+        ].filter(Boolean);
+        body += '<div class="battle-lower cols-' + cols.length +
+            (doHtml ? ' has-do' : '') + (foeHtml ? ' has-foe' : '') + '">' + cols.join('') + '</div>';
 
         showModal(body, false, 'battle');
 
@@ -17982,6 +20139,8 @@ kbd {
                 battleTarget = el.dataset.target;
                 renderModal();
             }));
+        $$('#modal [data-warmth]').forEach(el =>
+            el.addEventListener('click', () => act('usePowerup', { uid: el.dataset.warmth })));
         $$('#modal [data-move]').forEach(el =>
             el.addEventListener('click', () => act('battleAttack',
                 { moveId: el.dataset.move, target: battleTarget })));
@@ -17992,8 +20151,9 @@ kbd {
         bind('b-purse', () => { openPanel = 'purse'; renderModal(); });
         bind('b-pu', () => pickFrom('Play an item card',
             () => (me() || p).powerups.map(c =>
-                ({ id: c.uid, name: D.POWERUPS[c.id].name, text: D.POWERUPS[c.id].text })),
-            uid => act('usePowerup', { uid: uid })));
+                ({ id: c.uid, name: D.POWERUPS[c.id].name, text: D.POWERUPS[c.id].text,
+                   why: E.cannotPlay(S, me() || p, D.POWERUPS[c.id]) })),
+            uid => playCard(uid)));
         bind('b-food', () => pickFrom('Eat food',
             () => (me() || p).foods.map(f =>
                 ({ id: f.uid, name: D.FOODS[f.id].name,
@@ -18057,6 +20217,15 @@ kbd {
     // bar, the line in the log -- before the next thing happens.
     const ENEMY_PAUSE_MS = 2800;
 
+    // And a few seconds more when you have just been frozen and are holding
+    // a Warmth Potion, so there is time to drink it.
+    const WARMTH_GRACE_MS = 4500;
+
+    function warmthCardOf(p) {
+        return p ? (p.powerups || []).find(c =>
+            D.POWERUPS[c.id] && D.POWERUPS[c.id].effect === 'unfreeze') || null : null;
+    }
+
     function driveEnemyTurn(b) {
         driveAutoSwing(b);
         const mine = b && b.kind === 'pve' && b.aId === NET.PID;
@@ -18081,7 +20250,7 @@ kbd {
             if (!now || now.kind !== 'pve' || now.aId !== NET.PID) return;
             if (now.phase !== 'enemy_act' && now.phase !== 'enemy_roll') return;
             act('enemyStrike', {});
-        })), ENEMY_PAUSE_MS);
+        })), ENEMY_PAUSE_MS + (E.chilledNow(b, 'a') && warmthCardOf(me()) ? WARMTH_GRACE_MS : 0));
     }
     // Only Fenrirak has a picture; the rest get a crest so no monster wears
     // the dragon's portrait by mistake.
@@ -18115,7 +20284,7 @@ kbd {
 
     // One fighter's half of the panel. `frost` (from sideFrost) puts them in
     // the ice: the portrait under a frozen glaze with a badge saying so.
-    function sideHtml(portrait, hp, max, name, barClass, energyKey, energy, frost, mine) {
+    function sideHtml(portrait, hp, max, name, barClass, energyKey, energy, frost, mine, chips) {
         return '<div class="battle-side' + (frost ? ' frozen' + (frost.now ? ' now' : '') : '') + '">' +
             '<div class="bportrait">' + portrait +
                 (frost ? '<div class="frost-glaze"></div>' + frostBadge(frost, mine) : '') +
@@ -18125,6 +20294,7 @@ kbd {
                 Math.max(0, Math.round(hp / max * 100)) + '%"></i></div>' +
             '<div class="barlabel"><span>' + hp + ' / ' + max + '</span></div>' +
             (energy === undefined ? '' : energyHtml(energyKey, energy)) +
+            fxRowHtml(chips || []) +
             '</div>';
     }
 
@@ -18136,7 +20306,9 @@ kbd {
         showModal('<h2>' + esc(title) + '</h2><div class="item-grid">' +
             options().map(o => '<div class="item">' +
                 paperCardHtml('pink', o.name, o.text || '') +
-                '<button class="btn small" data-pick="' + esc(o.id) + '">Use</button></div>').join('') +
+                (o.why ? '<div class="pu-why">' + esc(o.why) + '</div>' : '') +
+                '<button class="btn small" data-pick="' + esc(o.id) + '"' +
+                    (o.why ? ' disabled' : '') + '>Use</button></div>').join('') +
             '</div><div class="modal-actions"><button class="btn" id="pick-cancel">Back</button></div>', true, 'pick');
         $$('#modal [data-pick]').forEach(b =>
             b.addEventListener('click', () => { closeOverlay(); onPick(b.dataset.pick); }));
@@ -18626,12 +20798,12 @@ kbd {
 
     function renderMerchant() {
         const p = me();
-        const cls = D.CLASSES[p.cls];
 
         // The stall is laid out in full, the way the merchant's price sheets
         // are: everything he has, with who each piece is for written on it.
-        // Yours come first; the rest are dimmed but still readable, so you can
-        // see what the other classes are being offered.
+        // Yours come first. Another class's can be bought too, to trade on
+        // to a player who can use it -- you just cannot use it yourself --
+        // and the Barbarian's, to hand to him (or to whoever he rides with).
         const forWho = (d) => D.SUBTYPE_OWNER[d.subtype] || 'Anyone';
         const mineFirst = D.MERCHANT_GEAR.slice().sort((x, y) => {
             const a = E.suitsClass(p, x) ? 0 : 1, b = E.suitsClass(p, y) ? 0 : 1;
@@ -18643,7 +20815,7 @@ kbd {
             const stock = S.merchant.gear[id] || 0;
             const yours = E.suitsClass(p, id);
             const price = E.merchantPrice(S, d.price);
-            const afford = p.coins >= price && stock > 0 && yours;
+            const afford = p.coins >= price && stock > 0;
             const who = forWho(d);
             return '<div class="shop-item' + (stock ? '' : ' out') +
                 (yours ? '' : ' not-yours') + '">' +
@@ -18653,8 +20825,8 @@ kbd {
                     (who === 'Anyone' ? 'Any class' : 'For the ' + esc(who)) + '</span>' +
                 '<button class="btn small" data-buy-gear="' + esc(id) + '"' +
                     (afford ? '' : ' disabled') + '>' +
-                    (yours ? 'Buy' : 'Not for ' + article(cls.name) + ' ' +
-                     esc(cls.name)) + '</button></div>';
+                    (yours ? 'Buy' : who === 'Barbarian' ? 'Buy for the Barbarian' : 'Buy to trade') +
+                '</button></div>';
         }).join('');
 
         // Same three dishes handed out free at the Cosy Cabin, now sitting
@@ -18681,7 +20853,8 @@ kbd {
                 esc(D.HALVING_NOTE) : '') + '</div>' +
             '<h3>Weapons &amp; armour</h3>' +
             '<p class="shop-section-note">Everything the merchant carries. Each piece ' +
-            'says which class it is cut for — you can only buy your own.</p>' +
+            'says which class it is made for. You can only use your own, but you may buy ' +
+            'anyone’s to trade, and the Barbarian’s to hand to him.</p>' +
             '<div class="shop-grid">' + gearHtml + '</div>' +
             '<h3>Food</h3>' +
             '<p class="shop-section-note">The same dishes from the Cosy Cabin, ' +
@@ -18839,7 +21012,9 @@ kbd {
             fragPickHtml(p, other, prefix, mine) +
             (cards
                 ? '<div class="item-grid trade-pick">' +
-                    p.inventory.map(i => checkItem(prefix + '-item', i.uid, D.ITEMS[i.id].name)).join('') +
+                    p.inventory.map(i => checkItem(prefix + '-item', i.uid, D.ITEMS[i.id].name +
+                        (i.uid === p.weaponUid || i.uid === p.armourUid || i.uid === p.specialUid
+                            ? ' (in use)' : ''))).join('') +
                     p.powerups.map(i => checkItem(prefix + '-pu', i.uid, D.POWERUPS[i.id].name + ' (card)')).join('') +
                     p.foods.map(i => checkItem(prefix + '-food', i.uid, D.FOODS[i.id].name + ' (food)')).join('') +
                     p.skills.map(i => checkItem(prefix + '-skill', i.uid, D.SKILLS[i.id].name + ' (skill)')).join('') +
@@ -19035,6 +21210,8 @@ kbd {
         NET = SOLO;
         initHome();
         initLobby();
+        initLogFilter();
+        initSquareTips();
 
         $('#modal-back').addEventListener('click', (e) => {
             if (e.target === $('#modal-back') &&

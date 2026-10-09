@@ -996,133 +996,724 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; 
 .bot-count span { flex: 1; font-size: 14px; }
 .bot-count .btn { font-size: 18px; width: 36px; height: 32px; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
 .bot-count b { font-size: 20px; color: var(--gold-bright); min-width: 22px; text-align: center; }
-.mods-summary { font-size: 13px; margin: 6px 0 10px; }
-.mods-summary .mtag {
-    display: inline-flex; align-items: center; gap: 6px; margin: 2px 4px 2px 0; padding: 3px 10px;
-    border-radius: 999px; font-size: 12px; color: var(--cream);
-    background: rgba(255, 255, 255, .05); border: 1px solid var(--line);
-}
-.mtag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.mods-summary { font-size: 13px; margin: 6px 0 10px; line-height: 1.7; }
+.mods-summary .mtag { color: var(--cream); white-space: nowrap; }
+.mtag::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
 .mtag.deadly::before { background: var(--bad); }
 .mtag.relaxed::before { background: var(--good); }
 #lobby-hint { font-size: 13.5px; margin: 10px 0; }
 #btn-start { width: 100%; }
 
 /* ---- living pictures (art.js live()) -----------------------------------
-   Fire flickers, smoke drifts, sparks and bubbles rise, trees, grass and
-   hops sway, flags wave, signs swing, stars twinkle and drift, water
-   shimmers, eyes blink in the dark, rocks fall off the Cliff of Doom, birds
-   cross the sky, and every so often the Wild Brewery's tankard is carried
-   off and a fresh one filled at the tap. How much is the graphics setting's
-   business (the html.gfx-* rules below). Each moving part is its own group,
-   pivoting on its own foot (fill-box). */
+   Fire flickers, smoke billows and drifts, sparks and bubbles rise, potions
+   swirl in their flasks, trees, grass and hops sway, flags wave, signs
+   swing, an awning flaps, stars twinkle and drift, water shimmers, ale
+   drips from a tap, and birds cross the sky (ui.js BIRDS). These go round
+   and round, each at its own pace; Regular takes them all a little slower
+   (--pace). Each moving part is its own group, pivoting on its own foot
+   (fill-box) unless it says otherwise. The things that happen only now and
+   then are below ("Now and then"). How much moves is the graphics
+   setting's business (the html.gfx-* rules further down). */
+:root { --pace: 1; }
 [class^="an-"] { transform-box: fill-box; }
-.an-flame { transform-origin: 50% 100%; animation: an-flame 1.3s ease-in-out infinite alternate; }
+.an-flame { transform-origin: 50% 100%; animation: an-flame calc(1.3s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-flame {
     0%   { transform: scale(1, .88) skewX(-4deg); }
     50%  { transform: scale(.95, 1.05) skewX(2deg); }
     100% { transform: scale(1.04, 1.1) skewX(4deg); }
 }
-.an-smoke { transform-origin: 50% 100%; animation: an-smoke 4.6s ease-in-out infinite; }
+.an-smoke { transform-origin: 50% 100%; animation: an-smoke calc(4.6s * var(--pace)) ease-in-out infinite; }
 @keyframes an-smoke {
     0%, 100% { transform: translate(0, 0) scale(1); opacity: .95; }
     55%      { transform: translate(1.2px, -2.6px) scale(1.14); opacity: .5; }
 }
-.an-spark { animation: an-spark 1.7s ease-out infinite; }
+.an-spark { animation: an-spark calc(1.7s * var(--pace)) ease-out infinite; }
 @keyframes an-spark { 0% { transform: translate(0, 2px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(1px, -5px); opacity: 0; } }
-.an-bubble { transform-origin: 50% 50%; animation: an-bubble 2.2s ease-in infinite; }
+.an-bubble { transform-origin: 50% 50%; animation: an-bubble calc(2.2s * var(--pace)) ease-in infinite; }
 @keyframes an-bubble { 0% { transform: translate(0, 3px) scale(.5); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(0, -4px) scale(1.1); opacity: 0; } }
-.an-sway { transform-origin: 50% 100%; animation: an-sway 5.4s ease-in-out infinite alternate; }
+.an-sway { transform-origin: 50% 100%; animation: an-sway calc(5.4s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-sway { from { transform: rotate(-1.8deg); } to { transform: rotate(1.8deg); } }
-.an-sway-soft { transform-origin: 50% 100%; animation: an-sway-soft 6.8s ease-in-out infinite alternate; }
+.an-sway-soft { transform-origin: 50% 100%; animation: an-sway-soft calc(6.8s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-sway-soft { from { transform: rotate(-1deg) scaleY(.99); } to { transform: rotate(1deg) scaleY(1.01); } }
-.an-grass { transform-origin: 50% 100%; animation: an-grass 3.2s ease-in-out infinite alternate; }
+.an-grass { transform-origin: 50% 100%; animation: an-grass calc(3.2s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-grass { from { transform: skewX(-9deg); } to { transform: skewX(9deg); } }
-.an-flag { transform-origin: 0 50%; animation: an-flag 2.3s ease-in-out infinite alternate; }
+.an-flag { transform-origin: 0 50%; animation: an-flag calc(2.3s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-flag { from { transform: skewY(-5deg) scaleX(.96); } to { transform: skewY(4deg) scaleX(1.02); } }
-.an-swing { transform-origin: 50% 0; animation: an-swing 3.6s ease-in-out infinite alternate; }
+.an-swing { transform-origin: 50% 0; animation: an-swing calc(3.6s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-swing { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
-.an-twinkle { transform-origin: 50% 50%; animation: an-twinkle 3.4s ease-in-out infinite; }
+.an-twinkle { transform-origin: 50% 50%; animation: an-twinkle calc(3.4s * var(--pace)) ease-in-out infinite; }
 @keyframes an-twinkle { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 45% { transform: scale(.5) rotate(30deg); opacity: .5; } }
-.an-drift { animation: an-drift 9s ease-in-out infinite alternate; }
+.an-drift { animation: an-drift calc(9s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-drift { from { transform: translate(-1px, .5px); } to { transform: translate(1px, -.5px); } }
-.an-water { animation: an-water 1.4s ease-in-out infinite alternate; }
+.an-water { animation: an-water calc(1.4s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-water { from { opacity: 1; } to { opacity: .5; } }
-.an-float { transform-origin: 50% 50%; animation: an-float 3.8s ease-in-out infinite; }
+.an-float { transform-origin: 50% 50%; animation: an-float calc(3.8s * var(--pace)) ease-in-out infinite; }
 @keyframes an-float { 0% { transform: translateY(1.5px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-4.5px); opacity: 0; } }
-.an-wisp { transform-origin: 50% 100%; animation: an-wisp 3.4s ease-in-out infinite alternate; }
+.an-wisp { transform-origin: 50% 100%; animation: an-wisp calc(3.4s * var(--pace)) ease-in-out infinite alternate; }
 @keyframes an-wisp { from { transform: translateY(0) skewX(-7deg); opacity: .75; } to { transform: translateY(-1.6px) skewX(7deg); opacity: 1; } }
-.an-blink { transform-origin: 50% 50%; animation: an-blink 6.5s linear infinite; }
-@keyframes an-blink { 0%, 90%, 96%, 100% { transform: scaleY(1); } 93% { transform: scaleY(.1); } }
-.an-fall { transform-origin: 50% 50%; animation: an-fall 6s ease-in infinite; }
-@keyframes an-fall {
-    0%, 50% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-    80%     { transform: translate(2px, 16px) rotate(110deg); opacity: 0; }
-    81%, 90% { transform: translate(0, -3px); opacity: 0; }
-    100%    { transform: translate(0, 0); opacity: 1; }
+/* Smoke from the chimneys (the bakery, Ametin's Inn, the Commoner's
+   Quarter): four puffs a cycle (art.js billow()), each born small at the
+   chimney's mouth, rising, swelling and drifting with the wind (--wind,
+   and up by --rise) as it thins away. */
+.an-billow { transform-origin: 50% 50%; animation: an-billow calc(4.4s * var(--pace)) cubic-bezier(.3, .2, .6, 1) infinite; }
+@keyframes an-billow {
+    0%   { transform: translate(0, 1.5px) scale(.3); opacity: 0; }
+    10%  { opacity: 1; }
+    45%  { transform: translate(calc(var(--wind, 3px) * .4), calc(var(--rise, -14px) * .43)) scale(.95); opacity: .9; }
+    100% { transform: translate(var(--wind, 3px), var(--rise, -14px)) scale(1.6); opacity: 0; }
 }
-.an-comet { animation: an-comet 9s ease-in-out infinite; }
+/* The potion squares (art.js flask(), fizz): the potion tilts gently one
+   way and the other in its round flask (turning about the flask's middle,
+   so it never leaves the glass), and bubbles rise through it, swell at the
+   top and are gone. */
+.an-slosh { transform-box: view-box; transform-origin: 0 0; animation: an-slosh calc(3.4s * var(--pace)) ease-in-out infinite alternate; }
+@keyframes an-slosh { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+.an-fizz { transform-origin: 50% 50%; animation: an-fizz calc(2.3s * var(--pace)) ease-in infinite; }
+@keyframes an-fizz {
+    0%   { transform: translate(0, 0) scale(.4); opacity: 0; }
+    15%  { opacity: 1; }
+    50%  { transform: translate(.3px, -2.4px) scale(.8); }
+    82%  { transform: translate(-.2px, -4.3px) scale(1); opacity: 1; }
+    94%, 100% { transform: translate(0, -4.8px) scale(1.3); opacity: 0; }
+}
+/* The Farmer's Market: the scalloped edge of the awning lifting and
+   flapping in the breeze, hung from its top. */
+.an-flutter { transform-origin: 50% 0; animation: an-flutter calc(1.9s * var(--pace)) ease-in-out infinite alternate; }
+@keyframes an-flutter {
+    0%   { transform: scaleY(.96) skewX(2deg); }
+    50%  { transform: scaleY(1.12) skewX(-3deg); }
+    100% { transform: scaleY(1.02) skewX(4deg); }
+}
+/* Roan's Tavern: a drop of ale gathers at the cask's tap, stretches,
+   falls into the puddle and splashes. Still, it hangs at the tap. */
+.an-drop { transform-origin: 50% 0; animation: an-drop calc(2.4s * var(--pace)) ease-in infinite; }
+@keyframes an-drop {
+    0%   { transform: translateY(0) scale(.2); opacity: 0; }
+    10%  { opacity: 1; }
+    56%  { transform: translateY(0) scale(1, 1); }
+    62%  { transform: translateY(.3px) scale(.95, 1.15); }
+    74%  { transform: translateY(2.6px) scale(.9, 1.1); opacity: 1; }
+    75%, 100% { transform: translateY(2.6px) scale(.9, 1.1); opacity: 0; }
+}
+.an-splash { transform-origin: 50% 100%; opacity: 0; animation: an-splash calc(2.4s * var(--pace)) ease-out infinite; }
+@keyframes an-splash {
+    0%, 74% { transform: scale(.5); opacity: 0; }
+    76%     { transform: scale(.8); opacity: 1; }
+    90%, 100% { transform: scale(1.3); opacity: 0; }
+}
+/* The crows at the Cursed Ruins, seen side on: wings up, then beaten down
+   below the body. */
+.an-flap { transform-origin: 50% 85%; animation: an-flap .4s ease-in-out infinite alternate; }
+@keyframes an-flap { from { transform: scaleY(1); } to { transform: scaleY(-.6); } }
+/* The birds over the board, seen from above: the wings foreshortening as
+   they beat up and down (ui.js BIRDS flies the flock itself). */
+.an-wings { transform-origin: 50% 50%; animation: an-wings .3s ease-in-out infinite alternate; }
+@keyframes an-wings { from { transform: scaleY(1); } to { transform: scaleY(.18); } }
+
+/* ---- Now and then (art.js cue(); ui.js CUES) -----------------------------
+   The moments that come every so often rather than over and over: an axe
+   thrown, a rock off the cliff, a lamp lit, a bell rung. ui.js CUES keeps
+   each one's time (a little less often than before on Regular, more often
+   when the GPU is to hurt, never on Kūmara) and sets it off by putting
+   class `go` on it afresh; its parts play their part once (`both`: before
+   and after, each stands as it does at rest). `rev` runs it the other way.
+   Their easing is var(--ev*, ...) so that Regular can take them in steps.
+   Parts that are only there while they move (the axe, the straw, the dust,
+   the stamp) are hidden at rest; a few that belong to the still picture
+   (the falling rocks and their trails, the crows over the ruins, the ale
+   running from the brewery's tap) are there on Kūmara only. */
+html:not(.gfx-potato) .an-rock, html:not(.gfx-potato) .an-trail,
+html:not(.gfx-potato) .an-glide, html:not(.gfx-potato) .an-pour { opacity: 0; }
+
+/* The training camp: the axe spins in from the right (two turns, turning
+   the way a thrown axe does), sticks in the target, quivers, is left a
+   while and pulled out; the dummy rocks back as it bites and straw flies. */
+.an-axe { transform-origin: 35% 30%; opacity: 0; }
+.cue.go .an-axe { animation: an-axe 3.4s var(--ev6, linear) both; }
+@keyframes an-axe {
+    0%, 2.9%  { transform: translate(26px, -9px) rotate(720deg); opacity: 0; }
+    3.6%      { opacity: 1; }
+    14.3%     { transform: translate(12px, -11px) rotate(360deg); opacity: 1; }
+    25.6%     { transform: translate(0, 0) rotate(0deg); }
+    28.8%     { transform: translate(-.3px, .1px) rotate(-7deg); }
+    32.1%     { transform: translate(0, 0) rotate(4deg); }
+    35.3%     { transform: translate(0, 0) rotate(-2deg); }
+    38.5%, 87.1% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    96.8%, 100% { transform: translate(3px, -2px) rotate(-12deg); opacity: 0; }
+}
+.an-dummy { transform-origin: 50% 100%; }
+.cue.go .an-dummy { animation: an-dummy 3.4s var(--ev6, ease-out) both; }
+@keyframes an-dummy {
+    0%, 25.6%   { transform: rotate(0deg); }
+    28.8%       { transform: rotate(-4deg); }
+    33.7%       { transform: rotate(2.4deg); }
+    38.5%       { transform: rotate(-1.2deg); }
+    43.4%, 100% { transform: rotate(0deg); }
+}
+.an-straw { transform-origin: 50% 50%; opacity: 0; }
+.cue.go .an-straw { animation: an-straw 3.4s var(--ev6, ease-out) both; }
+@keyframes an-straw {
+    0%, 25.3% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    25.6%     { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    48.2%, 100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); opacity: 0; }
+}
+/* The Soldier Garrison: a man on the wall walks a few steps along it (--w)
+   and back, each in his own time; the two at the door lift their spears
+   and stamp them down together. */
+.cue.go .an-sentry { animation: an-sentry 7s var(--ev6, ease-in-out) both; }
+@keyframes an-sentry {
+    0%, 1.4%   { transform: translate(0, 0); }
+    9.1%       { transform: translate(calc(var(--w) * .25), -.6px); }
+    16.9%      { transform: translate(calc(var(--w) * .5), 0); }
+    24.6%      { transform: translate(calc(var(--w) * .75), -.6px); }
+    32.3%, 68.3% { transform: translate(var(--w), 0); }
+    76%        { transform: translate(calc(var(--w) * .75), -.6px); }
+    83.7%      { transform: translate(calc(var(--w) * .5), 0); }
+    91.4%      { transform: translate(calc(var(--w) * .25), -.6px); }
+    99.1%, 100% { transform: translate(0, 0); }
+}
+.cue.go .an-salute { animation: an-salute 1s var(--ev6, ease-in-out) both; }
+@keyframes an-salute {
+    0%, 10%   { transform: translateY(0); }
+    46%       { transform: translateY(-2.6px); }
+    70%       { transform: translateY(.3px); }
+    88%, 100% { transform: translateY(0); }
+}
+/* The Cliff of Doom (art.js fallingRock(), smash()): the rock appears on
+   the lip (--sx, --sy from where the still picture has it), wobbles, tips
+   over, falls with its trail, smashes down on the floor of the drop
+   (--ex, --ey) and bounces, then crumbles away. At the moment it lands a
+   fan of red strikes bursts up, the floor cracks, chips fly and dust rolls
+   out both sides, and the whole picture jolts (.an-quake, the `.shaker`
+   ui.js sets off with it). */
+.cue.go .an-rock { animation: an-rock 5s var(--ev6, linear) both; }
+@keyframes an-rock {
+    0%        { transform: translate(var(--sx), var(--sy)); opacity: 0; }
+    7%, 34.2% { transform: translate(var(--sx), var(--sy)); opacity: 1; }
+    39%       { transform: translate(calc(var(--sx) + 1.4px), calc(var(--sy) + .8px)); }
+    43.3%     { transform: translate(calc(var(--sx) + (var(--ex) - var(--sx)) * .55), calc(var(--sy) + (var(--ey) - var(--sy)) * .3)); }
+    47.4%     { transform: translate(var(--ex), var(--ey)); }
+    49.8%     { transform: translate(calc(var(--ex) + 1.4px), calc(var(--ey) - 2px)); }
+    52.2%     { transform: translate(calc(var(--ex) + 2px), var(--ey)); }
+    53.9%     { transform: translate(calc(var(--ex) + 2.4px), calc(var(--ey) - .6px)); }
+    55.8%, 84.6% { transform: translate(calc(var(--ex) + 2.6px), var(--ey)); opacity: 1; }
+    99%, 100% { transform: translate(calc(var(--ex) + 2.6px), var(--ey)); opacity: 0; }
+}
+.an-tumble { transform-origin: 50% 50%; }
+.cue.go .an-tumble { animation: an-tumble 5s var(--ev6, linear) both; }
+@keyframes an-tumble {
+    0%, 15%   { transform: rotate(0deg); }
+    19.8%     { transform: rotate(-9deg); }
+    24.6%     { transform: rotate(6deg); }
+    29.4%     { transform: rotate(-5deg); }
+    34.2%     { transform: rotate(0deg); }
+    47.4%     { transform: rotate(var(--spin)); }
+    52.2%     { transform: rotate(calc(var(--spin) + 25deg)); }
+    55.8%, 100% { transform: rotate(calc(var(--spin) + 30deg)); }
+}
+.cue.go .an-trail { animation: an-trail 5s linear both; }
+@keyframes an-trail { 0%, 40.2% { opacity: 0; } 43.3%, 46.9% { opacity: 1; } 47.6%, 100% { opacity: 0; } }
+.an-crack { opacity: 0; }
+.cue.go .an-crack { animation: an-crack 5s linear both; }
+@keyframes an-crack { 0%, 47.2% { opacity: 0; } 47.6%, 75% { opacity: 1; } 94.2%, 100% { opacity: 0; } }
+.an-crash { transform-origin: 50% 100%; opacity: 0; }
+.cue.go .an-crash { animation: an-crash 5s var(--ev6, ease-out) both; }
+@keyframes an-crash {
+    0%, 47.2% { transform: scale(.3); opacity: 0; }
+    47.6%     { transform: scale(.5); opacity: 1; }
+    52.2%     { transform: scale(1); opacity: 1; }
+    58.2%, 100% { transform: scale(1.15); opacity: 0; }
+}
+.an-chip { opacity: 0; }
+.cue.go .an-chip { animation: an-chip 5s var(--ev6, linear) both; }
+@keyframes an-chip {
+    0%, 47.2% { transform: translate(0, 0); opacity: 0; }
+    47.6%     { transform: translate(0, 0); opacity: 1; }
+    53.4%     { transform: translate(calc(var(--dx) * .6), var(--dy)); opacity: 1; }
+    60.6%, 100% { transform: translate(var(--dx), 1px); opacity: 0; }
+}
+.an-dust { transform-origin: 50% 50%; opacity: 0; }
+.cue.go .an-dust { animation: an-dust 5s var(--ev6, ease-out) both; }
+@keyframes an-dust {
+    0%, 47.2% { transform: translate(0, 0) scale(.3); opacity: 0; }
+    47.6%     { transform: translate(0, 0) scale(.4); opacity: 1; }
+    75%, 100% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0; }
+}
+.an-quake.go { animation: an-quake 5s var(--ev6, linear) both; }
+@keyframes an-quake {
+    0%, 47.4%  { transform: translate(0, 0); }
+    48.2%      { transform: translate(-.8px, .4px); }
+    49.4%      { transform: translate(.7px, -.3px); }
+    50.6%      { transform: translate(-.3px, .2px); }
+    51.8%, 100% { transform: translate(0, 0); }
+}
+/* The Vault of Comets: the comet streaks off out of the picture and a
+   while later sweeps back into its place. */
+.cue.go .an-comet { animation: an-comet 2.5s ease-in-out both; }
 @keyframes an-comet {
-    0%, 62% { transform: translate(0, 0); opacity: 1; }
-    74%     { transform: translate(-7px, 3px); opacity: 0; }
-    75%     { transform: translate(9px, -4px); opacity: 0; }
-    88%, 100% { transform: translate(0, 0); opacity: 1; }
+    0%, 3.2% { transform: translate(0, 0); opacity: 1; }
+    46.4%    { transform: translate(-7px, 3px); opacity: 0; }
+    50%      { transform: translate(9px, -4px); opacity: 0; }
+    96.8%, 100% { transform: translate(0, 0); opacity: 1; }
 }
-.an-glide { animation: an-glide 14s linear infinite; }
+/* The Cursed Ruins: two crows glide across. */
+.cue.go .an-glide { animation: an-glide 6.3s linear both; }
 @keyframes an-glide {
-    0%   { transform: translate(-34px, 3px); opacity: 0; }
-    4%   { opacity: 1; }
-    40%  { transform: translate(14px, -2px); opacity: 1; }
-    44%, 100% { transform: translate(20px, -3px); opacity: 0; }
-}
-.an-flap { transform-origin: 50% 50%; animation: an-flap .45s ease-in-out infinite alternate; }
-@keyframes an-flap { from { transform: scaleY(1); } to { transform: scaleY(.3); } }
-.an-flock { animation: an-flock 38s linear infinite; }
-@keyframes an-flock {
-    0%        { transform: translate(-90px, 150px); }
-    30%, 100% { transform: translate(1330px, 70px); }
+    0%    { transform: translate(-34px, 3px); opacity: 0; }
+    8.9%  { opacity: 1; }
+    88.9% { transform: translate(14px, -2px); opacity: 1; }
+    97.8%, 100% { transform: translate(20px, -3px); opacity: 0; }
 }
 /* The brewery's tankard: full, carried off, a fresh one set under the
    tap, the ale running into it and its head of foam rising. Still, it is
    simply full under a running tap. */
-.an-mug { animation: an-mug 16s ease-in-out infinite; }
+.cue.go .an-mug { animation: an-mug 5.3s ease-in-out both; }
 @keyframes an-mug {
-    0%, 58% { transform: translateX(0); opacity: 1; }
-    64%     { transform: translateX(13px); opacity: 0; }
-    65%     { transform: translateX(-11px); opacity: 0; }
-    71%, 100% { transform: translateX(0); opacity: 1; }
+    0%, 1.9% { transform: translateX(0); opacity: 1; }
+    20%      { transform: translateX(13px); opacity: 0; }
+    23%      { transform: translateX(-11px); opacity: 0; }
+    41.1%, 100% { transform: translateX(0); opacity: 1; }
 }
-.an-foam { transform-origin: 50% 100%; animation: an-foam 16s ease-in-out infinite; }
-@keyframes an-foam { 0%, 58% { transform: scale(1, 1); } 64%, 73% { transform: scale(.8, 0); } 90%, 100% { transform: scale(1, 1); } }
-.an-pour { animation: an-pour 16s linear infinite; }
-@keyframes an-pour { 0%, 71% { opacity: 0; } 72%, 89% { opacity: 1; } 90%, 100% { opacity: 0; } }
+.an-foam { transform-origin: 50% 100%; }
+.cue.go .an-foam { animation: an-foam 5.3s ease-in-out both; }
+@keyframes an-foam { 0%, 1.9% { transform: scale(1, 1); } 20%, 47.2% { transform: scale(.8, 0); } 98.5%, 100% { transform: scale(1, 1); } }
+.cue.go .an-pour { animation: an-pour 5.3s linear both; }
+@keyframes an-pour { 0%, 41.1% { opacity: 0; } 44.2%, 95.5% { opacity: 1; } 98.5%, 100% { opacity: 0; } }
+/* Eyes in the dark (the Darkwood, the Thieves' Guild) blink. */
+.an-blink { transform-origin: 50% 50%; }
+.cue.go .an-blink { animation: an-blink .5s linear both; }
+@keyframes an-blink { 0%, 10%, 88%, 100% { transform: scaleY(1); } 49% { transform: scaleY(.1); } }
+/* Draw 1 Item Card: a pale glint runs down the sword's blade. */
+.an-glint { opacity: 0; }
+.cue.go .an-glint { animation: an-glint 1.2s var(--ev8, ease-in-out) both; }
+@keyframes an-glint {
+    0%   { transform: translateY(-20px); opacity: 0; }
+    14%  { opacity: 1; }
+    82%  { opacity: 1; }
+    100% { transform: translateY(1.6px); opacity: 0; }
+}
+/* Route Split: a gust rocks the boards on their nails, each settling in a
+   few swings, and blows a leaf or two across, turning over as they go. */
+.an-creak { transform-origin: 96% 50%; }
+.an-creak-up { transform-origin: 50% 96%; }
+.cue.go .an-creak { animation: an-creak 2.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-creak-up { animation: an-creak 2.6s var(--ev6, ease-in-out) .12s both; }
+@keyframes an-creak {
+    0%   { transform: rotate(0deg); }
+    12%  { transform: rotate(-4.5deg); }
+    26%  { transform: rotate(3deg); }
+    40%  { transform: rotate(-2deg); }
+    54%  { transform: rotate(1.2deg); }
+    68%  { transform: rotate(-.6deg); }
+    82%, 100% { transform: rotate(0deg); }
+}
+.an-blow { opacity: 0; }
+.cue.go .an-blow { animation: an-blow 1.8s var(--ev8, linear) both; }
+@keyframes an-blow {
+    0%   { transform: translate(0, 0); opacity: 1; }
+    25%  { transform: translate(18px, -3px); }
+    50%  { transform: translate(36px, 1px); }
+    75%  { transform: translate(54px, -2.4px); }
+    100% { transform: translate(72px, -5px); opacity: 1; }
+}
+.an-whirl { transform-origin: 50% 50%; }
+.cue.go .an-whirl { animation: an-whirl .6s var(--ev8, linear) 3 both; }
+@keyframes an-whirl { from { transform: rotate(0deg) scaleY(1); } 50% { transform: rotate(180deg) scaleY(.4); } to { transform: rotate(360deg) scaleY(1); } }
+/* Soldier Patrol: the two march a few steps along their beat in step,
+   halt, turn about (narrowing to nothing and opening the other way), march
+   back, halt and turn again. */
+.an-about { transform-origin: 50% 50%; }
+.cue.go .an-march { animation: an-march 5.6s var(--ev4, ease-in-out) both; }
+.cue.go .an-about { animation: an-about 5.6s var(--ev4, linear) both; }
+@keyframes an-march {
+    0%, 3.6% { transform: translate(0, 0); }
+    7.6%   { transform: translate(.75px, -.5px); }
+    11.6%  { transform: translate(1.5px, 0); }
+    15.6%  { transform: translate(2.25px, -.5px); }
+    19.6%  { transform: translate(3px, 0); }
+    23.7%  { transform: translate(3.75px, -.5px); }
+    27.7%  { transform: translate(4.5px, 0); }
+    31.7%  { transform: translate(5.25px, -.5px); }
+    35.7%, 48.2% { transform: translate(6px, 0); }
+    52.2%  { transform: translate(5.25px, -.5px); }
+    56.3%  { transform: translate(4.5px, 0); }
+    60.3%  { transform: translate(3.75px, -.5px); }
+    64.3%  { transform: translate(3px, 0); }
+    68.3%  { transform: translate(2.25px, -.5px); }
+    72.3%  { transform: translate(1.5px, 0); }
+    76.3%  { transform: translate(.75px, -.5px); }
+    80.4%, 100% { transform: translate(0, 0); }
+}
+@keyframes an-about {
+    0%, 40.6%   { transform: scaleX(1); }
+    43.4%, 87.4% { transform: scaleX(-1); }
+    90.2%, 100% { transform: scaleX(1); }
+}
+/* Thorn Bush Valley: the red bud swells and opens into a thorn rose, which
+   breathes a while and closes back into the bud. */
+.an-bud { transform-origin: 50% 100%; }
+.an-petals { transform-box: view-box; transform-origin: 0 0; opacity: 0; }
+.cue.go .an-bud { animation: an-bud 4.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-petals { animation: an-petals 4.6s var(--ev6, ease-in-out) both; }
+@keyframes an-bud {
+    0%   { transform: scale(1); opacity: 1; }
+    10%  { transform: scale(1.12, 1.2); opacity: 1; }
+    20%, 80% { transform: scale(.4); opacity: 0; }
+    92%, 100% { transform: scale(1); opacity: 1; }
+}
+@keyframes an-petals {
+    0%, 12% { transform: scale(.2) rotate(-40deg); opacity: 0; }
+    16%  { opacity: 1; }
+    28%  { transform: scale(1.08) rotate(4deg); }
+    34%  { transform: scale(1) rotate(0deg); }
+    50%  { transform: scale(1.04) rotate(0deg); }
+    66%  { transform: scale(1) rotate(0deg); opacity: 1; }
+    84%  { transform: scale(.25) rotate(-30deg); opacity: 1; }
+    88%, 100% { transform: scale(.2) rotate(-40deg); opacity: 0; }
+}
+/* Roan's Tavern: the tankard's head of foam swells up and two runs of it
+   creep down the side and are gone. */
+.an-swell { transform-origin: 50% 100%; }
+.an-spill { transform-origin: 50% 0; opacity: 0; }
+.cue.go .an-swell { animation: an-swell 3.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-spill { animation: an-spill 3.6s var(--ev6, ease-out) both; }
+@keyframes an-swell {
+    0%   { transform: scale(1, 1); }
+    20%  { transform: scale(1.06, 1.28); }
+    30%  { transform: scale(1.08, 1.32); }
+    50%  { transform: scale(1.04, 1.14); }
+    80%, 100% { transform: scale(1, 1); }
+}
+@keyframes an-spill {
+    0%, 22% { transform: scaleY(.1); opacity: 0; }
+    24%  { opacity: 1; }
+    52%  { transform: scaleY(1); }
+    78%  { transform: scaleY(1.12); opacity: 1; }
+    94%, 100% { transform: scaleY(1.12); opacity: 0; }
+}
+/* The Commoner's Quarter: a lamp lit in a dark window (it catches,
+   flickers and burns steady), and later put out. */
+.an-lamp { opacity: 0; }
+.cue.go .an-lamp { animation: an-lamp 8s var(--ev4, ease-in-out) both; }
+@keyframes an-lamp {
+    0%   { opacity: 0; }
+    4%   { opacity: .55; }
+    6%   { opacity: .25; }
+    10%, 86% { opacity: 1; }
+    94%, 100% { opacity: 0; }
+}
+/* The Noble's Secret: the seal stamp comes down out of the air, its
+   shadow gathering under it, presses (the wax spreads under it and
+   settles) and lifts away. */
+.an-press { transform-origin: 50% 50%; }
+.an-stamp { transform-origin: 50% 100%; opacity: 0; }
+.an-stampshade { transform-origin: 50% 50%; opacity: 0; }
+.cue.go .an-stamp { animation: an-stamp 2.8s var(--ev6, ease-in-out) both; }
+.cue.go .an-stampshade { animation: an-stampshade 2.8s var(--ev6, ease-in-out) both; }
+.cue.go .an-press { animation: an-press 2.8s var(--ev6, ease-out) both; }
+@keyframes an-stamp {
+    0%   { transform: translateY(-11px) scaleY(1); opacity: 0; }
+    12%  { transform: translateY(-11px) scaleY(1); opacity: 1; }
+    32%  { transform: translateY(0) scaleY(1); }
+    35%  { transform: translateY(.3px) scaleY(.92); }
+    52%, 56% { transform: translateY(0) scaleY(1); }
+    76%  { transform: translateY(-11px) scaleY(1); opacity: 1; }
+    88%, 100% { transform: translateY(-12px) scaleY(1); opacity: 0; }
+}
+@keyframes an-stampshade {
+    0%, 8% { transform: scale(.5); opacity: 0; }
+    32%, 56% { transform: scale(1); opacity: 1; }
+    80%, 100% { transform: scale(.5); opacity: 0; }
+}
+@keyframes an-press {
+    0%, 33% { transform: scale(1); }
+    36%  { transform: scale(1.14); }
+    46%  { transform: scale(1.03); }
+    56%, 100% { transform: scale(1); }
+}
+/* Tip & Tap's Trip Traps. The jaw trap: a leaf drifts down, rocking, onto
+   the plate, and the jaws snap shut on it, flat ring gone and the closed
+   arch standing in its place at once, with a fan of strokes, a puff of
+   dust either side and a jolt; a while later the jaws ease open again.
+   Both turn on the hinge (21, 34.8). The bell: the wire twangs (its two
+   halves turning on their stakes), the bell rides it and swings and rings,
+   its clapper swinging after it, the strokes of its ringing on the side it
+   swings to, all dying away. */
+.an-jaws-open, .an-jaws-shut { transform-box: view-box; transform-origin: 21px 34.8px; }
+.an-jaws-shut { opacity: 0; }
+.an-leaffall { opacity: 0; }
+.an-leafspin { transform-origin: 50% 50%; }
+.an-strike { transform-origin: 50% 100%; opacity: 0; }
+.an-puff { transform-origin: 50% 50%; opacity: 0; }
+.cue.go .an-jaws-open { animation: an-jaws-open 5.2s var(--ev6, ease-out) both; }
+.cue.go .an-jaws-shut { animation: an-jaws-shut 5.2s var(--ev6, ease-out) both; }
+.cue.go .an-jolt { animation: an-jolt 5.2s linear both; }
+.cue.go .an-leaffall { animation: an-leaffall 5.2s var(--ev6, ease-in-out) both; }
+.cue.go .an-leafspin { animation: an-leafspin 5.2s var(--ev6, ease-in-out) both; }
+.cue.go .an-strike { animation: an-strike 5.2s var(--ev6, ease-out) both; }
+.cue.go .an-puff { animation: an-puff 5.2s var(--ev6, ease-out) both; }
+@keyframes an-leaffall {
+    0%    { transform: translate(10px, -31px); opacity: 0; }
+    4%    { opacity: 1; }
+    9%    { transform: translate(4px, -24px); }
+    15%   { transform: translate(9px, -16px); }
+    21%   { transform: translate(2.4px, -8px); }
+    28%   { transform: translate(0, 0); opacity: 1; }
+    28.6%, 100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes an-leafspin {
+    0%   { transform: rotate(-30deg); }
+    9%   { transform: rotate(35deg); }
+    15%  { transform: rotate(-28deg); }
+    21%  { transform: rotate(24deg); }
+    28%, 100% { transform: rotate(-8deg); }
+}
+@keyframes an-jaws-open {
+    0%, 28.2% { transform: scaleY(1); opacity: 1; }
+    29.6%, 76% { transform: scaleY(0); opacity: 0; }
+    77%       { transform: scaleY(.1); opacity: 1; }
+    90%, 100% { transform: scaleY(1); opacity: 1; }
+}
+@keyframes an-jaws-shut {
+    0%, 28.2% { transform: scaleY(.3); opacity: 0; }
+    28.4%     { transform: scaleY(.3); opacity: 1; }
+    29.8%     { transform: scaleY(1.14); }
+    31.6%     { transform: scaleY(.94); }
+    33.4%, 76% { transform: scaleY(1); opacity: 1; }
+    88%       { transform: scaleY(.12); opacity: 1; }
+    89%, 100% { transform: scaleY(.12); opacity: 0; }
+}
+@keyframes an-jolt {
+    0%, 29.6% { transform: translate(0, 0); }
+    30.4%     { transform: translate(-.8px, .3px); }
+    31.2%     { transform: translate(.7px, -.2px); }
+    32%       { transform: translate(-.4px, .1px); }
+    32.8%, 100% { transform: translate(0, 0); }
+}
+@keyframes an-strike {
+    0%, 29.4% { transform: scale(.5); opacity: 0; }
+    29.8%     { transform: scale(.7); opacity: 1; }
+    31.6%     { transform: scale(1.05); opacity: 1; }
+    35%, 100% { transform: scale(1.25); opacity: 0; }
+}
+@keyframes an-puff {
+    0%, 29.4% { transform: translate(0, 0) scale(.4); opacity: 0; }
+    29.8%     { transform: translate(0, 0) scale(.5); opacity: 1; }
+    44%, 100% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0; }
+}
+.an-twang-l { transform-box: view-box; transform-origin: 47px 30.6px; }
+.an-twang-r { transform-box: view-box; transform-origin: 61px 30.6px; }
+.an-ring { transform-box: view-box; transform-origin: 54px 30.9px; }
+.an-clapper { transform-box: view-box; transform-origin: 54px 32.6px; }
+.an-peal { opacity: 0; }
+.cue.go .an-twang-l { animation: an-twang-l 2.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-twang-r { animation: an-twang-r 2.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-bob { animation: an-bob 2.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-ring { animation: an-ring 2.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-clapper { animation: an-clapper 2.6s var(--ev6, ease-in-out) both; }
+.cue.go .an-peal { animation: an-peal 2.6s linear both; }
+/* (where the halves meet springs down 1.1, up .5, down .8 ... and the
+   bell rides on it) */
+@keyframes an-twang-l {
+    0%   { transform: rotate(0deg); }
+    5%   { transform: rotate(9deg); }
+    11%  { transform: rotate(-4.1deg); }
+    17%  { transform: rotate(6.5deg); }
+    23%  { transform: rotate(-.8deg); }
+    30%  { transform: rotate(4.1deg); }
+    38%, 100% { transform: rotate(0deg); }
+}
+@keyframes an-twang-r {
+    0%   { transform: rotate(0deg); }
+    5%   { transform: rotate(-9deg); }
+    11%  { transform: rotate(4.1deg); }
+    17%  { transform: rotate(-6.5deg); }
+    23%  { transform: rotate(.8deg); }
+    30%  { transform: rotate(-4.1deg); }
+    38%, 100% { transform: rotate(0deg); }
+}
+@keyframes an-bob {
+    0%   { transform: translateY(0); }
+    5%   { transform: translateY(1.1px); }
+    11%  { transform: translateY(-.5px); }
+    17%  { transform: translateY(.8px); }
+    23%  { transform: translateY(-.1px); }
+    30%  { transform: translateY(.5px); }
+    38%, 100% { transform: translateY(0); }
+}
+@keyframes an-ring {
+    0%   { transform: rotate(0deg); }
+    8%   { transform: rotate(24deg); }
+    20%  { transform: rotate(-19deg); }
+    32%  { transform: rotate(14deg); }
+    44%  { transform: rotate(-10deg); }
+    56%  { transform: rotate(6.5deg); }
+    68%  { transform: rotate(-4deg); }
+    80%  { transform: rotate(2deg); }
+    90%  { transform: rotate(-.8deg); }
+    100% { transform: rotate(0deg); }
+}
+@keyframes an-clapper {
+    0%   { transform: rotate(0deg); }
+    10%  { transform: rotate(-16deg); }
+    22%  { transform: rotate(18deg); }
+    34%  { transform: rotate(-14deg); }
+    46%  { transform: rotate(10deg); }
+    58%  { transform: rotate(-7deg); }
+    70%  { transform: rotate(4deg); }
+    82%  { transform: rotate(-2deg); }
+    100% { transform: rotate(0deg); }
+}
+@keyframes an-peal {
+    0%, 6%  { opacity: 0; }
+    9%      { opacity: 1; }
+    16%, 32% { opacity: 0; }
+    34%     { opacity: .8; }
+    40%, 56% { opacity: 0; }
+    58%     { opacity: .5; }
+    64%, 100% { opacity: 0; }
+}
+/* Noble's District: somebody with a candle walks the length of a wing,
+   seen only through its windows (art.js candleWalker() clips them), the
+   other way round on `rev`. */
+.an-walk { opacity: 0; }
+.an-face { transform-origin: 50% 50%; }
+.cue.go .an-walk { animation: an-walk 6s linear both; }
+.cue.go.rev .an-walk { animation-direction: reverse; }
+.cue.rev .an-face { transform: scaleX(-1); }
+@keyframes an-walk {
+    0%   { transform: translate(0, 0); opacity: 1; }
+    10%  { transform: translate(calc(var(--d) * .1), -.25px); }
+    20%  { transform: translate(calc(var(--d) * .2), 0); }
+    30%  { transform: translate(calc(var(--d) * .3), -.25px); }
+    40%  { transform: translate(calc(var(--d) * .4), 0); }
+    50%  { transform: translate(calc(var(--d) * .5), -.25px); }
+    60%  { transform: translate(calc(var(--d) * .6), 0); }
+    70%  { transform: translate(calc(var(--d) * .7), -.25px); }
+    80%  { transform: translate(calc(var(--d) * .8), 0); }
+    90%  { transform: translate(calc(var(--d) * .9), -.25px); }
+    100% { transform: translate(var(--d), 0); opacity: 1; }
+}
+/* The Farmer's Market: the top apple rocks, rolls off the pile and along
+   the counter, drops off its end, bounces and rolls away out of the
+   picture; later a fresh one is set back on the pile. It turns as it
+   rolls (about its own middle: the stem shows it). */
+.an-roll, .an-spin { transform-box: view-box; transform-origin: 0 0; }
+.cue.go .an-roll { animation: an-roll 4.4s var(--ev6, ease-in-out) both; }
+.cue.go .an-spin { animation: an-spin 4.4s var(--ev6, ease-in-out) both; }
+@keyframes an-roll {
+    0%, 12% { transform: translate(0, 0) scale(1); opacity: 1; }
+    22%  { transform: translate(-4.4px, 3.2px) scale(1); }
+    30%  { transform: translate(-7.6px, 3.2px) scale(1); }
+    35%  { transform: translate(-8.8px, 6.4px) scale(1); }
+    40%  { transform: translate(-10px, 16.2px) scale(1); }
+    46%  { transform: translate(-11.6px, 13.6px) scale(1); }
+    52%  { transform: translate(-13px, 16.2px) scale(1); }
+    64%  { transform: translate(-21px, 16.2px) scale(1); opacity: 1; }
+    64.2%, 86% { transform: translate(-21px, 16.2px) scale(1); opacity: 0; }
+    86.2% { transform: translate(0, 0) scale(.5); opacity: 0; }
+    100% { transform: translate(0, 0) scale(1); opacity: 1; }
+}
+@keyframes an-spin {
+    0%   { transform: rotate(0deg); }
+    4%   { transform: rotate(-9deg); }
+    8%   { transform: rotate(7deg); }
+    12%  { transform: rotate(0deg); }
+    22%  { transform: rotate(-130deg); }
+    30%  { transform: rotate(-210deg); }
+    40%  { transform: rotate(-260deg); }
+    52%  { transform: rotate(-330deg); }
+    64%, 86% { transform: rotate(-530deg); }
+    86.2%, 100% { transform: rotate(0deg); }
+}
+/* The Palace Gates: the portcullis lifts a hair as its catch slips, drops
+   with a jolt, bounces, settles with a puff of dust from under its spikes,
+   and is wound back up a notch at a time. */
+.cue.go .an-portcullis { animation: an-portcullis 4.8s var(--ev6, ease-in-out) both; }
+@keyframes an-portcullis {
+    0%       { transform: translateY(0); }
+    4%       { transform: translateY(-.5px); }
+    9%       { transform: translateY(3.2px); }
+    11%      { transform: translateY(2.5px); }
+    13%      { transform: translateY(3.1px); }
+    15%, 40% { transform: translateY(3px); }
+    46%, 50% { transform: translateY(2.25px); }
+    56%, 60% { transform: translateY(1.5px); }
+    66%, 70% { transform: translateY(.75px); }
+    76%, 100% { transform: translateY(0); }
+}
+.an-gdust { transform-origin: 50% 50%; opacity: 0; }
+.cue.go .an-gdust { animation: an-gdust 4.8s var(--ev6, ease-out) both; }
+@keyframes an-gdust {
+    0%, 8.8% { transform: translate(0, 0) scale(.4); opacity: 0; }
+    9.2%     { transform: translate(0, 0) scale(.5); opacity: 1; }
+    24%, 100% { transform: translate(var(--dx), -1px) scale(1.5); opacity: 0; }
+}
+/* (The Golden Dice's die tumbles in ui.js GOLDEN_DIE, drawn afresh each frame.) */
 
 /* ---- the graphics setting (ui.js GFX), asked at the start of every game ---
-   Potato: nothing moves but the Pendant (pendantfx.js) and the shield (its
-   dome, and shieldfx.js); no embers, no transitions.
+   Kūmara (gfx-potato: it was Potato until the user renamed it, 2026-10-09):
+   nothing on the page moves at all, the shield's dome included; no embers,
+   no transitions, no shield effect, and the Pendant in a far lighter form
+   (pendantfx.js). The dome stands lit as it does for reduced motion.
    Regular: everything moves, in small steps rather than every frame, so the
-   board is redrawn far less often (the battery's friend), and the birds come
-   by less often.
-   Make my GPU Hurt: everything at the screen's own rate, more embers, the
-   birds more often, the turn timer's ring sweeping rather than ticking. */
-html.gfx-potato *:not(.dome-lit):not(.dome-pulse),
+   board is redrawn far less often (the battery's friend); the pictures go
+   round a little slower (--pace), the moments come a little less often
+   (ui.js CUES), and fewer embers rise and fewer birds come by.
+   Make my GPU Hurt: everything at the screen's own rate, the moments more
+   often, more embers, the birds more often, a bubble more in the potions,
+   the turn timer's ring sweeping rather than ticking, and windows, screens
+   and new lines in the log easing in and out. */
+html.gfx-potato *,
 html.gfx-potato *::before, html.gfx-potato *::after { animation: none !important; transition: none !important; }
-html.gfx-potato .an-flock, html.gfx-potato .embers i { display: none; }
+html.gfx-potato .flock, html.gfx-potato .embers i, html.gfx-potato .an-billow.later { display: none; }
 html.gfx-potato .an-pour { opacity: 1; }
+html.gfx-potato .board-scene .dome-lit { opacity: 1; }
+html.gfx-potato .board-scene .dome-lit.more { display: none; }
+html.gfx-potato .board-scene .dome-pulse { stroke-dashoffset: -40; }
+html:not(.gfx-ultra) .ultra-only { display: none; }
 
+html.gfx-regular {
+    --pace: 1.18;
+    --ev4: steps(4, jump-none);
+    --ev6: steps(6, jump-none);
+    --ev8: steps(8, jump-none);
+}
 html.gfx-regular .an-flame { animation-timing-function: steps(9, jump-none); }
 html.gfx-regular .an-smoke, html.gfx-regular .an-float { animation-timing-function: steps(24, jump-none); }
 html.gfx-regular .an-sway, html.gfx-regular .an-sway-soft { animation-timing-function: steps(28, jump-none); }
 html.gfx-regular .an-grass, html.gfx-regular .an-flag, html.gfx-regular .an-swing, html.gfx-regular .an-wisp { animation-timing-function: steps(18, jump-none); }
-html.gfx-regular .an-twinkle, html.gfx-regular .an-water { animation-timing-function: steps(14, jump-none); }
+html.gfx-regular .an-twinkle, html.gfx-regular .an-water, html.gfx-regular .an-slosh { animation-timing-function: steps(14, jump-none); }
 html.gfx-regular .an-drift { animation-timing-function: steps(30, jump-none); }
-html.gfx-regular .an-flock { animation-duration: 56s; }
-html.gfx-regular .an-flap { animation-timing-function: steps(4, jump-none); }
+html.gfx-regular .an-billow { animation-timing-function: steps(20, jump-none); }
+html.gfx-regular .an-fizz, html.gfx-regular .an-flutter { animation-timing-function: steps(10, jump-none); }
+html.gfx-regular .an-drop { animation-timing-function: steps(8, jump-none); }
+html.gfx-regular .an-splash { animation-timing-function: steps(4, jump-none); }
+html.gfx-regular .an-flap, html.gfx-regular .an-wings { animation-timing-function: steps(4, jump-none); }
 
-html.gfx-ultra .an-flock { animation-duration: 20s; }
 html.gfx-ultra .an-flame { animation-duration: 1.05s; }
 html.gfx-ultra .timer .ring circle:last-of-type { transition: stroke-dashoffset 1s linear, stroke .3s ease; }
 html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; }
+/* Make my GPU Hurt: things come and go rather than appearing. A screen
+   fades in (opacity only: a transform would move anything fixed inside
+   it); a window's backdrop fades and the window rises and settles, and
+   closing it (ui.js closeModal/closePanel, .leaving) it sinks and fades;
+   new lines in the log slide in; bars, tabs and the hover card ease. */
+html.gfx-ultra .screen.active { animation: gfx-screen-in .4s ease-out both; }
+@keyframes gfx-screen-in { from { opacity: 0; } to { opacity: 1; } }
+html.gfx-ultra .modal-back.show:not(.mini):not(.dock):not(.leaving) { animation: gfx-back-in .26s ease-out both; }
+@keyframes gfx-back-in { from { opacity: 0; } to { opacity: 1; } }
+html.gfx-ultra .modal { animation: gfx-modal-in .36s cubic-bezier(.16, 1, .3, 1) both; }
+@keyframes gfx-modal-in { from { transform: translateY(16px) scale(.965); opacity: 0; } to { transform: none; opacity: 1; } }
+html.gfx-ultra .modal-back.leaving { animation: gfx-back-out .2s ease-in both; pointer-events: none; }
+html.gfx-ultra .modal-back.leaving .modal { animation: gfx-modal-out .2s ease-in both; pointer-events: none; }
+@keyframes gfx-back-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes gfx-modal-out { from { transform: none; opacity: 1; } to { transform: translateY(10px) scale(.975); opacity: 0; } }
+html.gfx-ultra .log div.fresh { animation: gfx-log-in .45s cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes gfx-log-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+html.gfx-ultra .tabs button, html.gfx-ultra .log-filter button { transition: color .2s ease, background .2s ease, border-color .2s ease; }
+html.gfx-ultra .hp-bar .fill, html.gfx-ultra .hp-bar .bonus { transition: width .6s cubic-bezier(.3, .7, .3, 1); }
+html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezier(.2, .9, .3, 1); }
 
 /* the question itself */
 .gfx-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
@@ -3988,10 +4579,17 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     /* read again in the square's detail card.                              */
     /* ------------------------------------------------------------------ */
 
-    function flask(x, y, s, liquid, glass) {
+    // A round glass flask of `liquid`, corked. `fizz`: the potion swirling
+    // gently in it and bubbles rising through it (style.css .an-slosh,
+    // .an-fizz; one more of them when the GPU is to hurt), for the potion
+    // squares.
+    function flask(x, y, s, liquid, glass, fizz) {
+        const brew = '<path d="M-8.6 2a9 9 0 0 0 17.2 0z" fill="' + liquid + '" stroke="' + INK + '" stroke-width="1.6"/>';
+        const bubble = (bx, r, delay, more) => '<g class="an-fizz' + (more ? ' ultra-only' : '') + '" style="animation-delay:' + delay + 's">' +
+            '<circle cx="' + bx + '" cy="7" r="' + r + '" fill="#ffffff" fill-opacity=".72"/></g>';
         return at(x, y, s,
             grp(glass || '#dfe9ee', '<circle cx="0" cy="0" r="9"/>') +
-            '<path d="M-8.6 2a9 9 0 0 0 17.2 0z" fill="' + liquid + '" stroke="' + INK + '" stroke-width="1.6"/>' +
+            (fizz ? live('slosh', brew) + bubble(-3.2, .75, 0) + bubble(1.4, .55, -.8) + bubble(3.8, .8, -1.5) + bubble(-.8, .5, -1.15, true) : brew) +
             grp(glass || '#dfe9ee', P('M-3-15h6v7h-6z')) +
             grp('#8a5a32', P('M-3.6-19h7.2v5h-7.2z')) +
             '<ellipse cx="-3.5" cy="-3" rx="1.8" ry="3" fill="#ffffff" opacity=".8"/>');
@@ -4172,9 +4770,12 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     // One of the garrison on guard, feet at (x, y): his kettle helmet, his
     // crimson tower shield with the thorn on it, and his spear grounded on
     // his outer side (the left; `flip` stands him the other way round).
+    // Every so often the two at the door lift their spears and stamp them
+    // down together (style.css .an-salute: the shaft, the hand and the point
+    // are three parts of him, each lifted alike).
     function guard(x, y, flip) {
         return at(x, y, 1,
-            line('M-5.6 0V-18', INK, 2) + line('M-5.6 0V-18', '#7a5232', 1) +
+            live('salute', line('M-5.6 0V-18', INK, 2) + line('M-5.6 0V-18', '#7a5232', 1)) +
             grpW('#3a2a20', 1, P('M-3.2 0v-2.6h2.4V0zM.8 0v-2.6h2.4V0z')) +
             grpW(CRIMSON, 1.2, P('M-4.2-11c0-2.4 1.8-3.6 4.2-3.6s4.2 1.2 4.2 3.6v1.4h-8.4z')) +
             line('M-3.6-12.2-5.2-9.8', INK, 2.6) + line('M-3.6-12.2-5.2-9.8', CRIMSON, 1.3) +
@@ -4184,8 +4785,8 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             line('M-1.4-17.6c.6-.6 1.4-.8 2.2-.6', STEEL_L, .7) +
             grpW(CRIMSON, 1.4, P('M-4.2-12.2h8.4v7.6c0 2.6-4.2 4.6-4.2 4.6s-4.2-2-4.2-4.6z')) +
             line('M-3.6-11.8h7.2', STEEL_L, 1.2) + smallSigil(0, -6.8, .4) +
-            '<circle cx="-5.6" cy="-9.4" r="1.1" fill="' + SKIN + '" stroke="' + INK + '" stroke-width=".9"/>' +
-            grpW(STEEL_L, .8, P('M-5.6-21.4l1.3 3.6h-2.6z')), flip);
+            live('salute', '<circle cx="-5.6" cy="-9.4" r="1.1" fill="' + SKIN + '" stroke="' + INK + '" stroke-width=".9"/>') +
+            live('salute', grpW(STEEL_L, .8, P('M-5.6-21.4l1.3 3.6h-2.6z'))), flip);
     }
     // A rose window: panes of coloured glass between stone spokes, a
     // stone ring round them and a boss at the middle, all in `stone`.
@@ -4252,6 +4853,234 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     function live(kind, body, delay) {
         return '<g class="an-' + kind + '"' + (delay ? ' style="animation-delay:' + delay + 's"' : '') + '>' + body + '</g>';
     }
+    // As live(), with the custom properties its keyframes read (`vars`, as
+    // {name: value}) for the parts that each go their own way.
+    function liveVars(kind, vars, body, delay) {
+        const st = Object.keys(vars).map(k => '--' + k + ':' + vars[k]).join(';') + (delay ? ';animation-delay:' + delay + 's' : '');
+        return '<g class="an-' + kind + '" style="' + st + '">' + body + '</g>';
+    }
+    // A moment that comes now and then rather than over and over (style.css
+    // "Now and then"): an axe thrown, a lamp lit, a bell rung. ui.js CUES
+    // keeps its time and sets it off by putting class `go` on it afresh, and
+    // its moving parts (live(), liveVars()) play their part once. `attrs`
+    // can carry data-flip (each time it may run the other way: class `rev`)
+    // and data-shake (it jolts the whole picture, the `.shaker` round it).
+    function cue(kind, body, attrs) {
+        return '<g class="cue" data-cue="' + kind + '"' + (attrs || '') + '>' + body + '</g>';
+    }
+
+    // Smoke billowing out of a chimney whose mouth is at (x, y): four puffs
+    // one after another, each rising (`rise`), swelling, drifting `wind` to
+    // the side and thinning away (style.css .an-billow), so there is always
+    // smoke. (Their delays keep pace with the puffs, which Regular slows a
+    // little: --pace.)
+    // Standing still (Kūmara) it is the one puff on the chimney.
+    const PUFFS = ['M-3.9 2.3c-2.4-1.6-.6-4.6 1.8-3.6.6-2.4 4.4-2.4 4.8 0 2.2-.6 3.4 2 1.6 3.4z',
+        'M-3.4 1.9c-2-1.4-.2-4.2 1.8-3.2.8-2.2 4-2 4.2.2 1.9-.2 2.6 2 .9 3z'];
+    function billow(x, y, s, wind, rise) {
+        let out = '';
+        for (let i = 0; i < 4; i++) {
+            out += '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')">' +
+                '<g class="an-billow' + (i ? ' later' : '') + '" style="--wind:' + wind + 'px;--rise:' + (rise || -14) + 'px;animation-delay:calc(' + (-i * 1.1).toFixed(1) + 's * var(--pace, 1))">' +
+                grpW('#c9c2b4', 1.1, P(PUFFS[i % 2])) + '</g></g>';
+        }
+        return out;
+    }
+
+    // A rock off the Cliff of Doom (style.css .an-rock): drawn where it is
+    // in the still picture, half way down; when things move it is nowhere
+    // until its moment comes (a cue of its own, with smash()), when it
+    // appears on the lip (`from`, its offset from there), wobbles, tips
+    // over, falls with its trail behind it and smashes down on the floor of
+    // the drop (`to`), where smash() throws up the dust.
+    function fallingRock(body, trail, from, to, spin) {
+        return liveVars('rock', { sx: from[0] + 'px', sy: from[1] + 'px', ex: to[0] + 'px', ey: to[1] + 'px' },
+            live('trail', line(trail, '#b8ae9e', 1)) + liveVars('tumble', { spin: spin + 'deg' }, body));
+    }
+    // A rock landing at (x, y): a fan of red strikes, a crack in the floor,
+    // chips of stone thrown up and out, and dust rolling away both sides.
+    function smash(x, y) {
+        const f = v => v.toFixed(2);
+        let fan = '';
+        [-158, -124, -90, -56, -22].forEach((a, i) => {
+            const r = a * Math.PI / 180, r0 = 2.2, r1 = i % 2 ? 4.2 : 5.2;
+            fan += 'M' + f(x + Math.cos(r) * r0) + ' ' + f(y - .8 + Math.sin(r) * r0) + 'L' + f(x + Math.cos(r) * r1) + ' ' + f(y - .8 + Math.sin(r) * r1);
+        });
+        const puff = (dx, dy, r, ox) => liveVars('dust', { dx: dx + 'px', dy: dy + 'px' },
+            '<circle cx="' + f(x + ox) + '" cy="' + f(y - 1.1) + '" r="' + r + '" fill="#b8ae9e" stroke="' + INK + '" stroke-width=".55"/>');
+        const chip = (dx, dy, d) => liveVars('chip', { dx: dx + 'px', dy: dy + 'px' }, grpW('#8a7a6a', .5, P('M' + f(x) + ' ' + f(y - 1) + d)));
+        return live('crack', line('M' + f(x - 3.4) + ' ' + f(y + .3) + 'l1.2.6 1-.8 1.2.9 1.4-.7 1.1.8 1.2-.6', INK, .8)) +
+            puff(-5.4, -1.4, 1.6, -1) + puff(5.6, -1.2, 1.5, 1) + puff(.4, -3.6, 1.3, 0) +
+            chip(-4.6, -4.4, 'l1-.4.6.9-1 .5z') + chip(4.2, -5, 'l.9-.5.5 1-.9.3z') + chip(-1.8, -6.2, 'l.7-.3.4.7-.8.3z') + chip(2.4, -3.2, 'l.8-.2.2.8-.8.1z') +
+            live('crash', '<path d="' + fan + '" fill="none" stroke="#e8603a" stroke-width="1" stroke-linecap="round"/>');
+    }
+
+    // A leaf blown across the picture by a gust at height `y`, turning over
+    // and over as it goes (style.css .an-blow, .an-whirl), `delay` seconds
+    // after the gust starts.
+    function blownLeaf(y, col, delay) {
+        const d = delay ? ' style="animation-delay:' + delay + 's"' : '';
+        return '<g class="an-blow"' + d + '><g transform="translate(-4 ' + y + ')"><g class="an-whirl"' + d + '>' +
+            grpW(col, .6, P('M-2.2 0c1-1.2 3.4-1.2 4.4 0-1 1.2-3.4 1.2-4.4 0z')) + line('M-2.2 0h3.8', '#4a3220', .45) + '</g></g></g>';
+    }
+
+    // A thorn rose open: five red petals round its dark heart, about (0, 0).
+    function thornRose() {
+        let p = '';
+        for (let i = 0; i < 5; i++) p += '<ellipse cx="0" cy="-2.1" rx="1.55" ry="2.3" transform="rotate(' + (i * 72) + ')"/>';
+        return grpW('#c8342b', .7, p) + dot(0, 0, 1.15, '#6d1418') + dot(0, 0, .45, '#f4d23c');
+    }
+
+    // A cottage window `w` by `h`, its top left at (x, y), with its cross of
+    // glazing bars: dark, or `lit`, or dark with a lamp somebody now and
+    // then lights in it and later puts out (`lamp`: a cue of its own).
+    function cottageWindow(x, y, w, h, lit, lamp) {
+        const f = v => +v.toFixed(2), r = 'M' + x + ' ' + y + 'h' + w + 'v' + h + 'h-' + w + 'z';
+        return '<path d="' + r + '" fill="' + (lit ? '#f4c84a' : '#3b3340') + '"/>' +
+            (lamp ? cue('lamp', live('lamp', '<path d="' + r + '" fill="#f4c84a"/>')) : '') +
+            line('M' + f(x + w / 2) + ' ' + y + 'v' + h + 'M' + x + ' ' + f(y + h / 2) + 'h' + w, '#5a3a22', .7) +
+            '<path d="' + r + '" fill="none" stroke="' + INK + '" stroke-width="1"/>';
+    }
+
+    // Somebody carrying a candle along the rooms behind the windows `wins`
+    // (their shapes, as one path), seen only through them: a dark figure
+    // against the lamplight walking from x0 to x1, or now and then the other
+    // way, turned round (style.css .an-walk, `rev`). `id` names the clip to
+    // the windows; squareSvg() makes it different in every copy of the
+    // picture (@ID@).
+    function candleWalker(id, wins, x0, x1) {
+        const figure = '<g fill="#4e3626"><circle cx="0" cy="23.4" r="1.3"/>' +
+            '<path d="M-2.3 30v-3.4c0-1.5 1-2.2 2.3-2.2s2.3.7 2.3 2.2V30z"/></g>' +
+            line('M1.5 26.8l1.9-1.1', '#4e3626', 1.1) +
+            '<path d="M3.2 24.3h1v1.9h-1z" fill="#f4f0e2"/>' +
+            live('flame', '<path d="M3.7 24.3c-.6-.5-.5-1.3 0-1.9.5.6.6 1.4 0 1.9z" fill="#ff8c2a"/>');
+        return '<defs><clipPath id="' + id + '"><path d="' + wins + '"/></clipPath></defs>' +
+            cue('walk', '<g clip-path="url(#' + id + ')"><g transform="translate(' + x0 + ' 0)">' +
+                liveVars('walk', { d: (x1 - x0) + 'px' }, '<g class="an-face">' + figure + '</g>') + '</g></g>', ' data-flip="1"');
+    }
+
+    // The jaw trap sprung: both jaws stood up and pressed together into one
+    // steel arch over the hinge at (21, 34.8), their teeth meshed along it
+    // and the points showing through all round.
+    function trapShut() {
+        const f = v => v.toFixed(2), pt = (a, rx, ry) => f(21 + rx * Math.cos(a)) + ' ' + f(34.8 - ry * Math.sin(a));
+        let teeth = '', zig = '';
+        for (let i = 1; i < 12; i++) {
+            const a = Math.PI * i / 12, w = .075;
+            teeth += 'M' + pt(a - w, 12.6, 11.4) + 'L' + pt(a, 15.4, 14.2) + 'L' + pt(a + w, 12.6, 11.4) + 'z';
+        }
+        for (let i = 0; i <= 18; i++) zig += (i ? 'L' : 'M') + (i % 2 ? pt(Math.PI * (.05 + .05 * i), 12.2, 11) : pt(Math.PI * (.05 + .05 * i), 10.9, 9.7));
+        return grpW(STEEL_L, .8, P(teeth)) +
+            grpW(STEEL, 1.2, P('M7.6 34.8A13.4 12.2 0 0 1 34.4 34.8H31.4A10.4 9.2 0 0 0 10.6 34.8z')) +
+            line(zig, STEEL_L, .7);
+    }
+
+    // Short strokes fanning up and out from just above (x, y): the snap of
+    // something shutting hard.
+    function strikeFan(x, y) {
+        const f = v => v.toFixed(2);
+        return [-160, -126, -90, -54, -20].map((a, i) => {
+            const r = a * Math.PI / 180, r1 = i % 2 ? 4.4 : 5.4;
+            return 'M' + f(x + Math.cos(r) * 2.2) + ' ' + f(y + Math.sin(r) * 2.2) + 'L' + f(x + Math.cos(r) * r1) + ' ' + f(y + Math.sin(r) * r1);
+        }).join('');
+    }
+
+    // A seal stamp standing on its foot at (0, 0): a brass foot under a
+    // turned wooden handle.
+    const SEAL_STAMP = grpW(GOLD, .9, P('M-4.2-1.6v-1.8h8.4v1.8a4.2 1.3 0 0 1-8.4 0z')) +
+        '<ellipse cx="0" cy="-3.4" rx="4.2" ry="1.3" fill="#f0d27a" stroke="' + INK + '" stroke-width=".9"/>' +
+        grpW('#6a4a2e', .9, P('M-1.4-3.8c.3-1.6.3-2.8-.4-4h3.6c-.7 1.2-.7 2.4-.4 4z')) +
+        '<ellipse cx="0" cy="-9.8" rx="2.7" ry="2.4" fill="#7a5232" stroke="' + INK + '" stroke-width=".9"/>' +
+        '<ellipse cx="-.8" cy="-10.5" rx=".8" ry=".55" fill="#a07a50"/>';
+
+    /* ---- the Golden Dice's die ---------------------------------------
+       Drawn from how it is turned in three dimensions, so that ui.js
+       (GOLDEN_DIE) can tumble it onto any face: `M` is the turn (3 x 3, its
+       columns where the die's own right, up and away point) and `lift` how far
+       it is off the ground, in die widths. Seen as the board sees everything,
+       a little from above and from the right: a step right is DIE_W to the
+       right, a step up DIE_W up, and a step away 9/26 of it right and 8/26 of
+       it up. At rest 1 is to the front, 2 on top and 3 to the right, opposite
+       faces make 7 and the pips are set as on a real die. Each face is shaded
+       by the way it faces (the top lightest, the right darkest: the golds of
+       the old flat picture), so the die stays one solid thing as it turns, and
+       its shadow lies under it, smaller and fainter the higher it is thrown. */
+    const DIE_W = 23.4, DIE_MID = [34.5, 28.3], DIE_Z = [9 / 26, 8 / 26];
+    const DIE_REST = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+    const DIE_EYE = [9, 8, -26].map(c => c / Math.hypot(9, 8, 26));
+    const DQ = .25;
+    const DIE_FACES = [
+        { n: [0, 0, -1], u: [1, 0, 0], v: [0, 1, 0], pips: [[0, 0]], r: .14 },
+        { n: [0, 1, 0], u: [1, 0, 0], v: [0, 0, 1], pips: [[-DQ, -DQ], [DQ, DQ]] },
+        { n: [1, 0, 0], u: [0, 0, 1], v: [0, 1, 0], pips: [[-DQ, DQ], [0, 0], [DQ, -DQ]] },
+        { n: [-1, 0, 0], u: [0, 0, -1], v: [0, 1, 0], pips: [[-DQ, -DQ], [-DQ, DQ], [DQ, -DQ], [DQ, DQ]] },
+        { n: [0, -1, 0], u: [1, 0, 0], v: [0, 0, -1], pips: [[-DQ, -DQ], [-DQ, DQ], [0, 0], [DQ, -DQ], [DQ, DQ]] },
+        { n: [0, 0, 1], u: [-1, 0, 0], v: [0, 1, 0], pips: [[-DQ, -DQ], [-DQ, 0], [-DQ, DQ], [DQ, -DQ], [DQ, 0], [DQ, DQ]] }
+    ];
+    // the gold a face is when it looks this way
+    const DIE_TINT = [[[0, 0, -1], [240, 195, 60]], [[0, 1, 0], [248, 220, 120]], [[1, 0, 0], [200, 150, 42]],
+        [[-1, 0, 0], [226, 180, 56]], [[0, -1, 0], [176, 128, 34]], [[0, 0, 1], [190, 140, 40]]];
+    const DIE_CORNERS = [];
+    [-.5, .5].forEach(x => [-.5, .5].forEach(y => [-.5, .5].forEach(z => DIE_CORNERS.push([x, y, z]))));
+    function dieTurn(M, p) { return [0, 1, 2].map(i => M[i][0] * p[0] + M[i][1] * p[1] + M[i][2] * p[2]); }
+    function dieSee(p, lift) {
+        return [DIE_MID[0] + DIE_W * (p[0] + DIE_Z[0] * p[2]), DIE_MID[1] - DIE_W * (p[1] + (lift || 0) + DIE_Z[1] * p[2])];
+    }
+    function dieSvg(M, lift) {
+        const f = v => v.toFixed(2), L = lift || 0;
+        // the shadow: the ground the die is over, a touch to the right
+        const foot = DIE_CORNERS.map(c => dieTurn(M, c)).map(p => [p[0], p[2]]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+        const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+        const half = list => list.reduce((h, p) => {
+            while (h.length > 1 && cross(h[h.length - 2], h[h.length - 1], p) <= 0) h.pop();
+            h.push(p);
+            return h;
+        }, []);
+        const lo = half(foot), hi = half(foot.slice().reverse());
+        const hull = lo.slice(0, -1).concat(hi.slice(0, -1));
+        const mx = hull.reduce((s, p) => s + p[0], 0) / hull.length, mz = hull.reduce((s, p) => s + p[1], 0) / hull.length;
+        const k = 1.1 - Math.min(.5, L * 1.4), shade = .26 * Math.max(0, 1 - L * 2.2);
+        let out = '<path d="M' + hull.map(p => {
+            const q = dieSee([mx + (p[0] - mx) * k, -.5, mz + (p[1] - mz) * k], 0);
+            return f(q[0] + 1.4) + ' ' + f(q[1] + .3);
+        }).join('L') + 'z" fill="' + INK + '" fill-opacity="' + shade.toFixed(3) + '"/>';
+        const vec = d => [DIE_W * (d[0] + DIE_Z[0] * d[2]), -DIE_W * (d[1] + DIE_Z[1] * d[2])];
+        DIE_FACES.forEach(F => {
+            const N = dieTurn(M, F.n);
+            if (N[0] * DIE_EYE[0] + N[1] * DIE_EYE[1] + N[2] * DIE_EYE[2] < .02) return;
+            const U = dieTurn(M, F.u), V = dieTurn(M, F.v);
+            const on = (a, b) => dieSee([0, 1, 2].map(i => N[i] * .5 + U[i] * a + V[i] * b), L);
+            let w = 0, tint = [0, 0, 0];
+            DIE_TINT.forEach(t => {
+                const d = Math.max(0, N[0] * t[0][0] + N[1] * t[0][1] + N[2] * t[0][2]);
+                w += d * d;
+                tint = tint.map((c, i) => c + d * d * t[1][i]);
+            });
+            out += '<path d="M' + [on(-.5, -.5), on(.5, -.5), on(.5, .5), on(-.5, .5)].map(q => f(q[0]) + ' ' + f(q[1])).join('L') +
+                'z" fill="rgb(' + tint.map(c => Math.round(c / w)).join(',') + ')" stroke="' + INK + '" stroke-width="2.2" stroke-linejoin="round"/>';
+            const su = vec(U), sv = vec(V), r = F.r || .09;
+            F.pips.forEach(p => {
+                const c = on(p[0], p[1]);
+                out += '<circle r="1" fill="' + INK + '" transform="matrix(' + [su[0] * r, su[1] * r, sv[0] * r, sv[1] * r, c[0], c[1]].map(f).join(' ') + ')"/>';
+            });
+        });
+        return out;
+    }
+    // A turn of `deg` degrees about `axis`, and one turn after another.
+    function dieRot(axis, deg) {
+        const n = Math.hypot(axis[0], axis[1], axis[2]), x = axis[0] / n, y = axis[1] / n, z = axis[2] / n;
+        const a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a), C = 1 - c;
+        return [[c + x * x * C, x * y * C - z * s, x * z * C + y * s],
+            [y * x * C + z * s, c + y * y * C, y * z * C - x * s],
+            [z * x * C - y * s, z * y * C + x * s, c + z * z * C]];
+    }
+    function dieMul(A, B) { return [0, 1, 2].map(i => [0, 1, 2].map(j => A[i][0] * B[0][j] + A[i][1] * B[1][j] + A[i][2] * B[2][j])); }
+    // How high it must be to stand clear of the ground turned so, and how
+    // high it may go before it leaves the top of the picture.
+    function dieFloor(M) { return Math.max(0, -.5 - Math.min(...DIE_CORNERS.map(c => dieTurn(M, c)[1]))); }
+    function dieRoof(M) {
+        return Math.min(...DIE_CORNERS.map(c => { const p = dieTurn(M, c); return (DIE_MID[1] - .8) / DIE_W - p[1] - DIE_Z[1] * p[2]; }));
+    }
 
     const SQUARE_ART = {
         // The Start: a stone gateway with the road running out through it,
@@ -4272,13 +5101,18 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             live('flame', grpW('#ff8c2a', 1.2, P('M7.4 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6z')) + dot(7.6, 23.6, 1, '#ffd04a')) +
             live('flame', grpW('#ff8c2a', 1.2, P('M56.6 26c-2.6-2.4-.4-5.6.2-7.6 1.2 2.2 3.2 4.6-.2 7.6z')) + dot(56.8, 23.6, 1, '#ffd04a'), -.7),
 
-        potion: flask(32, 30, 1.25, '#d23a3a'),
-        potions: flask(22, 30, 1.05, '#d23a3a') + flask(42, 32, 1, '#3a7fd2'),
+        // Draw 1 or 2 Potion Cards: the potions swirling in their flasks,
+        // bubbles rising through them.
+        potion: flask(32, 30, 1.25, '#d23a3a', null, true),
+        potions: flask(22, 30, 1.05, '#d23a3a', null, true) + flask(42, 32, 1, '#3a7fd2', null, true),
 
+        // Draw 1 Item Card: a shield with the thorn on it and a sword, and
+        // now and then a pale glint running down the blade (.an-glint).
         item:
             grp('#7a5a3a', P('M14 14h22v22c0 6-11 10-11 10s-11-4-11-10z')) +
             grp(STEEL_L, P('M17 17h16v18c0 4-8 7-8 7s-8-3-8-7z')) + thornSigil(25, 27, CRIMSON) +
-            sword(42, 26, 30, .9),
+            sword(42, 26, 30, .9) +
+            cue('glint', '<g transform="translate(42 26) rotate(30) scale(.9)">' + live('glint', line('M-1.3.75 1.3-.75', '#ffffff', 1.2)) + '</g>'),
         // Draw 2 Item Cards: a bow, a mage's staff with its orb, a sword.
         items:
             line('M14 6c10 8 10 32 0 40', INK, 4) + line('M14 6c10 8 10 32 0 40', '#8a5a32', 2.2) +
@@ -4298,26 +5132,56 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             '<circle cx="18" cy="24" r="4" fill="' + INK + '"/>' +
             grp('#e4c14a', P('M27 21h28v6H27zM44 27h5v8h-5zM51 27h4v10h-4z')),
 
+        // Route Split: a signpost, one board pointing on along the road and
+        // one pointing up it. Now and then a gust rocks the boards on their
+        // nails and blows a leaf or two past (.an-creak, .an-blow).
         split:
             grp('#6a4a2e', P('M30 18h4v28h-4z')) +
-            grp('#b07a44', P('M10 22h22v8H10l-5-4z')) +
-            grp('#b07a44', P('M28 4h8v16h-8z')) + grp('#b07a44', P('M26 8l6-7 6 7z')) +
-            line('M14 26h14', '#6a4a2e', 1.4) + line('M32 8v10', '#6a4a2e', 1.4) +
+            cue('gust',
+                live('creak', grp('#b07a44', P('M10 22h22v8H10l-5-4z')) + line('M14 26h14', '#6a4a2e', 1.4) + dot(30.4, 26, .6)) +
+                live('creak-up', grp('#b07a44', P('M28 4h8v16h-8z')) + grp('#b07a44', P('M26 8l6-7 6 7z')) +
+                    line('M32 8v10', '#6a4a2e', 1.4) + dot(32, 18.4, .6)) +
+                blownLeaf(13, '#8a6a2a', .15) + blownLeaf(34, '#6a7a2a', .5)) +
             grp('#7c6a52', P('M0 46c10-4 20-4 30 0 4-3 30-3 34 0z')),
 
-        // Two of the kingdom's sentries walking their beat, halberds up.
+        // Two of the kingdom's sentries walking their beat, halberds up. Now
+        // and then they march a few steps along it in step, turn about, march
+        // back and turn again (.an-march, .an-about).
         patrol:
             grp('#7c6a52', P('M0 45c16-3 48-3 64 0v3H0z')) +
-            soldier({ x: 33, y: 7.4, s: .46, helm: 'kettle', weapon: 'halberd', tabard: '#7d1a1c' }) +
-            soldier({ x: 9, y: 8.2, s: .46, helm: 'kettle', weapon: 'halberd' }),
+            cue('patrol',
+                '<g class="an-march"><g class="an-about">' +
+                soldier({ x: 33, y: 7.4, s: .46, helm: 'kettle', weapon: 'halberd', tabard: '#7d1a1c' }) + '</g></g>' +
+                '<g class="an-march"><g class="an-about">' +
+                soldier({ x: 9, y: 8.2, s: .46, helm: 'kettle', weapon: 'halberd' }) + '</g></g>'),
 
-        thorns: thornBush(20, 40, 1.1) + thornBush(44, 42, .9) + grp('#c8342b', P('M30 22c-2 3-2 5 0 6 2-1 2-3 0-6z')),
+        // Thorn Bush Valley: two thorn bushes stirring, and a red bud on one
+        // that now and then opens into a thorn rose and closes again
+        // (.an-bud, .an-petals).
+        thorns:
+            live('sway-soft', thornBush(20, 40, 1.1)) + live('sway-soft', thornBush(44, 42, .9), -2.6) +
+            cue('bloom', live('bud', grp('#c8342b', P('M30 22c-2 3-2 5 0 6 2-1 2-3 0-6z'))) +
+                '<g transform="translate(30 25.4)">' + live('petals', thornRose()) + '</g>'),
 
+        // Roan's Tavern: a great wooden tankard with its head of foam, and a
+        // cask with a brass tap in its side dripping ale into a puddle
+        // (.an-drop). Now and then the foam swells up and runs over the rim
+        // (.an-swell, .an-spill).
         tavern:
             grp('#8a5a32', P('M10 18h22v26H10z')) + line('M10 26h22M10 36h22', '#5a3a22', 1.6) +
             grp('#c9ced6', P('M30 22h6c6 0 6 14 0 14h-6v-4h5c2 0 2-6 0-6h-5z')) +
-            grp('#f4f0e2', P('M8 18c0-6 5-8 8-6 2-4 8-4 10 0 3-2 8 0 7 6z')) +
-            grp('#c8862a', P('M42 30c0-8 16-8 16 0v14H42z')) + line('M42 34h16M42 40h16', '#8a5a22', 1.4),
+            cue('spill',
+                live('spill', grpW('#f4f0e2', 1, P('M10.6 17.4h2.6v5.8c0 1.6-2.6 1.6-2.6 0z'))) +
+                '<g class="an-spill" style="animation-delay:.35s">' + grpW('#f4f0e2', 1, P('M26.8 17.4h2.4v3.8c0 1.4-2.4 1.4-2.4 0z')) + '</g>' +
+                live('swell', grp('#f4f0e2', P('M8 18c0-6 5-8 8-6 2-4 8-4 10 0 3-2 8 0 7 6z')))) +
+            grp('#c8862a', P('M42 30c0-8 16-8 16 0v14H42z')) + line('M42 34h16M42 40h16', '#8a5a22', 1.4) +
+            // its tap, out of the side: a brass pipe, the spout turned down
+            // and the handle on top
+            '<ellipse cx="60.2" cy="44.4" rx="2.6" ry=".65" fill="#f0a530" stroke="' + INK + '" stroke-width=".5"/>' +
+            line('M59.4 36.3v-1.9', INK, .9) + dot(59.4, 34.3, .7, '#8a5a22') +
+            grpW(GOLD, .8, P('M57.4 36.2h3.6v1.7h-3.6zM59.6 37.9h1.3v1.5h-1.3z')) +
+            live('drop', '<path d="M60.25 39.4c.6.9.9 1.4.9 1.8 0 .5-.4.9-.9.9s-.9-.4-.9-.9c0-.4.3-.9.9-1.8z" fill="#f0a530" stroke="' + INK + '" stroke-width=".45"/>') +
+            live('splash', line('M58.3 43.9c.2-.6.6-1 1.1-1.2M62.1 43.9c-.2-.6-.6-1-1.1-1.2', '#f0a530', .7)),
 
         // Smuggler's Alley: a narrow lane at night between two timber-
         // framed houses whose upper floors lean in over it, a cloaked
@@ -4352,18 +5216,35 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             grpW('#9a6a3a', 1.4, P('M3.4 38h10.4v10H3.4z')) + line('M3.4 38l10.4 10M13.8 38 3.4 48', '#6a4a2a', 1) +
             grpW('#8a5a32', 1.4, P('M50.6 38.4h8.8c.8 3.2.8 6.4 0 9.6h-8.8c-.8-3.2-.8-6.4 0-9.6z')) + line('M50.2 41h9.6M50.2 45.4h9.6', '#4a4e55', 1.1),
 
-        commoners: house(6, 44, 20, 16, '#8a4a2a') + house(36, 44, 22, 20, '#6a5a3a', '#d8c8a0'),
+        // The Commoner's Quarter: a cottage and a taller house, smoke
+        // billowing from the house's chimney and lamps lit in two of their
+        // windows. Now and then somebody lights a lamp in another window and
+        // later puts it out (.an-lamp; each dark window keeps its own time).
+        commoners:
+            grpW('#8a5a42', 1.4, P('M52.2 21V12.8h3.4V23z')) + grpW('#6a5a52', 1, P('M51.6 11.4h4.6v1.8h-4.6z')) +
+            house(6, 44, 20, 16, '#8a4a2a') + house(36, 44, 22, 20, '#6a5a3a', '#d8c8a0') +
+            billow(53.9, 11, .8, 6, -9) +
+            cottageWindow(7.8, 31, 3.6, 3.4, true) + cottageWindow(20.6, 31, 3.6, 3.4, false, true) +
+            cottageWindow(38.6, 26.8, 4, 3.6, false, true) + cottageWindow(51.4, 26.8, 4, 3.6, true) +
+            cottageWindow(38.6, 35, 4, 3.6, false, true) + cottageWindow(51.4, 35, 4, 3.6, false, true),
 
+        // The Noble's Secret: a letter under the noble's red wax seal, and
+        // the Gemstone it buys. Now and then a seal stamp comes down and
+        // presses the seal afresh (.an-stamp, .an-press).
         secret:
             grp('#efe2c0', P('M10 12h30c-4 2-4 22 0 26H10c4-4 4-24 0-26z')) +
             line('M16 20h16M16 25h16M16 30h10', '#9a8a6a', 1.4) +
-            '<circle cx="34" cy="34" r="5" fill="#b0242c" stroke="' + INK + '" stroke-width="1.6"/>' +
+            cue('seal',
+                live('press', '<circle cx="34" cy="34" r="5" fill="#b0242c" stroke="' + INK + '" stroke-width="1.6"/>' +
+                    '<circle cx="34" cy="34" r="3.2" fill="none" stroke="#7a161c" stroke-width=".8"/>' + smallSigil(34, 34, .3, '#7a161c')) +
+                live('stampshade', '<ellipse cx="34" cy="34.3" rx="4.4" ry="1.6" fill="' + INK + '" fill-opacity=".35"/>') +
+                '<g transform="translate(34 34.6)">' + live('stamp', SEAL_STAMP) + '</g>') +
             gemShape(52, 24, 1.15, '#d6365c'),
 
         darkwood:
             live('sway', pine(14, 34, .95, '#1c3226'), -1.4) + live('sway', pine(48, 34, .9, '#1c3226'), -3.1) +
             live('sway', pine(31, 38, 1.15, '#22392b')) +
-            live('blink', dot(28, 30, 1.2, '#f4d23c') + dot(33, 30, 1.2, '#f4d23c')),
+            cue('blink', live('blink', dot(28, 30, 1.2, '#f4d23c') + dot(33, 30, 1.2, '#f4d23c'))),
 
         // The Thieves' Guild: a crooked dark house, a lamp in the window
         // and eyes in the doorway, crossed daggers over the door, and the
@@ -4378,7 +5259,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             line('M14 17.4 31.4 16.8M18.6 12.8l13 .2', '#2a2428', 1) +
             '<circle cx="31.6" cy="27.6" r="2.8" fill="#f4c84a" stroke="' + INK + '" stroke-width="1.3"/>' + line('M31.6 24.8v5.6M28.8 27.6h5.6', '#5a3a22', .8) +
             grpW('#1b1418', 1.6, P('M16.4 44V33c0-4.2 8.8-4.2 8.8 0v11z')) +
-            live('blink', dot(19.4, 36.4, .9, '#f4d23c') + dot(22.2, 36.4, .9, '#f4d23c'), -2.6) +
+            cue('blink', live('blink', dot(19.4, 36.4, .9, '#f4d23c') + dot(22.2, 36.4, .9, '#f4d23c'))) +
             '<g transform="translate(20.8 25.6)">' + line('M-4.4-3.4 4.4 3.4M4.4-3.4-4.4 3.4', STEEL_L, 1.4) + line('M-4.4-3.4-2.6-2M4.4-3.4 2.6-2', INK, 1.4) + '</g>' +
             grpW('#8a6a3a', 1.4, P('M1.6 44c-1-6 1.6-9.4 5-9.6l-1.2-2.4h5.6l-1.2 2.4c3.4.2 6 3.6 5 9.6z')) + line('M5.4 32.4h5.6', '#5a3a22', 1.2) +
             '<circle cx="8.2" cy="39.4" r="2" fill="none" stroke="' + GOLD + '" stroke-width="1.2"/>' +
@@ -4395,7 +5276,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         // and smoke from its chimney, and a table of fresh loaves beside it.
         bakery:
             grp('#6a5238', P('M0 44h64v4H0z')) +
-            live('smoke', grpW('#c9c2b4', 1.2, P('M17.6 8.6c-2.4-1.6-.6-4.6 1.8-3.6.6-2.4 4.4-2.4 4.8 0 2.2-.6 3.4 2 1.6 3.4z'))) +
+            billow(19.2, 9.4, 1, 4) +
             grpW('#8a4a2a', 1.6, P('M16.4 11h5.2v10h-5.2z')) +
             grpW('#a39b8f', 1.6, P('M1.6 35.4h34v8.6h-34z')) + line('M1.6 39.6h34M10 35.4v4.2M20 35.4v4.2M28 35.4v4.2M6 39.6V44M15 39.6V44M24 39.6V44M32 39.6V44', '#7c746a', .9) +
             grpW('#b5653a', 1.8, P('M3.6 35.4C3.6 16.4 34 16.4 34 35.4z')) +
@@ -4435,6 +5316,9 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         // The Orc Training Camp: a patched hide tent with a skull over its
         // door, a straw dummy with a target on it, hacked about, and
         // the orcs' green skull banner on a spear over a round shield.
+        // Every so often an axe comes spinning in from the right and sticks
+        // in the target, the dummy rocking and straw flying (style.css
+        // .an-axe, .an-dummy, .an-straw), until it is pulled out again.
         orc_camp:
             grp('#6a5238', P('M0 44c14-3 50-3 64 0v4H0z')) +
             line('M11.6 4.6 17.4 13.4M18.4 4.6 12.6 13.4', INK, 2.8) + line('M11.6 4.6 17.4 13.4M18.4 4.6 12.6 13.4', '#8a6a44', 1.2) +
@@ -4447,6 +5331,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             grpW('#a07a50', 1.2, P('M15 27.4l4.4 17h4.4z')) +
             grpW('#f4f0e2', 1, P('M12.6 22.6c0-3.4 4.8-3.4 4.8 0 0 1.2-.6 1.8-1 2.2v1.2h-2.8v-1.2c-.4-.4-1-1-1-2.2z')) +
             dot(14.1, 22.6, .65) + dot(15.9, 22.6, .65) + line('M14.6 25.2v1M15.4 25.2v1', INK, .5) +
+            '<g class="cue" data-cue="axe"><g class="an-dummy">' +
             line('M40 44V14', INK, 3.6) + line('M40 44V14', '#8a6a44', 1.8) +
             line('M35.6 43.4 40 38.8l4.4 4.6', INK, 2.8) + line('M35.6 43.4 40 38.8l4.4 4.6', '#8a6a44', 1.2) +
             line('M32.4 24.4h15.2', INK, 3.2) + line('M32.4 24.4h15.2', '#8a6a44', 1.4) +
@@ -4459,6 +5344,14 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             '<circle cx="40" cy="15.4" r="4.2" fill="#d8b860" stroke="' + INK + '" stroke-width="1.4"/>' +
             line('M37.8 14.2l1.4 1.4M39.2 14.2l-1.4 1.4M40.8 14.2l1.4 1.4M42.2 14.2l-1.4 1.4M38.6 17.6h2.8', INK, .8) +
             line('M43.2 29.6l1.8-1.6', INK, .8) +
+            // the thrown axe, its blade in the target
+            live('axe', '<g transform="translate(46.8 29.6) rotate(-32)">' +
+                line('M0-5.4V5.4', INK, 2.6) + line('M0-5.4V5.4', '#8a6a44', 1.2) + line('M0 3.4v1.6', '#5a3a22', 1.4) +
+                grpW(STEEL, 1.1, P('M-.4-5.8-3.4-7.4C-5.4-5.6-5.4-2-3.4-.4L-.4-2.4z')) +
+                line('M-3.6-6.6C-5-5-5-2.6-3.6-1.2', STEEL_L, .7) + '</g>') +
+            [[-4.6, -3.2, -50], [-4, 2.6, 40], [-1.4, -5, -80], [-5.4, -.4, 20]].map(v =>
+                liveVars('straw', { sx: v[0] + 'px', sy: v[1] + 'px', sr: v[2] + 'deg' }, line('M41.4 28.2l1.6.5', '#e8c870', .9))).join('') +
+            '</g></g>' +
             line('M33.8 42.4l-1.8-.6M45.6 42l2-.8M47 43.2l1.6.2', '#b8902a', .9) +
             line('M53 44V6.6', INK, 3) + line('M53 44V6.6', '#8a6a44', 1.4) +
             grpW(STEEL_L, 1, P('M51.8 7 53 2.4 54.2 7z')) +
@@ -4501,8 +5394,8 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             live('grass', line('M50.6 44l-.4-1.5M51.3 44l.1-1.8M52 44l.6-1.2', '#8a8a5a', .8), -1.4) +
             flatCoin(33.6, 44.8) + flatCoin(17.6, 45) + flatCoin(46.4, 45.4, 1.6) +
             crowAt(27.4, 10.4, .62) +
-            live('glide', live('flap', line('M47 8.6c.8-1 1.8-1.2 2.6-.2.8-1 1.8-.8 2.6.2', INK, 1.1)) +
-            live('flap', line('M55 12.6c.5-.7 1.2-.8 1.7-.1.5-.7 1.2-.6 1.7.1', INK, .9), -.25)),
+            cue('glide', live('glide', live('flap', line('M47 8.6c.8-1 1.8-1.2 2.6-.2.8-1 1.8-.8 2.6.2', INK, 1.1)) +
+            live('flap', line('M55 12.6c.5-.7 1.2-.8 1.7-.1.5-.7 1.2-.6 1.7.1', INK, .9), -.25))),
 
         // The Vault of Comets: a round steel vault door in a stone wall,
         // its locking wheel at the middle under a plain keystone, and a
@@ -4523,15 +5416,22 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             line('M32 26v10.8M26.6 31.4h10.8M28.2 27.6l7.6 7.6M35.8 27.6l-7.6 7.6', INK, 1.5) +
             dot(32, 31.4, 1.6, GOLD) +
             grpW('#b8b0a2', 1.4, P('M28 16.6h8l-1.2 3.2h-5.6z')) +
-            live('comet', '<path d="M39 9.6 56.4 2.8M40.6 12.2 57.4 6.4M42 7.6 52 2.4" fill="none" stroke="#f4e38a" stroke-width="1.3" stroke-linecap="round"/>' +
-            grpW('#ffe27a', 1.2, P('M38.4 7.6l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z'))) +
+            cue('comet', live('comet', '<path d="M39 9.6 56.4 2.8M40.6 12.2 57.4 6.4M42 7.6 52 2.4" fill="none" stroke="#f4e38a" stroke-width="1.3" stroke-linecap="round"/>' +
+            grpW('#ffe27a', 1.2, P('M38.4 7.6l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z')))) +
             live('twinkle', '<path d="M25.4 3.6l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>') +
             live('twinkle', '<path d="M61 12.6l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4z" fill="#f4e38a" stroke="' + INK + '" stroke-width=".5"/>', -1.9),
 
         // The Cliff of Doom: a sheer cliff with a skull warning on its
         // edge, its lip crumbling and rocks tumbling down off it into the
         // drop. (No far wall: the user had it taken out, 2026-10-07.)
+        // Moving, now and then a rock breaks off the lip (each keeps its own
+        // time, and no two land within a few seconds of each other), falls
+        // and smashes on the rubble at the bottom, and the picture jolts as
+        // it lands (style.css .an-rock, .an-quake; fallingRock(), smash()).
         cliff:
+            '<g class="an-quake shaker">' +
+            grpW('#5a4c40', 1.1, P('M31 48.6 32.4 45.2l3.2.8 2.6-1.6 3.4.9 2.8-1.1 3.2 1.3 3-1.1 3.2 1.1 2.6-.7 2.8.9 3.4-.5V48.6z')) +
+            dot(35.4, 47, .6, '#7a6a5a') + dot(46.4, 46.8, .7, '#7a6a5a') + dot(57.6, 47.2, .6, '#7a6a5a') +
             grp('#7a6a5a', P('M-2 16h30.6l2.8 4.4-1.8 4.8 3.4 4.2-2.2 5.8 3.2 14.8H-2z')) +
             line('M1 22.6h16M21 23.4h6M3 29.4h11M17.6 29h12M1 36h20M24 36.4h7M5 42.4h22', '#5f5246', 1) +
             line('M27.8 16.4l-1.4 3 1 2.4-1.2 2.6M30.2 30.6l-2 1.8.4 2.4', INK, .9) +
@@ -4544,11 +5444,14 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             grpW('#f4f0e2', .7, P('M15.2 6c0-2.4 3.6-2.4 3.6 0 0 .8-.4 1.2-.8 1.6v.8h-2v-.8c-.4-.4-.8-.8-.8-1.6z')) +
             dot(16.3, 6, .45) + dot(17.7, 6, .45) +
             line('M13 4.6l1.6 1.6M14.6 4.6 13 6.2M19.4 7.2l1.6 1.6M21 7.2l-1.6 1.6', INK, .7) +
-            line('M36.4 4.6v4M38.8 3.4v4.4M46.6 16v4M49 15v4.6M40.4 29.6v3.4M42.6 28.8v3.6', '#b8ae9e', 1) +
-            live('fall', grpW('#8a7a6a', 1.4, P('M35 10.6l3.4-1.6 3.2 1.4.6 3.4-2.8 2-3.6-.8z')) + grpW('#a39686', .6, P('M38.4 9l3.2 1.4-1.6 1.6-2-.8z'))) +
-            live('fall', grpW('#8a7a6a', 1.4, P('M45.4 21.6l3-1.2 2.6 1.6-.4 3-2.8 1.2-2.6-1.6z')) + grpW('#a39686', .6, P('M48.4 20.4l2.6 1.6-1.4 1-1.6-.8z')), -2.6) +
-            live('fall', grpW('#8a7a6a', 1.2, P('M39.6 34.6l2.4-1 2 1.2-.4 2.4-2.2.8-2-1.2z')), -4.1) +
-            dot(33.6, 22, .8, '#7a6a5a') + dot(35.4, 26.8, .7, '#7a6a5a') + dot(33.2, 30.6, .6, '#7a6a5a'),
+            cue('rock', fallingRock(grpW('#8a7a6a', 1.4, P('M35 10.6l3.4-1.6 3.2 1.4.6 3.4-2.8 2-3.6-.8z')) + grpW('#a39686', .6, P('M38.4 9l3.2 1.4-1.6 1.6-2-.8z')),
+                'M36.4 4.6v4M38.8 3.4v4.4', [-10.2, -.8], [-1, 31], 250) + smash(37.4, 45.4), ' data-shake="1"') +
+            cue('rock', fallingRock(grpW('#8a7a6a', 1.4, P('M45.4 21.6l3-1.2 2.6 1.6-.4 3-2.8 1.2-2.6-1.6z')) + grpW('#a39686', .6, P('M48.4 20.4l2.6 1.6-1.4 1-1.6-.8z')),
+                'M46.6 16v4M49 15v4.6', [-22.4, -11.4], [1.6, 20], -290) + smash(49.8, 45.4), ' data-shake="1"') +
+            cue('rock', fallingRock(grpW('#8a7a6a', 1.2, P('M39.6 34.6l2.4-1 2 1.2-.4 2.4-2.2.8-2-1.2z')),
+                'M40.4 29.6v3.4M42.6 28.8v3.6', [-11.2, -23.4], [1.4, 8.4], 200) + smash(43.2, 45.4), ' data-shake="1"') +
+            dot(33.6, 22, .8, '#7a6a5a') + dot(35.4, 26.8, .7, '#7a6a5a') + dot(33.2, 30.6, .6, '#7a6a5a') +
+            '</g>',
 
         // The Forsaken Road: a rutted road winding away over bare hills,
         // its signpost broken and leaning, a dead tree with a crow on it,
@@ -4620,26 +5523,44 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 
         // Tip & Tap's Trip Traps: an iron jaw-trap set open among the
         // leaves, its springs out to either side, and a tripwire strung
-        // low between two stakes with a bell hung on it.
+        // low between two stakes with a bell hung on it. Now and then a leaf
+        // drifts down onto the trap's plate and the jaws snap shut on it
+        // with a jolt, and after a while open again (.an-jaws-open,
+        // .an-jaws-shut); now and then something brushes the wire, which
+        // twangs, and the bell swings and rings (.an-twang, .an-ring).
         traps:
             grp('#6a5238', P('M0 42c16-3 48-3 64 0v6H0z')) +
             [[10, 45, -20, '#8a6a2a'], [39, 45.4, 25, '#6a7a2a'], [3.6, 40.6, 10, '#9a5a22'], [30, 46.6, -35, '#7a6a2a']].map(l =>
                 '<g transform="translate(' + l[0] + ' ' + l[1] + ') rotate(' + l[2] + ')">' +
                 grpW(l[3], .7, P('M-2.6 0c1.2-1.4 3.8-1.4 5.2 0-1.4 1.4-4 1.4-5.2 0z')) + line('M-2.6 0h4.6', '#4a3220', .5) + '</g>').join('') +
             '<ellipse cx="21" cy="39.4" rx="18" ry="4.2" fill="#4a3a28" opacity=".5"/>' +
-            // the springs: a flat steel bow out to either side, looped at the end
-            grpW('#5a5f66', 1.2, P('M8.6 36.4H2.8c-1.8 0-1.8-3.6 0-3.6h5.8zM33.4 36.4h5.8c1.8 0 1.8-3.6 0-3.6h-5.8z')) +
-            trapTeeth(false) +
-            '<ellipse cx="21" cy="34.8" rx="13" ry="5" fill="none" stroke="' + INK + '" stroke-width="4.6"/>' +
-            '<ellipse cx="21" cy="34.8" rx="13" ry="5" fill="none" stroke="' + STEEL + '" stroke-width="2.4"/>' +
-            '<ellipse cx="21" cy="35.4" rx="5.2" ry="1.9" fill="#6d737b" stroke="' + INK + '" stroke-width="1.2"/>' +
-            dot(21, 35.2, .9, INK) +
-            trapTeeth(true) +
+            cue('snap',
+                '<g class="an-jolt">' +
+                // the springs: a flat steel bow out to either side, looped at the end
+                grpW('#5a5f66', 1.2, P('M8.6 36.4H2.8c-1.8 0-1.8-3.6 0-3.6h5.8zM33.4 36.4h5.8c1.8 0 1.8-3.6 0-3.6h-5.8z')) +
+                live('jaws-open', trapTeeth(false) +
+                    '<ellipse cx="21" cy="34.8" rx="13" ry="5" fill="none" stroke="' + INK + '" stroke-width="4.6"/>' +
+                    '<ellipse cx="21" cy="34.8" rx="13" ry="5" fill="none" stroke="' + STEEL + '" stroke-width="2.4"/>' +
+                    '<ellipse cx="21" cy="35.4" rx="5.2" ry="1.9" fill="#6d737b" stroke="' + INK + '" stroke-width="1.2"/>' +
+                    dot(21, 35.2, .9, INK) +
+                    trapTeeth(true)) +
+                live('jaws-shut', trapShut()) +
+                '</g>' +
+                '<g transform="translate(21 34.4)"><g class="an-leaffall">' +
+                live('leafspin', grpW('#9a7a2a', .7, P('M-2.6 0c1.2-1.4 3.8-1.4 5.2 0-1.4 1.4-4 1.4-5.2 0z')) + line('M-2.6 0h4.6', '#4a3220', .5)) + '</g></g>' +
+                live('strike', '<path d="' + strikeFan(21, 19.6) + '" fill="none" stroke="' + INK + '" stroke-width=".9" stroke-linecap="round"/>') +
+                liveVars('puff', { dx: '-3.6px', dy: '-1.2px' }, '<circle cx="7.4" cy="35.6" r="1.4" fill="#b8ae9e" stroke="' + INK + '" stroke-width=".5"/>') +
+                liveVars('puff', { dx: '3.6px', dy: '-1.2px' }, '<circle cx="34.6" cy="35.6" r="1.4" fill="#b8ae9e" stroke="' + INK + '" stroke-width=".5"/>')) +
             line('M47 44V24M61 44V24', INK, 3.4) + line('M47 44V24M61 44V24', '#8a6a44', 1.8) +
             grpW('#8a6a44', 1.2, P('M45.3 24l1.7-3.4 1.7 3.4zM59.3 24l1.7-3.4 1.7 3.4z')) +
-            line('M47 30.6c4.6.6 9.4.6 14 0', '#d9cdb0', 1.1) +
-            line('M54 31v1.6', INK, .9) +
-            grpW(GOLD, 1, P('M51.8 36.6c0-3 1-4.2 2.2-4.2s2.2 1.2 2.2 4.2z')) + dot(54, 37.4, .9, INK),
+            cue('bell',
+                // the wire in two halves, each turning on its stake, so it
+                // can spring up and down where the bell hangs and stay a wire
+                live('twang-l', line('M47 30.6 54 31.05', '#d9cdb0', 1.1)) + live('twang-r', line('M61 30.6 54 31.05', '#d9cdb0', 1.1)) +
+                live('bob', live('ring', line('M54 31v1.6', INK, .9) +
+                    grpW(GOLD, 1, P('M51.8 36.6c0-3 1-4.2 2.2-4.2s2.2 1.2 2.2 4.2z')) + live('clapper', dot(54, 37.4, .9, INK)))) +
+                live('peal', line('M50.4 33.4c-.9.9-1.1 2.2-.8 3.4M49 32.6c-1.4 1.4-1.7 3.2-1.2 5', INK, .7)) +
+                '<g class="an-peal" style="animation-delay:.31s">' + line('M57.6 33.4c.9.9 1.1 2.2.8 3.4M59 32.6c1.4 1.4 1.7 3.2 1.2 5', INK, .7) + '</g>'),
 
         // The Thorned Pyrite: an alcove cut into a crag of great gold pyrite
         // cubes, framed in a thorned vine with red roses on it, and kept in
@@ -4715,7 +5636,9 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 
         // Noble's District: a grand townhouse behind gilded railings, its
         // pillared porch, a crest over the door, tall lit windows under a
-        // slate roof.
+        // slate roof. Now and then somebody carries a candle along the
+        // upstairs rooms of one wing, a dark shape passing behind the lit
+        // windows (candleWalker(), .an-walk).
         district:
             grp('#8a8278', P('M0 44h64v4H0z')) +
             grpW('#8a6a5a', 1.6, P('M14 4.6h5v6h-5zM45 4.6h5v6h-5z')) +
@@ -4723,7 +5646,10 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             grpW('#efe2c0', 2, P('M6 18h52v26H6z')) +
             line('M6 30.6h52', '#c9b88e', 1.4) +
             [10, 17.6, 41.4, 49].map(x => grpW('#f4d23c', 1.2, P('M' + x + ' 27.6v-5.2c0-1.8 4.6-1.8 4.6 0v5.2z')) +
-                grpW('#f4d23c', 1.2, P('M' + x + ' 40.4v-6.2c0-1.8 4.6-1.8 4.6 0v6.2z')) +
+                grpW('#f4d23c', 1.2, P('M' + x + ' 40.4v-6.2c0-1.8 4.6-1.8 4.6 0v6.2z'))).join('') +
+            candleWalker('lof-dw-@ID@', 'M10 27.6v-5.2c0-1.8 4.6-1.8 4.6 0v5.2zM17.6 27.6v-5.2c0-1.8 4.6-1.8 4.6 0v5.2z', 4, 27) +
+            candleWalker('lof-de-@ID@', 'M41.4 27.6v-5.2c0-1.8 4.6-1.8 4.6 0v5.2zM49 27.6v-5.2c0-1.8 4.6-1.8 4.6 0v5.2z', 35.4, 59) +
+            [10, 17.6, 41.4, 49].map(x => '<path d="M' + x + ' 27.6v-5.2c0-1.8 4.6-1.8 4.6 0v5.2z" fill="none" stroke="' + INK + '" stroke-width="1.2" stroke-linejoin="round"/>' +
                 line('M' + (x + 2.3) + ' 22v5.4M' + (x + 2.3) + ' 33.6v6.6M' + x + ' 36.6h4.6', '#8a6a2a', .8)).join('') +
             grpW('#f4f0e2', 1.6, P('M23 19.4 32 12.6l9 6.8z')) + dot(32, 16.8, 1.5, GOLD) +
             grpW('#f4f0e2', 1, P('M24.4 19.4h2.4V42h-2.4zM28.4 19.4h2v22.6h-2zM33.6 19.4h2v22.6h-2zM37.2 19.4h2.4V42h-2.4z')) +
@@ -4735,16 +5661,23 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 
         // A market day in the square: a wooden stall under a striped awning
         // with a scalloped edge, apples, cabbages and bread on its counter,
-        // and a farmer's handcart piled with pumpkins beside it.
+        // and a farmer's handcart piled with pumpkins beside it. The awning's
+        // edge flaps in the breeze (.an-flutter); now and then the top apple
+        // rolls off (.an-roll, .an-spin).
         market:
             grp('#8a8278', P('M0 43h64v5H0z')) + line('M6 45.5h6M20 45h7M36 46h6M50 45h7', '#6a645c', 1.1) +
             line('M5 43V12M31 43V12', INK, 3.2) + line('M5 43V12M31 43V12', '#7a5232', 1.6) +
             grp('#8a5a32', P('M2 30h32v7H2z')) + line('M2 33.5h32', '#6a4a2e', 1.1) +
             grp('#f1e6cf', P('M1 7h34v8H1z')) +
             grp(CRIMSON, P('M6.7 7h5.6v8H6.7zM18 7h5.6v8H18zM29.4 7h5.6v8h-5.6z'), 'stroke-width="1"') +
-            '<path d="M1 15a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0' +
-            'a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0z" fill="' + CRIMSON + '" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/>' +
-            dot(7.6, 27.6, 2.4, '#d23a3a') + dot(12, 27.6, 2.4, '#d23a3a') + dot(9.8, 24.4, 2.4, '#d23a3a') +
+            live('flutter', '<path d="M1 15a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0' +
+            'a2.83 2.83 0 0 0 5.67 0a2.83 2.83 0 0 0 5.67 0z" fill="' + CRIMSON + '" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/>') +
+            dot(7.6, 27.6, 2.4, '#d23a3a') + dot(12, 27.6, 2.4, '#d23a3a') +
+            // the apple on top, which now and then rolls off the pile, off
+            // the end of the counter and away, and a fresh one is put back
+            cue('apple', '<g transform="translate(9.8 24.4)"><g class="an-roll"><g class="an-spin">' + dot(0, 0, 2.4, '#d23a3a') +
+                line('M0-2.2l.5-1.3', '#5a3a22', .8) +
+                '<path d="M.5-3c.8-.9 1.9-.9 2.4-.2-.7.6-1.6.8-2.4.2z" fill="#4a8a3a" stroke="' + INK + '" stroke-width=".4"/>' + '</g></g></g>') +
             '<circle cx="18.8" cy="27" r="3.2" fill="#6aa83f" stroke="' + INK + '" stroke-width="1.4"/>' +
             line('M17.4 25.4l1.4 1.6 1.6-1.6', '#3f6a24', 1) +
             grp('#d39a4a', P('M24 30c0-5 9-5 9 0z'), 'stroke-width="1.4"') + line('M26.5 27.5l1-1.5M29.5 27.5l1-1.5', '#9a6a2a', 1) +
@@ -4785,7 +5718,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         // from the chimney, and its sign -- a crescent moon -- hung out over
         // the road.
         inn:
-            live('smoke', grp('#c9c2b4', P('M39 4c-2-3 2-5 4-3 1-2 5-2 5 1 2 0 3 2 1 3z'), 'stroke-width="1.2"'), -1.5) +
+            billow(39.8, 4.4, 1.05, 13, -7) +
             grp('#6a6a72', P('M37 6h5v9h-5z'), 'stroke-width="1.6"') +
             grp('#2e4a6a', P('M3 17 25 3l22 14z')) + line('M10 13h30M16 9h18', '#24384f', 1) +
             grp('#efe2c0', P('M5 17h40v11H5z')) +
@@ -4804,17 +5737,12 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
                 live('twinkle', dot(52, 12, .8, '#f4e38a'), -2.6)),
 
         // The Golden Dice: a gold die with 1 to the front, 2 on top and 3 on
-        // the side, numbered as a real die is (opposite faces make 7).
-        dice:
-            grp('#f0c33c', P('M17 15h26v26H17z')) +
-            grp('#f8dc78', P('M17 15l9-8h26l-9 8z')) +
-            grp('#c8962a', P('M43 15l9-8v26l-9 8z')) +
-            dot(30, 28, 3.6) +
-            '<ellipse cx="26.7" cy="12.6" rx="2.4" ry="1.3" fill="' + INK + '"/>' +
-            '<ellipse cx="42.3" cy="9.4" rx="2.4" ry="1.3" fill="' + INK + '"/>' +
-            '<ellipse cx="45.7" cy="18.3" rx="1.4" ry="2.3" fill="' + INK + '"/>' +
-            '<ellipse cx="47.5" cy="24" rx="1.4" ry="2.3" fill="' + INK + '"/>' +
-            '<ellipse cx="49.3" cy="29.7" rx="1.4" ry="2.3" fill="' + INK + '"/>',
+        // the side, numbered as a real die is (opposite faces make 7), its
+        // shadow under it. Now and then it hops, tumbles over in the air and
+        // lands on another face, rocking a moment before it settles; it keeps
+        // that face until the next time (ui.js GOLDEN_DIE draws it turning, with
+        // dieSvg()).
+        dice: cue('dice', dieSvg(DIE_REST, 0)),
 
         // The Soldier Garrison: a stone gatehouse between two stretches of
         // wall, the garrison's helmets and spears showing over the
@@ -4824,8 +5752,11 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         garrison:
             grp('#6a5238', P('M0 44h64v4H0z')) +
             '<path d="M25.6 45.2h12.8l2 2.8H23.6z" fill="#8a6e4a"/>' +
-            [7.8, 15.8, 48.2, 56.2].map(x => line('M' + x + ' 21V7.6', INK, 2) + line('M' + x + ' 21V7.6', '#7a5232', 1) +
-                grpW(STEEL_L, .8, P('M' + x + ' 4.4l1.3 3.6h-2.6z')) + helmTop(x, 18.8)).join('') +
+            // the men on the walls, now and then walking a few steps along
+            // them and back (style.css .an-sentry), each in his own time
+            [[7.8, -3.4], [15.8, 3.4], [48.2, -3.4], [56.2, 3.4]].map(m => cue('sentry', liveVars('sentry', { w: m[1] + 'px' },
+                line('M' + m[0] + ' 21V7.6', INK, 2) + line('M' + m[0] + ' 21V7.6', '#7a5232', 1) +
+                grpW(STEEL_L, .8, P('M' + m[0] + ' 4.4l1.3 3.6h-2.6z')) + helmTop(m[0], 18.8)))).join('') +
             grp('#8a8278', P('M2 44V22h20v22zM42 44V22h20v22z')) +
             grp('#8a8278', P('M2 22v-4h3.6v4zM10 22v-4h3.6v4zM18 22v-4h4v4zM42 22v-4h4v4zM50.4 22v-4H54v4zM58.4 22v-4H62v4z')) +
             line('M3 40.6h6M55 40.6h6', '#6d665c', 1) +
@@ -4843,7 +5774,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             line('M30.2 27.4V44M33.8 27.4V44', '#4a3220', .8) +
             line('M26.8 32.6h10.4M26.8 39h10.4', '#3a3a40', 1.3) +
             dot(28.4, 32.6, .5, STEEL_L) + dot(35.6, 32.6, .5, STEEL_L) + dot(28.4, 39, .5, STEEL_L) + dot(35.6, 39, .5, STEEL_L) +
-            guard(19.4, 44) + guard(44.6, 44, true),
+            cue('salute', guard(19.4, 44) + guard(44.6, 44, true)),
 
         // The Ancient Shrine: a blue crystal held in a gold cup on a worn
         // stone altar, moss on it and a crack, a rune carved in its face,
@@ -4896,12 +5827,12 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             '<circle cx="20" cy="19.4" r="1.6" fill="#5a3a22"/>' +
             dot(20, 6.6, .9, '#8a8f96') + dot(32.8, 19.4, .9, '#8a8f96') + dot(7.2, 19.4, .9, '#8a8f96') +
             grpW(GOLD, 1.2, P('M31.6 25.4h6.4v3h-6.4zM35.2 28.4h2.6v3.2h-2.6zM33.4 25.4v-2.6h2.4v2.6z')) +
-            live('pour', line('M36.5 32v3.4', '#f0a530', 1.5)) +
+            cue('mug', live('pour', line('M36.5 32v3.4', '#f0a530', 1.5)) +
             live('mug', grpW('#a0703a', 1.4, P('M31.4 36.6h10.6V44H31.4z')) +
             line('M31.4 39h10.6M31.4 42h10.6', '#6a4a2e', .9) +
             '<path d="M42 37.8h2.2c1.6 0 2.2 1 2.2 2.4v.6c0 1.4-.6 2.2-2.2 2.2H42" fill="none" stroke="' + INK + '" stroke-width="2.6"/>' +
             '<path d="M42 37.8h2.2c1.6 0 2.2 1 2.2 2.4v.6c0 1.4-.6 2.2-2.2 2.2H42" fill="none" stroke="#a0703a" stroke-width="1.2"/>' +
-            live('foam', grpW('#f8f4ea', 1.1, P('M30.6 37.4c-.8-2.2 1.2-3.6 3-2.6.8-1.8 4-2 5 0 1.8-1 3.8.4 3.4 2.4.6 1-.2 1.8-1.2 1.6v1.4c0 .9-1.4.9-1.4 0v-1.4h-6.6c-1.4 0-2.4-.4-2.2-1.4z')))) +
+            live('foam', grpW('#f8f4ea', 1.1, P('M30.6 37.4c-.8-2.2 1.2-3.6 3-2.6.8-1.8 4-2 5 0 1.8-1 3.8.4 3.4 2.4.6 1-.2 1.8-1.2 1.6v1.4c0 .9-1.4.9-1.4 0v-1.4h-6.6c-1.4 0-2.4-.4-2.2-1.4z'))))) +
             line('M3 44c-1.6-9 .4-19 4.6-26C12 10.6 18 5.6 26 4.6', '#3f7d3a', .9) +
             live('sway', hop(6.2, 22.6), -.6) + live('sway', hop(15.2, 6.4), -2.1) + live('sway', hop(46.6, 15.6), -1.2) +
             live('sway', hop(52.2, 28), -3.3) + live('sway', hop(57.6, 15.4), -2.6) +
@@ -4913,7 +5844,9 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 
         // The Palace Gates: a gatehouse between two round-roofed towers,
         // royal banners on the towers and a crown over the arch, and the
-        // portcullis hanging half raised, its spikes ready to drop.
+        // portcullis hanging half raised, its spikes ready to drop. Now and
+        // then they do: it drops with a jolt and a puff of dust, and is
+        // wound back up a notch at a time.
         gates:
             grp('#a39b8f', P('M0 44h64v4H0z')) + line('M6 46h6M22 45.6h5M37 46.2h6M52 45.6h6', '#7c746a', 1) +
             grp('#9e968a', P('M19 44V13h26v31z')) +
@@ -4922,8 +5855,15 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             '<path d="M22.4 44V31c0-9.6 19.2-9.6 19.2 0v13" fill="none" stroke="' + INK + '" stroke-width="5.6"/>' +
             '<path d="M22.4 44V31c0-9.6 19.2-9.6 19.2 0v13" fill="none" stroke="#b8b0a2" stroke-width="3"/>' +
             grp('#2a2028', P('M24 44V31c0-7.4 16-7.4 16 0v13z')) +
-            line('M26.4 27.2v10.6M29.2 26v11.8M32 25.7v12.1M34.8 26v11.8M37.6 27.2v10.6M24.6 29.2h14.8M24.4 33.2h15.2M24.4 37.2h15.2', '#6d737b', 1.4) +
-            grpW('#6d737b', .6, P('M25.6 37.8l.8 2.2.8-2.2zM28.4 37.8l.8 2.2.8-2.2zM31.2 37.8l.8 2.2.8-2.2zM34 37.8l.8 2.2.8-2.2zM36.8 37.8l.8 2.2.8-2.2z')) +
+            // the portcullis, its bars running on up into the wall, seen only
+            // in the gateway; now and then it drops with a jolt and is wound
+            // back up a notch at a time (.an-portcullis)
+            '<defs><clipPath id="lof-pg-@ID@"><path d="M24 44V31c0-7.4 16-7.4 16 0v13z"/></clipPath></defs>' +
+            cue('portcullis', '<g clip-path="url(#lof-pg-@ID@)">' + live('portcullis',
+                line('M26.4 20v17.8M29.2 20v17.8M32 20v17.8M34.8 20v17.8M37.6 20v17.8M24.4 25.2h15.2M24.6 29.2h14.8M24.4 33.2h15.2M24.4 37.2h15.2', '#6d737b', 1.4) +
+                grpW('#6d737b', .6, P('M25.6 37.8l.8 2.2.8-2.2zM28.4 37.8l.8 2.2.8-2.2zM31.2 37.8l.8 2.2.8-2.2zM34 37.8l.8 2.2.8-2.2zM36.8 37.8l.8 2.2.8-2.2z'))) + '</g>' +
+                liveVars('gdust', { dx: '-3.4px' }, '<circle cx="26.4" cy="43.2" r="1.3" fill="#c9c2b4" stroke="' + INK + '" stroke-width=".5"/>') +
+                liveVars('gdust', { dx: '3.4px' }, '<circle cx="37.6" cy="43.2" r="1.3" fill="#c9c2b4" stroke="' + INK + '" stroke-width=".5"/>')) +
             grpW(GOLD, 1.2, P('M30.2 20.8h3.6l-.6 4.4h-2.4z')) +
             crown(32, 17, .5) +
             [3, 45].map(x =>
@@ -5774,21 +6714,30 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         // tufts of the meadow's grass swaying (the grass painted on the
         // ground stays still: these are drawn over it)
         [[548, 168], [700, 128], [812, 136], [955, 150], [1066, 196], [968, 238], [552, 556], [648, 534],
-         [772, 552], [928, 560], [1048, 548], [1058, 432], [536, 330], [560, 446], [1012, 470], [618, 270]].forEach((t, i) => {
+         [772, 552], [928, 560], [1058, 432], [536, 330], [618, 270]].forEach((t, i) => {
             s += live('grass', '<path d="M' + t[0] + ' ' + t[1] + 'l-3-11M' + (t[0] + 3) + ' ' + t[1] + 'l1-13M' + (t[0] + 6) + ' ' + t[1] +
                 'l4-10" fill="none" stroke="#7aa34c" stroke-width="2.4" stroke-linecap="round"/>', -(i % 5) * .6);
         });
 
-        // now and then a few birds cross the sky
-        const bird = (x, y, k) => '<g transform="translate(' + x + ' ' + y + ') scale(' + k + ')">' +
-            live('flap', '<path d="M-9-2c3-4 6-4 9 0 3-4 6-4 9 0" fill="none" stroke="#1b1418" stroke-width="2.6" stroke-linecap="round"/>', -(x % 3) * .15) + '</g>';
-        s += live('flock', bird(0, 0, 1.2) + bird(-26, 12, 1) + bird(-18, -16, .9) + bird(-46, 4, .8));
+        // now and then a few birds cross the sky: ui.js BIRDS flies the
+        // flock in at one edge and out at another, a different way each
+        // time, turned to face the way it goes. Seen from above, each heads
+        // right (its beak at +x, its forked tail behind), wings beating
+        // (style.css .an-wings), each at its own pace. Off the board till
+        // then.
+        const bird = (x, y, k, i) => '<g class="bird" transform="translate(' + x + ' ' + y + ') scale(' + k + ')">' +
+            '<g class="an-wings" style="animation-duration:' + (.27 + i * .025).toFixed(3) + 's;animation-delay:' + (-i * .11).toFixed(2) + 's">' +
+            '<path d="M2.4-1C1.4-5-1-8.6-5.4-11.6-3.6-7.4-3.2-4.2-3.4-1zM2.4 1C1.4 5-1 8.6-5.4 11.6-3.6 7.4-3.2 4.2-3.4 1z" fill="#1b1418"/></g>' +
+            '<path d="M7.6 0C6.4-1.4 3.6-1.8.8-1.4L-6-.9-9.6-2.6-8.6 0-9.6 2.6-6 .9.8 1.4C3.6 1.8 6.4 1.4 7.6 0z" fill="#1b1418"/></g>';
+        s += '<g class="flock" transform="translate(-400 -400)">' + bird(0, 0, 1.15, 0) + bird(-26, 18, 1, 1) + bird(-22, -20, .95, 2) +
+            bird(-50, 6, .88, 3) + bird(-47, -36, .82, 4) + '</g>';
 
         return '<svg class="board-scene" viewBox="0 0 1200 700" preserveAspectRatio="none" aria-hidden="true">' + s + '</svg>';
     }
 
     /* ------------------------------------------------------------------ */
 
+    let svgCopies = 0;
     function uri(svg) { return 'data:image/svg+xml,' + encodeURIComponent(svg).replace(/'/g, '%27'); }
     function wrap(inner, vb) { return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + (vb || '0 0 100 100') + '">' + inner + '</svg>'; }
 
@@ -5815,7 +6764,11 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         arenaRing: arenaRing,
         merchantSvg: () => wrap(merchantHut(), '0 0 160 112'),
         enemySvg: id => ENEMY_ART[id] ? wrap(ENEMY_ART[id]) : '',
-        squareSvg: key => SQUARE_ART[key] ? wrap(SQUARE_ART[key], '0 0 64 48') : '',
+        // Each copy of a square's picture names its clips afresh (@ID@), so
+        // copies on the board and in a card never share one.
+        squareSvg: key => SQUARE_ART[key] ? wrap(SQUARE_ART[key].replace(/@ID@/g, String(++svgCopies)), '0 0 64 48') : '',
+        // The Golden Dice's die, for ui.js GOLDEN_DIE to tumble.
+        DIE: { svg: dieSvg, REST: DIE_REST, rot: dieRot, mul: dieMul, floor: dieFloor, roof: dieRoof },
         bossPlaceholder: id => BOSS_PLACEHOLDER[id] || '',
         uri: uri, wrap: wrap
     };
@@ -6289,6 +7242,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             lastDie: null, dieSeq: 0,
             battleSeq: 0, lastBattle: null,
             zapSeq: 0, lastZap: null,
+            crumbleSeq: 0, lastCrumble: null,
             drawSeq: 0, lastDraw: null,
             dropSeq: 0, lastDrop: null,
             createdAt: Date.now(),
@@ -7132,6 +8086,9 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
                         p.fragments.splice(i, 1);
                         log(state, 'Raw Oblivion Shield: a ' + roll + '. Pendant Fragment #' + roll +
                             ' crumbles to dust.', 'death');
+                        // for the screens: pendantfx.js breaks it (ui.js CRUMBLE)
+                        state.crumbleSeq = (state.crumbleSeq | 0) + 1;
+                        state.lastCrumble = { playerId: p.id, frag: roll, have: p.fragments.slice(), n: state.crumbleSeq };
                     } else {
                         log(state, 'Raw Oblivion Shield: a ' + roll + ', but ' + p.name +
                             ' has no Fragment #' + roll + ' to lose.', 'roll');
@@ -11252,14 +12209,22 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 /* ==== game-oblivion/pendantfx.js ==== */
 /* =========================================================================
    Legend of Fenrirak™, The Oblivion Dragon: Online Version
-   pendantfx.js: the five Pendant Fragments becoming the Oblivion Pendant.
+   pendantfx.js: the five Pendant Fragments becoming the Oblivion Pendant,
+   and a fragment breaking.
 
-   Played over the whole screen when somebody holds all five fragments.
+   play(): over the whole screen when somebody holds all five fragments.
    The five gold wedges circle the middle in a tightening, quickening
    spiral, trailing gold, until they meet with force; the whole pendant (its
    dark plate, its red gem) bursts into being in rings of light, then sits a
    moment in a slowly turning ring of gold beads under the words before it
-   all fades.
+   all fades. On Kūmara (html.gfx-potato) it is far lighter, for very old
+   machines: the wedges slide straight in, one ring goes out, and the
+   finished pendant simply stands under the words, a few frames a second
+   and none at all while nothing moves.
+
+   crumble(): the Raw Oblivion Shield's roll taking a fragment: the
+   shield's hexagons crush it to shards, the board shaking. Never on
+   Kūmara (ui.js).
 
    One canvas, flat colours and crisp lines only: no blur, no glow. The
    violet is the --zap-* set in style.css, the gold and the gem are the
@@ -11267,7 +12232,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 
    Orbit was the user's pick of four looks (2026-10-05); the ring of beads
    replaced rotating bars behind the pendant, which the user did not like.
-   ui.js calls play() through BANNERS.
+   ui.js calls play() and crumble() through BANNERS.
    ========================================================================= */
 
 (function (global) {
@@ -11276,6 +12241,8 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     const IMP = 2000;      // the pieces meet: the kablam
     const CAP = 2250;      // the words come up
     const END = 5800;      // and it is all gone
+    // Kūmara's: the pieces are home, the words, the end.
+    const LITE = { IN: 1000, CAP: 1100, END: 4000 };
 
     const TAU = Math.PI * 2;
     const clamp = (v, a, b) => (v < a ? a : (v > b ? b : v));
@@ -11285,6 +12252,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     const inCubic = t => t * t * t;
     const outQuad = t => 1 - (1 - t) * (1 - t);
     const outCubic = t => 1 - Math.pow(1 - t, 3);
+    const inOut = t => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
     const outBack = (t, k) => { k = k || 1.70158; return 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2); };
 
     function seeded(seed) {
@@ -11313,7 +12281,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     // The pendant's own colours (as the icon in art.js).
     const INK = '#1a1014';
     const GOLD = '#e2b13c', GOLD_LIT = '#f3d27a', GOLD_DIM = '#c08a25', GOLD_EDGE = '#7a4a12';
-    const PLATE = '#2a2024', PLATE_RIM = '#3d3238';
+    const PLATE = '#2a2024', PLATE_RIM = '#3d3238', SLOT = '#3d3238', SLOT_EDGE = '#55484e';
     const GEM = '#c8342b', GEM_DARK = '#8e1f1a', GEM_LIT = '#ef7a6a';
     const CREAM = [255, 244, 214];
     const GOLD_RGB = hexRgb(GOLD);
@@ -11328,6 +12296,11 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         c.moveTo(pts[0][0], pts[0][1]);
         for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
         c.closePath();
+    }
+    function centroid(pts) {
+        let x = 0, y = 0;
+        pts.forEach(p => { x += p[0]; y += p[1]; });
+        return [x / pts.length, y / pts.length];
     }
     // Fragment i (0 to 4) is the wedge from the middle to corners i and i+1.
     // Each is drawn about its own centroid.
@@ -11444,14 +12417,14 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     /* ---- shards --------------------------------------------------------- */
 
     // Gold shards flung out from the middle, swirling as they go.
-    function spray(fx, n, power) {
+    function spray(fx, n, power, from) {
         if (fx.reduced) return;
-        const R = fx.R;
+        const R = fx.R, r0 = from == null ? R * 0.5 : from;
         for (let i = 0; i < n; i++) {
             const a = fx.rnd() * TAU;
             const sp = (0.35 + fx.rnd() * 0.9) * power * R * 0.022;
             fx.shards.push({
-                x: Math.cos(a) * R * 0.5, y: Math.sin(a) * R * 0.5,
+                x: Math.cos(a) * r0, y: Math.sin(a) * r0,
                 vx: Math.cos(a) * sp - Math.sin(a) * sp * 0.6, vy: Math.sin(a) * sp + Math.cos(a) * sp * 0.6,
                 rot: fx.rnd() * TAU, vr: (fx.rnd() - 0.5) * 0.02, size: R * (0.035 + fx.rnd() * 0.06),
                 col: fx.rnd() < 0.7 ? 'gold' : (fx.rnd() < 0.5 ? 'cream' : 'violet'),
@@ -11480,27 +12453,37 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         document.body.appendChild(cap);
     }
 
-    function play(o, done, seekTo) {
+    function gfxIs(level) {
+        const g = global.document && global.document.documentElement.classList;
+        return !!(g && g.contains('gfx-' + level));
+    }
+
+    // Everything both effects share: the canvas sized to the screen, the
+    // words under the middle, the seed.
+    function begin(o, done, kind) {
         stop();
         ensure();
         const vw = window.innerWidth || 800, vh = window.innerHeight || 600;
         const reduced = !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
         const seed = o.seed || ((Math.random() * 1e9) | 0);
-        last = { o: o, seed: seed };
-        const gfx = global.document && global.document.documentElement.classList;
-        dpr = Math.min(gfx && gfx.contains('gfx-ultra') ? 3 : (gfx && gfx.contains('gfx-potato') ? 1 : 2), global.devicePixelRatio || 1);
+        last = { o: o, seed: seed, kind: kind };
+        const lite = kind === 'join' && gfxIs('potato');
+        dpr = Math.min(gfxIs('ultra') ? 3 : (gfxIs('potato') ? 1 : 2), global.devicePixelRatio || 1);
         canvas.width = Math.round(vw * dpr);
         canvas.height = Math.round(vh * dpr);
+        canvas.style.background = '';
+        canvas.style.opacity = '';
         canvas.classList.add('on');
         const R = clamp(Math.min(vw, vh) * 0.15, 56, 130);
         fx = {
+            kind: kind, lite: lite,
             o: o, done: done || null, t: 0, last: 0, vw: vw, vh: vh, cx: vw / 2, cy: vh * 0.42,
             R: R, far: Math.min(vw * 0.32, vh * 0.27, R * 3.2), rnd: seeded(seed), pal: palette(),
             reduced: reduced, geo: wedgeGeom(R),
             parts: [0, 1, 2, 3, 4].map(() => ({ x: 0, y: 0, rot: 0, s: 1, a: 0, trail: false, hist: [] })),
-            shards: [], rings: [], kick: 0, fired: {}
+            shards: [], rings: [], kick: 0, fired: {},
+            END: lite ? LITE.END : END, CAP: lite ? LITE.CAP : CAP
         };
-        cap.style.top = Math.round(fx.cy + R * 1.45 + 18) + 'px';
         cap.innerHTML = '';
         cap.className = 'zap-caption pend-caption';
         if (o.caption) {
@@ -11508,6 +12491,17 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             sp.textContent = o.caption;
             cap.appendChild(sp);
         }
+        return fx;
+    }
+
+    function play(o, done, seekTo) {
+        const f = begin(o, done, 'join');
+        cap.style.top = Math.round(f.cy + f.R * 1.45 + 18) + 'px';
+        if (f.lite) { liteStart(); return; }
+        run(seekTo);
+    }
+
+    function run(seekTo) {
         if (document.hidden && seekTo == null) { finish(); return; }
         if (seekTo != null) {
             while (fx.t < seekTo) advance(Math.min(16, seekTo - fx.t));
@@ -11517,7 +12511,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         }
         fx.last = performance.now();
         next();
-        watchdog = setTimeout(finish, END + 2500);
+        watchdog = setTimeout(finish, fx.END + 2500);
     }
 
     function next() {
@@ -11534,14 +12528,15 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         advance(dt);
         if (!fx) return;
         draw();
-        if (fx.t >= END) finish();
+        if (fx.t >= fx.END) finish();
         else next();
     }
 
     function advance(dt) {
         fx.t += dt;
         const t = fx.t;
-        if (t < IMP) {
+        if (fx.kind === 'crumble') crumbleAdvance(dt, t);
+        else if (t < IMP) {
             for (let i = 0; i < 5; i++) {
                 place(fx, i, t);
                 const P = fx.parts[i];
@@ -11554,8 +12549,8 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             hit(fx);
             fx.kick = 16;
         }
-        if (!fx.fired.cap && t >= CAP) { fx.fired.cap = true; cap.classList.add('show'); }
-        if (!fx.fired.capOff && t >= END - 450) { fx.fired.capOff = true; cap.classList.remove('show'); }
+        if (!fx.fired.cap && t >= fx.CAP) { fx.fired.cap = true; cap.classList.add('show'); }
+        if (!fx.fired.capOff && t >= fx.END - 450) { fx.fired.capOff = true; cap.classList.remove('show'); }
         // shards
         fx.shards.forEach(s => {
             s.life += dt;
@@ -11565,21 +12560,24 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
             s.rot += s.vr * dt;
         });
         fx.shards = fx.shards.filter(s => s.life < s.max);
-        // the shake
-        fx.kick *= Math.pow(0.991, dt);
+        // the shake: the jolts dying away, or (a fragment shattering) the
+        // rumble before it, the board tipping a little as well
+        fx.kick *= Math.pow(fx.decay || 0.991, dt);
         if (fx.reduced) fx.kick = 0;
-        const sh = fx.o.shake;
-        if (sh) sh.style.transform = fx.kick > 0.4 ? 'translate(' + ((fx.rnd() - 0.5) * fx.kick).toFixed(1) + 'px,' + ((fx.rnd() - 0.5) * fx.kick).toFixed(1) + 'px)' : '';
+        const sh = fx.o.shake, q = Math.max(fx.kick, fx.rumble || 0);
+        if (sh) sh.style.transform = q > 0.4 ? 'translate(' + ((fx.rnd() - 0.5) * q).toFixed(1) + 'px,' + ((fx.rnd() - 0.5) * q).toFixed(1) + 'px)' +
+            (fx.tilt ? ' rotate(' + ((fx.rnd() - 0.5) * q * fx.tilt).toFixed(2) + 'deg)' : '') : '';
     }
 
     function draw() {
         const c = ctx, t = fx.t, R = fx.R, pal = fx.pal;
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.clearRect(0, 0, fx.vw, fx.vh);
-        const out = 1 - seg(t, END - 600, END);
+        const out = 1 - seg(t, fx.END - 600, fx.END);
         // the veil
         c.fillStyle = rgba(pal.veil, 0.8 * outQuad(seg(t, 0, 380)) * out);
         c.fillRect(0, 0, fx.vw, fx.vh);
+        if (fx.kind === 'crumble') { crumbleDraw(c, t, out); return; }
         // the two flash frames of the kablam, each one flat colour
         if (t >= IMP && t < IMP + 55) { c.fillStyle = rgba(CREAM, 0.92); c.fillRect(0, 0, fx.vw, fx.vh); }
         else if (t >= IMP + 55 && t < IMP + 115) { c.fillStyle = rgba(pal.deep, 0.92); c.fillRect(0, 0, fx.vw, fx.vh); }
@@ -11679,13 +12677,442 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         });
     }
 
+    /* ================================================================== */
+    /* Kūmara: the pendant for a very old machine                          */
+    /*                                                                    */
+    /* No spiral, no trails, no shards, no shake, no flash, no bead ring.  */
+    /* The veil is the canvas's own background (drawn once, by the        */
+    /* browser); the wedges slide straight into place at about 15 frames  */
+    /* a second, one gold ring goes out, and then nothing is drawn at all  */
+    /* until it fades in four steps.                                       */
+    /* ================================================================== */
+
+    function liteStart() {
+        if (document.hidden) { finish(); return; }
+        canvas.style.background = rgba(fx.pal.veil, 0.8);
+        // Only the middle is ever drawn on: the wedges start no further out
+        // than `far`, and the ring stops at 2.6 R.
+        const r = Math.max(fx.far + fx.R * 1.4, fx.R * 2.7) + 4;
+        fx.box = { x: Math.max(0, fx.cx - r), y: Math.max(0, fx.cy - r), w: r * 2, h: r * 2 };
+        fx.last = performance.now();
+        watchdog = setTimeout(finish, LITE.END + 2500);
+        liteFrame();
+    }
+    function liteFrame() {
+        clearTimeout(tick);
+        if (!fx || !fx.lite) return;
+        const now = performance.now();
+        fx.t += clamp(now - fx.last, 0, 200);
+        fx.last = now;
+        const t = fx.t;
+        if (!fx.fired.cap && t >= LITE.CAP) { fx.fired.cap = true; cap.classList.add('show'); }
+        if (t >= LITE.END) { finish(); return; }
+        const fadeAt = LITE.END - 500;
+        if (t >= fadeAt) {
+            // fading: four steps of the whole canvas, nothing redrawn
+            if (!fx.fired.capOff) { fx.fired.capOff = true; cap.classList.remove('show'); }
+            canvas.style.opacity = String(Math.max(0, 1 - Math.ceil(seg(t, fadeAt, LITE.END) * 4) / 4));
+            tick = setTimeout(liteFrame, 125);
+            return;
+        }
+        liteDraw(t);
+        const ringDone = LITE.IN + 520;
+        // still moving: another frame soon; standing still: wait to fade
+        tick = setTimeout(liteFrame, t < ringDone ? 66 : Math.max(16, fadeAt - t));
+    }
+    function liteDraw(t) {
+        const c = ctx, R = fx.R, b = fx.box;
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        c.clearRect(b.x, b.y, b.w, b.h);
+        c.save();
+        c.translate(fx.cx, fx.cy);
+        const home = t >= LITE.IN;
+        if (home) drawPlate(c, R, 1);
+        const u = outCubic(seg(t, 150, LITE.IN));
+        for (let i = 0; i < 5; i++) {
+            const w = fx.geo[i], d = fx.far * (1 - u);
+            c.save();
+            c.translate(w.c[0] + w.dir[0] * d, w.c[1] + w.dir[1] * d);
+            drawWedge(c, w, R, Math.min(1, seg(t, 80 + i * 50, 380 + i * 50) * 1.4));
+            c.restore();
+        }
+        if (home) {
+            drawGem(c, R, 1, 1);
+            const p = seg(t, LITE.IN, LITE.IN + 500);
+            if (p > 0 && p < 1) {
+                c.beginPath(); c.arc(0, 0, R * lerp(1.15, 2.6, p), 0, TAU);
+                c.lineWidth = lerp(4, 1, p); c.strokeStyle = rgba(GOLD_RGB, 1 - p); c.stroke();
+            }
+        }
+        c.restore();
+    }
+
+    /* ================================================================== */
+    /* A fragment shattering                                               */
+    /*                                                                    */
+    /* The Raw Oblivion Shield's roll has taken Pendant Fragment n. It is  */
+    /* shown big in the middle of the screen, trembling, and the shield's  */
+    /* violet hexagons close round it in three squeezes: each one cracks   */
+    /* it further, knocks chips off it and jolts the board, which rumbles  */
+    /* harder and harder. Then they crush it. It bursts into chunks and    */
+    /* shards with a hard jolt, and two aftershocks follow while the       */
+    /* chunks tumble over and fall away. The hexagons are blown out, then  */
+    /* drawn back to stand in a ring round the empty place where it was   */
+    /* (the dark slot of a missing fragment), until it all fades. The      */
+    /* user picked this of four looks (2026-10-10), asking for a fuller    */
+    /* ending and more shaking. The break splits the wedge along straight */
+    /* cuts (cutPoly), so the chunks fit back together exactly.           */
+    /* ================================================================== */
+
+    // When it breaks, when the words come up and the end; the hexagons'
+    // three squeezes, and the two aftershocks (counted from the break).
+    const SHATTER = { BREAK: 1400, CAP: 1850, END: 4800, PUSH: [600, 900, 1150], AFTER: [650, 1300] };
+
+    // A steady shake: a fresh offset (-0.5 to 0.5) every `step` ms, the
+    // same each time that moment is drawn.
+    function jolt(t, step, salt) {
+        let n = Math.imul(Math.floor(t / step) + 1, 374761393) ^ Math.imul(salt + 1, 668265263);
+        n = Math.imul(n ^ (n >>> 13), 1274126177);
+        return ((n ^ (n >>> 16)) >>> 0) / 4294967296 - 0.5;
+    }
+
+    // The part of a convex polygon either side of the line through p with
+    // normal n.
+    function cutPoly(pts, p, n) {
+        const A = [], B = [];
+        for (let i = 0; i < pts.length; i++) {
+            const a = pts[i], b = pts[(i + 1) % pts.length];
+            const da = (a[0] - p[0]) * n[0] + (a[1] - p[1]) * n[1];
+            const db = (b[0] - p[0]) * n[0] + (b[1] - p[1]) * n[1];
+            if (da >= 0) A.push(a);
+            if (da <= 0) B.push(a);
+            if ((da > 0 && db < 0) || (da < 0 && db > 0)) {
+                const k = da / (da - db), q = [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
+                A.push(q); B.push(q);
+            }
+        }
+        return [A, B].filter(x => x.length >= 3);
+    }
+    // Where the line through p along d crosses the triangle: its chord.
+    function chord(tri, p, d) {
+        const hits = [];
+        for (let i = 0; i < 3; i++) {
+            const a = tri[i], b = tri[(i + 1) % 3];
+            const ex = b[0] - a[0], ey = b[1] - a[1];
+            const den = d[0] * ey - d[1] * ex;
+            if (Math.abs(den) < 1e-9) continue;
+            const s = ((a[0] - p[0]) * ey - (a[1] - p[1]) * ex) / den;
+            const u = ((a[0] - p[0]) * d[1] - (a[1] - p[1]) * d[0]) / den;
+            if (u >= -1e-6 && u <= 1 + 1e-6) hits.push([p[0] + d[0] * s, p[1] + d[1] * s, s]);
+        }
+        hits.sort((x, y) => x[2] - y[2]);
+        return hits.length >= 2 ? [hits[0], hits[hits.length - 1]] : null;
+    }
+    // Break the wedge (its points about its centroid) along `cuts` lines,
+    // each crossing it near its middle. The lines are kept as cracks: a
+    // zig-zag along each, drawn growing before the break.
+    function breakWedge(tri, cuts, rnd, RR) {
+        let pieces = [tri.slice()];
+        const cracks = [];
+        for (let k = 0; k < cuts; k++) {
+            let w0 = 0.2 + rnd() * 0.6, w1 = 0.2 + rnd() * 0.6, w2 = 0.2 + rnd() * 0.6;
+            const sw = w0 + w1 + w2;
+            w0 /= sw; w1 /= sw; w2 /= sw;
+            const p = [tri[0][0] * w0 + tri[1][0] * w1 + tri[2][0] * w2, tri[0][1] * w0 + tri[1][1] * w1 + tri[2][1] * w2];
+            const a = rnd() * Math.PI, d = [Math.cos(a), Math.sin(a)], n = [-d[1], d[0]];
+            pieces = pieces.reduce((acc, pc) => acc.concat(cutPoly(pc, p, n)), []);
+            const ch = chord(tri, p, d);
+            if (!ch) continue;
+            const zig = [];
+            const steps = 7;
+            for (let i = 0; i <= steps; i++) {
+                const f = i / steps, j = i === 0 || i === steps ? 0 : (rnd() - 0.5) * RR * 0.05;
+                zig.push([lerp(ch[0][0], ch[1][0], f) + n[0] * j, lerp(ch[0][1], ch[1][1], f) + n[1] * j]);
+            }
+            cracks.push({ pts: zig });
+        }
+        // Each chunk about its own middle, coloured as the facet it came from.
+        const B = tri[1], C = tri[2], A0 = tri[0], M = [(B[0] + C[0]) / 2, (B[1] + C[1]) / 2];
+        const side = q => (M[0] - A0[0]) * (q[1] - A0[1]) - (M[1] - A0[1]) * (q[0] - A0[0]);
+        const lit = side(B) > 0;
+        return {
+            cracks: cracks,
+            pieces: pieces.map(pc => {
+                const m = centroid(pc);
+                return { pts: pc.map(q => [q[0] - m[0], q[1] - m[1]]), c: m, x: m[0], y: m[1], bx: 0, by: 0, vy: 0,
+                    rot: 0, vr: 0, flip: 0, vf: 0, a: 1, fill: (side(m) > 0) === lit ? GOLD_LIT : GOLD };
+            })
+        };
+    }
+
+    function crumble(o, done, seekTo) {
+        const f = begin(o, done, 'crumble');
+        Object.assign(f, {
+            n: clamp(o.frag | 0, 1, 5), RR: f.R * 1.8, BREAK: SHATTER.BREAK, CAP: SHATTER.CAP, END: SHATTER.END,
+            broken: false, rumble: 0, decay: 0.9945, tilt: 0.03
+        });
+        f.w = wedgeGeom(f.RR)[f.n - 1];
+        const br = breakWedge(f.w.pts, 4, f.rnd, f.RR);
+        f.cracks = br.cracks;
+        f.pieces = br.pieces;
+        // a little above the middle, so the ring the hexagons settle into
+        // clears the words
+        f.cy = (window.innerHeight || 600) * 0.37;
+        cap.style.top = Math.round(f.cy + f.RR * 1.2 + 22) + 'px';
+        run(seekTo);
+    }
+
+    // How hard the fragment trembles at t (a share of RR): more and more as
+    // the hexagons close, a flinch at each squeeze, wildest in the crush.
+    function trembling(t) {
+        if (fx.reduced) return 0;
+        let s = 0.012 * seg(t, 300, fx.BREAK) + 0.05 * inQuad(seg(t, SHATTER.PUSH[2] + 90, fx.BREAK));
+        SHATTER.PUSH.forEach(p => { if (t >= p) s += 0.045 * (1 - seg(t, p, p + 240)); });
+        return s;
+    }
+    // Where the fragment's centre is before it breaks, and its tilt.
+    function wedgeAt(t) {
+        const s = trembling(t);
+        return [jolt(t, 30, 1) * s * fx.RR * 2, jolt(t, 30, 2) * s * fx.RR * 2, jolt(t, 30, 3) * Math.min(0.16, s * 2.2)];
+    }
+    // Its size, as each squeeze presses it and the crush comes down.
+    function squash(t) {
+        let k = 1;
+        SHATTER.PUSH.forEach(p => { k -= 0.045 * Math.sin(Math.PI * seg(t, p, p + 180)); });
+        return k - 0.06 * inCubic(seg(t, SHATTER.PUSH[2] + 90, fx.BREAK));
+    }
+    // How far the hexagons have closed: 0 out wide, 1 on the fragment.
+    // Each squeeze lunges in, overshoots a little and eases back.
+    function closing(t) {
+        const P = SHATTER.PUSH;
+        let k = 0.1 * outQuad(seg(t, 200, 560));
+        P.forEach(p => { k += 0.17 * outBack(seg(t, p, p + 170), 2.2); });
+        return k + 0.39 * inCubic(seg(t, P[2] + 90, fx.BREAK));
+    }
+    // The hexagons' ring: closing in; after the break, blown out and drawn
+    // back to stand round the empty place, flinching at the aftershocks.
+    function hexRing(t) {
+        if (t < fx.BREAK) return fx.RR * lerp(2.6, 0.55, closing(t));
+        const d = t - fx.BREAK;
+        let r = lerp(0.55, 2.1, outCubic(seg(d, 0, 420)));
+        r = lerp(r, 1.02, inOut(seg(d, 650, 1700)));
+        SHATTER.AFTER.forEach(a => { r *= 1 - 0.07 * Math.sin(Math.PI * seg(d, a, a + 220)); });
+        return fx.RR * r;
+    }
+
+    // Chips of gold knocked off the fragment's edges (or the empty
+    // place's), the fragment standing at `at`.
+    function chips(n, at) {
+        if (fx.reduced) return;
+        const rnd = fx.rnd, pts = fx.w.pts, RR = fx.RR;
+        for (let i = 0; i < n; i++) {
+            const e = (rnd() * 3) | 0, u = rnd(), a = pts[e], b = pts[(e + 1) % 3];
+            const x = lerp(a[0], b[0], u), y = lerp(a[1], b[1], u), l = Math.hypot(x, y) || 1;
+            const sp = RR * (0.0003 + rnd() * 0.0005);
+            fx.shards.push({ x: at[0] + x, y: at[1] + y, vx: x / l * sp, vy: y / l * sp - RR * 0.0003,
+                rot: rnd() * TAU, vr: (rnd() - 0.5) * 0.02, size: fx.R * (0.022 + rnd() * 0.03),
+                col: rnd() < 0.75 ? 'gold' : 'cream', g: 0.0009, life: 0, max: 650 + rnd() * 450 });
+        }
+    }
+
+    function crumbleAdvance(dt, t) {
+        const RR = fx.RR, rnd = fx.rnd;
+        // each squeeze: a jolt, and chips knocked off
+        SHATTER.PUSH.forEach((p, i) => {
+            if (t < p || fx.fired['push' + i]) return;
+            fx.fired['push' + i] = true;
+            fx.kick = Math.max(fx.kick, 6 + i * 2.5);
+            chips(4 + i * 2, wedgeAt(t));
+        });
+        // the board rumbling harder as they close in
+        fx.rumble = fx.broken || fx.reduced ? 0 : 6 * inQuad(seg(t, 350, fx.BREAK));
+        if (!fx.broken && t >= fx.BREAK) {
+            fx.broken = true;
+            const at = wedgeAt(t);
+            fx.pieces.forEach(p => {
+                p.x = at[0] + p.c[0]; p.y = at[1] + p.c[1];
+                // flung out (slowing in the air) and a little up, then
+                // falling, turning and tumbling over as they go
+                const l = Math.hypot(p.c[0], p.c[1]) || 1, sp = RR * (0.0011 + rnd() * 0.0009);
+                p.bx = p.c[0] / l * sp; p.by = p.c[1] / l * sp - RR * 0.0004;
+                p.vr = (rnd() - 0.5) * 0.014;
+                p.flip = rnd() * TAU; p.vf = (0.004 + rnd() * 0.008) * (rnd() < 0.5 ? -1 : 1);
+                p.born = t;
+            });
+            fx.kick = 28;
+            spray(fx, 46, 1.25, RR * 0.2);
+            fx.rings = [0, 90, 200].map((d, k) => ({ at: t + d, w: 6 - k * 1.5, reach: 1 + k * 0.3 }));
+        }
+        if (!fx.broken) return;
+        // the aftershocks: a jolt, a ring from the empty place, the last
+        // chips falling off its edges
+        SHATTER.AFTER.forEach((a, i) => {
+            if (t < fx.BREAK + a || fx.fired['after' + i]) return;
+            fx.fired['after' + i] = true;
+            fx.kick = Math.max(fx.kick, 13 - i * 5);
+            fx.rings.push({ at: t, w: 3 - i, reach: 0.55 });
+            chips(8 - i * 3, [0, 0]);
+        });
+        const drag = Math.pow(0.998, dt), g = RR * 0.0000026;
+        fx.pieces.forEach(p => {
+            p.vy += g * dt;
+            p.x += p.bx * dt; p.y += (p.by + p.vy) * dt;
+            p.bx *= drag; p.by *= drag;
+            p.rot += p.vr * dt; p.flip += p.vf * dt;
+            p.a = 1 - seg(t - p.born, 900, 1700);
+        });
+    }
+
+    function crumbleDraw(c, t, out) {
+        const RR = fx.RR, pal = fx.pal, A = out;
+        // the two flash frames, each one flat colour
+        if (!fx.reduced && t >= fx.BREAK && t < fx.BREAK + 50) { c.fillStyle = rgba(pal.bright, 0.85); c.fillRect(0, 0, fx.vw, fx.vh); }
+        else if (!fx.reduced && t >= fx.BREAK + 50 && t < fx.BREAK + 100) { c.fillStyle = rgba(CREAM, 0.85); c.fillRect(0, 0, fx.vw, fx.vh); }
+        const jx = fx.kick > 0.4 ? (fx.rnd() - 0.5) * fx.kick * 0.5 : 0, jy = fx.kick > 0.4 ? (fx.rnd() - 0.5) * fx.kick * 0.5 : 0;
+        c.save();
+        c.translate(fx.cx + jx, fx.cy + jy);
+        drawHexes(c, t, A);
+        if (!fx.broken) {
+            // the whole fragment: trembling, squeezed, cracking
+            const at = wedgeAt(t), k = outBack(seg(t, 120, 520), 1.6) * squash(t);
+            const inA = Math.min(1, seg(t, 80, 380) * 1.6) * A;
+            c.save();
+            c.translate(at[0], at[1]);
+            c.rotate(at[2]);
+            c.scale(k, k);
+            drawWedge(c, fx.w, RR, inA);
+            drawNumber(c, inA);
+            drawCracks(c, t, inA);
+            c.restore();
+        } else {
+            drawGap(c, t, A);
+            drawPieces(c, A);
+        }
+        drawRings(c, t, A);
+        drawShards(c, A);
+        c.restore();
+    }
+
+    function drawNumber(c, a) {
+        if (a <= 0) return;
+        c.globalAlpha = a;
+        c.fillStyle = INK;
+        c.font = '700 ' + Math.round(fx.RR * 0.26) + 'px Cinzel, Georgia, serif';
+        c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillText(String(fx.n), 0, fx.RR * 0.03);
+        c.globalAlpha = 1;
+    }
+    // The cracks: each squeeze sends one across (the last two come in the
+    // last squeeze), growing from end to end, violet with a pale lip.
+    function drawCracks(c, t, a) {
+        const P = SHATTER.PUSH;
+        fx.cracks.forEach((k, idx) => {
+            const st = P[Math.min(idx, P.length - 1)] + Math.max(0, idx - P.length + 1) * 70;
+            const g = seg(t, st, st + 170);
+            if (g <= 0) return;
+            const pts = k.pts, n = pts.length - 1, upto = g * n;
+            c.beginPath();
+            c.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i <= Math.ceil(upto); i++) {
+                const f = Math.min(1, upto - (i - 1));
+                c.lineTo(lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f));
+            }
+            c.lineJoin = 'round'; c.lineCap = 'round';
+            c.lineWidth = Math.max(2, fx.RR * 0.026); c.strokeStyle = rgba(fx.pal.bright, a); c.stroke();
+            c.lineWidth = Math.max(0.8, fx.RR * 0.008); c.strokeStyle = rgba(CREAM, a); c.stroke();
+        });
+    }
+    // The empty place where the fragment was: the dark slot of a missing
+    // fragment (as the pendant icon shows one), edged in the shield's
+    // violet, its number worn faintly into it.
+    function drawGap(c, t, A) {
+        const a = seg(t, fx.BREAK + 40, fx.BREAK + 320) * A, RR = fx.RR;
+        if (a <= 0) return;
+        c.globalAlpha = a;
+        c.beginPath(); poly(c, fx.w.pts);
+        c.fillStyle = SLOT; c.fill();
+        c.lineJoin = 'round'; c.lineWidth = Math.max(2, RR * 0.026); c.strokeStyle = INK; c.stroke();
+        c.lineWidth = Math.max(1, RR * 0.01); c.strokeStyle = rgba(fx.pal.bright, 1); c.stroke();
+        c.fillStyle = SLOT_EDGE;
+        c.font = '700 ' + Math.round(RR * 0.26) + 'px Cinzel, Georgia, serif';
+        c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillText(String(fx.n), 0, RR * 0.03);
+        c.globalAlpha = 1;
+    }
+    // The chunks, tumbling: each turns over as it falls (narrowing to its
+    // edge and widening again), its back a darker gold.
+    function drawPieces(c, A) {
+        const RR = fx.RR;
+        fx.pieces.forEach(p => {
+            if (p.a <= 0) return;
+            const fl = Math.cos(p.flip), k = Math.max(0.08, Math.abs(fl));
+            const cr = Math.cos(p.rot), sr = Math.sin(p.rot);
+            c.globalAlpha = p.a * A;
+            c.beginPath(); poly(c, p.pts.map(q => [p.x + q[0] * k * cr - q[1] * sr, p.y + q[0] * k * sr + q[1] * cr]));
+            c.fillStyle = fl >= 0 ? p.fill : GOLD_DIM; c.fill();
+            c.lineJoin = 'round'; c.lineWidth = Math.max(1.2, RR * 0.022); c.strokeStyle = INK; c.stroke();
+        });
+        c.globalAlpha = 1;
+    }
+    function drawRings(c, t, A) {
+        (fx.rings || []).forEach(s => {
+            const p = seg(t, s.at, s.at + 600);
+            if (p <= 0 || p >= 1) return;
+            c.beginPath(); c.arc(0, 0, fx.RR * lerp(0.5, 2.2 * s.reach, outCubic(p)), 0, TAU);
+            c.lineWidth = lerp(s.w, 0.6, p); c.strokeStyle = rgba(fx.pal.bright, (1 - p) * A); c.stroke();
+        });
+    }
+
+    // The shield's violet hexagons: shivering as they close round the
+    // fragment in squeezes, bolts of its magic in the last moments, then
+    // blown out by the break and gathering again in a ring round the
+    // empty place, shrinking away as it all fades.
+    function drawHexes(c, t, A) {
+        const RR = fx.RR, pal = fx.pal, n = 12, after = t >= fx.BREAK;
+        const r = hexRing(t);
+        const turn = t * 0.0006 + (after ? 1.1 * outCubic(seg(t - fx.BREAK, 0, 1400)) : 0);
+        const hx = RR * (after ? 0.15 * (0.35 + 0.65 * A) : lerp(0.2, 0.16, closing(t)));
+        const a = seg(t, 200, 600) * A;
+        const shiver = after || fx.reduced ? 0 : RR * 0.035 * seg(t, 500, fx.BREAK);
+        for (let i = 0; i < n; i++) {
+            const ang = turn + i / n * TAU;
+            const x = Math.cos(ang) * r + jolt(t, 40, 10 + i) * shiver, y = Math.sin(ang) * r + jolt(t, 40, 30 + i) * shiver;
+            c.beginPath();
+            for (let k = 0; k < 6; k++) {
+                const q = ang + k * TAU / 6;
+                const px = x + Math.cos(q) * hx, py = y + Math.sin(q) * hx;
+                if (k) c.lineTo(px, py); else c.moveTo(px, py);
+            }
+            c.closePath();
+            c.fillStyle = rgba(pal.deep, 0.55 * a); c.fill();
+            c.lineJoin = 'round'; c.lineWidth = 2; c.strokeStyle = rgba(pal.bright, a); c.stroke();
+        }
+        // the bolts of the shield's magic, in the last moments
+        if (!after && t > fx.BREAK - 300) {
+            c.beginPath();
+            for (let i = 0; i < 4; i++) {
+                const ang = turn * 3 + i / 4 * TAU + Math.floor(t / 70);
+                let x = Math.cos(ang) * r, y = Math.sin(ang) * r;
+                c.moveTo(x, y);
+                for (let k = 1; k <= 4; k++) {
+                    const f = 1 - k / 4;
+                    x = Math.cos(ang) * r * f + (fx.rnd() - 0.5) * RR * 0.18 * f;
+                    y = Math.sin(ang) * r * f + (fx.rnd() - 0.5) * RR * 0.18 * f;
+                    c.lineTo(x, y);
+                }
+            }
+            c.lineJoin = 'miter'; c.lineWidth = 3; c.strokeStyle = rgba(pal.core, A); c.stroke();
+            c.lineWidth = 1.2; c.strokeStyle = rgba(CREAM, A); c.stroke();
+        }
+    }
+
     function cleanUp() {
         cancelAnimationFrame(raf);
         clearTimeout(tick);
         clearTimeout(watchdog);
         raf = 0; tick = 0; watchdog = 0;
         if (ctx) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        if (canvas) canvas.classList.remove('on');
+        if (canvas) { canvas.classList.remove('on'); canvas.style.background = ''; canvas.style.opacity = ''; }
         if (cap) cap.classList.remove('show');
         if (fx && fx.o.shake) fx.o.shake.style.transform = '';
     }
@@ -11705,11 +13132,15 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     global.LOF_PENDANTFX = {
         DURATION: END,
         play: function (o, done) { play(o || {}, done); },
+        // A fragment shattering: { frag: 1 to 5, caption, shake }.
+        crumble: function (o, done) { crumble(o || {}, done); },
         stop: stop,
         playing: function () { return !!fx; },
         seek: function (ms, opts) {
             if (!last) return;
-            play(Object.assign({}, last.o, { seed: last.seed }, opts || {}), null, ms);
+            const o = Object.assign({}, last.o, { seed: last.seed }, opts || {});
+            if (last.kind === 'crumble') crumble(o, null, ms);
+            else play(o, null, ms);
         },
         resume: function () { if (fx && fx.frozen) { fx.frozen = false; fx.last = performance.now(); next(); } }
     };
@@ -12185,8 +13616,10 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
                 flush();
                 done();
             };
-            if (!FX || !el || !$('#screen-game.active') || document.hidden) {
-                notice('The shield’s magic rips through ' + z.who + '’s flesh before they make it through!');
+            // (Kūmara has no death effect: the piece is simply sent home.)
+            if (!FX || !el || !$('#screen-game.active') || document.hidden || gfxLevel() === 'potato') {
+                notice(pid === NET.PID ? 'The shield’s magic rips through your flesh before you make it through!'
+                    : 'The shield’s magic rips through ' + z.who + '’s flesh before they make it through!');
                 end();
                 return;
             }
@@ -12286,6 +13719,219 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
                 if (state) this.saw(state);
             }
         };
+    })();
+
+    // The Raw Oblivion Shield's roll has broken somebody's fragment:
+    // pendantfx.js breaks it on everybody's screen, once the die has been
+    // read. Not on Kūmara, where the die and the log say it.
+    const CRUMBLE = (function () {
+        let seen = 0, primed = false;
+        function play(c, done) {
+            const FX = window.LOF_PENDANTFX;
+            if (!FX || !FX.crumble || gfxLevel() === 'potato' || !$('#screen-game.active') || document.hidden) { done(); return; }
+            const p = S && E.player(S, c.playerId);
+            const mine = c.playerId === NET.PID, who = p ? p.name : 'they';
+            const words = 'The shield’s raw magic tears at the fragments ' + (mine ? 'you' : who) + ' carried through it. ' +
+                (mine ? 'Your' : who + '’s') + ' Pendant Fragment #' + c.frag + ' is lost.';
+            FX.crumble({ frag: c.frag, caption: words, shake: $('#board') }, done);
+        }
+        return {
+            saw(state) {
+                const c = state.lastCrumble;
+                const n = c ? c.n : 0;
+                if (!primed) { primed = true; seen = n; return; }
+                if (!c || n === seen) return;
+                seen = n;
+                BANNERS.add('crumble', done => play(c, done));
+            },
+            reset(state) {
+                primed = false;
+                if (state) this.saw(state);
+            }
+        };
+    })();
+
+    // Birds over the kingdom: now and then a small flock crosses the board,
+    // in at one edge and out at another, a different way and a different
+    // few birds each time, turning gently along a curve and always facing
+    // the way it flies (art.js draws them heading right, wings beating).
+    // Not on Kūmara; far more often when the GPU is to hurt.
+    const BIRDS = (function () {
+        const W = 1200, H = 700, SPEED = 110;   // board units a second
+        let timer = 0, anim = null;
+        function edgePoint(side) {
+            const m = 70;
+            if (side === 0) return [-m, 70 + Math.random() * (H - 140)];
+            if (side === 1) return [W + m, 70 + Math.random() * (H - 140)];
+            if (side === 2) return [90 + Math.random() * (W - 180), -m];
+            return [90 + Math.random() * (W - 180), H + m];
+        }
+        function later(first) {
+            clearTimeout(timer);
+            const level = gfxLevel();
+            if (level === 'potato') return;
+            const ultra = level === 'ultra';
+            const wait = first ? (ultra ? 2500 + Math.random() * 3000 : 6000 + Math.random() * 8000)
+                : (ultra ? 8000 + Math.random() * 9000 : 28000 + Math.random() * 26000);
+            timer = setTimeout(fly, wait);
+        }
+        function fly() {
+            timer = 0;
+            if (gfxLevel() === 'potato') return;
+            const el = document.querySelector('#board .board-scene .flock');
+            if (!el || !el.animate || document.hidden || !$('#screen-game.active')) { later(); return; }
+            // in at one edge, out at any other (left and right, top and
+            // bottom, are 0 and 1, 2 and 3)
+            const from = (Math.random() * 4) | 0;
+            let to = (Math.random() * 4) | 0;
+            if (to === from) to = from ^ 1;
+            const a = edgePoint(from), b = edgePoint(to);
+            const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+            const bend = (Math.random() - 0.5) * 0.5 * len;
+            const cx = (a[0] + b[0]) / 2 - dy / len * bend, cy = (a[1] + b[1]) / 2 + dx / len * bend;
+            const k = 0.8 + Math.random() * 0.4, N = 12, frames = [];
+            let prev = null;
+            for (let i = 0; i <= N; i++) {
+                const t = i / N, u = 1 - t;
+                const x = u * u * a[0] + 2 * u * t * cx + t * t * b[0], y = u * u * a[1] + 2 * u * t * cy + t * t * b[1];
+                const tx = 2 * u * (cx - a[0]) + 2 * t * (b[0] - cx), ty = 2 * u * (cy - a[1]) + 2 * t * (b[1] - cy);
+                let ang = Math.atan2(ty, tx) * 180 / Math.PI;
+                if (prev !== null) { while (ang - prev > 180) ang -= 360; while (ang - prev < -180) ang += 360; }
+                prev = ang;
+                frames.push({ transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + ang.toFixed(1) + 'deg) scale(' + k.toFixed(2) + ')' });
+            }
+            // two to five of them, the leader always
+            const birds = Array.from(el.querySelectorAll('.bird'));
+            const n = 2 + ((Math.random() * (birds.length - 1)) | 0);
+            birds.map((bd, i) => [bd, i === 0 ? -1 : Math.random()]).sort((x, y) => x[1] - y[1])
+                .forEach((o, i) => { o[0].style.display = i < n ? '' : 'none'; });
+            if (anim) anim.cancel();
+            anim = el.animate(frames, { duration: len * 1.08 / SPEED * 1000, easing: 'linear' });
+            anim.onfinish = () => { anim = null; later(); };
+        }
+        return {
+            start() { if (anim) { anim.cancel(); anim = null; } later(true); },
+            stop() { clearTimeout(timer); timer = 0; if (anim) { anim.cancel(); anim = null; } }
+        };
+    })();
+
+    // The moments in the pictures that come now and then rather than over
+    // and over (art.js cue(), style.css "Now and then"): an axe thrown at the
+    // dummy, a rock off the Cliff of Doom, a lamp lit, the bell on the
+    // tripwire, the Golden Dice's die tumbling. Each one, wherever its
+    // picture is (the board, a square's card), keeps its own time: every
+    // EVERY[kind] seconds or so (the middle of the range is about how often
+    // it came before 2026-10-10), a third longer on Regular and a quarter
+    // shorter when the GPU is to hurt, but never before the last one is
+    // done (LONG), it is set off by putting class `go` on it afresh. Never
+    // on Kūmara, and not while the game is out of sight.
+    const CUES = (function () {
+        const EVERY = {
+            axe: [8, 14], sentry: [11, 22], salute: [8, 15], rock: [9, 15], comet: [6, 11], glide: [9, 16],
+            mug: [11, 19], blink: [3, 8], glint: [6, 11], gust: [6, 12], patrol: [8, 14], bloom: [9, 15],
+            spill: [8, 14], lamp: [14, 26], seal: [8, 14], snap: [9, 15], bell: [6, 11], walk: [12, 22],
+            apple: [10, 17], dice: [6, 11], portcullis: [9, 15]
+        };
+        const LONG = {
+            axe: 3.4, sentry: 7, salute: 1, rock: 5, comet: 2.5, glide: 6.3, mug: 5.3, blink: .5, glint: 1.2,
+            gust: 2.9, patrol: 5.6, bloom: 4.6, spill: 4, lamp: 8, seal: 2.8, snap: 5.2, bell: 2.95, walk: 6,
+            apple: 4.4, dice: 1.1, portcullis: 4.8
+        };
+        const PACE = { regular: 1.3, ultra: .75 };
+        // Rocks off one cliff land at least this far apart, each with its own jolt.
+        const APART = 2800;
+        const due = new WeakMap(), shook = new WeakMap();
+        let timer = 0;
+        function wait(kind) {
+            const r = EVERY[kind] || [8, 14];
+            return Math.max(LONG[kind] || 0, (r[0] + Math.random() * (r[1] - r[0])) * (PACE[gfxLevel()] || 1)) * 1000 + 300;
+        }
+        function tick() {
+            if (document.hidden || !$('#screen-game.active')) return;
+            const now = performance.now(), fire = [];
+            document.querySelectorAll('.cue').forEach(el => {
+                const kind = el.getAttribute('data-cue'), t = due.get(el);
+                // a picture just put up starts anywhere along its first wait,
+                // so a new board does not set everything off at once
+                if (t === undefined) { due.set(el, now + (.05 + Math.random() * .95) * wait(kind)); return; }
+                if (now < t) return;
+                // one missed long ago (the game was out of sight) waits its turn again
+                if (now - t > 3000) { due.set(el, now + Math.random() * wait(kind)); return; }
+                if (el.hasAttribute('data-shake')) {
+                    const host = el.closest('.shaker'), last = host && shook.get(host);
+                    if (last && now - last < APART) { due.set(el, last + APART + Math.random() * 1500); return; }
+                    if (host) { shook.set(host, now); fire.push(host); }
+                }
+                due.set(el, now + wait(kind));
+                fire.push(el);
+            });
+            if (!fire.length) return;
+            fire.forEach(el => { if (el.getAttribute('data-cue') !== 'dice') el.classList.remove('go', 'rev'); });
+            void document.body.offsetWidth;   // so each starts again from its beginning
+            fire.forEach(el => {
+                if (el.getAttribute('data-cue') === 'dice') { GOLDEN_DIE.tumble(el); return; }
+                if (el.hasAttribute('data-flip') && Math.random() < .5) el.classList.add('rev');
+                el.classList.add('go');
+            });
+        }
+        return {
+            start() { clearInterval(timer); timer = gfxLevel() === 'potato' ? 0 : setInterval(tick, 400); },
+            stop() { clearInterval(timer); timer = 0; }
+        };
+    })();
+
+    // The Golden Dice's die: when its moment comes (CUES) it rocks back,
+    // hops, tumbles over in the air (a quarter turn forwards or backwards, a
+    // half turn, or a third of a turn over a corner) and lands on another
+    // face, rocking on an edge a moment before it settles, and keeps that
+    // face until the next time. Drawn afresh each frame from its turn in
+    // three dimensions (art.js DIE): every frame when the GPU is to hurt,
+    // about eighteen a second on Regular. Lifted always just enough to clear
+    // the ground, and thrown no higher than the picture.
+    const GOLDEN_DIE = (function () {
+        const held = new WeakMap(), busy = new WeakSet();
+        const MOVES = [[[1, 0, 0], 90], [[1, 0, 0], -90], [[1, 0, 0], 180], [[1, 1, 1], 120], [[1, 1, 1], -120],
+            [[-1, 1, 1], 120], [[-1, 1, 1], -120]];
+        const LONG = 1000, THROW = .2;
+        const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+        function tumble(el) {
+            const DIE = A.DIE;
+            if (!DIE || busy.has(el) || !window.requestAnimationFrame) return;
+            const from = held.get(el) || DIE.REST;
+            const mv = MOVES[(Math.random() * MOVES.length) | 0], axis = mv[0], turn = mv[1], sign = turn < 0 ? -1 : 1;
+            const to = DIE.mul(DIE.rot(axis, turn), from).map(r => r.map(Math.round));
+            held.set(el, to);
+            busy.add(el);
+            const every = gfxLevel() === 'ultra' ? 0 : 55;
+            let t0 = 0, drawn = -1e9;
+            function pose(ms) {
+                const t = Math.min(1, ms / LONG);
+                let a, hop = 0;   // degrees turned, and how far into the throw (0 to 1 and back)
+                if (t < .1) a = -6 * sign * Math.sin(t / .1 * Math.PI / 2);
+                else if (t < .62) {
+                    const u = (t - .1) / .52;
+                    a = -6 * sign + (turn + 6 * sign) * ease(u);
+                    hop = Math.sin(Math.PI * u);
+                } else {
+                    const v = (t - .62) / .38;
+                    a = turn + sign * 9 * (1 - v) * (1 - v) * Math.sin(Math.PI * 2.4 * v);
+                    hop = v < .3 ? .22 * Math.sin(Math.PI * v / .3) : 0;
+                }
+                const M = t >= 1 ? to : DIE.mul(DIE.rot(axis, a), from);
+                const floor = DIE.floor(M), lift = Math.max(floor, Math.min(floor + THROW * hop, DIE.roof(M)));
+                return DIE.svg(M, t >= 1 ? 0 : lift);
+            }
+            function frame(now) {
+                if (!el.isConnected) { busy.delete(el); return; }
+                if (!t0) t0 = now;
+                const ms = now - t0;
+                if (ms >= LONG) { el.innerHTML = pose(LONG); busy.delete(el); return; }
+                if (now - drawn >= every) { drawn = now; el.innerHTML = pose(ms); }
+                requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+        }
+        return { tumble: tumble };
     })();
 
     // Cards you have just drawn, dealt to the corner of the screen.
@@ -12402,6 +14048,8 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         });
         $('#merchant-hot').addEventListener('click', () => openMerchant());
         boardFor = ROOM;
+        BIRDS.start();
+        CUES.start();
     }
 
     // A square's description as this game's modifiers leave it: the
@@ -12922,6 +14570,12 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         logSeen = last;
         const lines = logMine ? mineOnly(S.log) : S.log;
         el.innerHTML = lines.length ? logLines(lines) : '<div class="t-muted">Nothing about you yet.</div>';
+        if (before > 0) {
+            for (const row of el.children) {
+                if (+row.getAttribute('data-n') <= before) break;
+                row.classList.add('fresh');
+            }
+        }
         if (from < 30) { el.scrollTop = 0; return; }
         let added = 0;
         for (const row of el.children) {
@@ -13239,7 +14893,17 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     // keeps where you had scrolled to: on a phone a fight is taller than the
     // screen, and it used to jump back to the top at every blow.
     let modalKind = '';
+    // Make my GPU Hurt: a window closing settles away and fades (style.css
+    // .leaving) rather than vanishing; opening another meanwhile keeps it.
+    function smooth() { return document.documentElement.classList.contains('gfx-ultra'); }
+    let modalLeaving = 0;
+    function keepModal() {
+        clearTimeout(modalLeaving);
+        modalLeaving = 0;
+        $('#modal-back').classList.remove('leaving');
+    }
     function showModal(html, wide, sig, dock) {
+        keepModal();
         const back = $('#modal-back');
         const m = $('#modal');
         const wasShowing = back.classList.contains('show') && !back.classList.contains('mini');
@@ -13264,9 +14928,22 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     };
 
     function closeModal() {
-        $('#modal-back').classList.remove('show', 'mini', 'dock');
-        $('#modal').innerHTML = '';
+        const back = $('#modal-back');
         modalSig = '';
+        if (smooth() && back.classList.contains('show') && !back.classList.contains('mini')) {
+            if (!modalLeaving) {
+                back.classList.add('leaving');
+                modalLeaving = setTimeout(() => {
+                    modalLeaving = 0;
+                    back.classList.remove('show', 'mini', 'dock', 'leaving');
+                    $('#modal').innerHTML = '';
+                }, 200);
+            }
+            return;
+        }
+        keepModal();
+        back.classList.remove('show', 'mini', 'dock');
+        $('#modal').innerHTML = '';
     }
 
     function renderModal() {
@@ -13403,6 +15080,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 
         // A fight you are only watching can be tucked into the corner.
         if (!involved && miniBattle === bid) {
+            keepModal();
             const back = $('#modal-back');
             back.classList.add('show', 'mini');
             const sig = 'mini' + bid + ':' + S.logSeq;
@@ -13875,15 +15553,31 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     /* Panels you open yourself                                            */
     /* ------------------------------------------------------------------ */
 
+    let panelLeaving = 0;
     function openPanel(key, draw, live) {
+        clearTimeout(panelLeaving);
+        panelLeaving = 0;
         panel = { key: key, draw: draw, live: !!live };
+        $('#panel-back').classList.remove('leaving');
         $('#panel-back').classList.add('show');
         draw();
     }
     function closePanel() {
         panel = null;
-        $('#panel-back').classList.remove('show');
-        $('#panel').innerHTML = '';
+        const back = $('#panel-back');
+        if (smooth() && back.classList.contains('show')) {
+            if (!panelLeaving) {
+                back.classList.add('leaving');
+                panelLeaving = setTimeout(() => {
+                    panelLeaving = 0;
+                    back.classList.remove('show', 'leaving');
+                    $('#panel').innerHTML = '';
+                }, 200);
+            }
+        } else {
+            back.classList.remove('show');
+            $('#panel').innerHTML = '';
+        }
         SPOT.panelClosed();
     }
     let panelKey = '';
@@ -14421,7 +16115,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
 
         const on = D.MODIFIERS.filter(x => S.mods && S.mods[x.id]);
         $('#mods-summary').innerHTML = on.length ? '<span class="muted">Modifiers: </span>' + on.map(x =>
-            '<span class="mtag ' + x.side + '" title="' + (x.side === 'deadly' ? 'More deadly' : 'More relaxed') + '">' + esc(x.name) + '</span>').join('') :
+            '<span class="mtag ' + x.side + '" title="' + (x.side === 'deadly' ? 'More deadly' : 'More relaxed') + '">' + esc(x.name) + '</span>').join(', ') :
             (isHost() ? '<span class="muted">No modifiers. Press the gear to toggle some.</span>' : '');
 
         const ready = S.players.length >= D.RULES.minPlayers && S.players.every(x => x.cls);
@@ -14804,6 +16498,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         BEND.reset(state);
         ZAP.reset(state);
         PENDANT.reset(state);
+        CRUMBLE.reset(state);
         DRAW.reset(state);
         WALK.reset();
         prevHp = {};
@@ -14878,6 +16573,7 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         DRAW.saw(state);
         BEND.saw(state);
         PENDANT.saw(state);
+        CRUMBLE.saw(state);
         TURN.saw(state);
         if (state.phase === 'lobby') {
             closeModal();
@@ -14911,6 +16607,8 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         S = null;
         reaped = false;
         gfxAskedFor = null;
+        BIRDS.stop();
+        CUES.stop();
         if (isSolo()) { if (keep) SOLO.detach(); else SOLO.closeRoom(); }
         NET = SOLO;
         try { history.replaceState(null, '', location.pathname); } catch (e) { }
@@ -14924,19 +16622,19 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
     /* Graphics: how much on the screen moves (style.css html.gfx-*)       */
     /*                                                                     */
     /* Asked at the start of every game, and kept in this browser for the   */
-    /* next. Potato stops everything but the Pendant and the shield; Regular */
+    /* next. Kūmara (the key is still 'potato') stops everything; Regular  */
     /* moves it all in easy steps; Make my GPU Hurt moves it all at full    */
     /* speed with more of it.                                               */
     /* ------------------------------------------------------------------ */
 
     const GFX_KEY = 'lof_obl_gfx';
     const GFX = {
-        potato: { name: 'Potato', note: 'Lightest',
-            text: 'Nothing moves but the Pendant and the shield. For older machines, or to save the battery.' },
+        potato: { name: 'Kūmara', note: 'Lightest',
+            text: 'Nothing on the board moves, the shield included, and the Pendant comes together simply. For older machines, or to save the battery.' },
         regular: { name: 'Regular', note: 'Balanced',
-            text: 'The kingdom comes alive (fire, trees, flags, stars, birds), drawn in easy steps so it goes gently on the battery.' },
+            text: 'The kingdom comes alive (fire, trees, flags, birds, and now and then an axe thrown or a rock falling), drawn in easy steps so it goes gently on the battery.' },
         ultra: { name: 'Make my GPU Hurt', note: 'Smoothest',
-            text: 'Everything moving as smoothly as your screen can go, with more embers, more birds and a sweeping turn timer.' }
+            text: 'Everything moving as smoothly as your screen can go, and more of it, more often: more embers, more birds, a sweeping turn timer and windows that ease in and out.' }
     };
     let gfxAskedFor = null;
     function gfxLevel() {
@@ -14948,6 +16646,8 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         const root = document.documentElement;
         Object.keys(GFX).forEach(k => root.classList.toggle('gfx-' + k, k === level));
         embers(true);
+        BIRDS.start();
+        CUES.start();
     }
     function setGfx(level) {
         if (!GFX[level]) return;
@@ -15122,12 +16822,12 @@ html.gfx-ultra .board-scene, html.gfx-ultra .embers i { will-change: transform; 
         }
     }
 
-    // The embers drifting up the screen: none on Potato, a few on Regular,
+    // The embers drifting up the screen: none on Kūmara, a few on Regular,
     // a great many when the GPU is to hurt. `again` lays them out afresh.
     function embers(again) {
         const box = $('.embers');
         if (!box || (box.childElementCount && !again)) return;
-        const count = { potato: 0, regular: 24, ultra: 80 }[gfxLevel()];
+        const count = { potato: 0, regular: 20, ultra: 80 }[gfxLevel()];
         let h = '';
         for (let i = 0; i < count; i++) {
             const left = Math.random() * 100;
