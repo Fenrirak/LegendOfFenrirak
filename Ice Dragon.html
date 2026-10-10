@@ -2455,57 +2455,6 @@ body.holding .modal-back[data-key="pending"] .modal .btn {
    on top of that reads as two lines drawn by mistake. */
 .move.extra .msum { border-top-color: rgba(228, 193, 74, .22); }
 
-/* ---- the purse ------------------------------------------------------
-   Setting the Gold Forged Armour Set. Two buttons for whether, one box for
-   how much, and a line underneath that works the choice through on a hit of
-   fifty -- because "up to 30 coins" is an abstraction and "30 coins and 20
-   health" is the thing actually being decided.
-   ---------------------------------------------------------------------- */
-
-.purse { margin-top: 4px; }
-.purse-choice { display: flex; gap: 8px; flex-wrap: wrap; }
-
-.purse-set {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    flex-wrap: wrap;
-    margin-top: 14px;
-    font-size: 13.5px;
-    color: #b3aa98;
-}
-.purse-set[hidden] { display: none; }
-.purse-set label { color: #b3aa98; }
-.purse-set input {
-    width: 92px;
-    padding: 8px 10px;
-    font-family: 'Cutive Mono', 'Courier New', monospace;
-    font-size: 16px;
-    text-align: center;
-    color: var(--gold-bright);
-    background: #100e0b;
-    border: 1px solid var(--panel-edge);
-    border-radius: 8px;
-}
-.purse-set input:focus {
-    outline: none;
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(217, 163, 92, .16);
-}
-.purse-set input::placeholder { color: #6d6558; font-size: 13px; }
-
-.purse-say {
-    margin-top: 14px;
-    padding: 11px 13px;
-    border-radius: 9px;
-    background: rgba(217, 163, 92, .07);
-    border: 1px solid rgba(217, 163, 92, .2);
-    font-size: 13.5px;
-    line-height: 1.5;
-    color: #b3aa98;
-}
-.purse-say b { color: var(--gold-bright); }
-
 /* ---- merchant -------------------------------------------------------- */
 
 .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
@@ -14395,7 +14344,7 @@ kbd {
     let unsub = null;
     let invTab = 'gear';
     let battleTarget = 'player';   // 'player' or 'barbarian' — who your next attack goes to
-    let openPanel = null;      // 'merchant' | 'trade' | 'purse' | null
+    let openPanel = null;      // 'merchant' | 'trade' | null
 
     /* A small panel opened on top of whatever else is up: the power-up picker
        in a fight, the Mage's illusion, the question asking whether you really
@@ -18523,15 +18472,6 @@ kbd {
         // button sat there lit and did nothing at all when it was pressed.
         buttons.push(btn('a-trade', 'Propose a trade', '',
             S.players.length < 2 || !mine || blocked));
-        // The Gold Forged Armour Set says you *may* pay in coins. Asking on
-        // every single hit would be unbearable, so it is a standing choice
-        // you can flip whenever you like.
-        const aInst = E.equippedArmour(p);
-        const aItem = aInst ? D.ITEMS[aInst.id] : null;
-        if (aItem && aItem.payInCoins) {
-            buttons.push(btn('a-coinpay', purseLabel(p), '',
-                !!S.paused || holding || !!S.pending || !!S.battle));
-        }
         /* Eating is not a turn action -- you may open your own pack on
            anybody's go. What it will not do is cut across a question
            standing in front of you: that is your own square only, and
@@ -18595,7 +18535,6 @@ kbd {
         bind('a-shop', () => { openPanel = 'merchant'; renderModal(); });
         bind('a-trade', () => { openPanel = 'trade'; renderModal(); });
         bind('a-end', () => act('endTurn', {}));
-        bind('a-coinpay', () => { openPanel = 'purse'; renderModal(); });
         bind('a-guide', openGuide);
         bind('a-close', confirmCloseGame);
         bind('a-leave', leaveRoom);
@@ -19899,7 +19838,6 @@ kbd {
         // and your coins and his stock have to come down as you spend. It is a
         // list rather than a form, so there is nothing to lose by redrawing --
         // only where you had scrolled to, which is put back.
-        if (openPanel === 'purse') return openPurse();
         if (openPanel === 'merchant') {
             const keep = $('#modal-back').scrollTop;
             renderMerchant();
@@ -20279,9 +20217,6 @@ kbd {
                       abilityNote(p) +
                       '</button>'
                     : '') +
-                (aItemOf(p) && aItemOf(p).payInCoins
-                    ? '<button class="btn small" id="b-purse">' + esc(purseLabel(p)) +
-                      '</button>' : '') +
                 (p.powerups.length ? '<button class="btn small" id="b-pu">Play an item card</button>' : '') +
                 (p.foods.length ? '<button class="btn small" id="b-food">Eat food</button>' : '');
             if (extras) {
@@ -20326,7 +20261,6 @@ kbd {
             el.addEventListener('click', () => act('barbarianAttack', { moveId: el.dataset.barbMove })));
         bind('b-ability', () => rollAct(D.CLASSES[p.cls].ability.name, 'useAbility', {},
                                        'An even number and it works.'));
-        bind('b-purse', () => { openPanel = 'purse'; renderModal(); });
         bind('b-pu', () => pickFrom('Play an item card',
             () => (me() || p).powerups.map(c =>
                 ({ id: c.uid, name: D.POWERUPS[c.id].name, text: D.POWERUPS[c.id].text,
@@ -20854,112 +20788,6 @@ kbd {
             }
             act('resolvePending', { choice: c });
         }));
-    }
-
-    /* ------------------------------------------------------------------ */
-    /* The purse                                                           */
-    /*                                                                     */
-    /* The Gold Forged Armour Set turns a hit into a bill. Whether it does  */
-    /* and how much of the hit it takes are both the wearer's to say, and   */
-    /* they are the same choice from two ends: the coins you spend are the  */
-    /* damage you do not take. So there is one number to set, and both      */
-    /* sides of it are shown as you set it.                                 */
-    /*                                                                     */
-    /* A standing instruction rather than a question on every blow. A fight */
-    /* is already several presses a round and stopping it dead to ask       */
-    /* "how much of this one?" would wear thin by the second exchange --    */
-    /* this can be changed as often as you like, in a fight or out of one,  */
-    /* and it applies from the next hit onwards.                            */
-    /* ------------------------------------------------------------------ */
-
-    function openPurse() {
-        const p = me();
-        const on = p.payInCoins !== false;
-        const cap = (p.coinCap === null || p.coinCap === undefined) ? '' : p.coinCap;
-
-        showModal('<h2>The Gold Forged Armour Set</h2>' +
-            '<div class="sub">Instead of losing health you may lose coins, ' +
-                'one coin for every point. You have <b>' + p.coins + '</b>.</div>' +
-            '<div class="purse">' +
-                '<div class="purse-choice">' +
-                    '<button class="btn' + (on ? ' primary' : '') + '" id="purse-on">' +
-                        'Pay in coins</button>' +
-                    '<button class="btn' + (on ? '' : ' primary') + '" id="purse-off">' +
-                        'Take it as damage</button>' +
-                '</div>' +
-                '<div class="purse-set"' + (on ? '' : ' hidden') + '>' +
-                    '<label for="purse-cap">At most</label>' +
-                    '<input id="purse-cap" type="number" min="0" step="1" ' +
-                        'inputmode="numeric" placeholder="all of it" value="' + cap + '">' +
-                    '<span>coins a hit \u2014 the rest comes off your health.</span>' +
-                '</div>' +
-                '<div class="purse-say" id="purse-say"></div>' +
-            '</div>' +
-            '<div class="modal-actions">' +
-                '<button class="btn primary" id="purse-save">Done</button>' +
-                '<button class="btn" id="purse-cancel">Back</button>' +
-            '</div>', true, 'purse');
-
-        const input = $('#purse-cap');
-        let want = on;
-
-        /* Worked through on a hit of fifty, because an abstract "up to 30" is
-           hard to picture and "30 coins and 20 health" is not. Fifty is about
-           what a heavy blow lands for once defence has had its say. */
-        const EXAMPLE = 50;
-        function say() {
-            const el = $('#purse-say');
-            if (!want) {
-                el.innerHTML = 'Every hit comes off your health and your coins are ' +
-                    'left alone.';
-                return;
-            }
-            const raw = input.value.trim();
-            const n = raw === '' ? Infinity : Math.max(0, Math.floor(Number(raw) || 0));
-            const paid = Math.min(p.coins, EXAMPLE, n);
-            const hurt = EXAMPLE - paid;
-            // The purse is only worth mentioning when it is the thing doing
-            // the limiting -- saying "you only have 120 coins" about a cap
-            // of 500 on a hit of 50 is true and beside the point.
-            const short = p.coins < Math.min(EXAMPLE, n);
-            el.innerHTML = 'A hit of ' + EXAMPLE + ' would cost you ' +
-                '<b>' + paid + ' coins</b> and <b>' + hurt + ' health</b>' +
-                (short ? ' — your ' + p.coins + ' coins will not cover more.' : '.');
-        }
-
-        function pick(next) {
-            want = next;
-            $('#purse-on').classList.toggle('primary', want);
-            $('#purse-off').classList.toggle('primary', !want);
-            $('.purse-set').hidden = !want;
-            say();
-        }
-
-        bind('purse-on', () => pick(true));
-        bind('purse-off', () => pick(false));
-        input.addEventListener('input', say);
-        say();
-
-        bind('purse-cancel', () => { openPanel = null; renderModal(); });
-        bind('purse-save', () => {
-            const raw = input.value.trim();
-            openPanel = null;
-            act('payInCoins', { on: want, cap: raw === '' ? null : Number(raw) });
-        });
-    }
-
-    // What the button says it is doing, in as few words as it can.
-    // The armour on somebody's back, as its card rather than as the copy in
-    // their bag -- asked for in two places now.
-    function aItemOf(p) {
-        const inst = p && E.equippedArmour(p);
-        return inst ? D.ITEMS[inst.id] : null;
-    }
-
-    function purseLabel(p) {
-        if (p.payInCoins === false) return 'Paying in health';
-        if (p.coinCap === null || p.coinCap === undefined) return 'Paying in coins';
-        return 'Paying ' + p.coinCap + ' a hit';
     }
 
     /* ---- merchant ---- */
@@ -21492,6 +21320,11 @@ const E = window.LOF_ENGINE;
 /* storage: the rules on the server side check request.auth.uid directly,  */
 /* which nothing running in the page can forge.                            */
 /*                                                                         */
+/* Because the id is the uid, there is no separate seat lock any more: a     */
+/* seat can only be acted on by the browser signed in as that uid. (An older */
+/* version stored a per-seat key in localStorage; clearing it locked people   */
+/* out of their own seat, and it guarded nothing the uid does not.)           */
+/*                                                                         */
 /* Uses the same Firebase project (and so the same Anonymous sign-in) as   */
 /* The Thunder Dragon -- once Anonymous auth is enabled for the project,   */
 /* both games have it.                                                    */
@@ -21512,99 +21345,6 @@ const ready = new Promise((resolve, reject) => {
     }, reject);
     signInAnonymously(auth).catch(reject);
 });
-
-/* ---------------------------------------------------------------------- */
-/* Seat locks                                                              */
-/*                                                                         */
-/* A player's id is not a secret. It is drawn into the page on the trade    */
-/* menus and it sits in the room document, which anybody may read -- so     */
-/* until now taking somebody's seat needed no more than reading their id    */
-/* off the screen, pasting it over `lof_pid` in the browser's own storage   */
-/* panel, and reloading. The seat was handed over: their turn, their coins, */
-/* their fragments, and if you picked the host, the power to end the game.  */
-/*                                                                         */
-/* So a seat now carries a lock. The key is made when the seat is first     */
-/* taken, kept in that browser and sent with everything the seat does. What */
-/* the room stores is not the key but its SHA-256 -- the document is world- */
-/* readable, and a lock that published its own key would not be a lock.     */
-/*                                                                         */
-/* The key is per room, so it dies with the room, and a seat that has no    */
-/* lock yet takes one from the first claimant: rooms already in progress    */
-/* keep working, and a refresh still puts you back in your chair, because   */
-/* the key lives in the same storage the id always did.                     */
-/*                                                                         */
-/* This stops the trick above. It does not, and cannot, stop somebody who   */
-/* writes JavaScript: every rule here runs in the player's own browser and  */
-/* they are free to skip it. Only an engine on a server can do that.        */
-/* ---------------------------------------------------------------------- */
-
-function seatSecret(code) {
-    // Keyed to the seat as well as the room. Somebody who pastes another
-    // player's id over their own does not thereby acquire that seat's key --
-    // they get a fresh one, which is exactly what the lock then refuses.
-    const k = 'lof_seat_' + code + '_' + PID;
-    let s = localStorage.getItem(k);
-    if (!s) {
-        const b = new Uint8Array(16);
-        if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-            crypto.getRandomValues(b);
-        } else {
-            for (let i = 0; i < b.length; i++) b[i] = Math.floor(Math.random() * 256);
-        }
-        s = hex(b);
-        localStorage.setItem(k, s);
-    }
-    return s;
-}
-
-function hex(bytes) {
-    let out = '';
-    for (let i = 0; i < bytes.length; i++) {
-        out += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
-    }
-    return out;
-}
-
-/* Kept only for a page opened over plain http on a LAN address, where
-   crypto.subtle is not available. It is not a cryptographic hash and does not
-   pretend to be one -- it is here so the lock still holds against somebody
-   reading the screen, which is the whole of what it is for. */
-function weakHash(str) {
-    let h = 5381;
-    for (let i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
-    let g = 52711;
-    for (let i = str.length - 1; i >= 0; i--) g = ((g * 31) ^ str.charCodeAt(i)) >>> 0;
-    return 'w' + h.toString(16) + g.toString(16);
-}
-
-const seatCache = {};
-
-async function seatHash(code) {
-    if (seatCache[code]) return seatCache[code];
-
-    const msg = code + ':' + PID + ':' + seatSecret(code);
-    let out;
-    if (typeof crypto !== 'undefined' && crypto.subtle) {
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-        out = hex(new Uint8Array(buf));
-    } else {
-        out = weakHash(msg);
-    }
-    seatCache[code] = out;
-    return out;
-}
-
-/* True if this browser may act as `pid`. An unlocked seat is locked here, to
-   the first browser that reaches for it. */
-function holdsSeat(state, pid, hash) {
-    const p = E.player(state, pid);
-    if (!p) return true;                       // no seat yet -- nothing to hold
-    if (!p.seat) { p.seat = hash; return true; }
-    return p.seat === hash;
-}
-
-const TAKEN = 'That seat belongs to another player. If it is yours, rejoin ' +
-              'from the browser you started the game in.';
 
 /* ---------------------------------------------------------------------- */
 /* Actions the engine exposes to the network layer                         */
@@ -21645,8 +21385,6 @@ async function createRoom(name) {
         const snap = await getDoc(ref);
         if (snap.exists()) continue;
         const state = E.createGame(code, PID, name);
-        const host = E.player(state, PID);
-        if (host) host.seat = await seatHash(code);
         await setDoc(ref, clean(state));
         return code;
     }
@@ -21660,23 +21398,20 @@ async function joinRoom(code, name) {
     if (!/^[A-Z]{5}$/.test(code)) throw new Error('Room codes are 5 letters, like ABCDE.');
 
     const ref = roomRef(code);
-    const hash = await seatHash(code);
     const result = await runTransaction(db, async (tx) => {
         const snap = await tx.get(ref);
         if (!snap.exists()) throw new Error('No room with the code ' + code + '.');
         const state = snap.data();
         const existing = E.player(state, PID);
         if (existing) {
-            // Coming back to your own chair -- or reaching for somebody else's.
-            if (!holdsSeat(state, PID, hash)) throw new Error(TAKEN);
+            // Coming back to your own chair. The seat is yours because the
+            // id is your Firebase uid -- nobody else can sign in as it.
             existing.name = name || existing.name;
             existing.connected = true;
             existing.lastSeen = Date.now();
         } else {
             const r = E.addPlayer(state, PID, name);
             if (!r.ok) throw new Error(r.error);
-            const seated = E.player(state, PID);
-            if (seated) seated.seat = hash;
         }
         state.updatedAt = Date.now();
         tx.set(ref, clean(state));
@@ -21699,16 +21434,11 @@ async function act(code, action, args) {
     const fn = ACTIONS[action];
     if (!fn) throw new Error('Unknown action: ' + action);
     const ref = roomRef(code);
-    const hash = await seatHash(code);
 
     return runTransaction(db, async (tx) => {
         const snap = await tx.get(ref);
         if (!snap.exists()) throw new Error('This room no longer exists.');
         const state = snap.data();
-
-        // Before the rules, the chair: whatever this move is, it has to be
-        // coming from the browser the seat was taken in.
-        if (!holdsSeat(state, PID, hash)) throw new Error(TAKEN);
 
         const res = fn(state, PID, args || {}) || { ok: true };
         if (!res.ok) {
