@@ -10438,7 +10438,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         const heals = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && !D.POTIONS[x.id].special).length;
         if (!L.kit) {
             // Easy: a healing potion in the pack, when it has the gold.
-            if (!heals && p.gold >= healCost('healing_potion') + 25) return act('buy', { kind: 'potion', id: 'healing_potion' });
+            if (heals < 2 && p.gold >= healCost('healing_potion') + 25) return act('buy', { kind: 'potion', id: 'healing_potion' });
+            if (heals < 3 && p.gold >= healCost('potion_of_awakening') + 60) return act('buy', { kind: 'potion', id: 'potion_of_awakening' });
             return null;
         }
         // Getting ready for the arena: the final fight is won or lost on
@@ -10526,7 +10527,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     // Easy: drinks when badly hurt, uses its ability when it can, and hits.
     function plainJob(state, p, b, u) {
         const o = E.body(state, u);
-        if (o.hp + (o.bonusHp || 0) < (o.maxHp || 1) * 0.35) {
+        if (o.hp + (o.bonusHp || 0) < (o.maxHp || 1) * (b.kind === 'boss' ? 0.5 : 0.35)) {
             const heal = p.potions.filter(x => D.POTIONS[x.id].group === 'heal' && E.canUsePotion(state, p.id, x.uid).ok)
                 .sort((a, c) => D.POTIONS[c.id].heal - D.POTIONS[a.id].heal)[0];
             if (heal) return act('usePotion', { uid: heal.uid });
