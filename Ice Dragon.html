@@ -608,6 +608,60 @@
     .reveal-text .word { opacity: 1; }
 }
 
+/* =========================================================================
+   Site-wide footer — used by every page. Edit here, not per-page.
+   ========================================================================= */
+
+.site-footer {
+    margin-top: 60px;
+    padding: 28px 20px 36px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    background: #16161a;
+    color: #9c9a95;
+}
+
+.site-footer .footer-inner {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.site-footer .footer-brand {
+    margin: 0;
+    color: rgb(242, 204, 143);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+.site-footer .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 18px;
+}
+
+.site-footer .footer-links a {
+    color: #9c9a95;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s ease;
+}
+
+.site-footer .footer-links a:hover {
+    color: rgb(242, 204, 143);
+}
+
+.site-footer .footer-copy {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
     </style>
 
     <style>
@@ -6395,15 +6449,14 @@ kbd {
 #board.board .sq {
     height: auto !important;
     min-height: 0 !important;
-    padding: max(4.5px, .5cqw) !important;
+    padding: .31cqw !important;
 }
 #board.board .arena { height: auto !important; min-height: 0 !important; }
-#board.board .sq .sq-name { font-size: max(7.6px, .717cqw) !important; line-height: 1.1 !important; }
-#board.board .sq .sq-text { font-size: max(6.4px, .59cqw) !important; line-height: 1.17 !important; }
-#board.board .sq .sq-badge { font-size: max(5.6px, .475cqw) !important; }
-#board.board .sq .sq-name { margin: 0 0 max(2px, .2cqw) !important; padding-bottom: max(2px, .2cqw) !important; }
-#board.board .sq .sq-text { line-height: 1.13 !important; }
-#board.board .sq .sq-badge { margin-top: 2px !important; padding: 1.5px 4px !important; }
+#board.board .sq .sq-name { font-size: .8cqw !important; line-height: 1.06 !important; }
+#board.board .sq .sq-text { font-size: .69cqw !important; line-height: 1.05 !important; }
+#board.board .sq .sq-badge { font-size: max(5px, .5cqw) !important; }
+#board.board .sq .sq-name { margin: 0 0 .1cqw !important; padding-bottom: .1cqw !important; }
+#board.board .sq .sq-badge { margin-top: 1px !important; padding: 1px 3px !important; }
 #board.board .token { width: max(21px, 1.96cqw) !important; height: max(21px, 1.96cqw) !important; }
 
 @media (max-width: 900px) {
@@ -6414,7 +6467,7 @@ kbd {
         padding: 7px !important;
     }
     #board.board .sq { padding: 5px !important; }
-    #board.board .sq .sq-name { font-size: 8.4px !important; line-height: 1.12 !important; }
+    #board.board .sq .sq-name { font-size: 9px !important; line-height: 1.1 !important; }
     #board.board .sq .sq-text { display: none !important; }
     #board.board .sq .sq-badge { font-size: 6px !important; }
     #board.board .token { width: 22px !important; height: 22px !important; }
@@ -21866,7 +21919,20 @@ ready.then((uid) => {
                         entry.el.style.opacity = '';
                         entry.el.style.transform = '';
                     } else {
-                        entry.el.style.opacity = progress;
+                        /* Floored at 0.3, never 0 — matches the floor
+                           initRevealText already uses (0.25) below. An
+                           element below the fold gets this opacity the
+                           moment the page loads, before any scroll event
+                           fires, and Google's renderer doesn't scroll the
+                           page for you: leaving this at literal 0 meant
+                           every image in every .pop-group (most of the
+                           images on the page) rendered fully invisible on
+                           first load, which is exactly the kind of hidden
+                           content Google Images skips over. A 0.3 floor
+                           keeps the same fade-and-slide-up effect for real
+                           visitors while guaranteeing nothing is ever
+                           actually invisible in the rendered DOM. */
+                        entry.el.style.opacity = 0.3 + progress * 0.7;
                         entry.el.style.transform = 'translateY(' + (26 * (1 - progress)) + 'px)';
                     }
                 });
