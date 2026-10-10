@@ -608,60 +608,6 @@
     .reveal-text .word { opacity: 1; }
 }
 
-/* =========================================================================
-   Site-wide footer — used by every page. Edit here, not per-page.
-   ========================================================================= */
-
-.site-footer {
-    margin-top: 60px;
-    padding: 28px 20px 36px;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-    background: #16161a;
-    color: #9c9a95;
-}
-
-.site-footer .footer-inner {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    text-align: center;
-}
-
-.site-footer .footer-brand {
-    margin: 0;
-    color: rgb(242, 204, 143);
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.3px;
-}
-
-.site-footer .footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px 18px;
-}
-
-.site-footer .footer-links a {
-    color: #9c9a95;
-    text-decoration: none;
-    font-size: 13px;
-    transition: color 0.2s ease;
-}
-
-.site-footer .footer-links a:hover {
-    color: rgb(242, 204, 143);
-}
-
-.site-footer .footer-copy {
-    margin: 0;
-    font-size: 12px;
-    opacity: 0.7;
-}
-
     </style>
 
     <style>
@@ -15556,21 +15502,10 @@ kbd {
             /* p: who reached it. sq: the square. carryOn: true when the walk
                goes on past it (Eagle's Descent part way through a move). */
             play(p, sq, carryOn) {
-                build();
-                const mine = p.id === NET.PID;
-                nameEl.textContent = sq.name;
-                whoEl.textContent = carryOn
-                    ? (mine ? 'You stop here, then carry on' : p.name + ' stops here, then carries on')
-                    : (mine ? 'You have to stop here' : p.name + ' has to stop here');
-                subEl.textContent = whatHappens(sq);
-                subEl.style.display = subEl.textContent ? '' : 'none';
-                back.classList.toggle('mine', mine);
-                back.classList.remove('on');
-                void back.offsetWidth;              // restart the animation
-                back.classList.add('on');
-                clearTimeout(hideT);
-                dueAt = Date.now() + SHOW_MS;
-                hideT = setTimeout(() => back.classList.remove('on'), SHOW_MS);
+                /* The red STOP sign that used to drop over the screen is gone.
+                   The square still flashes red as the piece arrives, and the
+                   narrator still says what happens there. Nothing holds the
+                   table any more, so busy() below is always false. */
                 flashSquare(sq.i);
             },
 
@@ -21894,20 +21829,7 @@ ready.then((uid) => {
                         entry.el.style.opacity = '';
                         entry.el.style.transform = '';
                     } else {
-                        /* Floored at 0.3, never 0 — matches the floor
-                           initRevealText already uses (0.25) below. An
-                           element below the fold gets this opacity the
-                           moment the page loads, before any scroll event
-                           fires, and Google's renderer doesn't scroll the
-                           page for you: leaving this at literal 0 meant
-                           every image in every .pop-group (most of the
-                           images on the page) rendered fully invisible on
-                           first load, which is exactly the kind of hidden
-                           content Google Images skips over. A 0.3 floor
-                           keeps the same fade-and-slide-up effect for real
-                           visitors while guaranteeing nothing is ever
-                           actually invisible in the rendered DOM. */
-                        entry.el.style.opacity = 0.3 + progress * 0.7;
+                        entry.el.style.opacity = progress;
                         entry.el.style.transform = 'translateY(' + (26 * (1 - progress)) + 'px)';
                     }
                 });
