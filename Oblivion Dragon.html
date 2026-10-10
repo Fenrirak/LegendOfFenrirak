@@ -3490,13 +3490,13 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     gear('archer', 'armour', [
         { id: 'iron_shoulderguards', name: 'Iron Shoulderguards', defence: 10,
           text: '+10 Defence, breaks after 10 uses.' },
-        { id: 'steel_plated_cloak', name: 'Steel Plated Cloak', defence: 15, moveUpTo: 1,
-          text: '+15 Defence, add up to 1 to your movement dice rolls.' },
+        { id: 'steel_plated_cloak', name: 'Steel Plated Cloak', defence: 15,
+          text: '+15 Defence.' },
         { id: 'studded_leather_armour', name: 'Studded Leather Armour', defence: 20, text: '+20 Defence.' },
         { id: 'cloak_of_swiftness', name: 'Cloak of Swiftness', defence: 25, moveUpTo: 1,
           text: '+25 Defence, add up to 1 to your movement dice rolls.' },
-        { id: 'rangers_vest', name: 'Ranger’s Vest', defence: 30, moveUpTo: 2,
-          text: '+30 Defence, add up to 2 to your movement dice rolls.' },
+        { id: 'rangers_vest', name: 'Ranger’s Vest', defence: 30, moveUpTo: 1,
+          text: '+30 Defence, add up to 1 to your movement dice rolls.' },
         { id: 'hunters_garb', name: 'Hunter’s Garb', defence: 35, moveUpTo: 2,
           text: '+35 Defence, add up to 2 to your movement die rolls.' },
         { id: 'fenrirak_scales_cloak', name: 'Fenrirak Scales’ Cloak', defence: 35,
@@ -3822,7 +3822,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
           action: 'battle', enemy: 'royal_soldiers', text: 'Fight Royal Soldiers.' },
         { id: '33', name: 'Palace Gates', row: 1, col: 11, next: ['34'], pic: 'gates',
           action: 'roll', roll: 'palace_gates',
-          text: 'Roll a die. If odd, take 20 DMG, if even, nothing happens.' },
+          text: 'Roll a die to climb over the gate. If odd, you get injured and take 20 DMG, if even, you get over unhurt.' },
         { id: '34', name: 'King’s Square', row: 2, col: 11, next: ['35'], pic: 'kings_square',
           action: 'key_swap', gems: 1, text: 'You may get 1 Gemstone for 1 Chest Key.' },
         { id: '35', name: 'Royal Watchtower', row: 3, col: 11, next: ['36'], pic: 'watchtower',
@@ -7918,9 +7918,12 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
                 else { dieSays(state, 'Odd: lose 20 Gold'); forfeitGold(state, p, 20, sq.name); }
                 break;
             case 'palace_gates':
-                dieSays(state, even ? 'Even: safe passage' : 'Odd: take 20 DMG');
-                if (even) log(state, 'The guards at the Palace Gates let ' + p.name + ' pass.', 'muted');
-                else squareDamage(state, p, 20, sq.name);
+                dieSays(state, even ? 'Even: climb over unhurt' : 'Odd: injured climbing over, take 20 DMG');
+                if (even) log(state, p.name + ' climbs over the Palace Gates without getting injured.', 'muted');
+                else {
+                    log(state, p.name + ' climbs over the Palace Gates and gets injured on the way.', 'muted');
+                    squareDamage(state, p, 20, sq.name);
+                }
                 break;
         }
     }
@@ -8937,8 +8940,10 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             } else if (u.kind === 'ally') {
                 log(state, 'The Barbarian is struck down!', 'death');
                 // Whose he was, for the end of a duel (winPvp).
+                // In a duel he is not sent home: whoever wins the duel takes
+                // him, gear and all, at full health (winPvp).
                 if (b.kind === 'pvp' && state.barbarian) b.barbFell = state.barbarian.ownerId;
-                barbarianReturns(state, 'limps back');
+                else barbarianReturns(state, 'limps back');
             }
         });
 
@@ -9076,14 +9081,25 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         cleanUpAfter(state, winner);
         cleanUpAfter(state, loser);
 
-        // The loser's Barbarian: struck down in this fight, the winner gets
-        // Pendant Fragment #2 for it and the loser keeps theirs; still on his
-        // feet, he changes sides and the fragment comes with him.
+        // The Barbarian, whoever he stood with, follows the victor at full
+        // health, wearing and carrying what he had on. Pendant Fragment #2
+        // goes to the winner if he was the loser's: for striking him down,
+        // or with him if he was still on his feet.
         let barbWon = '';
-        if (hasBarbarian(state, loser)) {
-            state.barbarian.ownerId = winner.id;
-            log(state, 'The Barbarian follows the victor, ' + winner.name + '.', 'system');
-            barbWon = ' with him';
+        const bar = state.barbarian;
+        if (bar && bar.ownerId && (bar.ownerId === winner.id || bar.ownerId === loser.id)) {
+            const fromLoser = bar.ownerId === loser.id;
+            const fell = b.barbFell === bar.ownerId;
+            bar.ownerId = winner.id;
+            bar.hp = bar.maxHp;
+            if (fromLoser) {
+                log(state, 'The Barbarian follows the victor, ' + winner.name + ', at full health, ' +
+                    'keeping the gear he wears.', 'system');
+                barbWon = fell ? ' for striking down ' + loser.name + '’s Barbarian' : ' with him';
+            } else if (fell) {
+                log(state, 'The Barbarian gets back on his feet at full health and stays with ' +
+                    winner.name + '.', 'system');
+            }
         } else if (b.barbFell && b.barbFell === loser.id) {
             barbWon = ' for striking down ' + loser.name + '’s Barbarian';
         }
@@ -13214,7 +13230,35 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         notice._t = setTimeout(() => n.classList.remove('show'), 4800);
     }
 
-    function showScreen(id) { $$('.screen').forEach(s => s.classList.toggle('active', s.id === id)); }
+    function showScreen(id) {
+        $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+        syncWake();
+    }
+
+    /* Keep the phone or computer awake while the game screen is up and the
+       tab is in front. The browser drops a wake lock whenever the tab is
+       hidden, so it is asked for again when the tab comes back. Browsers
+       without the Screen Wake Lock API simply carry on as before. */
+    let wakeLock = null;
+    function wantWake() {
+        const g = document.getElementById('screen-game');
+        return !!(g && g.classList.contains('active')) && document.visibilityState === 'visible';
+    }
+    function syncWake() {
+        try {
+            if (!wantWake()) {
+                if (wakeLock) { const w = wakeLock; wakeLock = null; w.release().catch(() => { }); }
+                return;
+            }
+            if (wakeLock || !navigator.wakeLock) return;
+            navigator.wakeLock.request('screen').then(lock => {
+                if (!wantWake()) { lock.release().catch(() => { }); return; }
+                wakeLock = lock;
+                lock.addEventListener('release', () => { if (wakeLock === lock) wakeLock = null; });
+            }).catch(() => { });
+        } catch (e) { }
+    }
+    document.addEventListener('visibilitychange', syncWake);
 
     function act(action, args) {
         if (!ROOM) return Promise.resolve(null);

@@ -9,8 +9,8 @@
 
     <title>Legend of Fenrirak | The Thunder Dragon — Play Online</title>
 
-    <link rel="icon" type="image/png" href="Favicon.png?v=9dcbe526">
-    <link rel="apple-touch-icon" href="Favicon.png?v=9dcbe526">
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="apple-touch-icon" href="Favicon.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
     <link rel="canonical" href="https://www.legend-of-fenrirak.com/Thunder%20Dragon.html">
@@ -24,9 +24,9 @@
     <meta property="og:description" content="Play Legend of Fenrirak™, The Thunder Dragon online with up to 6 players.">
     <meta property="og:url" content="https://www.legend-of-fenrirak.com/Thunder%20Dragon.html">
     <meta property="og:site_name" content="Legend of Fenrirak">
-    <meta property="og:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png?v=1d95aed6">
+    <meta property="og:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png?v=1d95aed6">
+    <meta name="twitter:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png">
 
     <style>
 /* ==== site-nav.css ==== */
@@ -4888,7 +4888,7 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
         "name": "Legend of Fenrirak: The Thunder Dragon",
         "url": "https://www.legend-of-fenrirak.com/Thunder%20Dragon.html",
         "description": "Play Legend of Fenrirak™, The Thunder Dragon online with up to 6 players. Pick a Knight, Archer or Mage, gather the three key fragments and bring down Fenrirak.",
-        "image": "https://www.legend-of-fenrirak.com/Fenrirak.png?v=1d95aed6",
+        "image": "https://www.legend-of-fenrirak.com/Fenrirak.png",
         "genre": "Board Game",
         "numberOfPlayers": {"@type": "QuantitativeValue", "minValue": 1, "maxValue": 6},
         "isPartOf": {"@type": "WebSite", "name": "Legend of Fenrirak", "url": "https://www.legend-of-fenrirak.com/index.html"}
@@ -5207,7 +5207,7 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
 
     // `art` is filled in further down: each class is drawn as flat vector art
     // and handed out as a data: URI, so there are no character PNGs to upload
-    // any more. Knight.png?v=5b4a86e8, Archer.png?v=b55619cd and Mage.png?v=f437b181 are what those drawings
+    // any more. Knight.png, Archer.png and Mage.png are what those drawings
     // were taken from.
     const CLASSES = {
         knight: {
@@ -5293,7 +5293,7 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
     /* ------------------------------------------------------------------ */
     /* The characters, drawn                                               */
     /*                                                                     */
-    /* Knight.png?v=5b4a86e8, Archer.png?v=b55619cd and Mage.png?v=f437b181 are the canonical look, and      */
+    /* Knight.png, Archer.png and Mage.png are the canonical look, and      */
     /* these are those three redrawn as flat vector art: blocks of colour   */
     /* inside one hard dark outline, straight edges and simple curves, no   */
     /* shading and no gradients -- the same way the monsters and the board  */
@@ -17493,7 +17493,7 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
         $('#over-body').innerHTML =
             '<div class="victory">' +
             '<div class="vtitle">Victory</div>' +
-            '<img src="Fenrirak.png?v=1d95aed6" alt="Fenrirak">' +
+            '<img src="Fenrirak.png" alt="Fenrirak">' +
             '<h2>' + esc(w ? w.name : 'Someone') + ' has slain Fenrirak.</h2>' +
             timeHtml +
             '<p class="muted">' + (w && w.id === NET.PID
@@ -17568,6 +17568,24 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
                 });
         } else { notice('Enter a name, then press Join to enter room ' + room + '.'); }
     }
+
+    /* Keep the screen awake while this tab is in front. The browser drops the
+       lock itself whenever the tab is hidden, so it is asked for again when
+       the tab returns. Unsupported browsers (or plain-http pages) just skip it. */
+    let wakeLock = null;
+    function keepAwake() {
+        if (!('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+        if (wakeLock) return;
+        navigator.wakeLock.request('screen').then(lock => {
+            wakeLock = lock;
+            lock.addEventListener('release', () => { wakeLock = null; });
+        }).catch(() => { wakeLock = null; });
+    }
+    document.addEventListener('visibilitychange', keepAwake);
+    // Some browsers only grant it after a user gesture, so retry on first touch.
+    ['pointerdown', 'keydown'].forEach(ev =>
+        document.addEventListener(ev, keepAwake, { once: true }));
+    keepAwake();
 
     boot();
     if (!window.LOF_NET) {
