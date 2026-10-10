@@ -6486,6 +6486,49 @@ kbd {
     }
 }
 
+
+/* ==== Layout: Actions beside the board, the narrator next to Your things ====
+   On a computer the board takes the left, with the Actions card and your
+   hero on its right, and the narrator and Your things sit side by side
+   underneath. Under 1280px wide (a phone, a tablet) it is one column in the
+   order The Oblivion Dragon uses: Actions, the board, the narrator, then you
+   and your things. The narrator lists the newest line first -- it was being
+   turned upside down again here by `column-reverse`, which is why the newest
+   used to be at the bottom. ==== */
+#log { flex-direction: column !important; }
+.game-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 320px !important;
+    grid-template-areas: "board side" "lower side";
+    grid-template-rows: auto 1fr;
+    gap: 18px 20px !important;
+    align-items: start;
+}
+.game-grid > .g-board { grid-area: board; min-width: 0; }
+.game-grid > .g-side { grid-area: side; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.game-grid > .g-lower {
+    grid-area: lower; min-width: 0; align-items: start;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px;
+}
+.game-grid .card { margin-top: 0 !important; }
+.game-grid .board-scroll { margin: 0; }
+.game-grid > .g-board > .board-scroll > #board.board { min-width: 900px !important; }
+#log { max-height: 340px; }
+
+@media (max-width: 1279px) {
+    .game-grid { display: flex !important; flex-direction: column; align-items: stretch; gap: 14px !important; grid-template-rows: none; }
+    .game-grid > .g-side, .game-grid > .g-lower { display: contents; }
+    .game-grid .actions-card { order: 1; }
+    .game-grid > .g-board { order: 2; }
+    .game-grid .narrator-card { order: 3; }
+    .game-grid #side-hero { order: 4; }
+    .game-grid .things-card { order: 5; }
+    .game-grid > .g-board > .board-scroll > #board.board { min-width: 1000px !important; }
+}
+@media (max-width: 900px) {
+    .game-grid > .g-board > .board-scroll > #board.board { min-width: 860px !important; }
+}
+
     </style>
 
     <script type="application/ld+json">
@@ -6772,30 +6815,33 @@ kbd {
             <div id="turn-banner" class="turn-banner"></div>
 
             <div class="game-grid">
-                <div>
+                <div class="g-board">
                     <div class="board-scroll"><div class="board" id="board"></div></div>
                     <!-- Only on a touch screen, where there is no pointing at a square. -->
                     <p class="board-hint">Tap any square on the board to read its full description.</p>
+                </div>
 
-                    <div class="action-log-row" style="margin-top:16px">
-                        <div class="card">
-                            <h3>Actions</h3>
-                            <div id="side-actions"></div>
-                        </div>
-                        <div class="card">
-                            <div class="log-head">
-                                <h3>The narrator</h3>
-                                <div class="log-filter" role="group" aria-label="Which lines to show">
-                                    <button id="log-all" class="on" aria-pressed="true">All</button><button id="log-mine" aria-pressed="false">Just mine</button>
-                                </div>
+                <!-- Beside the board on a computer; on a phone each card takes its own place in the column. -->
+                <div class="g-side">
+                    <div class="card actions-card">
+                        <h3>Actions</h3>
+                        <div id="side-actions"></div>
+                    </div>
+                    <div class="card profile-panel" id="side-hero"></div>
+                </div>
+
+                <div class="g-lower">
+                    <div class="card narrator-card">
+                        <div class="log-head">
+                            <h3>The narrator</h3>
+                            <div class="log-filter" role="group" aria-label="Which lines to show">
+                                <button id="log-all" class="on" aria-pressed="true">All</button><button id="log-mine" aria-pressed="false">Just mine</button>
                             </div>
-                            <div class="log" id="log"></div>
                         </div>
+                        <div class="log" id="log"></div>
                     </div>
 
-                    <div class="card profile-panel" id="side-hero" style="margin-top:16px"></div>
-
-                    <div class="card" style="margin-top:16px">
+                    <div class="card things-card">
                         <h2>Your things</h2>
                         <div class="inv-tabs" id="inv-tabs"></div>
                         <div id="inventory"></div>
@@ -19112,10 +19158,10 @@ kbd {
 
         '<h3 class="guide-h">Worth knowing</h3>' +
         '<ul class="guide-bullets">' +
-            '<li><b>Your things</b> sit under the board — gear, item cards, food and skill ' +
+            '<li><b>Your things</b> sit next to the narrator under the board — gear, item cards, food and skill ' +
                 'cards. You equip gear, wear special equipment and play cards from there.</li>' +
             '<li><b>The host</b> may pause the game, and may end it for everybody.</li>' +
-            '<li><b>The narrator</b> beside your actions says everything that happens. ' +
+            '<li><b>The narrator</b> says everything that happens, newest at the top. ' +
                 'If you missed something, it is in there.</li>' +
         '</ul>' +
 
