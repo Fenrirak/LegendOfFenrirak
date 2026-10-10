@@ -12229,6 +12229,22 @@ kbd {
         return ok();
     }
 
+    /* A class ability cannot be stacked on itself: while one use of it is
+       still running, it cannot be called on again -- not by waiting out the
+       cooldown, not by a second player's. It still stacks freely with
+       potions, item cards, weapons and armour, which are separate things.
+       Strength Up runs for two moves, which can outlast the cooldown, so the
+       cooldown alone was not enough. */
+    function abilityActive(p) {
+        const cls = p && D.CLASSES[p.cls];
+        if (!cls || !cls.ability) return false;
+        if (cls.ability.id === 'agile') return (p.agileBonus || 0) > 0;
+        if (cls.ability.id === 'strength_up') {
+            return (p.buffs || []).some(b => b.from === cls.ability.name && b.uses > 0);
+        }
+        return false;
+    }
+
     function useAbility(state, pid, payload) {
         const p = player(state, pid);
         if (!p) return fail('Unknown player.');
@@ -12251,6 +12267,19 @@ kbd {
         if (state.turnNo - p.lastAbilityTurn < R.abilityCooldownTurns) {
             return fail('You may only use an ability once every ' +
                         R.abilityCooldownTurns + ' turns.');
+        }
+        // Only one use of an ability may be running at a time. Checked before
+        // the die is thrown, so a refused call costs nothing.
+        if (abilityActive(p)) {
+            return fail(cls.ability.name + ' is still active. Wait for it to run out ' +
+                        'before calling on it again.');
+        }
+        if (cls.ability.id === 'illusion') {
+            const t = player(state, payload && payload.targetPlayerId);
+            if (t && t.pendingIllusion) {
+                return fail('An illusion is already waiting to ambush ' + t.name +
+                            '. Choose someone else.');
+            }
         }
         p.lastAbilityTurn = state.turnNo;
 
@@ -12728,7 +12757,7 @@ kbd {
         barbarianRoll, barbarianAttack, barbarianMoves, barbarianEligible,
         barbarianDefence, barbarianAttackBonus,
         startEnemyBattle, startPvp, availableMoves, battleActorId,
-        usePowerup, eatFood, equip, giveToBarbarian, useAbility, buy,
+        usePowerup, eatFood, equip, giveToBarbarian, useAbility, abilityActive, buy,
         setPaused,
         proposeTrade, respondTrade, cancelTrade, collapse, closeGame,
         fragmentsOf, suitsClass, barbarianCanUse, turnLimit, hasSkill,
@@ -13458,6 +13487,7 @@ kbd {
         // first would be the cooldown spent for nothing.
         if ((b.phase === 'act' || b.phase === 'roll') && D.CLASSES[p.cls].ability.inBattle &&
             state.turnNo - p.lastAbilityTurn >= D.RULES.abilityCooldownTurns &&
+            !E.abilityActive(p) &&
             !(p.buffs || []).some(x => x.kind === 'damage')) {
             return { action: 'useAbility', args: {} };
         }
@@ -13634,6 +13664,7 @@ kbd {
     function abilityStep(state, p) {
         const cls = D.CLASSES[p.cls];
         if (state.turnNo - p.lastAbilityTurn < D.RULES.abilityCooldownTurns) return null;
+        if (E.abilityActive(p)) return null;
 
         if (cls.ability.id === 'agile') {
             // The two spaces are an offer that can be declined after the fact,
@@ -18372,7 +18403,13 @@ kbd {
        now (the side panel, the battle panel and the line under the button),
        so it is worked out in one. */
     function abilityIsReady(p) {
-        return abilityWait(p) === 0;
+        return abilityWait(p) === 0 && !E.abilityActive(p);
+    }
+
+    // What the ability's button adds to its name when it cannot be used yet.
+    function abilityNote(p) {
+        const w = abilityWait(p);
+        return w > 0 ? ' \u00b7 in ' + w : (E.abilityActive(p) ? ' \u00b7 active' : '');
     }
 
     function abilityWait(p) {
@@ -18423,7 +18460,7 @@ kbd {
         // When it is not ready, the button says how long it has left rather
         // than sitting there greyed out for no stated reason.
         buttons.push(btn('a-ability',
-            cls.ability.name + (abilityReady ? '' : ' \u00b7 in ' + abilityWait(p)), '',
+            cls.ability.name + abilityNote(p), '',
             !mine || blocked || !abilityReady ||
             (cls.ability.id === 'agile' && p.hasMoved)));
         buttons.push(btn('a-shop', 'Visit the Merchant', '', !mine || blocked, 'Shortcut: M'));
@@ -20186,7 +20223,7 @@ kbd {
                     ? '<button class="btn small" id="b-ability"' +
                       (abilityIsReady(p) ? '' : ' disabled') + '>' +
                       esc(inFightAbility.name) +
-                      (abilityIsReady(p) ? '' : ' · in ' + abilityWait(p)) +
+                      abilityNote(p) +
                       '</button>'
                     : '') +
                 (aItemOf(p) && aItemOf(p).payInCoins
