@@ -12014,7 +12014,7 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
         $('#btn-resume').style.display = SOLO.hasGame() ? '' : 'none';
 
         $('#btn-solo').addEventListener('click', async () => {
-            const name = $('#inp-name').value.trim() || 'You';
+            const name = $('#inp-name').value.trim() || 'Adventurer';
             $('#inp-name').value = name;
             NET = SOLO;
             $('#btn-solo').disabled = true;

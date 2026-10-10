@@ -9,8 +9,8 @@
 
     <title>Legend of Fenrirak | The Ice Dragon — Play Online</title>
 
-    <link rel="icon" type="image/png" href="Favicon.png?v=9dcbe526">
-    <link rel="apple-touch-icon" href="Favicon.png?v=9dcbe526">
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="apple-touch-icon" href="Favicon.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
     <link rel="canonical" href="https://www.legend-of-fenrirak.com/Ice%20Dragon.html">
@@ -24,9 +24,9 @@
     <meta property="og:description" content="Play Legend of Fenrirak™, The Ice Dragon online with up to 6 players.">
     <meta property="og:url" content="https://www.legend-of-fenrirak.com/Ice%20Dragon.html">
     <meta property="og:site_name" content="Legend of Fenrirak">
-    <meta property="og:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png?v=1d95aed6">
+    <meta property="og:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png?v=1d95aed6">
+    <meta name="twitter:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png">
 
     <style>
 /* ==== site-nav.css ==== */
@@ -6405,6 +6405,87 @@ kbd {
 /* Reduced motion: no fire or flying ice, just the card and the warm edge. */
 .ward-fx.calm .ward-card, .ward-fx.calm .ward-edge, .ward-fx.calm .ward-icon { animation: none; opacity: 1; }
 
+
+/* ==== Smaller board, scaled in ratio -- and the phone view Oblivion uses ====
+   This sits last on purpose: the board's size has been set and re-set by
+   several earlier passes (all !important), so rather than untangle them it is
+   decided here, once.
+
+   The board is now a fixed shape (aspect-ratio) whose rows follow its width,
+   instead of eight rows of a fixed pixel height. Everything drawn inside it --
+   writing, badges, pieces, padding -- is sized in cqw, i.e. as a share of the
+   board's own width, so making the board narrower makes all of it smaller by
+   the same amount and nothing is cut off. It is also capped at 1200px wide,
+   about 13% smaller than it was on a laptop.
+
+   On a phone it does what The Oblivion Dragon does: the board keeps its full
+   proportions inside .board-scroll and you slide it sideways, with the page
+   itself only ever scrolling up and down. Squares show their picture and name;
+   tapping one opens the full text (the writing in the square is too small to
+   be read at that size, so it is left to the tap). ==== */
+.game-grid > div:first-child { overflow: visible !important; }
+.board-scroll {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    border-radius: 12px;
+    scrollbar-width: thin;
+}
+.game-grid > div:first-child > .board-scroll > #board.board {
+    container-type: inline-size;
+    width: 100% !important;
+    min-width: 1000px !important;
+    height: auto !important;
+    aspect-ratio: 1200 / 886;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(8, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+    padding: 10px !important;
+}
+#board.board .sq {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: max(4.5px, .5cqw) !important;
+}
+#board.board .arena { height: auto !important; min-height: 0 !important; }
+#board.board .sq .sq-name { font-size: max(7.6px, .717cqw) !important; line-height: 1.1 !important; }
+#board.board .sq .sq-text { font-size: max(6.4px, .59cqw) !important; line-height: 1.17 !important; }
+#board.board .sq .sq-badge { font-size: max(5.6px, .475cqw) !important; }
+#board.board .sq .sq-name { margin: 0 0 max(2px, .2cqw) !important; padding-bottom: max(2px, .2cqw) !important; }
+#board.board .sq .sq-text { line-height: 1.13 !important; }
+#board.board .sq .sq-badge { margin-top: 2px !important; padding: 1.5px 4px !important; }
+#board.board .token { width: max(21px, 1.96cqw) !important; height: max(21px, 1.96cqw) !important; }
+
+@media (max-width: 900px) {
+    .board-scroll { max-width: none; border-radius: 16px; }
+    .game-grid > div:first-child > .board-scroll > #board.board {
+        min-width: 860px !important;
+        gap: 2px !important;
+        padding: 7px !important;
+    }
+    #board.board .sq { padding: 5px !important; }
+    #board.board .sq .sq-name { font-size: 8.4px !important; line-height: 1.12 !important; }
+    #board.board .sq .sq-text { display: none !important; }
+    #board.board .sq .sq-badge { font-size: 6px !important; }
+    #board.board .token { width: 22px !important; height: 22px !important; }
+}
+
+/* The reminder under the board that its squares can be read -- a pill, as in
+   The Oblivion Dragon. */
+@media (hover: none) {
+    .board-hint {
+        width: fit-content; max-width: 100%;
+        margin: 12px auto 0 !important; padding: 7px 18px;
+        font-size: 13.5px !important; color: #dce8f8 !important;
+        background: rgba(120, 160, 220, .2);
+        border: 1px solid rgba(164, 194, 244, .4); border-radius: 999px;
+    }
+}
+
     </style>
 
     <script type="application/ld+json">
@@ -6414,7 +6495,7 @@ kbd {
         "name": "Legend of Fenrirak: The Ice Dragon",
         "url": "https://www.legend-of-fenrirak.com/Ice%20Dragon.html",
         "description": "Play Legend of Fenrirak™, The Ice Dragon online with up to 6 players.",
-        "image": "https://www.legend-of-fenrirak.com/Fenrirak.png?v=1d95aed6",
+        "image": "https://www.legend-of-fenrirak.com/Fenrirak.png",
         "genre": "Board Game",
         "numberOfPlayers": {
             "@type": "QuantitativeValue",
@@ -6692,9 +6773,9 @@ kbd {
 
             <div class="game-grid">
                 <div>
-                    <div class="board" id="board"></div>
+                    <div class="board-scroll"><div class="board" id="board"></div></div>
                     <!-- Only on a touch screen, where there is no pointing at a square. -->
-                    <p class="board-hint">Tap any square to read it in full.</p>
+                    <p class="board-hint">Tap any square on the board to read its full description.</p>
 
                     <div class="action-log-row" style="margin-top:16px">
                         <div class="card">
@@ -14282,7 +14363,33 @@ kbd {
 
     function showScreen(id) {
         $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+        syncWake();
     }
+
+    /* Keep the phone or computer awake while the game screen is up and the
+       tab is in front. The browser drops a wake lock whenever the tab is
+       hidden, so it is asked for again when the tab comes back. Browsers
+       without the Screen Wake Lock API simply carry on as before. */
+    let wakeLock = null;
+    function wantWake() {
+        const g = document.getElementById('screen-game');
+        return !!(g && g.classList.contains('active')) && document.visibilityState === 'visible';
+    }
+    function syncWake() {
+        try {
+            if (!wantWake()) {
+                if (wakeLock) { const w = wakeLock; wakeLock = null; w.release().catch(() => { }); }
+                return;
+            }
+            if (wakeLock || !navigator.wakeLock) return;
+            navigator.wakeLock.request('screen').then(lock => {
+                if (!wantWake()) { lock.release().catch(() => { }); return; }
+                wakeLock = lock;
+                lock.addEventListener('release', () => { if (wakeLock === lock) wakeLock = null; });
+            }).catch(() => { });
+        } catch (e) { }
+    }
+    document.addEventListener('visibilitychange', syncWake);
 
     /* ------------------------------------------------------------------ */
     /* The die                                                             */
@@ -15652,7 +15759,7 @@ kbd {
     /* ------------------------------------------------------------------ */
 
     function initHome() {
-        $('#inp-name').value = NET.localName();
+        $('#inp-name').value = NET.localName() || 'Adventurer';
 
         // Until Firestore has loaded there is no room to make or join. Solo
         // needs none of it and is live from the first paint.
@@ -15685,7 +15792,7 @@ kbd {
         $('#btn-resume').style.display = SOLO.hasGame() ? '' : 'none';
 
         $('#btn-solo').addEventListener('click', async () => {
-            const name = $('#inp-name').value.trim() || 'You';
+            const name = $('#inp-name').value.trim() || 'Adventurer';
             $('#inp-name').value = name;
             NET = SOLO;
             $('#btn-solo').disabled = true;
