@@ -28,4 +28,4 @@ Gallery photos (board games, cards, characters, book cover, timeline, Minecraft 
 - [The Thunder Dragon](https://www.legend-of-fenrirak.com/thunder-dragon.html): Play the board game online, up to 6 players.
 - [The Ice Dragon](https://www.legend-of-fenrirak.com/ice-dragon.html): Play the board game online, up to 6 players.
 - [The Oblivion Dragon](https://www.legend-of-fenrirak.com/oblivion-dragon.html): Play the board game online, up to 6 players, or against 1-5 computer players.
-- [Showdowns](https://www.legend-of-fenrirak.com/Testplay%20Showdowns.html): A free, single-player online board game — battle AI opponents on a board of terrains and chests.
+- [Showdowns](https://www.legend-of-fenrirak.com/showdowns.html): A free, single-player online board game — battle AI opponents on a board of terrains and chests.
