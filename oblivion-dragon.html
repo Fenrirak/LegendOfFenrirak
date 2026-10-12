@@ -841,6 +841,11 @@ a { color: var(--gold-bright); }
 .btn.small { font-size: 12.5px; padding: 6px 10px; border-radius: 8px; }
 .btn.block { display: block; width: 100%; }
 
+/* dropdown lists: the browser draws them white unless told otherwise */
+select.btn { color-scheme: dark; }
+select.btn option { background: #1b1620; color: var(--cream); }
+select.btn option:checked, select.btn option:hover { background: #4a3a63; color: #fff; }
+
 input[type=text] {
     font-family: inherit;
     font-size: 16px;
@@ -3552,7 +3557,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         { id: 'war_hammer', name: 'War Hammer', attack: 20, text: '+20 DMG.' },
         { id: 'blood_axe', name: 'Blood Axe', attack: 25, text: '+25 DMG.' },
         { id: 'warbreaker', name: 'Warbreaker', attack: 30, text: '+30 DMG.' },
-        { id: 'obsidian_spear', name: 'Obsidian Spear', attack: 30, price: 90, text: '+30 DMG.' },
+        { id: 'obsidian_spear', name: 'Obsidian Spear', attack: 30, price: 70, text: '+30 DMG.' },
         { id: 'death_bringer', name: 'Death Bringer', attack: 35, text: '+35 DMG.' }
     ]);
     gear('barbarian', 'armour', [
@@ -3562,7 +3567,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         { id: 'studded_leather_jacket', name: 'Studded Leather Jacket', defence: 20, text: '+20 Defence.' },
         { id: 'berserkers_chestplate', name: 'Berserker’s Chestplate', defence: 25, text: '+25 Defence.' },
         { id: 'warforged_armour', name: 'Warforged Armour', defence: 30, text: '+30 Defence.' },
-        { id: 'razor_plate', name: 'Razor Plate', defence: 30, thorns: 5, price: 105,
+        { id: 'razor_plate', name: 'Razor Plate', defence: 30, thorns: 5, price: 85,
           text: '+30 Defence, opponent takes 5 damage when they attack the Barbarian ' +
                 '(Excluding Fenrirak and Oblivion Mage Helen).' },
         { id: 'crystal_scale_mail', name: 'Crystal Scale Mail', defence: 35, lowRegen: 5,
