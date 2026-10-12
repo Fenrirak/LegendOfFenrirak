@@ -10283,9 +10283,13 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             // Passing the temple means walking into the shield: only with the
             // fragments, and only healthy.
             if (!E.hasFragments(state, p)) return true;
-            if (!L.thinks) return !rival && p.hp < p.maxHp * 0.75;
-            if (L.sharp) return totalHp(p) < p.maxHp;
-            if (p.hp < p.maxHp * 0.9) return true;
+            // The temple heals the Barbarian along with the player, so his
+            // wounds count too.
+            const bar = E.hasBarbarian(state, p) ? state.barbarian : null;
+            const barHurt = !!bar && bar.hp < bar.maxHp * (L.sharp ? 1 : 0.6);
+            if (!L.thinks) return !rival && (p.hp < p.maxHp * 0.75 || barHurt);
+            if (L.sharp) return totalHp(p) < p.maxHp || barHurt;
+            if (p.hp < p.maxHp * 0.9 || barHurt) return true;
             return !simBoss(state, p).win;
         }
         const sq = E.square(id);
@@ -14693,7 +14697,18 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     $('#log-all').addEventListener('click', () => setLogMine(false));
     $('#log-mine').addEventListener('click', () => setLogMine(true));
 
+    // The log tells what happened, so it waits: nothing new is written while
+    // a die is in the air, a piece is walking or a card is up, and the lines
+    // appear once that has finished.
+    let logWaiting = false;
     function renderLog() {
+        if (tableBusy()) {
+            if (!logWaiting) {
+                logWaiting = true;
+                whenSettled(() => { logWaiting = false; if (S) renderLog(); });
+            }
+            return;
+        }
         const el = $('#log');
         const last = S.log.length ? S.log[S.log.length - 1].n : 0;
         if (last === logSeen && el.childElementCount) return;
