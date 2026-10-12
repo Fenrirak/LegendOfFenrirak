@@ -9380,7 +9380,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         if (kind === 'gear') {
             const def = D.ITEMS[id];
             if (!def || !def.price) return fail('The Merchant does not sell that.');
-            if (!suits(state, p, id)) return fail('That is not made for you.');
+            // Barbarian gear can be bought any time; it waits in the pack until he follows.
+            if (!suits(state, p, id) && def.cls !== 'barbarian') return fail('That is not made for you.');
             const cost = merchantPrice(state, def.price);
             if (p.gold < cost) return fail('You cannot afford that.');
             p.gold -= cost;
@@ -15819,12 +15820,12 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             } else {
                 D.MERCHANT_GEAR.forEach(id => {
                     const it = D.ITEMS[id];
-                    const ok = p && E.suits(S, p, id);
+                    const ok = p && (E.suits(S, p, id) || it.cls === 'barbarian');
                     const cost = { gold: E.merchantPrice(S, it.price), gems: 0 };
                     h += '<div class="shop-item' + (ok ? '' : ' not-mine') + '"><div><div class="nm">' + esc(it.name) +
                         ' <span class="muted" style="font-size:11px">' + className(it.cls) + '</span></div><div class="tx">' + esc(it.text) + '</div>' +
                         '<div class="price">' + (ok ? priceButton('data-buy-gear', id, cost, 'gold', p, it.price) :
-                            '<span class="muted" style="font-size:12px">' + (it.cls === 'barbarian' ? 'For your Barbarian, once he follows you' : 'Made for a ' + className(it.cls)) + '</span>') +
+                            '<span class="muted" style="font-size:12px">' + 'Made for a ' + className(it.cls) + '</span>') +
                         '</div></div></div>';
                 });
             }
