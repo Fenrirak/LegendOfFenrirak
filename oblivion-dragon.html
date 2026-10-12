@@ -11007,8 +11007,18 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         // A fair swap is a good swap: take anything that gives at least what it
         // asks for (the sharper computers allow no slack, the rest a little,
         // as the values are only rough). A gift is always welcome.
-        const slack = levelOf(p).sharp ? 1 : 0.9;
-        return act('respondTrade', { tradeId: t.id, accept: gain > 0 && gain >= cost * slack });
+        let slack = levelOf(p).sharp ? 1 : 0.9;
+        let accept;
+        const from = E.player(state, t.fromId);
+        if (levelOf(p).sharp && from && !from.botLevel && cost > 0) {
+            // Hard computers drive a harder bargain with a person: they want a
+            // clear profit (35% over what it is worth to them), and even then
+            // they only say yes about two times in three. Gifts and the
+            // computers' own offers to one another are unaffected.
+            slack = 1.35;
+            accept = gain > 0 && gain >= cost * slack && Math.random() < 0.65;
+        } else accept = gain > 0 && gain >= cost * slack;
+        return act('respondTrade', { tradeId: t.id, accept: accept });
     }
 
 
