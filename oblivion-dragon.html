@@ -13272,8 +13272,15 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     }
     document.addEventListener('visibilitychange', syncWake);
 
+    // Nothing that belongs to your own turn can be done until the "Your turn!"
+    // card has come and gone. Merchant, potions, battles and answering
+    // questions are not turn actions and stay open.
+    const TURN_ONLY = { rollMove: 1, endTurn: 1, useAbility: 1, equip: 1, proposeTrade: 1 };
+    function turnCardUp() { return myTurn() && BANNERS.pending('turn'); }
+
     function act(action, args) {
         if (!ROOM) return Promise.resolve(null);
+        if (TURN_ONLY[action] && turnCardUp()) return Promise.resolve(null);
         return NET.act(ROOM, action, args || {}).catch(err => {
             if (err && !err.silent && err.message !== 'no-change') notice(err.message || 'That is not allowed.');
             return null;
@@ -13517,7 +13524,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 
     const BANNERS = (function () {
         const queue = [];
-        let showing = false, wait = null;
+        let showing = false, wait = null, current = null;
         function pump() {
             clearTimeout(wait);
             if (showing || !queue.length) return;
@@ -13527,8 +13534,10 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             if (DICE.showing()) { DICE.hurry(); wait = setTimeout(pump, 100); return; }
             const next = queue.shift();
             showing = true;
+            current = next.kind;
             next.play(() => {
                 showing = false;
+                current = null;
                 DICE.release();
                 // A breath between one card going and the next coming.
                 if (queue.length) wait = setTimeout(pump, 160);
@@ -13546,6 +13555,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
                 pump();
             },
             showing: () => showing,
+            // A card of this kind is up, or still waiting to go up.
+            pending: kind => current === kind || queue.some(q => q.kind === kind),
             busy: () => showing || queue.length > 0,
             reset() { queue.length = 0; clearTimeout(wait); }
         };
@@ -15126,8 +15137,13 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         return '<div class="sum" title="' + esc(c.attackParts.map(x => x.label + ' ' + (x.value >= 0 ? '+' : '') + x.value).join(', ')) + '">' + s + '</div>';
     }
 
+    // The fight whose popup has actually gone up. A computer player waits
+    // for this before it rolls for who strikes first in a PvP clash.
+    let orderShownFor = null;
+
     function renderBattle() {
         const b = S.battle;
+        orderShownFor = b.logFrom;
         const p = me();
         const involved = p && E.inBattle(S, p.id);
         const bid = b.logFrom;
@@ -15864,6 +15880,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     /* ---- trading -------------------------------------------------------- */
 
     function openTrade() {
+        if (turnCardUp()) return;
         const p = me();
         if (!p) return;
         const others = S.players.filter(x => x.id !== p.id && x.cls);
@@ -16901,7 +16918,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         applyGfx(gfxLevel());
         initHome();
         initLobby();
-        SOLO.setBusyCheck(() => tableBusy());
+        SOLO.setBusyCheck(() => tableBusy() || (S && S.battle && S.battle.kind === 'pvp' &&
+            S.battle.phase === 'order' && orderShownFor !== S.battle.logFrom));
         if (window.LOF_NET) onlineReady();
         else {
             window.addEventListener('lof-net-ready', onlineReady);
