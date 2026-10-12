@@ -3934,6 +3934,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         startingGold: 0,
         startingEnergy: 1,
         equipChangesPerTurn: 1,
+        tradeOffersPerTurn: 5,
         abilityCooldownTurns: 3,
         enemyMinDamage: 5,
         potionsHealingPerTurn: 3,
@@ -6223,7 +6224,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 
     function merchantHut() {
         // A humble stall: a plank counter, four posts and a flat, oblong
-        // canvas roof with a patch on it, the merchant standing behind his
+        // canvas roof, the merchant standing behind his
         // wares.
         return '<g class="merchant-hut">' +
             grp('#8a6a44', P('M20 70h120v40H20z'), 'stroke-width="3.4"') +
@@ -6235,15 +6236,11 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             grp('#7a5a3a', P('M70 34c0-10 20-10 20 0z'), 'stroke-width="3"') +
             dot(77, 39, 1.6) + dot(83, 39, 1.6) +
             // the canvas roof: one plain oblong across the posts, its hem
-            // turned under along the front edge, and a square patch
+            // turned under along the front edge
             grp('#d8c49a', P('M10 4h140v22H10z'), 'stroke-width="3.4"') +
             line('M12 20.5h136', '#b8a478', 2.2) +
-            grp('#b8a478', P('M100 7h22v10H100z'), 'stroke-width="2"') +
-            line('M103 9.5v5M119 9.5v5', '#8a7a58', 1.2) +
             // wares on the counter
             flask(44, 62, .8, '#d23a3a') + flask(58, 64, .7, '#3a7fd2') + flask(112, 62, .8, '#3ab06a') +
-            grp('#f4e9d0', P('M44 78h72v12H44z'), 'stroke-width="2.4"') +
-            '<text x="80" y="87.5" text-anchor="middle" font-family="Cutive Mono, monospace" font-size="10" font-weight="700" fill="' + INK + '">MERCHANT</text>' +
             '</g>';
     }
 
@@ -6948,7 +6945,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             turnsTaken: 0,
             abilityUsedAt: null,    // turnsTaken when it last worked
             abilityTriedAt: null,   // turnsTaken when it was last tried
-            weaponSwaps: 0, armourSwaps: 0,
+            weaponSwaps: 0, armourSwaps: 0, tradeOffers: 0,
             barbWeaponSwaps: 0, barbArmourSwaps: 0,
             path: [],
             hasMoved: false,
@@ -7470,7 +7467,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         if (!p) return;
         if (!state.playStartedAt) state.playStartedAt = Date.now();
         p.hasMoved = false;
-        p.weaponSwaps = 0; p.armourSwaps = 0;
+        p.weaponSwaps = 0; p.armourSwaps = 0; p.tradeOffers = 0;
         p.barbWeaponSwaps = 0; p.barbArmourSwaps = 0;
         p.path = [];
         state.turnStartedAt = Date.now();
@@ -9529,10 +9526,11 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         if (state.battle) return fail('Finish the battle first.');
         if (state.pending && state.pending.type !== 'astrix') return fail('Finish what your square asks first.');
         if (state.trades.some(t => t.fromId === fromId && t.status === 'open')) return fail('You already have an offer waiting.');
+        if ((a.tradeOffers | 0) >= R.tradeOffersPerTurn) return fail('You can only offer ' + R.tradeOffersPerTurn + ' trades each turn.');
         const t = {
             id: uid('tr'), fromId: fromId, toId: toId,
             give: normaliseBundle(give), want: normaliseBundle(want),
-            status: 'open', at: Date.now()
+            status: 'open', at: Date.now(), turn: a.turnsTaken | 0
         };
         if (bundleEmpty(t.give) && bundleEmpty(t.want)) return fail('The trade is empty.');
         if (!validBundle(a, t.give)) return fail('You do not have everything you offered.');
@@ -9540,6 +9538,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         const dup = duplicateFragment(t, a, b);
         if (dup) return fail(dup);
         state.trades.push(t);
+        a.tradeOffers = (a.tradeOffers | 0) + 1;
         const open = state.trades.filter(x => x.status === 'open');
         const done = state.trades.filter(x => x.status !== 'open');
         if (done.length > 10) state.trades = done.slice(-10).concat(open);
@@ -9875,7 +9874,11 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
            means to finish Helen before Obliviate; and, when the final fight
            cannot be won yet, keeps its potions for the next try. It sees no
            more than you do: the dice it imagines are not the dice that fall,
-           and it waits at most two turns in a row.
+           and it waits at most two turns in a row. It also goes looking for
+           the gear, potions and Pendant Fragments it needs, and offers the
+           other players a fair swap for them.
+
+   Every level uses its class ability only when it actually pays off.
    ========================================================================= */
 
 (function (global) {
@@ -10602,7 +10605,51 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         return act('battleAttack', { moveId: choice.id, target: tgt ? tgt.key : null });
     }
 
-    // Easy: drinks when badly hurt, uses its ability when it can, and hits.
+
+    /* ------------------------------------------------------------------ */
+    /* Is the class ability worth using right now?                         */
+    /*                                                                     */
+    /* Runed Relic: not while it is already running, and not when the next */
+    /* blow ends the fight anyway. Iron Body: only against blows that      */
+    /* would otherwise be lifted to the monsters' minimum damage. Agile    */
+    /* Footwork: only if the extra step makes the roll clearly better.     */
+    /* ------------------------------------------------------------------ */
+
+    function abilityPays(state, p, L, b, u) {
+        try {
+            const id = D.CLASSES[p.cls].ability.id;
+            const buffs = p.buffs || [];
+            if (!b) {
+                if (id !== 'agile_footwork') return false;
+                const Lm = L.thinks ? L : LEVELS.medium;
+                return rollValue(state, p, Lm, 1, 0, true) - rollValue(state, p, Lm, 0, 0, true) > 2;
+            }
+            const live = b.units.filter(x => x.kind === 'enemy' && !x.down);
+            if (id === 'runed_relic') {
+                if (buffs.some(x => x.from === 'Runed Relic' && x.uses > 0)) return false;
+                const tgt = u && pickTarget(state, b, u);
+                if (tgt && live.length <= 1) {
+                    const foe = E.body(state, tgt);
+                    const hp = foe.hp + (foe.bonusHp || 0);
+                    const best = Math.max.apply(null, [0].concat(E.availableMoves(state, u.key)
+                        .filter(m => m.usable).map(m => E.computeHit(state, b, u, tgt, m).net)));
+                    if (best >= hp) return false;   // the next blow finishes it without help
+                }
+                return true;
+            }
+            if (id === 'iron_body') {
+                if (b.kind === 'pvp') return false;
+                if (buffs.some(x => x.kind === 'ignoreMin' && x.uses > 0)) return false;
+                const me = b.units.find(x => x.kind === 'player' && x.pid === p.id);
+                if (!me) return false;
+                return live.some(en => ((D.ENEMIES[en.enemyId] || {}).moves || [])
+                    .some(m => m.damage > 0 && E.computeHit(state, b, en, me, m).floored));
+            }
+            return false;
+        } catch (err) { return false; }
+    }
+
+    // Easy: drinks when badly hurt, uses its ability when it pays, and hits.
     function plainJob(state, p, b, u) {
         const o = E.body(state, u);
         if (o.hp + (o.bonusHp || 0) < (o.maxHp || 1) * (b.kind === 'boss' ? 0.5 : 0.35)) {
@@ -10612,8 +10659,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         }
         if (u.kind === 'player') {
             const ab = E.canUseAbility(state, p.id);
-            const pointless = D.CLASSES[p.cls].ability.id === 'iron_body' && b.kind === 'pvp';
-            if (ab.ok && !pointless) return act('useAbility');
+            if (ab.ok && abilityPays(state, p, levelOf(p), b, u)) return act('useAbility');
         }
         return blowJob(state, b, u, pickTarget(state, b, u));
     }
@@ -10653,7 +10699,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             if (b.botPlan === 'keep') {
                 if (!isAlly) {
                     const ab = E.canUseAbility(state, p.id);
-                    if (ab.ok && D.CLASSES[p.cls].ability.id !== 'iron_body') return act('useAbility');
+                    if (ab.ok && abilityPays(state, p, L, b, u)) return act('useAbility');
                 }
                 return blowJob(state, b, u, tgt);
             }
@@ -10681,9 +10727,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 
         if (!isAlly) {
             const ab = E.canUseAbility(state, p.id);
-            // Iron Body is about a monster's minimum damage: no use in a duel.
-            const pointless = D.CLASSES[p.cls].ability.id === 'iron_body' && b.kind === 'pvp';
-            if (ab.ok && !pointless) return act('useAbility');
+            if (ab.ok && abilityPays(state, p, L, b, u)) return act('useAbility');
         }
 
         // Hard: a defence potion before a monster's heavy blow lands on us.
@@ -10841,7 +10885,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 
         if (u.kind === 'player') {
             const ab = E.canUseAbility(state, p.id);
-            if (ab.ok && D.CLASSES[p.cls].ability.id !== 'iron_body') return act('useAbility');
+            if (ab.ok && abilityPays(state, p, levelOf(p), b, u)) return act('useAbility');
         }
 
         const target = fen || helen;
@@ -10967,6 +11011,103 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         return act('respondTrade', { tradeId: t.id, accept: gain > 0 && gain >= cost * slack });
     }
 
+
+    /* Hard computers go looking for what they need. On its own turn, before
+       it moves, it picks something another player is holding that it wants
+       (a Pendant Fragment it needs, a piece of gear better than anything it
+       has, a potion its kit is short of) and offers a fair price for it out
+       of its spare gear, spare potions and, if that falls short, Gold. The
+       other side has to be getting at least what the thing is worth to
+       them, and the computer has to come out ahead on its own reckoning.
+       One offer a turn at most, and not more than one every third turn. */
+
+    function emptyBundle() { return { gold: 0, gems: 0, keys: 0, fragments: [], items: [], potions: [] }; }
+
+    function potionNeed(p, L, id) {
+        const d = D.POTIONS[id];
+        if (!d) return false;
+        const list = KITS[L.kit] || [];
+        if (d.group === 'heal' && !d.special) {
+            const top = list.reduce((n, w) => Math.max(n, w.heal || 0), 0);
+            return healPoints(p) < top;
+        }
+        if (d.tranquility) return list.some(w => w.tranq) && !p.potions.some(x => D.POTIONS[x.id].tranquility);
+        return list.some(w => w.id === id && count(p, id) < w.n);
+    }
+
+    function wantSignature(toId, bd) {
+        return JSON.stringify([toId, bd.fragments || [], bd.items || [], bd.potions || []]);
+    }
+
+    function tradeOfferJob(state, p, L) {
+        if (!L.sharp || state.battle || state.pending || p.hasMoved) return null;
+        if (!E.isMyTurn(state, p.id) || (p.tradeOffers | 0) >= 1) return null;
+        const mine = (state.trades || []).filter(t => t.fromId === p.id);
+        if (mine.some(t => t.status === 'open')) return null;
+        if (mine.some(t => t.turn !== undefined && (p.turnsTaken | 0) - t.turn < 3)) return null;
+        const tried = {};
+        mine.forEach(t => { if (t.status !== 'accepted') tried[wantSignature(t.toId, t.want)] = true; });
+
+        const spareItems = spareGear(state, p);
+        const sparePots = sparePotions(p);
+        let best = null;
+
+        state.players.forEach(q => {
+            if (q.id === p.id || !q.cls || E.inBattle(state, q.id)) return;
+            const wants = [];
+            (q.fragments || []).forEach(n => { if (needsFragment(state, p, n)) { const w = emptyBundle(); w.fragments = [n]; wants.push(w); } });
+            q.inventory.forEach(it => {
+                const d = E.itemDef(it);
+                if (!d || it.uid === q.weaponUid || it.uid === q.armourUid) return;
+                if (!(d.cls === p.cls || (d.cls === 'barbarian' && E.hasBarbarian(state, p)))) return;
+                const w = emptyBundle(); w.items = [it.uid];
+                if (bundleWorth(state, p, w, true) > 20) wants.push(w);   // better than anything it has
+            });
+            const seen = {};
+            q.potions.forEach(x => {
+                if (seen[x.id] || !potionNeed(p, L, x.id)) return;
+                seen[x.id] = true;
+                const w = emptyBundle(); w.potions = [x.uid]; wants.push(w);
+            });
+
+            wants.forEach(want => {
+                if (tried[wantSignature(q.id, want)]) return;
+                const need = bundleWorth(state, p, want, true);
+                const qCost = bundleWorth(state, q, want, false);
+                const target = Math.max(qCost, need * 0.55);
+                const cap = need * (want.fragments.length ? 1 : 0.9);
+
+                const give = emptyBundle();
+                let qGain = 0;
+                const pieces = [];
+                spareItems.forEach(it => pieces.push({ kind: 'items', uid: it.uid }));
+                sparePots.forEach(x => pieces.push({ kind: 'potions', uid: x.uid }));
+                pieces.forEach(pc => {
+                    const one = emptyBundle(); one[pc.kind] = [pc.uid];
+                    pc.q = bundleWorth(state, q, one, true);
+                    pc.me = bundleWorth(state, p, one, false);
+                });
+                pieces.filter(pc => pc.q > pc.me).sort((a, c) => (c.q - c.me) - (a.q - a.me)).slice(0, 2).forEach(pc => {
+                    if (qGain < target) { give[pc.kind].push(pc.uid); qGain += pc.q; }
+                });
+                if (qGain < target) {
+                    const gold = Math.ceil(target - qGain);
+                    if (p.gold - gold < 25) return;       // keeps something for the shop
+                    give.gold = gold;
+                }
+                const myCost = bundleWorth(state, p, give, false);
+                const surplus = need - myCost;
+                if (myCost > cap || surplus < (want.fragments.length ? 0 : 8)) return;
+                if (!best || surplus > best.surplus) best = { to: q.id, give: give, want: want, surplus: surplus };
+            });
+        });
+
+        if (!best) return null;
+        const check = E.ACTIONS.proposeTrade(copyOf(state), p.id, { toId: best.to, give: best.give, want: best.want });
+        if (!check || !check.ok) return null;
+        return act('proposeTrade', { toId: best.to, give: best.give, want: best.want });
+    }
+
     /* ------------------------------------------------------------------ */
     /* Questions                                                           */
     /* ------------------------------------------------------------------ */
@@ -11089,6 +11230,10 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 
         if (!E.isMyTurn(state, pid)) return null;
 
+        // An offer to another computer is answered at once: wait for it.
+        const waiting = (state.trades || []).find(t => t.fromId === pid && t.status === 'open');
+        if (waiting) { const to = E.player(state, waiting.toId); if (to && to.botLevel) return null; }
+
         const g = gearJob(state, p);
         if (g) return g;
         const h = healJob(state, p, p.hasMoved ? 0.5 : 0.6, L);
@@ -11097,12 +11242,14 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         if (s) return s;
 
         if (!p.hasMoved) {
+            const offer = tradeOfferJob(state, p, L);
+            if (offer) return offer;
             if (L.sharp) {
                 const pre = preDrinkJob(state, p);
                 if (pre) return pre;
             }
             const ab = E.canUseAbility(state, pid);
-            if (ab.ok && D.CLASSES[p.cls].ability.id === 'agile_footwork') return act('useAbility');
+            if (ab.ok && abilityPays(state, p, L, null, null)) return act('useAbility');
             if (L.sharp) {
                 const mp = movePotionJob(state, p, L);
                 if (mp) return mp;
@@ -15933,7 +16080,14 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             bind('shop-s', () => { shopTab = 'sell'; panel.draw(); });
             $$('[data-sell]').forEach(x => {
                 if (blocked) x.disabled = true;
-                x.addEventListener('click', () => confirmSell(p, x.getAttribute('data-sell')));
+                x.addEventListener('click', () => {
+                    // Only gear the Merchant stocks asks first (and, as before, your best Barbarian piece).
+                    const uid = x.getAttribute('data-sell');
+                    const inst = p.inventory.find(y => y.uid === uid);
+                    const def = inst && E.itemDef(inst);
+                    if (def && (def.price || isTopBarbarianPiece(p, uid))) confirmSell(p, uid);
+                    else act('sell', { uid: uid });
+                });
             });
             $$('[data-sell-potion]').forEach(x => {
                 if (blocked) x.disabled = true;
@@ -16098,6 +16252,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             h += '<div class="trade-num"><span>Trade with</span><select id="tr-who" class="btn small">' + others.map(o =>
                 '<option value="' + esc(o.id) + '"' + (o.id === partner ? ' selected' : '') + '>' + esc(o.name) + ' (' + className(o.cls) + ')</option>').join('') + '</select></div>';
             h += '<div class="trade-cols">' + bundleUi(mine, them, 'g', 'You give') + bundleUi(them, mine, 'w', esc(them.name) + ' gives') + '</div>';
+            h += '<div class="sub">You can offer up to ' + D.RULES.tradeOffersPerTurn + ' trades each turn (' +
+                Math.max(0, D.RULES.tradeOffersPerTurn - (mine.tradeOffers | 0)) + ' left).</div>';
             h += '<div class="modal-actions"><button class="btn primary" id="tr-send">Send the offer</button></div>';
             setPanel(h, 'wide');
             if (kept) kept();
