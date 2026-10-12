@@ -9414,6 +9414,30 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         return ok();
     }
 
+    // A potion sells for 10 Gold, a vial for 5.
+    function potionSellPrice(id) {
+        const d = D.POTIONS[id];
+        return d && /vial/i.test(d.name) ? 5 : 10;
+    }
+
+    function sellPotion(state, pid, potionUid) {
+        const p = player(state, pid);
+        if (!p) return fail('Unknown player.');
+        if (state.phase !== 'playing') return fail('The game is not running.');
+        if (inBattle(state, pid)) return fail('The Merchant will not deal during a battle.');
+        if (state.pending && state.pending.playerId === pid && state.pending.type !== 'astrix') {
+            return fail('Finish what your square asks first.');
+        }
+        const i = p.potions.findIndex(x => x.uid === potionUid);
+        if (i < 0) return fail('You do not have that.');
+        const id = p.potions[i].id;
+        const price = potionSellPrice(id);
+        p.potions.splice(i, 1);
+        p.gold += price;
+        log(state, p.name + ' sells a ' + D.POTIONS[id].name + ' to the Merchant for ' + price + ' Gold.', 'item');
+        return ok();
+    }
+
     function buyAstrix(state, pid, id, pay) {
         const p = player(state, pid);
         if (!p) return fail('Unknown player.');
@@ -9737,6 +9761,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         buy:           (s, pid, a) => buy(s, pid, a.kind, a.id, a.pay),
         buyAstrix:     (s, pid, a) => buyAstrix(s, pid, a.id, a.pay),
         sell:          (s, pid, a) => sell(s, pid, a.uid),
+        sellPotion:    (s, pid, a) => sellPotion(s, pid, a.uid),
         battleOrderRoll:(s, pid)   => battleOrderRoll(s, pid),
         battleAttack:  (s, pid, a) => battleAttack(s, pid, a.moveId, a.target),
         enemyAct:      (s, pid)    => enemyAct(s, pid),
@@ -9789,7 +9814,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         makeRoomCode, createGame, addPlayer, joinLate, removePlayer, chooseClass, setMods, startGame,
         rollForOrder, currentPlayer, isMyTurn, advanceTurn, checkTimeout, turnLimit,
         player, square, previewWalk, moveOffer, isOptionalStop, fragmentsNeeded, hasFragments,
-        weaponOf, armourOf, itemDef, ownedItem, suits, hasBarbarian, hasFought, guardOf,
+        potionSellPrice, weaponOf, armourOf, itemDef, ownedItem, suits, hasBarbarian, hasFought, guardOf,
         availableMoves, computeHit, battleActorId, inBattle, curUnit, unit, unitName,
         controllerOf, opponents, defaultTarget, movesOf, chooseEnemyMove, enemyTarget, isPlural,
         attackParts, defenceParts, body, buffsOf, oblivionControlOn, tranquil,
@@ -10372,6 +10397,22 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         return out.sort((a, b) => E.itemDef(a).score - E.itemDef(b).score);
     }
 
+    // Potions past what it would ever use: more than two of a kind, or more
+    // than its kit asks for. Healing and Tranquility are never spare.
+    function sparePotions(p) {
+        const want = {};
+        Object.keys(KITS).forEach(k => KITS[k].forEach(w => { if (w.id) want[w.id] = Math.max(want[w.id] || 0, w.n); }));
+        const seen = {};
+        const out = [];
+        p.potions.forEach(x => {
+            const d = D.POTIONS[x.id];
+            if (!d || d.group === 'heal' || d.tranquility || d.special) return;
+            seen[x.id] = (seen[x.id] || 0) + 1;
+            if (seen[x.id] > Math.max(2, want[x.id] || 0)) out.push(x);
+        });
+        return out.sort((a, b) => E.potionSellPrice(a.id) - E.potionSellPrice(b.id));
+    }
+
     function gearShopJob(state, p) {
         // The Merchant's own piece for my class, if it beats what I wear.
         for (const id of D.MERCHANT_GEAR) {
@@ -10437,7 +10478,11 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             if (p.gold >= cost) return act('buy', { kind: 'potion', id: id, pay: pay });
             // Short: the spare gear goes to the Merchant if that covers it.
             const spare = spareGear(state, p);
-            if (spare.length && p.gold + spare.length * D.SELL_PRICE >= cost) return act('sell', { uid: spare[0].uid });
+            const extra = sparePotions(p);
+            const total = spare.length * D.SELL_PRICE + extra.reduce((n, x) => n + E.potionSellPrice(x.id), 0);
+            if ((spare.length || extra.length) && p.gold + total >= cost) {
+                return spare.length ? act('sell', { uid: spare[0].uid }) : act('sellPotion', { uid: extra[0].uid });
+            }
             if (L.sharp) return SAVING;
         }
         return null;
@@ -15822,7 +15867,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             h += '<div class="tabs shop-tabs"><button id="shop-p" class="' + (shopTab === 'potions' ? 'on' : '') + '">Potions</button>' +
                 '<button id="shop-g" class="' + (shopTab === 'gear' ? 'on' : '') + '">Weapons &amp; Armour</button>' +
                 '<button id="shop-s" class="' + (shopTab === 'sell' ? 'on' : '') + '">Sell</button></div>';
-            if (shopTab === 'sell') h += '<div class="sub">He buys any weapon or armour you are not wearing, ' + D.SELL_PRICE + ' Gold a piece, whatever it is.</div>';
+            if (shopTab === 'sell') h += '<div class="sub">He buys any weapon or armour you are not wearing, ' + D.SELL_PRICE + ' Gold a piece, whatever it is. Potions fetch 10 Gold, vials 5.</div>';
             h += '<div class="shop-list">';
             const blocked = !p || (S && E.inBattle(S, p.id));
             if (shopTab === 'potions') {
@@ -15834,7 +15879,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
                         (e.alt ? priceButton('data-buy-potion', e.id, E.priceFor(S, 'merchant', e, 'alt'), 'alt', p, e.alt.gold) : '') : '') + '</div></div></div>';
                 });
             } else if (shopTab === 'sell') {
-                h += sellRows(p);
+                h += (sellRows(p) + potionSellRows(p)) || '<div class="empty-note">Nothing to sell. What you are wearing stays on you.</div>';
             } else {
                 D.MERCHANT_GEAR.forEach(id => {
                     const it = D.ITEMS[id];
@@ -15860,6 +15905,10 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
                     if (isTopBarbarianPiece(p, uid)) confirmSell(p, uid);
                     else act('sell', { uid: uid });
                 });
+            });
+            $$('[data-sell-potion]').forEach(x => {
+                if (blocked) x.disabled = true;
+                x.addEventListener('click', () => act('sellPotion', { uid: x.getAttribute('data-sell-potion') }));
             });
             $$('[data-buy-potion]').forEach(x => {
                 if (blocked) x.disabled = true;
@@ -15902,6 +15951,25 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         });
     }
 
+    function potionSellRows(p) {
+        if (!p || !p.potions.length) return '';
+        const stacks = {};
+        const order = [];
+        p.potions.forEach(x => {
+            if (!stacks[x.id]) { stacks[x.id] = { uid: x.uid, n: 0 }; order.push(x.id); }
+            stacks[x.id].n += 1;
+        });
+        return order.map(id => {
+            const d = D.POTIONS[id];
+            const st = stacks[id];
+            return '<div class="shop-item"><div><div class="nm">' + esc(d.name) + (st.n > 1 ? ' ×' + st.n : '') +
+                ' <span class="muted" style="font-size:11px">Potion</span></div>' +
+                '<div class="tx">' + esc(d.text || '') + '</div>' +
+                '<div class="price"><button class="btn small" data-sell-potion="' + esc(st.uid) + '">Sell one for ' +
+                A.ICONS.gold(14) + E.potionSellPrice(id) + '</button></div></div></div>';
+        }).join('');
+    }
+
     function sellRows(p) {
         if (!p) return '';
         const loose = p.inventory.filter(it => E.itemDef(it) && it.uid !== p.weaponUid && it.uid !== p.armourUid)
@@ -15909,7 +15977,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
                 const da = E.itemDef(a), db = E.itemDef(b);
                 return (da.kind === db.kind ? 0 : da.kind === 'weapon' ? -1 : 1) || db.score - da.score;
             });
-        if (!loose.length) return '<div class="empty-note">Nothing to sell. What you are wearing stays on you.</div>';
+        if (!loose.length) return '';
         const rows = [];
         const spare = {};
         loose.forEach(inst => {
@@ -16383,7 +16451,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             '<h3>Pendant Fragments</h3><p>You need all 5 different Pendant Fragments to pass the Oblivion Mage’s shield. Reach it without them and ' +
             'it throws you back to the Start (this counts as a death).</p>' +
             '<h3>Trading and the Merchant</h3><p>Only Gold, Pendant Fragments, Potions, Gemstones, Weapons and Armour can be traded, and both sides ' +
-            'must agree. The Merchant is open any time except during your battles (click his stall on the board), and he buys any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold a piece. Astrix’s Alchemy only sells ' +
+            'must agree. The Merchant is open any time except during your battles (click his stall on the board), and he buys any weapon or armour you are not wearing for ' + D.SELL_PRICE + ' Gold a piece, and any potion for 10 Gold (a vial for 5). Astrix’s Alchemy only sells ' +
             'to whoever is standing on it.</p>' +
             '<h3>Keyboard shortcuts</h3><p><b>R</b> rolls the die (for turn order, or to move). <b>Backspace</b> ends your turn. ' +
             '<b>M</b> opens the Merchant. <b>T</b> offers a trade. <b>P</b> pauses the game, or carries it on (the host, or you on your own). <b>Escape</b> closes the window that is open. They do just what the buttons do, so a key does ' +
