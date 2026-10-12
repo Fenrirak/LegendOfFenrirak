@@ -10868,8 +10868,22 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             if (!inst) return;
             const d = E.itemDef(inst);
             const useful = d.cls === p.cls || (d.cls === 'barbarian' && E.hasBarbarian(state, p));
-            v += useful ? d.score * 2 : 8;
-            if (!receiving && (p.weaponUid === u || p.armourUid === u)) v += 40;
+            // What is worn now, and the best piece sitting in the pack.
+            let worn;
+            if (d.cls === 'barbarian') {
+                const bar = state.barbarian;
+                worn = bar && E.itemDef(d.kind === 'weapon' ? bar.weapon : bar.armour);
+            } else worn = E.itemDef(d.kind === 'weapon' ? E.weaponOf(p) : E.armourOf(p));
+            const wornScore = worn ? worn.score : 0;
+            const equipped = !receiving && (p.weaponUid === u || p.armourUid === u);
+            if (!useful) v += 8;
+            else if (equipped) v += d.score * 2 + 40;
+            else if (receiving) {
+                // Only worth much if it beats everything already owned.
+                const owned = bestOwned(state, p, d.kind, d.cls === 'barbarian');
+                const have = Math.max(wornScore, owned ? E.itemDef(owned).score : 0);
+                v += d.score > have ? d.score * 2 : 10;
+            } else v += d.score > wornScore ? d.score * 2 : 10;   // a spare that is no better than what is worn is nearly scrap
         });
         return v;
     }
@@ -10880,7 +10894,11 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         if (E.inBattle(state, p.id)) return null;
         const gain = bundleWorth(state, p, t.give, true);
         const cost = bundleWorth(state, p, t.want, false);
-        return act('respondTrade', { tradeId: t.id, accept: gain >= cost * 1.2 + 5 });
+        // A fair swap is a good swap: take anything that gives at least what it
+        // asks for (the sharper computers allow no slack, the rest a little,
+        // as the values are only rough). A gift is always welcome.
+        const slack = levelOf(p).sharp ? 1 : 0.9;
+        return act('respondTrade', { tradeId: t.id, accept: gain > 0 && gain >= cost * slack });
     }
 
     /* ------------------------------------------------------------------ */
@@ -15837,7 +15855,11 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             bind('shop-s', () => { shopTab = 'sell'; panel.draw(); });
             $$('[data-sell]').forEach(x => {
                 if (blocked) x.disabled = true;
-                x.addEventListener('click', () => act('sell', { uid: x.getAttribute('data-sell') }));
+                x.addEventListener('click', () => {
+                    const uid = x.getAttribute('data-sell');
+                    if (isTopBarbarianPiece(p, uid)) confirmSell(p, uid);
+                    else act('sell', { uid: uid });
+                });
             });
             $$('[data-buy-potion]').forEach(x => {
                 if (blocked) x.disabled = true;
@@ -15852,6 +15874,34 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 
     // Everything the Merchant would buy off you: weapons first, then armour,
     // best first, with identical spares on one row (one sells at a time).
+    // Is this the best Barbarian weapon (or armour) you have, counting the one
+    // he is wearing? Another piece just as good means it is not the only one.
+    function isTopBarbarianPiece(p, uid) {
+        const inst = p.inventory.find(x => x.uid === uid);
+        const d = inst && E.itemDef(inst);
+        if (!d || d.cls !== 'barbarian') return false;
+        const rivals = p.inventory.filter(x => x.uid !== uid).map(E.itemDef)
+            .filter(o => o && o.cls === 'barbarian' && o.kind === d.kind);
+        if (S && S.barbarian && E.hasBarbarian(S, p)) {
+            const worn = E.itemDef(d.kind === 'weapon' ? S.barbarian.weapon : S.barbarian.armour);
+            if (worn) rivals.push(worn);
+        }
+        return !rivals.some(o => o.score >= d.score);
+    }
+
+    function confirmSell(p, uid) {
+        const inst = p.inventory.find(x => x.uid === uid);
+        const d = inst && E.itemDef(inst);
+        if (!d) return;
+        openPanel('sellsure', () => {
+            setPanel('<h2>Sell the ' + esc(d.name) + '?</h2><div class="sub">It is the best Barbarian ' + d.kind +
+                ' you have, including the one he is wearing. The Merchant pays ' + D.SELL_PRICE + ' Gold and it is gone for good.</div>' +
+                '<div class="modal-actions"><button class="btn" id="ss-no">Keep it</button><button class="btn danger" id="ss-yes">Sell it</button></div>');
+            bind('ss-no', openMerchant);
+            bind('ss-yes', () => { act('sell', { uid: uid }).then(() => openMerchant()); });
+        });
+    }
+
     function sellRows(p) {
         if (!p) return '';
         const loose = p.inventory.filter(it => E.itemDef(it) && it.uid !== p.weaponUid && it.uid !== p.armourUid)
