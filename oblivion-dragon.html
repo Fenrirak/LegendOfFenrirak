@@ -2749,6 +2749,14 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 .over table { margin: 10px auto 20px; border-collapse: collapse; font-size: 14px; }
 .over th, .over td { padding: 6px 12px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
 .over th { color: var(--gold-bright); font-weight: normal; }
+.over-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 14px 0 6px; }
+.over-fact { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 18px;
+    background: rgba(255, 255, 255, .05); border: 1px solid rgba(242, 204, 143, .28); border-radius: 10px; }
+.over-fact span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.over-fact b { font-size: 15px; font-weight: normal; color: var(--gold-bright); }
+.over-scroll { max-width: 100%; overflow-x: auto; }
+.over-bot { font-size: 11.5px; color: var(--muted); }
+@media (max-width: 520px) { .over-fact { flex: 1 1 100%; } }
 
 /* ---- smaller screens ------------------------------------------------- */
 
@@ -7263,7 +7271,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             tutorialPausedFor: null,
             tutorialPausedAt: null,
             tutorialExemptMs: 0,
-            finishedPlayMs: null
+            finishedPlayMs: null,
+            finishedAt: null
         };
         state.barbarian = freshBarbarian(state);
         if (opts && opts.mods) setModsDirect(state, opts.mods);
@@ -9002,6 +9011,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             state.phase = 'over';
             state.winner = p.id;
             state.finishedPlayMs = playTimeMs(state, Date.now());
+            state.finishedAt = Date.now();
             log(state, p.name + ' has defeated Fenrirak and Oblivion Mage Helen. ' +
                 'The final legend is theirs!', 'system');
             return;
@@ -16561,9 +16571,32 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     /* The end                                                             */
     /* ------------------------------------------------------------------ */
 
+    // "Hard", or "Easy and Hard" if the table ever mixes levels; '' with no computer players.
+    function overBotLevels() {
+        const seen = [];
+        S.players.forEach(p => {
+            if (!p.bot) return;
+            const k = BOT_LEVELS[p.botLevel] ? p.botLevel : 'medium'; // bot.js treats a missing level as Medium
+            if (seen.indexOf(k) < 0) seen.push(k);
+        });
+        const names = ['easy', 'medium', 'hard'].filter(k => seen.indexOf(k) >= 0).map(k => BOT_LEVELS[k].name);
+        return names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1] : (names[0] || '');
+    }
+
+    // The moment the game ended, in the viewer's own time zone.
+    function overStamp() {
+        const t = S.finishedAt || S.updatedAt;
+        if (!t) return '';
+        const d = new Date(t);
+        try { return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }); }
+        catch (e) { return d.toLocaleString(); }
+    }
+
     function renderOver() {
         const w = E.player(S, S.winner);
         const mine = w && w.id === NET.PID;
+        const botLevels = overBotLevels();
+        const stamp = overStamp();
         const rows = S.players.filter(p => p.cls).slice().sort((a, b) => (b.id === S.winner) - (a.id === S.winner) || b.fragments.length - a.fragments.length);
         $('#over-body').innerHTML = '<div class="over card">' +
             '<div class="crown-art">' + enemyPic('fenrirak') + '</div>' +
@@ -16571,10 +16604,15 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             '<div class="champion">' + portrait(w) + '<div>' + esc(w ? w.name : '') + ' the ' + className(w && w.cls) +
             ' defeated Fenrirak and Oblivion Mage Helen.</div></div>' +
             '<div class="muted">Game time ' + fmtClock(S.finishedPlayMs || E.playTimeMs(S, Date.now())) + ' · ' + plural(S.turnNo | 0, 'round') + '</div>' +
-            '<table><tr><th>Player</th><th>Class</th><th>Fragments</th><th>Gold</th><th>Gems</th><th>Monsters beaten</th><th>Deaths</th></tr>' +
-            rows.map(p => '<tr><td style="color:' + seatColour(p.id) + '">' + esc(p.name) + (p.id === S.winner ? ' <span class="chip good">Winner</span>' : '') + '</td><td>' + className(p.cls) +
+            '<div class="over-meta">' +
+            (botLevels ? '<div class="over-fact"><span>Computer players</span><b>' + esc(botLevels) + '</b></div>' : '') +
+            (stamp ? '<div class="over-fact"><span>Finished</span><b>' + esc(stamp) + '</b></div>' : '') +
+            '</div>' +
+            '<div class="over-scroll"><table><tr><th>Player</th><th>Class</th><th>Fragments</th><th>Gold</th><th>Gems</th><th>Monsters beaten</th><th>Deaths</th></tr>' +
+            rows.map(p => '<tr><td style="color:' + seatColour(p.id) + '">' + esc(p.name) + (p.id === S.winner ? ' <span class="chip good">Winner</span>' : '') +
+                (p.bot ? '<div class="over-bot">' + esc(botLabel({ botLevel: BOT_LEVELS[p.botLevel] ? p.botLevel : 'medium' })) + '</div>' : '') + '</td><td>' + className(p.cls) +
                 '</td><td>' + p.fragments.length + '</td><td>' + p.gold + '</td><td>' + p.gems + '</td><td>' + (p.kills | 0) + '</td><td>' + (p.deaths | 0) + '</td></tr>').join('') +
-            '</table><button class="btn primary" id="over-home">Back to the start</button></div>';
+            '</table></div><button class="btn primary" id="over-home">Back to the start</button></div>';
         bind('over-home', () => backHome(''));
     }
 
