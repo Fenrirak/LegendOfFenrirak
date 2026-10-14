@@ -2842,6 +2842,9 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     h1 { font-size: 30px; }
 }
 
+/* Online play could not connect: shown under the Create a room card. */
+#online-note.down { display: block; margin-top: 10px; padding: 10px 12px; border: 1px solid var(--bad); border-radius: 8px; background: rgba(224, 87, 74, .10); line-height: 1.45; }
+
     </style>
 
     <script type="application/ld+json">
@@ -13534,7 +13537,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         if (!ROOM) return Promise.resolve(null);
         if (TURN_ONLY[action] && turnCardUp()) return Promise.resolve(null);
         return NET.act(ROOM, action, args || {}).catch(err => {
-            if (err && !err.silent && err.message !== 'no-change') notice(err.message || 'That is not allowed.');
+            if (err && !err.silent && err.message !== 'no-change') notice(netTrouble(err) || err.message || 'That is not allowed.');
             return null;
         });
     }
@@ -16561,7 +16564,14 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
                 .catch(() => notice('Invite link: ' + url));
         });
         $('#btn-leave-lobby').addEventListener('click', () => {
-            if (!isSolo()) { act('leave'); forgetRoom(ROOM); }
+            if (!isSolo()) {
+                const code = ROOM;
+                // On your own in the lobby, leaving closes the room: an update cannot leave
+                // a room with nobody in it, so it has to be deleted (the rules allow that).
+                if (S && S.players && S.players.length === 1) Promise.resolve(NET.closeRoom(code)).catch(() => { });
+                else act('leave');
+                forgetRoom(code);
+            }
             else SOLO.closeRoom();
             backHome('');
         });
@@ -17239,15 +17249,43 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         });
     }
 
-    // Firestore refusing everything means the rules for this game's rooms
-    // have not been published yet (see game-oblivion/SETUP.md).
+    // What a player sees when online play cannot reach the game server. Never
+    // their fault, and it says so.
+    const ONLINE_DOWN = 'Online play could not connect to the game server. This is not your fault, and ' +
+        'nothing you did caused it. It is usually a temporary problem on our side or with the network ' +
+        '(a content blocker or firewall can cause it too). Refresh the page to try again, or play Single ' +
+        'Player, which works without it.';
+
+    // Firebase errors a player cannot do anything about, in plain words. The
+    // game's own refusals ("That is not allowed") are ordinary Errors with no
+    // code and pass straight through (null here).
+    function netTrouble(err) {
+        const code = err && err.code ? String(err.code) : '';
+        const msg = (err && err.message) || '';
+        if (code === 'permission-denied' || /insufficient permissions/i.test(msg)) {
+            console.error('Legend of Fenrirak: Firestore refused a write (permission-denied). ' +
+                'If every online action fails, the rules for games_oblivion are not published (see SETUP.md).', err);
+            return 'The game server refused that, and it is not something you did. Please try again in a ' +
+                'moment. If it keeps happening, the problem is on our side.';
+        }
+        if (/^(unavailable|deadline-exceeded|aborted|cancelled|resource-exhausted|internal|unauthenticated)$/.test(code) ||
+            /^auth\//.test(code) || /network|offline|could not reach|failed to get document|transport/i.test(msg)) {
+            return 'Could not reach the game server. This is not your fault: it is the connection or a ' +
+                'temporary problem on our side. The game keeps trying, so please wait a moment and try again.';
+        }
+        return null;
+    }
+
     function onlineError(err, fallback) {
         const msg = (err && err.message) || '';
-        if ((err && err.code === 'permission-denied') || /insufficient permissions/i.test(msg)) {
-            return 'Online rooms are not switched on yet: the site\u2019s Firestore rules for The Oblivion Dragon ' +
-                'still need publishing. Single player works now.';
-        }
-        return msg || fallback;
+        return netTrouble(err) || msg || fallback;
+    }
+
+    function showOnlineDown() {
+        const note = $('#online-note');
+        note.textContent = ONLINE_DOWN;
+        note.classList.add('down');
+        notice(ONLINE_DOWN);
     }
 
     function onlineReady() {
@@ -17296,11 +17334,13 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         SOLO.setBusyCheck(() => tableBusy() || (S && S.battle && S.battle.kind === 'pvp' &&
             S.battle.phase === 'order' && orderShownFor !== S.battle.logFrom));
         if (window.LOF_NET) onlineReady();
+        else if (window.LOF_NET_FAILED) showOnlineDown();
         else {
+            let failed = false;
             window.addEventListener('lof-net-ready', onlineReady);
-            window.addEventListener('lof-net-failed', () => { $('#online-note').textContent = 'Online play is unavailable right now. Single player still works.'; });
+            window.addEventListener('lof-net-failed', () => { failed = true; showOnlineDown(); });
             setTimeout(() => {
-                if (!ONLINE) $('#online-note').textContent = 'Still connecting… single player works without it.';
+                if (!ONLINE && !failed) $('#online-note').textContent = 'Still connecting… single player works without it.';
             }, 8000);
         }
     }
@@ -17328,14 +17368,15 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
    collection have to be published before it will work -- see SETUP.md.
    ========================================================================= */
 
-import { initializeApp }
-    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {
-    getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, runTransaction
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import {
-    getAuth, signInAnonymously, onAuthStateChanged
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+/* The Firebase code is loaded with import() inside connect() below, not with
+   static imports. A static import that fails (the user is offline, a blocker
+   or firewall stops gstatic.com, Google is down) stops this whole file before
+   a single line of it runs, so nothing could tell the page it failed. Loaded
+   this way, any failure is caught and the page is told: it shows a plain
+   "not your fault" message and single player carries on. */
+const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+let initializeApp, getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, runTransaction,
+    getAuth, signInAnonymously, onAuthStateChanged;
 
 const firebaseConfig = {
     apiKey: "AIzaSyB-97iZ8wtRynNvr678178hQdEtZSWrwwo",
@@ -17349,9 +17390,8 @@ const firebaseConfig = {
 
 const COLLECTION = 'games_oblivion';
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+let db = null;
+let auth = null;
 
 const E = window.LOF_ENGINE;
 
@@ -17364,10 +17404,35 @@ function localName() { try { return localStorage.getItem('lof_name') || ''; } ca
 function setLocalName(n) { try { localStorage.setItem('lof_name', n); } catch (e) { } }
 
 let PID = null;
-const ready = new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, (user) => { if (user) resolve(user.uid); }, reject);
-    signInAnonymously(auth).catch(reject);
-});
+
+// Fails the wait, instead of hanging for ever, if something never answers.
+const CONNECT_LIMIT_MS = 20000;
+function withLimit(promise, ms, what) {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error(what + ' took too long.')), ms);
+        promise.then(v => { clearTimeout(timer); resolve(v); },
+                     e => { clearTimeout(timer); reject(e); });
+    });
+}
+
+async function connect() {
+    const mods = await withLimit(Promise.all([
+        import(SDK + 'firebase-app.js'),
+        import(SDK + 'firebase-firestore.js'),
+        import(SDK + 'firebase-auth.js')
+    ]), CONNECT_LIMIT_MS, 'Loading the online code');
+    ({ initializeApp } = mods[0]);
+    ({ getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, runTransaction } = mods[1]);
+    ({ getAuth, signInAnonymously, onAuthStateChanged } = mods[2]);
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    return withLimit(new Promise((resolve, reject) => {
+        onAuthStateChanged(auth, (user) => { if (user) resolve(user.uid); }, reject);
+        signInAnonymously(auth).catch(reject);
+    }), CONNECT_LIMIT_MS, 'Signing in');
+}
+const ready = connect();
 
 /* ---------------------------------------------------------------------- */
 /* Seat locks -- the same as The Thunder Dragon. A seat carries the        */
@@ -17561,7 +17626,8 @@ ready.then((uid) => {
     };
     window.dispatchEvent(new Event('lof-net-ready'));
 }).catch((err) => {
-    console.error('Legend of Fenrirak: anonymous sign-in failed, online play is unavailable.', err);
+    console.error('Legend of Fenrirak: could not connect to Firebase, online play is unavailable.', err);
+    window.LOF_NET_FAILED = true;
     window.dispatchEvent(new Event('lof-net-failed'));
 });
 
