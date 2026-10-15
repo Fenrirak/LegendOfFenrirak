@@ -14019,7 +14019,11 @@ kbd {
 
     function save() {
         try {
-            if (state) localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            // A finished game is not saved: it would be offered back as
+            // something to carry on.
+            if (state && state.phase !== 'over' && state.phase !== 'closed') {
+                localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            }
             else localStorage.removeItem(SAVE_KEY);
         } catch (e) { /* out of room, or private mode — the game still runs */ }
     }
@@ -16496,7 +16500,22 @@ kbd {
         // A solo game is not left, it is put down: walk away and it is still
         // there under "Carry on your last game".
         if (NET !== SOLO) {
-            try { await NET.act(ROOM, 'leave', {}); } catch (e) { /* ignore */ }
+            const code = ROOM;
+            // On your own in the lobby, leaving deletes the room: an update
+            // cannot leave a room with nobody in it, so the write would be
+            // refused and the room left behind (the rules allow this delete).
+            // The listener goes first, or it would hear the room vanish and
+            // announce that the host ended the game.
+            const alone = !!S && S.phase === 'lobby' && S.players.length === 1 &&
+                          S.players[0].id === NET.PID;
+            if (alone) {
+                listenGen += 1;
+                if (unsub) { try { unsub(); } catch (e) { } unsub = null; }
+            }
+            try {
+                if (alone) await NET.closeRoom(code);
+                else await NET.act(code, 'leave', {});
+            } catch (e) { /* ignore */ }
         }
         backHome();
     }
@@ -18442,11 +18461,20 @@ kbd {
                 '</button>' +
                 '<div class="actions-help">' +
                 btn('a-guide', 'How to play', 'ghost', false) +
+                '</div>' +
+                /* A way out. Nothing times out while the order is being rolled,
+                   so a player who has gone would otherwise hold the room here
+                   for ever, with nobody able to leave or end it. */
+                '<div class="actions-end">' +
+                btn('a-leave', 'Leave game', 'danger', false) +
+                (S.hostId === NET.PID ? btn('a-close', 'End the game', 'danger', false) : '') +
                 '</div>';
             const b = $('#a-order');
             if (b) b.addEventListener('click', () =>
                 rollAct('Turn Order', 'rollForOrder', {}, 'Highest goes first.'));
             bind('a-guide', openGuide);
+            bind('a-close', confirmCloseGame);
+            bind('a-leave', leaveRoom);
             renderPhoneBar();
             return;
         }

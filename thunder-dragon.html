@@ -10323,7 +10323,11 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
 
     function save() {
         try {
-            if (state) localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            // A finished game is not saved: it would be offered back as
+            // something to carry on.
+            if (state && state.phase !== 'over' && state.phase !== 'closed') {
+                localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            }
             else localStorage.removeItem(SAVE_KEY);
         } catch (e) { /* out of room, or private mode — the game still runs */ }
     }
@@ -12863,7 +12867,22 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
         // A solo game is not left, it is put down: walk away and it is still
         // there under "Carry on your last game".
         if (NET !== SOLO) {
-            try { await NET.act(ROOM, 'leave', {}); } catch (e) { /* ignore */ }
+            const code = ROOM;
+            // On your own in the lobby, leaving deletes the room: an update
+            // cannot leave a room with nobody in it, so the write would be
+            // refused and the room left behind (the rules allow this delete).
+            // The listener goes first, or it would hear the room vanish and
+            // announce that the host ended the game.
+            const alone = !!S && S.phase === 'lobby' && S.players.length === 1 &&
+                          S.players[0].id === NET.PID;
+            if (alone) {
+                listenGen += 1;
+                if (unsub) { try { unsub(); } catch (e) { } unsub = null; }
+            }
+            try {
+                if (alone) await NET.closeRoom(code);
+                else await NET.act(code, 'leave', {});
+            } catch (e) { /* ignore */ }
         }
         backHome();
     }
@@ -14522,11 +14541,20 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
                 '</button>' +
                 '<div class="actions-help">' +
                 btn('a-guide', 'How to play', 'ghost', false) +
+                '</div>' +
+                /* A way out. Nothing times out while the order is being rolled,
+                   so a player who has gone would otherwise hold the room here
+                   for ever, with nobody able to leave or end it. */
+                '<div class="actions-end">' +
+                btn('a-leave', 'Leave game', 'danger', false) +
+                (S.hostId === NET.PID ? btn('a-close', 'End the game', 'danger', false) : '') +
                 '</div>';
             const b = $('#a-order');
             if (b) b.addEventListener('click', () =>
                 rollAct('Turn Order', 'rollForOrder', {}, 'Highest goes first.'));
             bind('a-guide', openGuide);
+            bind('a-close', confirmCloseGame);
+            bind('a-leave', leaveRoom);
             renderPhoneBar();
             return;
         }
@@ -17590,22 +17618,6 @@ body.holding .modal-back[data-key="battle"] .modal .x-btn { pointer-events: auto
         if (!bits.length && !cards.length) return '<div class="muted">Nothing.</div>';
         return (bits.length ? '<div class="stat-row">' + bits.join('') + '</div>' : '') +
             (cards.length ? '<div class="item-grid trade-cards">' + cards.join('') + '</div>' : '');
-    }
-
-    function describeBundle(b) {
-        const parts = [];
-        if (b.coins) parts.push(b.coins + ' coins');
-        if (b.rawSteaks) parts.push(b.rawSteaks + ' raw steak');
-        if (b.cookedSteaks) parts.push(b.cookedSteaks + ' seared steak');
-        if (b.fragments && b.fragments.length) {
-            parts.push('key fragment ' + b.fragments.join(' and '));
-        } else if (b.keyFragments) {
-            parts.push(b.keyFragments + ' key fragment(s)');
-        }
-        if (b.chestKeys) parts.push(b.chestKeys + ' chest key(s)');
-        const n = (b.items || []).length + (b.powerups || []).length + (b.potions || []).length;
-        if (n) parts.push(n + ' card(s)');
-        return parts.length ? parts.join(', ') : 'nothing';
     }
 
     function renderIncomingTrade(t) {
