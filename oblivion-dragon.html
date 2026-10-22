@@ -1734,6 +1734,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 }
 .gfx-pick button:hover, .gfx-pick button:focus-visible { border-color: var(--accent-soft); outline: none; }
 .gfx-pick button.on { border-color: var(--line); background: color-mix(in srgb, var(--accent) 18%, rgba(0, 0, 0, .28)); }
+.mac { position: relative; display: inline-block; line-height: 1; }
+.mac::after { content: ''; position: absolute; left: .14em; right: .14em; top: .2em; height: .08em; background: currentColor; }
 .gfx-pick b { color: var(--cream); font-size: 15px; }
 .gfx-pick button.on b { color: var(--gold-bright); }
 .gfx-pick span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
@@ -17121,7 +17123,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             setPanel('<h2>How good do you want your graphics?</h2><div class="sub">You can change it any time with the ' +
                 '<b>Graphics</b> button under the actions.</div><div class="gfx-pick">' +
                 Object.keys(GFX).map(k => '<button type="button" data-level="' + k + '"' + (k === cur ? ' class="on"' : '') + '><b>' +
-                    GFX[k].name + '</b><span>' + GFX[k].text + '</span><i>' + GFX[k].note + (k === cur ? ', chosen last time' : '') + '</i></button>').join('') +
+                    GFX[k].name.replace('\u016B', '<span class="mac">u</span>') + '</b><span>' + GFX[k].text + '</span><i>' + GFX[k].note + (k === cur ? ', chosen last time' : '') + '</i></button>').join('') +
                 '</div>', 'wide');
             $$('.gfx-pick [data-level]').forEach(b => b.addEventListener('click', () => {
                 setGfx(b.getAttribute('data-level'));
