@@ -1734,8 +1734,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 }
 .gfx-pick button:hover, .gfx-pick button:focus-visible { border-color: var(--accent-soft); outline: none; }
 .gfx-pick button.on { border-color: var(--line); background: color-mix(in srgb, var(--accent) 18%, rgba(0, 0, 0, .28)); }
-.mac { position: relative; display: inline-block; line-height: 1; }
-.mac::after { content: ''; position: absolute; left: .14em; right: .14em; top: .2em; height: .08em; background: currentColor; }
+.gfx-pick b .mac { position: relative; display: inline-block; line-height: 1; font-size: inherit; color: inherit; }
+.gfx-pick b .mac::after { content: ''; position: absolute; left: .14em; right: .14em; top: .2em; height: .08em; background: currentColor; }
 .gfx-pick b { color: var(--cream); font-size: 15px; }
 .gfx-pick button.on b { color: var(--gold-bright); }
 .gfx-pick span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
@@ -3317,7 +3317,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
                      [{ t: 'weaken', value: 5, uses: 1 }],
                      'The opponent does 5 less damage on their next turn.')
             ],
-            loot: { gold: 20, chest: true }
+            loot: { gold: 25, chest: true }
         },
         veteran_soldiers: {
             id: 'veteran_soldiers', plural: true, name: 'Veteran Soldiers', hp: 165, defence: 15,
@@ -16284,8 +16284,25 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             if (kept) kept();
             const sel = $('#tr-who');
             if (sel) sel.addEventListener('change', () => { partner = sel.value; sig = null; panel.draw(); });
+            let armed = null;
             bind('tr-send', () => {
                 const give = readBundle('g'), want = readBundle('w');
+                const has = b => b.gold || b.gems || b.keys || b.fragments.length || b.items.length || b.potions.length;
+                // Giving something away for nothing: ask once, on the same form.
+                if (has(give) && !has(want)) {
+                    const key = JSON.stringify(give);
+                    if (armed !== key) {
+                        armed = key;
+                        const old = $('#tr-warn'); if (old) old.remove();
+                        const w = document.createElement('div');
+                        w.id = 'tr-warn'; w.className = 'sub';
+                        w.style.color = 'var(--gold-bright)';
+                        w.textContent = 'Are you sure? You are giving ' + them.name + ' everything you ticked and asking for nothing in return.';
+                        $('#tr-send').parentNode.parentNode.insertBefore(w, $('#tr-send').parentNode);
+                        $('#tr-send').textContent = 'Yes, give it for nothing';
+                        return;
+                    }
+                }
                 act('proposeTrade', { toId: partner, give: give, want: want }).then(r => {
                     if (r) { notice('Offer sent to ' + them.name + '.'); if (panel) panel.draw(); }
                 });
