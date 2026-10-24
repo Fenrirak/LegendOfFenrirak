@@ -2756,6 +2756,16 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
     background: rgba(255, 255, 255, .05); border: 1px solid rgba(242, 204, 143, .28); border-radius: 10px; }
 .over-fact span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .over-fact b { font-size: 15px; font-weight: normal; color: var(--gold-bright); }
+.over-mods { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 8px auto 6px; padding: 8px 18px; max-width: 640px;
+    background: rgba(255, 255, 255, .05); border: 1px solid rgba(242, 204, 143, .28); border-radius: 10px; }
+.over-mods > span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.over-mods .om-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.over-mods .om { display: inline-flex; align-items: center; gap: 6px; font-style: normal; font-size: 13px; color: var(--cream);
+    padding: 3px 10px; border-radius: 999px; background: rgba(0, 0, 0, .28); border: 1px solid rgba(255, 255, 255, .12); }
+.over-mods .om i { flex: none; width: 7px; height: 7px; border-radius: 50%; }
+.over-mods .om.deadly i { background: var(--bad); }
+.over-mods .om.relaxed i { background: var(--good); }
+.over-mods .om-none { font-size: 14px; font-weight: normal; color: var(--muted); }
 .over-scroll { max-width: 100%; overflow-x: auto; }
 .over-bot { font-size: 11.5px; color: var(--muted); }
 @media (max-width: 520px) { .over-fact { flex: 1 1 100%; } }
@@ -16621,6 +16631,14 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         catch (e) { return d.toLocaleString(); }
     }
 
+    // The modifiers that were on in this game, as neat chips (red = more deadly, green = more relaxed).
+    function overMods() {
+        const on = modsOn();
+        return '<div class="over-mods"><span>Modifiers</span>' + (on.length
+            ? '<div class="om-list">' + on.map(x => '<em class="om ' + x.side + '" title="' + esc(x.text) + '"><i></i>' + esc(x.name) + '</em>').join('') + '</div>'
+            : '<b class="om-none">None: every rule as printed</b>') + '</div>';
+    }
+
     function renderOver() {
         const w = E.player(S, S.winner);
         const mine = w && w.id === NET.PID;
@@ -16636,7 +16654,7 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             '<div class="over-meta">' +
             (botLevels ? '<div class="over-fact"><span>Computer players</span><b>' + esc(botLevels) + '</b></div>' : '') +
             (stamp ? '<div class="over-fact"><span>Finished</span><b>' + esc(stamp) + '</b></div>' : '') +
-            '</div>' +
+            '</div>' + overMods() +
             '<div class="over-scroll"><table><tr><th>Player</th><th>Class</th><th>Fragments</th><th>Gold</th><th>Gems</th><th>Monsters beaten</th><th>Deaths</th></tr>' +
             rows.map(p => '<tr><td style="color:' + seatColour(p.id) + '">' + esc(p.name) + (p.id === S.winner ? ' <span class="chip good">Winner</span>' : '') +
                 (p.bot ? '<div class="over-bot">' + esc(botLabel({ botLevel: BOT_LEVELS[p.botLevel] ? p.botLevel : 'medium' })) + '</div>' : '') + '</td><td>' + className(p.cls) +
