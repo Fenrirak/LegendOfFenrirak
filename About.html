@@ -33,6 +33,14 @@
     <meta property="og:site_name" content="Legend of Fenrirak">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://www.legend-of-fenrirak.com/Fenrirak.png?v=1d95aed6">
+    <meta property="og:image:alt" content="Fenrirak, the ocean-blue dragon of Legend of Fenrirak">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="1144">
+    <meta property="og:locale" content="en_NZ">
+    <meta name="twitter:title" content="About &amp; Gallery - Legend of Fenrirak">
+    <meta name="twitter:description" content="The story of Legend of Fenrirak, its games and books, and a photo gallery of them all.">
+    <meta name="twitter:image:alt" content="Fenrirak, the ocean-blue dragon of Legend of Fenrirak">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     <link rel="stylesheet" href="site-nav.css?v=5">
 
@@ -42,6 +50,7 @@
             --c-cream: rgb(255, 246, 230);
             --c-thunder: #ebca13;
             --c-ice: #7373ff;
+            --c-oblivion: #a274d4;
             --c-showdowns: #4a82c7;
             --c-forgotten: #b98d1b;
             --c-minecraft: #4caf50;
@@ -179,6 +188,35 @@
         img.lightbox-trigger:not(.tilt-hover):hover {
             transform: scale(1.02);
             box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+        }
+
+        /* ---- oblivion dragon: placeholder pictures ----------------------
+           Two landscape (16:9) slots until the real pictures arrive. To
+           swap one in, replace the whole <div class="img-placeholder">
+           with an <img class="lightbox-trigger pop-in" src="..." alt="...">
+           (see the comment inside the Oblivion section). */
+        .media-stack {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .media-stack img { aspect-ratio: 16 / 9; object-fit: cover; }
+        .img-placeholder {
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            color: var(--c-oblivion);
+            font-family: Allegro, serif;
+            font-size: 14px;
+            letter-spacing: 1px;
+            background:
+                radial-gradient(ellipse at 50% 115%, rgba(89, 0, 22, 0.55), transparent 62%),
+                linear-gradient(180deg, #17121c, #060606);
+            border: 1px dashed color-mix(in srgb, var(--c-oblivion) 55%, transparent);
         }
 
         /* ---- showdowns highlight card ----------------------------------- */
@@ -328,7 +366,7 @@
         "@type": "AboutPage",
         "name": "About & Gallery - Legend of Fenrirak",
         "url": "https://www.legend-of-fenrirak.com/About.html",
-        "description": "Legend of Fenrirak was originally created by four Year 7 students at Murrays Bay Intermediate in New Zealand. It currently includes 2 board games (The Thunder Dragon and The Ice Dragon), 3 in-progress story books, and an in-progress online version called Showdowns.",
+        "description": "Legend of Fenrirak was originally created by four Year 7 students at Murrays Bay Intermediate in New Zealand. It currently includes 3 board games (The Thunder Dragon, The Ice Dragon and The Oblivion Dragon, which is online only for now with a physical version in progress), 3 in-progress story books, and an in-progress online version called Showdowns.",
         "isPartOf": {
             "@type": "WebSite",
             "name": "Legend of Fenrirak",
@@ -436,7 +474,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/1.png?v=8d950724",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-1.png?v=8d950724",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 1 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 1 of 10",
       "creator": {
@@ -446,7 +484,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/2.png?v=398324a2",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-2.png?v=398324a2",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 2 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 2 of 10",
       "creator": {
@@ -456,7 +494,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/3.png?v=c1c18036",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-3.png?v=c1c18036",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 3 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 3 of 10",
       "creator": {
@@ -466,7 +504,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/4.png?v=7e6e982d",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-4.png?v=7e6e982d",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 4 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 4 of 10",
       "creator": {
@@ -476,7 +514,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/5.png?v=2433953d",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-5.png?v=2433953d",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 5 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 5 of 10",
       "creator": {
@@ -486,7 +524,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/6.png?v=62265141",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-6.png?v=62265141",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 6 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 6 of 10",
       "creator": {
@@ -496,7 +534,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/7.png?v=2175aa86",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-7.png?v=2175aa86",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 7 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 7 of 10",
       "creator": {
@@ -506,7 +544,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/8.png?v=15e32df3",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-8.png?v=15e32df3",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 8 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 8 of 10",
       "creator": {
@@ -516,7 +554,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/9.png?v=44dd0e4a",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-9.png?v=44dd0e4a",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 9 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 9 of 10",
       "creator": {
@@ -526,7 +564,7 @@
     },
     {
       "@type": "ImageObject",
-      "contentUrl": "https://www.legend-of-fenrirak.com/10.png?v=c31e29bb",
+      "contentUrl": "https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-10.png?v=c31e29bb",
       "name": "Screenshot from the Thunder Dragon Minecraft recreation, 10 of 10",
       "caption": "Screenshot from the Thunder Dragon Minecraft recreation, 10 of 10",
       "creator": {
@@ -601,6 +639,26 @@
     .site-footer .footer-copy { font-size: 13.5px; }
 }
 </style>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.legend-of-fenrirak.com/index.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "About & Gallery",
+      "item": "https://www.legend-of-fenrirak.com/About.html"
+    }
+  ]
+}
+    </script>
 </head>
 
 <body>
@@ -666,7 +724,7 @@
                 Since then, it has continued to grow and evolve into something much larger.
             </p>
             <p class="pop-in">
-                Currently, Legend of Fenrirak includes 2 board games, 3 in-progress story books, an in-progress online
+                Currently, Legend of Fenrirak includes 3 board games (the third, The Oblivion Dragon, is online only for now), 3 in-progress story books, an in-progress online
                 version, and countless future ideas waiting to be developed.
             </p>
         </section>
@@ -730,6 +788,41 @@
                         <img class="lightbox-trigger pop-in" src="LOF2 Cards.jpeg" alt="Ice Dragon card designs">
                         <img class="lightbox-trigger pop-in" src="LOF2 Character.jpeg" alt="An Ice Dragon character piece">
                         <img class="lightbox-trigger pop-in" src="LOF2 Box.jpeg" alt="The Ice Dragon game box">
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- OBLIVION DRAGON -->
+        <article class="chapter pop-group" id="oblivion-dragon" style="--accent: var(--c-oblivion)">
+            <div class="chapter-grid">
+                <div class="chapter-text">
+                    <h2 class="pop-in">Legend of Fenrirak, The Oblivion Dragon</h2>
+                    <p class="pop-in">
+                        Legend of Fenrirak, The Oblivion Dragon is the third board game, currently online only with a physical version in progress. It is set in a darker, fire-lit
+                        world where Oblivion Mage Helen has taken Thornwick, the secret kingdom, and Fenrirak
+                        now answers to her.
+                    </p>
+                    <p class="pop-in">
+                        Each player picks a Knight, Archer or Mage and races their rivals through the kingdom to
+                        win all five Pendant Fragments. Only then can Helen&rsquo;s shield be broken, and the
+                        dragon and the mage brought down together. The board shows only each square&rsquo;s name
+                        and picture, so you click a square to read what it holds. You can play it online with
+                        2 to 6 players, or alone against 1 to 5 computer players.
+                    </p>
+                    <a href="oblivion-dragon.html" class="section pop-in" style="border-color: color-mix(in srgb, var(--c-oblivion) 55%, transparent)">
+                        Learn More About The Oblivion Dragon
+                    </a>
+                </div>
+                <div class="chapter-media parallax" data-speed="0.12">
+                    <!-- PLACEHOLDERS: 2 landscape images. When the pictures arrive, replace each
+                         <div class="img-placeholder"> below with
+                         <img class="lightbox-trigger pop-in" src="FILE.jpeg" alt="DESCRIPTION">
+                         then ALSO add them to (1) the ImageGallery JSON-LD at the top of this file and
+                         (2) the About.html entry in sitemap.xml, and run update-image-versions.py. -->
+                    <div class="media-stack">
+                        <div class="img-placeholder pop-in" role="img" aria-label="Placeholder: The Oblivion Dragon image 1 of 2, coming soon">Image coming soon</div>
+                        <div class="img-placeholder pop-in" role="img" aria-label="Placeholder: The Oblivion Dragon image 2 of 2, coming soon">Image coming soon</div>
                     </div>
                 </div>
             </div>
@@ -802,16 +895,16 @@
                 projects such as the Ice Dragon and The Forgotten Adventure.
             </p>
             <div class="spread-media screenshot-grid parallax" data-speed="0.1">
-                <img class="lightbox-trigger pop-in" src="1.png?v=8d950724" alt="Screenshot from the Thunder Dragon Minecraft recreation, 1 of 10">
-                <img class="lightbox-trigger pop-in" src="2.png?v=398324a2" alt="Screenshot from the Thunder Dragon Minecraft recreation, 2 of 10">
-                <img class="lightbox-trigger pop-in" src="3.png?v=c1c18036" alt="Screenshot from the Thunder Dragon Minecraft recreation, 3 of 10">
-                <img class="lightbox-trigger pop-in" src="4.png?v=7e6e982d" alt="Screenshot from the Thunder Dragon Minecraft recreation, 4 of 10">
-                <img class="lightbox-trigger pop-in" src="5.png?v=2433953d" alt="Screenshot from the Thunder Dragon Minecraft recreation, 5 of 10">
-                <img class="lightbox-trigger pop-in" src="6.png?v=62265141" alt="Screenshot from the Thunder Dragon Minecraft recreation, 6 of 10">
-                <img class="lightbox-trigger pop-in" src="7.png?v=2175aa86" alt="Screenshot from the Thunder Dragon Minecraft recreation, 7 of 10">
-                <img class="lightbox-trigger pop-in" src="8.png?v=15e32df3" alt="Screenshot from the Thunder Dragon Minecraft recreation, 8 of 10">
-                <img class="lightbox-trigger pop-in" src="9.png?v=44dd0e4a" alt="Screenshot from the Thunder Dragon Minecraft recreation, 9 of 10">
-                <img class="lightbox-trigger pop-in" src="10.png?v=c31e29bb" alt="Screenshot from the Thunder Dragon Minecraft recreation, 10 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-1.png?v=8d950724" alt="Screenshot from the Thunder Dragon Minecraft recreation, 1 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-2.png?v=398324a2" alt="Screenshot from the Thunder Dragon Minecraft recreation, 2 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-3.png?v=c1c18036" alt="Screenshot from the Thunder Dragon Minecraft recreation, 3 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-4.png?v=7e6e982d" alt="Screenshot from the Thunder Dragon Minecraft recreation, 4 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-5.png?v=2433953d" alt="Screenshot from the Thunder Dragon Minecraft recreation, 5 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-6.png?v=62265141" alt="Screenshot from the Thunder Dragon Minecraft recreation, 6 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-7.png?v=2175aa86" alt="Screenshot from the Thunder Dragon Minecraft recreation, 7 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-8.png?v=15e32df3" alt="Screenshot from the Thunder Dragon Minecraft recreation, 8 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-9.png?v=44dd0e4a" alt="Screenshot from the Thunder Dragon Minecraft recreation, 9 of 10">
+                <img class="lightbox-trigger pop-in" src="minecraft-thunder-dragon-10.png?v=c31e29bb" alt="Screenshot from the Thunder Dragon Minecraft recreation, 10 of 10">
             </div>
         </article>
 
@@ -834,6 +927,7 @@
                 <a href="Creators.html" class="section">Meet the Creators!</a>
                 <a href="thunder-dragon.html" class="section">Legend of Fenrirak: The Thunder Dragon</a>
                 <a href="ice-dragon.html" class="section">Legend of Fenrirak: The Ice Dragon</a>
+                <a href="oblivion-dragon.html" class="section">Legend of Fenrirak: The Oblivion Dragon</a>
             </div>
             <a href="showdowns.html" class="section cta-solo">Play Legend of Fenrirak Showdowns</a>
             <a href="https://buymeacoffee.com/29world" target="_blank" class="support-btn block cta-solo">

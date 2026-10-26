@@ -4,7 +4,7 @@
   <url>
     <loc>https://www.legend-of-fenrirak.com/</loc>
     <priority>1.0</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
       <image:caption>Fenrirak, the ocean-blue dragon of Legend of Fenrirak</image:caption>
@@ -13,7 +13,7 @@
   <url>
     <loc>https://www.legend-of-fenrirak.com/About.html</loc>
     <priority>0.8</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
       <image:caption>Fenrirak, the ocean-blue dragon and final boss of The Thunder Dragon</image:caption>
@@ -51,45 +51,46 @@
       <image:caption>Cover art for The Forgotten Adventure</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/1.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-1.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 1 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/2.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-2.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 2 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/3.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-3.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 3 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/4.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-4.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 4 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/5.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-5.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 5 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/6.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-6.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 6 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/7.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-7.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 7 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/8.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-8.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 8 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/9.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-9.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 9 of 10</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://www.legend-of-fenrirak.com/10.png</image:loc>
+      <image:loc>https://www.legend-of-fenrirak.com/minecraft-thunder-dragon-10.png</image:loc>
       <image:caption>Screenshot from the Thunder Dragon Minecraft recreation, 10 of 10</image:caption>
     </image:image>
+    <!-- Oblivion Dragon images (2 landscape): add <image:image> entries here when the pictures arrive -->
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Timeline.png</image:loc>
       <image:caption>Timeline of Legend of Fenrirak's past and upcoming projects</image:caption>
@@ -98,36 +99,36 @@
   <url>
     <loc>https://www.legend-of-fenrirak.com/Creators.html</loc>
     <priority>0.6</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Nathan.jpg</image:loc>
-      <image:caption>Nathan</image:caption>
+      <image:caption>Nathan, original idea and story writer of Legend of Fenrirak</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Ronald.jpeg</image:loc>
-      <image:caption>Ronald</image:caption>
+      <image:caption>Ronald, main creator of all the Legend of Fenrirak games</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Justin.png</image:loc>
-      <image:caption>Justin</image:caption>
+      <image:caption>Justin, co-creator of Legend of Fenrirak</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Ashton.jpeg</image:loc>
-      <image:caption>Ashton</image:caption>
+      <image:caption>Ashton, character and monster artist of Legend of Fenrirak</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Joy.jpeg</image:loc>
-      <image:caption>Joy</image:caption>
+      <image:caption>Joy, main artist of Legend of Fenrirak: The Ice Dragon</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Jason.png</image:loc>
-      <image:caption>Jason</image:caption>
+      <image:caption>Jason, playtester and AI tester of Legend of Fenrirak</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/showdowns.html</loc>
     <priority>0.8</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
       <image:caption>Fenrirak, the ocean-blue dragon</image:caption>
@@ -136,7 +137,7 @@
   <url>
     <loc>https://www.legend-of-fenrirak.com/thunder-dragon.html</loc>
     <priority>0.8</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
       <image:caption>Fenrirak, final boss of The Thunder Dragon</image:caption>
@@ -145,7 +146,7 @@
   <url>
     <loc>https://www.legend-of-fenrirak.com/ice-dragon.html</loc>
     <priority>0.8</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
       <image:caption>Fenrirak, the ocean-blue dragon</image:caption>
@@ -154,16 +155,20 @@
   <url>
     <loc>https://www.legend-of-fenrirak.com/oblivion-dragon.html</loc>
     <priority>0.8</priority>
-    <lastmod>2026-10-03</lastmod>
+    <lastmod>2026-10-27</lastmod>
+    <image:image>
+      <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
+      <image:caption>Fenrirak, final boss of The Oblivion Dragon</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/Contact.html</loc>
     <priority>0.3</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/Privacy.html</loc>
     <priority>0.3</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-27</lastmod>
   </url>
 </urlset>

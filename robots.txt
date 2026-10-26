@@ -34,4 +34,23 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
+# Image search: lets Google Images / Bing see every non-game picture on the site.
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
 Sitemap: https://www.legend-of-fenrirak.com/sitemap.xml

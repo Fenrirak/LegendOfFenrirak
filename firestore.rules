@@ -1,0 +1,504 @@
+rules_version = '2';
+
+/* =============================================================================
+   Legend of Fenrirak — Firestore Security Rules
+   (Thunder Dragon + Ice Dragon + Oblivion Dragon)
+
+   Shared by every game's rooms (games/{code}, games_ice/{code} and
+   games_oblivion/{code}), since they use the same net.js pattern: the whole
+   game state lives in one document, the client computes the next state
+   itself, and writes the whole thing back. The Ice Dragon and The Oblivion
+   Dragon each have a block of their own below Thunder's, because their rooms
+   are shaped differently.
+
+   This file in the site root is the one to publish. It covers all three
+   games, so publishing anything less removes the games it leaves out.
+
+   WHAT THIS DOES
+   - Room codes are not listable (allow list: if false) — a code is something
+     you're told, not something scraped by paging the collection. Individual
+     rooms are still readable by code, matching the design (nothing in this
+     game is secret at a table).
+   - Every write requires Firebase Anonymous Auth (wired up in net.js).
+     request.auth.uid is issued by Firebase and can't be forged from the
+     console — unlike a room code, which is just "shared" info, or the old
+     localStorage PID, which anyone could overwrite.
+   - Once a room leaves the lobby, the seated players (ids, order, host) are
+     frozen: a device that was never in the room can no longer write to it,
+     and no seat can be reassigned or impersonated. The one exception is The
+     Oblivion Dragon's late join (oblLateJoinOk): a newcomer may add a single
+     fresh seat for themselves at the end, touching nobody else's.
+   - Writes during play are gated to whoever's turn it is, with a named
+     allow-list for things that legitimately happen off-turn (trades,
+     reconnects, the log, a PvP duel's off-turn side, and a stalled turn
+     or duel being timed out by any seated player).
+   - A finished room (phase 'closed' or 'over') can be deleted by anyone —
+     matches the original rules' reasoning: a room nobody can rejoin
+     shouldn't go on costing reads forever, and there is nothing left in it
+     to protect.
+   - Everything else in the project is denied by default.
+
+   WHAT THIS DOES NOT DO
+   Rules can validate the *shape* of a write and *who* is allowed to make it;
+   they can't re-run the game's own logic (card effects, damage, RNG,
+   cooldowns) to confirm a specific move was legal. A genuinely-seated player
+   acting on their own turn can still fabricate numbers a real move wouldn't
+   have produced. Closing that needs a trusted server (Cloud Functions or
+   similar) re-running the engine — not possible on rules alone.
+   ============================================================================= */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- shared helpers (used by all three games' room collections) -------
+
+    function signedIn() { return request.auth != null; }
+
+    // Whose go it is. turnOrder holds plain uids, not player entries, so it
+    // is read directly: going through idAt would ask a string for `.id`,
+    // which is an error, and the turn gate would then never recognise the
+    // mover at all.
+    function moverOf(d) {
+      return d.turnIndex < d.turnOrder.size() ? d.turnOrder[d.turnIndex] : null;
+    }
+
+    // Bounds-checked access into a fixed-shape players list (max 6 seats).
+    // Rules has no general loop, so list checks are unrolled to 6 slots.
+    function idAt(list, i) { return i < list.size() ? list[i].id : null; }
+
+    function containsId(list, pid) {
+      return idAt(list, 0) == pid || idAt(list, 1) == pid || idAt(list, 2) == pid ||
+             idAt(list, 3) == pid || idAt(list, 4) == pid || idAt(list, 5) == pid;
+    }
+
+    // True if every id in `list` also appears somewhere in `other`.
+    function allIn(list, other) {
+      return (idAt(list, 0) == null || containsId(other, idAt(list, 0))) &&
+             (idAt(list, 1) == null || containsId(other, idAt(list, 1))) &&
+             (idAt(list, 2) == null || containsId(other, idAt(list, 2))) &&
+             (idAt(list, 3) == null || containsId(other, idAt(list, 3))) &&
+             (idAt(list, 4) == null || containsId(other, idAt(list, 4))) &&
+             (idAt(list, 5) == null || containsId(other, idAt(list, 5)));
+    }
+
+    // Same length, same id in the same position all the way through.
+    function sameOrder(a, b) {
+      return idAt(a, 0) == idAt(b, 0) && idAt(a, 1) == idAt(b, 1) &&
+             idAt(a, 2) == idAt(b, 2) && idAt(a, 3) == idAt(b, 3) &&
+             idAt(a, 4) == idAt(b, 4) && idAt(a, 5) == idAt(b, 5);
+    }
+
+    // Sanity bounds on one player entry — a backstop against storage abuse
+    // and impossible values, not a substitute for validating game logic.
+    // The lists are capped at 300, like the other two games: nothing in the
+    // game limits what a player carries, a long game can pass 40 pieces of
+    // gear, and one player over the cap would refuse every write to the room.
+    function playerOk(p) {
+      return p.id is string && p.id.size() > 0 &&
+             (!('name' in p)     || (p.name is string && p.name.size() <= 16)) &&
+             (!('hp' in p)       || (p.hp is number    && p.hp >= 0    && p.hp <= 999)) &&
+             (!('maxHp' in p)    || (p.maxHp is number && p.maxHp >= 0 && p.maxHp <= 999)) &&
+             (!('coins' in p)    || (p.coins is number && p.coins >= 0 && p.coins <= 99999)) &&
+             (!('energy' in p)   || (p.energy is number && p.energy >= 0 && p.energy <= 999)) &&
+             (!('inventory' in p) || (p.inventory is list && p.inventory.size() <= 300)) &&
+             (!('powerups' in p)  || (p.powerups is list  && p.powerups.size()  <= 300)) &&
+             (!('potions' in p)   || (p.potions is list   && p.potions.size()   <= 300));
+    }
+
+    function allPlayersOk(list) {
+      return (list.size() <= 0 || playerOk(list[0])) &&
+             (list.size() <= 1 || playerOk(list[1])) &&
+             (list.size() <= 2 || playerOk(list[2])) &&
+             (list.size() <= 3 || playerOk(list[3])) &&
+             (list.size() <= 4 || playerOk(list[4])) &&
+             (list.size() <= 5 || playerOk(list[5]));
+    }
+
+    // The only phase transitions the game logic ever makes.
+    function phaseOk(oldPhase, newPhase) {
+      return (oldPhase == 'lobby'   && (newPhase == 'lobby'   || newPhase == 'order')) ||
+             (oldPhase == 'order'   && (newPhase == 'order'   || newPhase == 'playing' || newPhase == 'closed')) ||
+             (oldPhase == 'playing' && (newPhase == 'playing' || newPhase == 'over' || newPhase == 'closed')) ||
+             (oldPhase == 'over'    && (newPhase == 'over'    || newPhase == 'closed')) ||
+             (oldPhase == 'closed'  &&  newPhase == 'closed');
+    }
+
+    // Roster changes are only legal in the lobby: a join (you, added once,
+    // nobody else's id touched) or a leave (you, removed, nobody else's id
+    // touched). In-place edits (class pick, ready-up) keep the same id set,
+    // and have to come from somebody sitting in the room: a device that is not
+    // in it may only "touch" the room (updatedAt and nothing else), which is
+    // what a repeated Leave or a stray heartbeat from a seat that is already
+    // gone looks like. Everything else it tries is refused. A leave is you
+    // removing yourself; the host may also remove somebody else (Thunder
+    // Dragon's Remove button), and only the host.
+    function lobbyRosterOk(oldP, newP) {
+      let diff = newP.size() - oldP.size();
+      return (diff == 0  && allIn(oldP, newP) && allIn(newP, oldP)
+                         && (containsId(oldP, request.auth.uid)
+                             || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['updatedAt', 'expireAt']))) ||
+             (diff == 1  && allIn(oldP, newP) && containsId(newP, request.auth.uid)
+                         && !containsId(oldP, request.auth.uid)) ||
+             (diff == -1 && allIn(newP, oldP) && containsId(oldP, request.auth.uid)
+                         && (!containsId(newP, request.auth.uid)
+                             || request.auth.uid == resource.data.hostId));
+    }
+
+    // Off-turn writes that are real but must not touch anything a turn
+    // actually changes on the *mover's* side of the game:
+    //   - accepting a trade, a reconnect touching `connected`/`lastSeen`,
+    //     the log
+    //   - a PvP duel: whoever lands on whoever starts the fight, but both
+    //     sides act in it, and only one of them can be `turnOrder[turnIndex]`
+    //     -- the other has to be able to roll, swing and (if they win) end
+    //     the duel while still "off turn" (`battle`, `lastBattle`,
+    //     `battleSeq`, plus the same `players`/`lastDie`/`dieSeq` an on-turn
+    //     fight already touches)
+    //   - the Cloak of Invisibility's avoid/fight choice, which can belong
+    //     to whichever side is *not* moving (see landOn's `holder`) -- and
+    //     choosing to avoid resolves the mover's own square on their
+    //     behalf, which can zap them through the Gate (`zapSeq`, `lastZap`)
+    //   - any seated player calling time on a stalled turn or an abandoned
+    //     duel (`timeoutCheck`), which -- exactly like a PvP win landing on
+    //     the player after the mover -- can itself advance whose turn it is
+    //     (`turnIndex`, `turnNo`)
+    //   - `turnStartedAt` (the turn clock, restarted at every handover inside a
+    //     duel) and `decks` (a power-up card drawn/played off-turn in a duel)
+    //   - `tutorialExemptMs`/`tutorialPausedFor`/`tutorialPausedAt`, reset by the
+    //     same turn advance when a stalled turn is timed out
+    function offTurnKeysOk() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['updatedAt', 'players', 'trades', 'pending',
+                         'log', 'logSeq', 'lastDie', 'dieSeq',
+                         'battle', 'lastBattle', 'battleSeq',
+                         'turnIndex', 'turnNo', 'zapSeq', 'lastZap',
+                         'turnStartedAt', 'decks', 'expireAt',
+                         'tutorialExemptMs', 'tutorialPausedFor', 'tutorialPausedAt']);
+    }
+
+    function turnGateOk(oldData) {
+      return moverOf(oldData) == request.auth.uid ||
+             request.auth.uid == oldData.hostId ||
+             offTurnKeysOk();
+    }
+
+    // Common create rule for a brand-new room: exactly one seat, that seat
+    // is you, counters at zero, no winner yet.
+    function createOk(code) {
+      return signedIn()
+        && request.resource.data.code == code
+        && request.resource.data.phase == 'lobby'
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.players.size() == 1
+        && request.resource.data.players[0].id == request.auth.uid
+        && request.resource.data.turnNo == 0
+        && request.resource.data.turnIndex == 0
+        && (!('winner' in request.resource.data) || request.resource.data.winner == null)
+        && allPlayersOk(request.resource.data.players);
+    }
+
+    // Common update rule: signed in, roster/host frozen and turn-gated once
+    // play has started, roster changes constrained to real joins/leaves
+    // while still in the lobby, sane phase transitions and value bounds.
+    function updateOk() {
+      return signedIn()
+        && request.resource.data.code == resource.data.code
+        && phaseOk(resource.data.phase, request.resource.data.phase)
+        && request.resource.data.players.size() >= 1
+        && request.resource.data.players.size() <= 6
+        && allPlayersOk(request.resource.data.players)
+        && (!('turnNo' in resource.data) || !('turnNo' in request.resource.data)
+            || request.resource.data.turnNo >= resource.data.turnNo)
+        && (
+             resource.data.phase == 'lobby'
+               ? lobbyRosterOk(resource.data.players, request.resource.data.players)
+                 && (request.resource.data.hostId == resource.data.hostId
+                     || (!containsId(request.resource.data.players, resource.data.hostId)
+                         && containsId(request.resource.data.players, request.resource.data.hostId)))
+               : sameOrder(resource.data.players, request.resource.data.players)
+                 && request.resource.data.hostId == resource.data.hostId
+                 && containsId(resource.data.players, request.auth.uid)
+                 && (resource.data.phase != 'playing' || turnGateOk(resource.data))
+           );
+    }
+
+    // ---- Thunder Dragon -----------------------------------------------------
+
+    match /games/{code} {
+      allow get: if true;
+      allow list: if false;
+
+      allow create: if code.matches('^[A-Z]{5}$')
+        && request.resource.data.keys().hasAll(['code', 'phase', 'players'])
+        && createOk(code);
+
+      allow update: if code.matches('^[A-Z]{5}$')
+        && request.resource.data.keys().hasAll(['code', 'phase', 'players'])
+        && updateOk();
+
+      // A finished room can be deleted by anyone. A lobby can be deleted by
+      // the one player sitting in it: leaving a lobby on your own would
+      // otherwise leave an empty room behind that nothing could ever remove
+      // (an update cannot leave a room with no players).
+      allow delete: if resource.data.phase == 'closed' || resource.data.phase == 'over'
+        || (resource.data.phase == 'lobby'
+            && resource.data.players.size() == 1
+            && resource.data.players[0].id == request.auth.uid);
+    }
+
+    // ---- Ice Dragon -----------------------------------------------------
+    //
+    // The shared rules above with this game's own shape. A long game can see
+    // a player carrying more than 40 pieces of gear or item cards, and the
+    // things that change off-turn include this game's own: the Barbarian
+    // (who fights on either side of a duel, and whose count of battles moves
+    // when a stalled fight is timed out) and the running "somebody lost a
+    // turn to the cold" marker (frozenSeq/lastFrozen), which a duel, or a
+    // timed-out turn handing over to a frozen player, can stamp.
+
+    function icePlayerOk(p) {
+      return p.id is string && p.id.size() > 0 &&
+             (!('name' in p)      || (p.name is string && p.name.size() <= 16)) &&
+             (!('hp' in p)        || (p.hp is number    && p.hp >= 0    && p.hp <= 999)) &&
+             (!('maxHp' in p)     || (p.maxHp is number && p.maxHp >= 0 && p.maxHp <= 999)) &&
+             (!('coins' in p)     || (p.coins is number && p.coins >= 0 && p.coins <= 99999)) &&
+             (!('energy' in p)    || (p.energy is number && p.energy >= 0 && p.energy <= 999)) &&
+             (!('inventory' in p) || (p.inventory is list && p.inventory.size() <= 300)) &&
+             (!('powerups' in p)  || (p.powerups is list  && p.powerups.size()  <= 300));
+    }
+
+    function iceAllPlayersOk(list) {
+      return (list.size() <= 0 || icePlayerOk(list[0])) &&
+             (list.size() <= 1 || icePlayerOk(list[1])) &&
+             (list.size() <= 2 || icePlayerOk(list[2])) &&
+             (list.size() <= 3 || icePlayerOk(list[3])) &&
+             (list.size() <= 4 || icePlayerOk(list[4])) &&
+             (list.size() <= 5 || icePlayerOk(list[5]));
+    }
+
+    function iceOffTurnKeysOk() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['updatedAt', 'players', 'trades', 'pending',
+                         'log', 'logSeq', 'lastDie', 'dieSeq',
+                         'battle', 'lastBattle', 'battleSeq', 'barbarian',
+                         'turnIndex', 'turnNo', 'zapSeq', 'lastZap',
+                         'frozenSeq', 'lastFrozen',
+                         'turnStartedAt', 'decks',
+                         'tutorialExemptMs', 'tutorialPausedFor', 'tutorialPausedAt']);
+    }
+
+    function iceTurnGateOk(oldData) {
+      return moverOf(oldData) == request.auth.uid ||
+             request.auth.uid == oldData.hostId ||
+             iceOffTurnKeysOk();
+    }
+
+    function iceCreateOk(code) {
+      return signedIn()
+        && request.resource.data.code == code
+        && request.resource.data.phase == 'lobby'
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.players.size() == 1
+        && request.resource.data.players[0].id == request.auth.uid
+        && request.resource.data.turnNo == 0
+        && request.resource.data.turnIndex == 0
+        && (!('winner' in request.resource.data) || request.resource.data.winner == null)
+        && iceAllPlayersOk(request.resource.data.players);
+    }
+
+    function iceUpdateOk() {
+      return signedIn()
+        && request.resource.data.code == resource.data.code
+        && phaseOk(resource.data.phase, request.resource.data.phase)
+        && request.resource.data.players.size() >= 1
+        && request.resource.data.players.size() <= 6
+        && iceAllPlayersOk(request.resource.data.players)
+        && (!('turnNo' in resource.data) || !('turnNo' in request.resource.data)
+            || request.resource.data.turnNo >= resource.data.turnNo)
+        && (
+             resource.data.phase == 'lobby'
+               ? lobbyRosterOk(resource.data.players, request.resource.data.players)
+                 && (request.resource.data.hostId == resource.data.hostId
+                     || (!containsId(request.resource.data.players, resource.data.hostId)
+                         && containsId(request.resource.data.players, request.resource.data.hostId)))
+               : sameOrder(resource.data.players, request.resource.data.players)
+                 && request.resource.data.hostId == resource.data.hostId
+                 && containsId(resource.data.players, request.auth.uid)
+                 && (resource.data.phase != 'playing' || iceTurnGateOk(resource.data))
+           );
+    }
+
+    match /games_ice/{code} {
+      allow get: if true;
+      allow list: if false;
+
+      allow create: if code.matches('^[A-Z]{5}$')
+        && request.resource.data.keys().hasAll(['code', 'phase', 'players'])
+        && iceCreateOk(code);
+
+      allow update: if code.matches('^[A-Z]{5}$')
+        && request.resource.data.keys().hasAll(['code', 'phase', 'players'])
+        && iceUpdateOk();
+
+      // A finished room can be deleted by anyone. A lobby can be deleted by
+      // the one player sitting in it (an update cannot leave a room with no
+      // players, so leaving a lobby on your own has to delete it).
+      allow delete: if resource.data.phase == 'closed' || resource.data.phase == 'over'
+        || (resource.data.phase == 'lobby'
+            && resource.data.players.size() == 1
+            && resource.data.players[0].id == request.auth.uid);
+    }
+
+    // ---- Oblivion Dragon ------------------------------------------------
+    //
+    // The same protections as the two games above, with this game's own
+    // shape: players carry `gold` and `gems` rather than `coins`, a long game
+    // can see a player holding far more than 40 weapons and potions, and the
+    // things that change off-turn are this game's own (the Barbarian, the
+    // cards drawn, a PvP defender's half of a fight, the clock fighting for a
+    // player who is away -- which can end the game).
+
+    function oblPlayerOk(p) {
+      return p.id is string && p.id.size() > 0 &&
+             (!('name' in p)      || (p.name is string && p.name.size() <= 16)) &&
+             (!('hp' in p)        || (p.hp is number    && p.hp >= 0    && p.hp <= 999)) &&
+             (!('maxHp' in p)     || (p.maxHp is number && p.maxHp >= 0 && p.maxHp <= 999)) &&
+             (!('gold' in p)      || (p.gold is number  && p.gold >= 0  && p.gold <= 999999)) &&
+             (!('gems' in p)      || (p.gems is number  && p.gems >= 0  && p.gems <= 9999)) &&
+             (!('keys' in p)      || (p.keys is number  && p.keys >= 0  && p.keys <= 9999)) &&
+             (!('inventory' in p) || (p.inventory is list && p.inventory.size() <= 300)) &&
+             (!('potions' in p)   || (p.potions is list   && p.potions.size()   <= 300));
+    }
+
+    function oblAllPlayersOk(list) {
+      return (list.size() <= 0 || oblPlayerOk(list[0])) &&
+             (list.size() <= 1 || oblPlayerOk(list[1])) &&
+             (list.size() <= 2 || oblPlayerOk(list[2])) &&
+             (list.size() <= 3 || oblPlayerOk(list[3])) &&
+             (list.size() <= 4 || oblPlayerOk(list[4])) &&
+             (list.size() <= 5 || oblPlayerOk(list[5]));
+    }
+
+    // Everything a seated player who is not the mover may legitimately
+    // change. What is left out -- the turn order, the host, the modifiers,
+    // pausing, the room code -- stays with the mover and the host.
+    function oblOffTurnKeysOk() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['updatedAt', 'players', 'trades', 'pending',
+                         'log', 'logSeq', 'lastDie', 'dieSeq',
+                         'battle', 'lastBattle', 'battleSeq', 'barbarian',
+                         'turnIndex', 'turnNo', 'turnStartedAt',
+                         'zapSeq', 'lastZap', 'dropSeq', 'lastDrop', 'drawSeq', 'lastDraw',
+                         'crumbleSeq', 'lastCrumble',
+                         'decks', 'phase', 'winner', 'finishedPlayMs',
+                         'tutorialExemptMs', 'tutorialPausedFor', 'tutorialPausedAt']);
+    }
+
+    function oblTurnGateOk(oldData) {
+      return moverOf(oldData) == request.auth.uid ||
+             request.auth.uid == oldData.hostId ||
+             oblOffTurnKeysOk();
+    }
+
+    function oblCreateOk(code) {
+      return signedIn()
+        && request.resource.data.code == code
+        && request.resource.data.phase == 'lobby'
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.players.size() == 1
+        && request.resource.data.players[0].id == request.auth.uid
+        && request.resource.data.turnNo == 0
+        && request.resource.data.turnIndex == 0
+        && (!('winner' in request.resource.data) || request.resource.data.winner == null)
+        && oblAllPlayersOk(request.resource.data.players);
+    }
+
+    // Joining a game already under way (a late seat, starting from the
+    // Start square): you, added once at the end of the seats -- and of the
+    // turn order, if it has been rolled -- with no Gold and no fragments;
+    // every other seat exactly as it was; nothing else in the room touched.
+    function oblSameAt(a, b, i) { return i >= a.size() || a[i] == b[i]; }
+    function oblKeepsAll(a, b) {
+      return oblSameAt(a, b, 0) && oblSameAt(a, b, 1) && oblSameAt(a, b, 2) &&
+             oblSameAt(a, b, 3) && oblSameAt(a, b, 4) && oblSameAt(a, b, 5);
+    }
+
+    function oblLateJoinOk() {
+      let o = resource.data;
+      let n = request.resource.data;
+      let me = n.players[o.players.size()];
+      return (o.phase == 'order' || o.phase == 'playing')
+        && n.phase == o.phase
+        && n.hostId == o.hostId
+        && !containsId(o.players, request.auth.uid)
+        && n.players.size() == o.players.size() + 1
+        && oblKeepsAll(o.players, n.players)
+        && me.id == request.auth.uid
+        && me.gold == 0
+        && me.fragments.size() == 0
+        && (o.phase == 'order'
+              ? n.turnOrder == o.turnOrder
+              : (n.turnOrder.size() == o.turnOrder.size() + 1
+                 && oblKeepsAll(o.turnOrder, n.turnOrder)
+                 && n.turnOrder[o.turnOrder.size()] == request.auth.uid))
+        && n.diff(o).affectedKeys().hasOnly(['updatedAt', 'players', 'turnOrder', 'log', 'logSeq']);
+    }
+
+    // phaseOk, plus one more: the host's End game button is on screen while
+    // the turn order is still being rolled, so ending the game from there has
+    // to be allowed (order -> closed).
+    function oblPhaseOk(oldPhase, newPhase) {
+      return phaseOk(oldPhase, newPhase) || (oldPhase == 'order' && newPhase == 'closed');
+    }
+
+    function oblUpdateOk() {
+      return signedIn()
+        && request.resource.data.code == resource.data.code
+        && oblPhaseOk(resource.data.phase, request.resource.data.phase)
+        && request.resource.data.players.size() >= 1
+        && request.resource.data.players.size() <= 6
+        && oblAllPlayersOk(request.resource.data.players)
+        && (!('turnNo' in resource.data) || !('turnNo' in request.resource.data)
+            || request.resource.data.turnNo >= resource.data.turnNo)
+        && (
+             resource.data.phase == 'lobby'
+               ? lobbyRosterOk(resource.data.players, request.resource.data.players)
+                 && (request.resource.data.hostId == resource.data.hostId
+                     || (!containsId(request.resource.data.players, resource.data.hostId)
+                         && containsId(request.resource.data.players, request.resource.data.hostId)))
+               : (sameOrder(resource.data.players, request.resource.data.players)
+                   && request.resource.data.hostId == resource.data.hostId
+                   && containsId(resource.data.players, request.auth.uid)
+                   && (resource.data.phase != 'playing' || oblTurnGateOk(resource.data)))
+                 || oblLateJoinOk()
+           );
+    }
+
+    match /games_oblivion/{code} {
+      allow get: if true;
+      allow list: if false;
+
+      allow create: if code.matches('^[A-Z]{5}$')
+        && request.resource.data.keys().hasAll(['code', 'phase', 'players'])
+        && oblCreateOk(code);
+
+      allow update: if code.matches('^[A-Z]{5}$')
+        && request.resource.data.keys().hasAll(['code', 'phase', 'players'])
+        && oblUpdateOk();
+
+      // A finished room can be deleted by anyone. A lobby can be deleted by
+      // the one player sitting in it: leaving a lobby on your own would
+      // otherwise leave an empty room behind that nothing could ever remove
+      // (an update cannot leave a room with no players).
+      allow delete: if resource.data.phase == 'closed' || resource.data.phase == 'over'
+        || (resource.data.phase == 'lobby'
+            && resource.data.players.size() == 1
+            && resource.data.players[0].id == request.auth.uid);
+    }
+
+    // Nothing else in the project is readable or writable.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
