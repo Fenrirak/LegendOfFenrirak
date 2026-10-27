@@ -191,30 +191,6 @@
         });
     }
 
-    /* ---- top scroll-progress thread ------------------------------------ */
-    function initProgress() {
-        var bar = document.querySelector('.scroll-progress');
-        if (!bar) return;
-
-        var ticking = false;
-        function update() {
-            var doc = document.documentElement;
-            var max = doc.scrollHeight - doc.clientHeight;
-            var pct = max > 0 ? (doc.scrollTop / max) * 100 : 0;
-            bar.style.width = pct + '%';
-            ticking = false;
-        }
-        function onScroll() {
-            if (!ticking) {
-                window.requestAnimationFrame(update);
-                ticking = true;
-            }
-        }
-        update();
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onScroll);
-    }
-
     /* ---- floating back-to-top ------------------------------------------ */
     function initBackToTop() {
         var btn = document.querySelector('.back-to-top');
@@ -509,7 +485,6 @@
         initGamesMenu();
         initStickyOffset();
         initPopIn();
-        initProgress();
         initBackToTop();
         initLightbox();
         initTiltHover();

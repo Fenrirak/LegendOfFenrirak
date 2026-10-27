@@ -332,21 +332,6 @@
    disabled (or a blocked/broken script) simply shows this content
    normally — it is never hidden by a stylesheet rule with no way back. */
 
-/* ---- top scroll-progress thread ---------------------------------------- */
-.scroll-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 3px;
-    width: 0%;
-    background: linear-gradient(90deg, rgba(217, 163, 92, 0.55), rgb(242, 204, 143));
-    z-index: 400;
-    transition: width 0.1s linear;
-}
-@media (prefers-reduced-motion: reduce) {
-    .scroll-progress { transition: none; }
-}
-
 /* ---- floating back-to-top ----------------------------------------------- */
 .back-to-top {
     position: fixed;
@@ -17892,30 +17877,6 @@ ready.then((uid) => {
         });
     }
 
-    /* ---- top scroll-progress thread ------------------------------------ */
-    function initProgress() {
-        var bar = document.querySelector('.scroll-progress');
-        if (!bar) return;
-
-        var ticking = false;
-        function update() {
-            var doc = document.documentElement;
-            var max = doc.scrollHeight - doc.clientHeight;
-            var pct = max > 0 ? (doc.scrollTop / max) * 100 : 0;
-            bar.style.width = pct + '%';
-            ticking = false;
-        }
-        function onScroll() {
-            if (!ticking) {
-                window.requestAnimationFrame(update);
-                ticking = true;
-            }
-        }
-        update();
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onScroll);
-    }
-
     /* ---- floating back-to-top ------------------------------------------ */
     function initBackToTop() {
         var btn = document.querySelector('.back-to-top');
@@ -18210,7 +18171,6 @@ ready.then((uid) => {
         initGamesMenu();
         initStickyOffset();
         initPopIn();
-        initProgress();
         initBackToTop();
         initLightbox();
         initTiltHover();
