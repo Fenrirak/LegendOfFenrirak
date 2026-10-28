@@ -12,7 +12,7 @@
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/About.html</loc>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
     <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
@@ -98,7 +98,7 @@
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/Creators.html</loc>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
     <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Nathan.jpg</image:loc>
@@ -127,7 +127,7 @@
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/showdowns.html</loc>
-    <priority>0.8</priority>
+    <priority>0.5</priority>
     <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
@@ -136,7 +136,7 @@
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/thunder-dragon.html</loc>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
@@ -145,7 +145,7 @@
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/ice-dragon.html</loc>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
@@ -154,7 +154,7 @@
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/oblivion-dragon.html</loc>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <lastmod>2026-10-27</lastmod>
     <image:image>
       <image:loc>https://www.legend-of-fenrirak.com/Fenrirak.png</image:loc>
@@ -163,12 +163,12 @@
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/Contact.html</loc>
-    <priority>0.3</priority>
+    <priority>0.2</priority>
     <lastmod>2026-10-27</lastmod>
   </url>
   <url>
     <loc>https://www.legend-of-fenrirak.com/Privacy.html</loc>
-    <priority>0.3</priority>
+    <priority>0.2</priority>
     <lastmod>2026-10-27</lastmod>
   </url>
 </urlset>
