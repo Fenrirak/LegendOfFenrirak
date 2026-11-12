@@ -2758,6 +2758,8 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
 .over-mods .om-none { font-size: 14px; font-weight: normal; color: var(--muted); }
 .over-scroll { max-width: 100%; overflow-x: auto; }
 .over-bot { font-size: 11.5px; color: var(--muted); }
+.over-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.over-shot-msg { text-align: center; margin-top: 10px; font-size: 13px; }
 @media (max-width: 520px) { .over-fact { flex: 1 1 100%; } }
 
 /* ---- smaller screens ------------------------------------------------- */
@@ -3421,7 +3423,11 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
         oblivion_mage: {
             id: 'oblivion_mage', name: 'Oblivion Mage Helen', short: 'Helen',
             image: null,     // as Fenrirak's: a file name, or a placeholder
-            hp: 65, defence: 5, proper: true, boss: true,
+            // 125 HP: 5 more than the most damage one attack can do to her with no potions (120:
+            // 125 before her Defence of 5): Mage Orb of Power 70 + Crestium Staff 40 + High Mage’s Robe 5 +
+            // Runed Relic 10, or Knight Piercing Blade 60 + Mythical Montante 35 + Runed Plate
+            // Armour 10 + its own +20 on the next one. Archer tops out at 100, Barbarian at 115.
+            hp: 125, defence: 5, proper: true, boss: true,
             passives: [
                 {
                     id: 'loyal_servant', name: 'Loyal Servant', untouchable: true,
@@ -16651,6 +16657,164 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             : '<b class="om-none">None: every rule as printed</b>') + '</div>';
     }
 
+    /* ------------------------------------------------------------------ */
+    /* Screenshot of the finish card                                       */
+    /*                                                                     */
+    /* No library: the card is copied with its computed styles written     */
+    /* in, wrapped in an SVG <foreignObject>, drawn onto a canvas and      */
+    /* saved as a PNG. The web fonts are fetched and embedded so it looks  */
+    /* like the screen; if that fails the fallback fonts are used and the  */
+    /* screenshot is still saved. On phones the share sheet is used, so    */
+    /* it can go to Photos.                                                */
+    /* ------------------------------------------------------------------ */
+
+    const SHOT_FONTS = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Comfortaa:wght@400;600&family=Cutive+Mono:wght@400&display=swap';
+    const SHOT_SVG_PROPS = ['fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap',
+        'stroke-linejoin', 'stroke-dasharray', 'stroke-dashoffset', 'opacity', 'display', 'visibility', 'filter',
+        'mix-blend-mode', 'stop-color', 'stop-opacity', 'font-family', 'font-size', 'font-weight', 'text-anchor'];
+    let shotFontCss = '', shotBusy = false;
+
+    function blobToDataUrl(blob) {
+        return new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result);
+            r.onerror = () => reject(r.error);
+            r.readAsDataURL(blob);
+        });
+    }
+
+    async function shotFontFaces() {
+        if (shotFontCss) return shotFontCss;
+        let out = '';
+        try {
+            const css = await (await fetch(SHOT_FONTS)).text();
+            const faces = css.match(/\/\*\s*latin\s*\*\/\s*@font-face\s*\{[^}]*\}/g) || [];
+            for (const face of faces) {
+                const m = /url\((https:[^)]+)\)/.exec(face);
+                if (!m) continue;
+                const data = await blobToDataUrl(await (await fetch(m[1])).blob());
+                out += face.replace(/\/\*[^*]*\*\//, '').replace(m[1], data);
+            }
+        } catch (e) { out = ''; }
+        shotFontCss = out;
+        return out;
+    }
+
+    // Copy `src`'s look onto its clone `dst`, element by element.
+    function shotStyle(src, dst, imgs) {
+        const cs = getComputedStyle(src);
+        let text = '';
+        if (src instanceof SVGElement && src.tagName.toLowerCase() !== 'svg') {
+            // Drawing parts: only the paint properties, and never a url(#id), which would point outside the picture.
+            SHOT_SVG_PROPS.forEach(k => {
+                const v = cs.getPropertyValue(k);
+                if (v && v.indexOf('url(') < 0) text += k + ':' + v + ';';
+            });
+        } else {
+            for (let i = 0; i < cs.length; i++) text += cs[i] + ':' + cs.getPropertyValue(cs[i]) + ';';
+            text += 'animation:none;transition:none;';
+        }
+        dst.setAttribute('style', text);
+        if (src instanceof HTMLImageElement) imgs.push([src, dst]);
+        for (let i = 0; i < src.children.length; i++) shotStyle(src.children[i], dst.children[i], imgs);
+    }
+
+    async function saveOverShot() {
+        const card = $('#over-body .over');
+        if (!card || shotBusy) return;
+        shotBusy = true;
+        const btn = document.getElementById('over-shot');
+        const msg = document.getElementById('over-shot-msg');
+        if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+        if (msg) msg.textContent = '';
+        try {
+            const fonts = await shotFontFaces();
+
+            // Measured and copied with the buttons hidden, in one go, so nothing flickers.
+            const actions = card.querySelector('.over-actions');
+            const scroll = card.querySelector('.over-scroll');
+            let W, H, clone;
+            const imgs = [];
+            if (actions) actions.style.display = 'none';
+            try {
+                const extra = scroll ? Math.max(0, scroll.scrollWidth - scroll.clientWidth) : 0;
+                W = Math.ceil(card.offsetWidth + extra);
+                H = Math.ceil(card.offsetHeight);
+                clone = card.cloneNode(true);
+                shotStyle(card, clone, imgs);
+                clone.style.cssText += ';width:' + W + 'px;margin:0;position:static;transform:none;opacity:1;';
+                const cs2 = clone.querySelector('.over-scroll');
+                if (cs2) cs2.style.cssText += ';overflow:visible;' + (extra ? 'width:' + scroll.scrollWidth + 'px;' : '');
+                const ca = clone.querySelector('.over-actions');
+                if (ca) ca.remove();
+            } finally {
+                if (actions) actions.style.display = '';
+            }
+
+            imgs.forEach(pair => {
+                const a = pair[0], b = pair[1];
+                if (/^data:/.test(a.src) || !a.naturalWidth) return;
+                try {
+                    const c = document.createElement('canvas');
+                    c.width = a.naturalWidth; c.height = a.naturalHeight;
+                    c.getContext('2d').drawImage(a, 0, 0);
+                    b.setAttribute('src', c.toDataURL('image/png'));
+                } catch (e) { /* left as it was */ }
+            });
+
+            const xhtml = new XMLSerializer().serializeToString(clone);
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '"><style>' + fonts +
+                '<' + '/style><foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' + xhtml + '</foreignObject></svg>';
+            const pic = new Image();
+            await new Promise((resolve, reject) => {
+                pic.onload = resolve;
+                pic.onerror = () => reject(new Error('the browser could not draw the picture'));
+                pic.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+            });
+
+            // The page's own dark background behind the card, with a margin round it.
+            const pad = 28, cw = W + pad * 2, ch = H + pad * 2;
+            const scale = Math.max(1, Math.min(2, 4096 / Math.max(cw, ch)));
+            const cv = document.createElement('canvas');
+            cv.width = Math.round(cw * scale); cv.height = Math.round(ch * scale);
+            const g = cv.getContext('2d');
+            const root = getComputedStyle(document.documentElement);
+            const v = (n, d) => root.getPropertyValue(n).trim() || d;
+            const grad = g.createLinearGradient(0, 0, 0, cv.height);
+            grad.addColorStop(0, v('--bg-top', '#0a080c'));
+            grad.addColorStop(0.6, v('--bg-mid', '#060606'));
+            grad.addColorStop(1, v('--bg-bottom', '#030303'));
+            g.fillStyle = grad;
+            g.fillRect(0, 0, cv.width, cv.height);
+            g.drawImage(pic, pad * scale, pad * scale, W * scale, H * scale);
+
+            const blob = await new Promise((resolve, reject) =>
+                cv.toBlob(b => b ? resolve(b) : reject(new Error('the browser would not save the picture')), 'image/png'));
+            const name = 'legend-of-fenrirak-oblivion-result.png';
+            const file = new File([blob], name, { type: 'image/png' });
+            if (window.matchMedia && matchMedia('(pointer: coarse)').matches && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try { await navigator.share({ files: [file], title: 'Legend of Fenrirak: The Oblivion Dragon' }); }
+                catch (e) { if (!e || e.name !== 'AbortError') throw e; }
+            } else {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = name;
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+                const m = document.getElementById('over-shot-msg');
+                if (m) m.textContent = 'Screenshot saved to your downloads.';
+            }
+        } catch (err) {
+            console.error('Screenshot failed', err);
+            const m = document.getElementById('over-shot-msg');
+            if (m) m.textContent = 'Could not make the screenshot here (' + ((err && err.message) || 'unknown error') + '). Your device’s own screenshot still works.';
+        } finally {
+            shotBusy = false;
+            const b = document.getElementById('over-shot');
+            if (b) { b.disabled = false; b.textContent = 'Save screenshot'; }
+        }
+    }
+
     function renderOver() {
         const w = E.player(S, S.winner);
         const mine = w && w.id === NET.PID;
@@ -16671,7 +16835,10 @@ html.gfx-ultra .notice { transition: opacity .3s ease, transform .35s cubic-bezi
             rows.map(p => '<tr><td style="color:' + seatColour(p.id) + '">' + esc(p.name) + (p.id === S.winner ? ' <span class="chip good">Winner</span>' : '') +
                 (p.bot ? '<div class="over-bot">' + esc(botLabel({ botLevel: BOT_LEVELS[p.botLevel] ? p.botLevel : 'medium' })) + '</div>' : '') + '</td><td>' + className(p.cls) +
                 '</td><td>' + p.fragments.length + '</td><td>' + p.gold + '</td><td>' + p.gems + '</td><td>' + (p.kills | 0) + '</td><td>' + (p.deaths | 0) + '</td></tr>').join('') +
-            '</table></div><button class="btn primary" id="over-home">Back to the start</button></div>';
+            '</table></div><div class="over-actions"><button class="btn" id="over-shot">Save screenshot</button>' +
+            '<button class="btn primary" id="over-home">Back to the start</button></div></div>' +
+            '<div class="muted over-shot-msg" id="over-shot-msg" aria-live="polite"></div>';
+        bind('over-shot', saveOverShot);
         bind('over-home', () => backHome(''));
     }
 
