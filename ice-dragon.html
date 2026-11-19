@@ -657,6 +657,229 @@
 }
 
     </style>
+    <style>
+/* ==== site-buttons.css ==== */
+/* Legend of Fenrirak — redesigned bottom-of-page buttons (:is(a.section, .end-btn)).
+   Shared by every page; the home page adds the grouped "hub" layout.
+   Remove the <link> to this file to fall back to each page's own style.
+   The Support the Creators button (.support-btn) is not touched here. */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@1,600&display=swap');
+
+/* ---------- Base button (used on every page, and the end-of-game screens) ---------- */
+a.section { --btn-rgb: 217, 163, 92; }
+:is(a.section, .end-btn) {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: min(100%, 500px);
+    max-width: none;
+    margin: 14px auto;
+    padding: 17px 24px;
+    font-family: 'Cinzel', Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-decoration: none;
+    color: #f3e9d8;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    background:
+        linear-gradient(160deg, #1e1c1a, #121110) padding-box,
+        linear-gradient(135deg, rgba(var(--btn-rgb), .9), rgba(var(--btn-rgb), .14) 48%, rgba(var(--btn-rgb), .55)) border-box;
+    box-shadow: 0 12px 26px -16px #000, inset 0 1px 0 rgba(255, 255, 255, .05);
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease, color .3s ease;
+}
+
+/* light sweep */
+:is(a.section, .end-btn)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(105deg, transparent 35%, rgba(var(--btn-rgb), .22) 50%, transparent 65%);
+    transform: translateX(-120%);
+    transition: transform .8s ease;
+}
+
+/* chevron */
+:is(a.section, .end-btn)::after {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid rgb(var(--btn-rgb));
+    border-right: 2px solid rgb(var(--btn-rgb));
+    transform: rotate(45deg);
+    transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+}
+
+:is(a.section, .end-btn):hover,
+:is(a.section, .end-btn):focus-visible {
+    background-color: transparent;
+    border-color: transparent;
+    color: #fff;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 36px -16px rgba(var(--btn-rgb), .6), 0 0 0 1px rgba(var(--btn-rgb), .35), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+:is(a.section, .end-btn):hover::before,
+:is(a.section, .end-btn):focus-visible::before { transform: translateX(120%); }
+:is(a.section, .end-btn):hover::after,
+:is(a.section, .end-btn):focus-visible::after { transform: translateX(5px) rotate(45deg); }
+:is(a.section, .end-btn):focus-visible { outline: 2px solid rgb(var(--btn-rgb)); outline-offset: 3px; }
+:is(a.section, .end-btn):active { transform: translateY(-1px) scale(.985); }
+
+/* element colours, picked by destination */
+a.section[href^="thunder-dragon"]  { --btn-rgb: 255, 196, 56; }
+a.section[href^="ice-dragon"]      { --btn-rgb: 125, 211, 252; }
+a.section[href^="oblivion-dragon"] { --btn-rgb: 192, 132, 252; }
+a.section[href^="showdowns"]       { --btn-rgb: 232, 182, 77; }
+
+/* ---------- Home page hub layout ---------- */
+.btn-hub {
+    display: grid;
+    gap: 32px;
+    width: min(100%, 800px);
+    margin: 34px auto 26px;
+}
+.hub-label {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 0 0 16px;
+    padding: 0;
+    font: 700 13px/1 'Cinzel', Georgia, serif;
+    letter-spacing: .34em;
+    text-transform: uppercase;
+    color: rgb(217, 163, 92);
+}
+.hub-label::before,
+.hub-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(217, 163, 92, .6));
+}
+.hub-label::after { transform: scaleX(-1); }
+.hub-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.btn-hub a.section {
+    width: auto;
+    margin: 0;
+    animation: hub-rise .7s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+.hub-row a.section:nth-child(2) { animation-delay: .08s; }
+.hub-row a.section:nth-child(3) { animation-delay: .16s; }
+.hub-row a.section:nth-child(4) { animation-delay: .24s; }
+@keyframes hub-rise { from { opacity: 0; transform: translateY(18px); } }
+
+/* rich card: icon medallion + title + sub line */
+a.section.card {
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 16px 20px 16px 16px;
+    text-align: left;
+}
+a.section.card::after { margin-left: auto; }
+.card .ico {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    color: rgb(var(--btn-rgb));
+    background: radial-gradient(circle at 30% 25%, rgba(var(--btn-rgb), .38), rgba(var(--btn-rgb), .06) 70%);
+    box-shadow: inset 0 0 0 1px rgba(var(--btn-rgb), .45), 0 0 18px -4px rgba(var(--btn-rgb), .5);
+    transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s ease;
+}
+.card .ico svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+a.section.card:hover .ico,
+a.section.card:focus-visible .ico {
+    transform: scale(1.1) rotate(-7deg);
+    box-shadow: inset 0 0 0 1px rgba(var(--btn-rgb), .85), 0 0 28px -2px rgba(var(--btn-rgb), .85);
+}
+.card .txt { display: grid; gap: 5px; min-width: 0; }
+.card .ttl { font-size: 16px; letter-spacing: .05em; line-height: 1.2; }
+.card .sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    font: italic 600 15px/1.2 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: .02em;
+    color: rgba(243, 233, 216, .62);
+}
+.card .tag {
+    font: 700 9.5px/1 'Cinzel', Georgia, serif;
+    font-style: normal;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 99px;
+    color: rgb(var(--btn-rgb));
+    background: rgba(var(--btn-rgb), .14);
+    border: 1px solid rgba(var(--btn-rgb), .45);
+}
+
+/* ---------- End-of-game buttons (Thunder, Ice and Oblivion victory screens) ----------
+   .end-actions sets the dragon's colour inline: style="--btn-rgb: R, G, B" */
+.end-actions {
+    --btn-rgb: 217, 163, 92;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 26px;
+}
+.end-actions .end-btn {
+    width: auto;
+    min-width: min(100%, 230px);
+    margin: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.end-btn.primary {
+    background:
+        linear-gradient(160deg, rgba(var(--btn-rgb), .3), rgba(var(--btn-rgb), .08)) padding-box,
+        linear-gradient(135deg, rgb(var(--btn-rgb)), rgba(var(--btn-rgb), .25) 48%, rgba(var(--btn-rgb), .75)) border-box;
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+    .hub-row { grid-template-columns: 1fr; }
+    .btn-hub { gap: 28px; }
+    a.section { font-size: 14px; padding: 15px 18px; }
+    a.section.card { padding: 14px 16px 14px 14px; }
+    .card .ico { width: 48px; height: 48px; }
+    .card .ttl { font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    a.section, a.section::before, a.section::after, .card .ico { transition: none; }
+    .btn-hub a.section { animation: none; }
+}
+
+    </style>
 
     <style>
 /* ==== game-ice/style.css ==== */
@@ -21235,11 +21458,11 @@ kbd {
             '<p class="muted">' + (w && w.id === NET.PID
                 ? 'The Ice Dragon falls to you. The legend is yours.'
                 : 'The Ice Dragon falls to another. Try again.') + '</p>' +
-            '<div class="modal-actions" style="justify-content:center">' +
-            '<a class="btn" style="display:inline-block;text-decoration:none" ' +
+            '<div class="end-actions" style="--btn-rgb:125, 211, 252">' +
+            '<a class="end-btn" ' +
                 'href="https://forms.gle/24zLuzzWdpTPHzBa7" target="_blank" ' +
                 'rel="noopener">Send us feedback</a>' +
-            '<button class="btn primary" id="over-home">Back to the start</button></div>' +
+            '<button class="end-btn primary" id="over-home">Back to the start</button></div>' +
             '</div>';
         bind('over-home', () => {
             // A finished solo game is finished: it is not offered back to you
