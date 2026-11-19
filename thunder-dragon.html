@@ -676,7 +676,7 @@ a.section { --btn-rgb: 217, 163, 92; }
     align-items: center;
     justify-content: center;
     gap: 12px;
-    width: min(100%, 500px);
+    width: min(92%, 500px);
     max-width: none;
     margin: 14px auto;
     padding: 17px 24px;
@@ -791,7 +791,7 @@ a.section.card {
     text-align: left;
 }
 a.section.card::after { margin-left: auto; }
-.card .ico {
+a.section.card .ico {
     flex: none;
     display: grid;
     place-items: center;
@@ -803,7 +803,7 @@ a.section.card::after { margin-left: auto; }
     box-shadow: inset 0 0 0 1px rgba(var(--btn-rgb), .45), 0 0 18px -4px rgba(var(--btn-rgb), .5);
     transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s ease;
 }
-.card .ico svg {
+a.section.card .ico svg {
     width: 26px;
     height: 26px;
     fill: none;
@@ -817,9 +817,9 @@ a.section.card:focus-visible .ico {
     transform: scale(1.1) rotate(-7deg);
     box-shadow: inset 0 0 0 1px rgba(var(--btn-rgb), .85), 0 0 28px -2px rgba(var(--btn-rgb), .85);
 }
-.card .txt { display: grid; gap: 5px; min-width: 0; }
-.card .ttl { font-size: 16px; letter-spacing: .05em; line-height: 1.2; }
-.card .sub {
+a.section.card .txt { display: grid; gap: 5px; min-width: 0; }
+a.section.card .ttl { font-size: 16px; letter-spacing: .05em; line-height: 1.2; }
+a.section.card .sub {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -828,7 +828,7 @@ a.section.card:focus-visible .ico {
     letter-spacing: .02em;
     color: rgba(243, 233, 216, .62);
 }
-.card .tag {
+a.section.card .tag {
     font: 700 9.5px/1 'Cinzel', Georgia, serif;
     font-style: normal;
     letter-spacing: .12em;
@@ -861,6 +861,7 @@ a.section.card:focus-visible .ico {
 .end-btn.primary {
     background:
         linear-gradient(160deg, rgba(var(--btn-rgb), .3), rgba(var(--btn-rgb), .08)) padding-box,
+        linear-gradient(160deg, #1e1c1a, #121110) padding-box,
         linear-gradient(135deg, rgb(var(--btn-rgb)), rgba(var(--btn-rgb), .25) 48%, rgba(var(--btn-rgb), .75)) border-box;
 }
 
@@ -870,8 +871,8 @@ a.section.card:focus-visible .ico {
     .btn-hub { gap: 28px; }
     a.section { font-size: 14px; padding: 15px 18px; }
     a.section.card { padding: 14px 16px 14px 14px; }
-    .card .ico { width: 48px; height: 48px; }
-    .card .ttl { font-size: 15px; }
+    a.section.card .ico { width: 48px; height: 48px; }
+    a.section.card .ttl { font-size: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
