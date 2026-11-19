@@ -704,7 +704,7 @@ a.section { --btn-rgb: 217, 163, 92; }
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(105deg, transparent 35%, rgba(var(--btn-rgb), .22) 50%, transparent 65%);
+    background: linear-gradient(105deg, transparent 35%, rgba(var(--btn-rgb), .26) 50%, transparent 65%);
     transform: translateX(-120%);
     transition: transform .8s ease;
 }
@@ -727,7 +727,7 @@ a.section { --btn-rgb: 217, 163, 92; }
     border-color: transparent;
     color: #fff;
     transform: translateY(-4px);
-    box-shadow: 0 20px 36px -16px rgba(var(--btn-rgb), .6), 0 0 0 1px rgba(var(--btn-rgb), .35), inset 0 1px 0 rgba(255, 255, 255, .08);
+    box-shadow: 0 14px 24px -16px #000, inset 0 1px 0 rgba(255, 255, 255, .08);
 }
 :is(a.section, .end-btn):hover::before,
 :is(a.section, .end-btn):focus-visible::before { transform: translateX(120%); }
@@ -737,7 +737,7 @@ a.section { --btn-rgb: 217, 163, 92; }
 :is(a.section, .end-btn):active { transform: translateY(-1px) scale(.985); }
 
 /* element colours, picked by destination */
-a.section[href^="thunder-dragon"]  { --btn-rgb: 255, 196, 56; }
+a.section[href^="thunder-dragon"]  { --btn-rgb: 255, 224, 51; }
 a.section[href^="ice-dragon"]      { --btn-rgb: 125, 211, 252; }
 a.section[href^="oblivion-dragon"] { --btn-rgb: 192, 132, 252; }
 a.section[href^="showdowns"]       { --btn-rgb: 232, 182, 77; }
@@ -787,36 +787,10 @@ a.section[href^="showdowns"]       { --btn-rgb: 232, 182, 77; }
 a.section.card {
     justify-content: flex-start;
     gap: 16px;
-    padding: 16px 20px 16px 16px;
+    padding: 18px 22px;
     text-align: left;
 }
 a.section.card::after { margin-left: auto; }
-a.section.card .ico {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    color: rgb(var(--btn-rgb));
-    background: radial-gradient(circle at 30% 25%, rgba(var(--btn-rgb), .38), rgba(var(--btn-rgb), .06) 70%);
-    box-shadow: inset 0 0 0 1px rgba(var(--btn-rgb), .45), 0 0 18px -4px rgba(var(--btn-rgb), .5);
-    transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s ease;
-}
-a.section.card .ico svg {
-    width: 26px;
-    height: 26px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-a.section.card:hover .ico,
-a.section.card:focus-visible .ico {
-    transform: scale(1.1) rotate(-7deg);
-    box-shadow: inset 0 0 0 1px rgba(var(--btn-rgb), .85), 0 0 28px -2px rgba(var(--btn-rgb), .85);
-}
 a.section.card .txt { display: grid; gap: 5px; min-width: 0; }
 a.section.card .ttl { font-size: 16px; letter-spacing: .05em; line-height: 1.2; }
 a.section.card .sub {
@@ -870,13 +844,12 @@ a.section.card .tag {
     .hub-row { grid-template-columns: 1fr; }
     .btn-hub { gap: 28px; }
     a.section { font-size: 14px; padding: 15px 18px; }
-    a.section.card { padding: 14px 16px 14px 14px; }
-    a.section.card .ico { width: 48px; height: 48px; }
+    a.section.card { padding: 15px 18px; }
     a.section.card .ttl { font-size: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    a.section, a.section::before, a.section::after, .card .ico { transition: none; }
+    :is(a.section, .end-btn), :is(a.section, .end-btn)::before, :is(a.section, .end-btn)::after { transition: none; }
     .btn-hub a.section { animation: none; }
 }
 
