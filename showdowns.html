@@ -25,10 +25,13 @@
 <link rel="apple-touch-icon" href="Favicon.png?v=9dcbe526">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d1115">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Lato:wght@300;400;700&display=swap">
     <link rel="canonical" href="https://www.legend-of-fenrirak.com/showdowns.html">
 <link rel="stylesheet" href="site-nav.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=Lato:wght@300;400;700&display=swap');
 
   :root {
     --gold: #d4af37;
@@ -1087,6 +1090,279 @@
     }
   }
 </style>
+<style id="ui-refresh">
+/* =====================================================================
+   UI REFRESH - presentation only. No gameplay rules or logic live here.
+   Palette stays on the site's slate + gold; the changes are hierarchy,
+   spacing, tactile controls and a better use of space in the game HUD.
+   ===================================================================== */
+:root{
+  --bg:#0d1115; --surface:#141a21; --surface-2:#1b242e; --well:#0e1318;
+  --line:#2a3542; --line-gold:rgba(212,175,55,.34);
+  --gold:#d4af37; --gold-hi:#f0d487; --accent:#d0922a;
+  --panel-bg:var(--surface); --panel-border:var(--line);
+  --text:#ece1c1; --text-dim:#b2a47f;
+  --serif:'Cinzel',Georgia,'Times New Roman',serif;
+  --sans:'Lato',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --game-h:632px;
+}
+html{color-scheme:dark}
+body{
+  background:var(--bg) radial-gradient(100% 70% at 50% 0%,#18222d 0%,rgba(13,17,21,0) 70%) no-repeat;
+  font-family:var(--sans);-webkit-font-smoothing:antialiased;
+}
+#screen-rules,#screen-name,#screen-board,#screen-class,#screen-weapon,
+#screen-start-tile,#screen-rollorder,#screen-game{background:transparent}
+#screen-name,#screen-board,#screen-class,#screen-weapon,#screen-start-tile,#screen-rollorder{padding:32px 20px 56px}
+#screen-rules{padding:48px 20px 0;justify-content:flex-start}
+#screen-rules,#screen-name,#screen-board,#screen-class,#screen-weapon,#screen-start-tile,#screen-rollorder{min-height:calc(100vh - var(--topbar-h,58px))}
+
+/* ---------- Focus + motion ---------- */
+:where(button,input,.class-card,.weapon-card,.inventory-item,.weapon-equip-box,.sp-weapon-name):focus-visible{
+  outline:2px solid var(--gold-hi);outline-offset:3px;
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+
+
+/* ---------- Shared plaque (setup box, dialogs) ---------- */
+.setup-box,.dice-container,.custom-modal-box,.item-card{
+  position:relative;background:linear-gradient(180deg,#19222b 0%,#11181e 100%);
+  border:1px solid var(--line-gold);border-radius:10px;box-shadow:0 24px 64px rgba(0,0,0,.55);
+}
+.setup-box::before,.dice-container::before,.custom-modal-box::before,.item-card::before{
+  content:'';position:absolute;inset:5px;border:1px solid rgba(212,175,55,.12);border-radius:6px;pointer-events:none;
+}
+.setup-box{padding:32px}
+#dice-overlay,#custom-modal-overlay,#item-popup,#settings-modal-overlay{background:rgba(6,9,12,.78);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+@keyframes popIn{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.dice-container,.custom-modal-box,.item-card{animation:popIn .18s ease-out;max-width:min(480px,92vw)}
+
+/* ---------- Title + rules ---------- */
+.game-title{font-size:clamp(2.1rem,5.4vw,3.6rem);font-weight:900;letter-spacing:.04em;line-height:1.08;margin-bottom:10px;text-shadow:0 0 30px rgba(212,175,55,.28),0 2px 0 rgba(0,0,0,.55)}
+.game-subtitle{font-size:clamp(1rem,2.4vw,1.4rem);letter-spacing:.32em;margin-bottom:34px}
+.rules-box{max-width:1040px;max-height:none;overflow:visible;background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0 0 8px;columns:2 340px;column-gap:20px}
+.rules-box .rule{
+  break-inside:avoid;margin:0 0 18px;padding:16px 20px 10px;
+  background:linear-gradient(180deg,#18212a,#121920);border:1px solid var(--line);border-radius:8px;
+}
+.rules-box .rule h2{font-size:1.08rem;letter-spacing:.03em;margin:0 0 8px;padding:0;border:0;color:var(--gold-hi)}
+.rules-box .rule p,.rules-box .rule li{font-size:.92rem;line-height:1.65;margin:0 0 8px}
+.rules-box .rule ul{padding-left:18px;margin:0}
+.rules-box .rule strong{color:var(--gold-hi)}
+.rules-box .rule-classes{column-span:all;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;background:none;border:0;box-shadow:none;padding:0;margin:0 0 8px}
+.rule-classes h2{grid-column:1/-1;margin:0 0 2px}
+.rules-box .rule-classes p{margin:0;padding:12px 14px;background:linear-gradient(180deg,#18212a,#121920);border:1px solid var(--line);border-radius:8px}
+.cta-bar{position:sticky;bottom:0;z-index:5;width:100%;display:flex;justify-content:center;padding:18px 0 22px;background:linear-gradient(0deg,var(--bg) 60%,rgba(13,17,21,0))}
+
+/* ---------- Setup flow ---------- */
+.steps{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 10px;list-style:none;margin:0 0 18px;padding:0;width:100%;max-width:560px;font:700 .8rem/1 var(--sans);color:#7d8793}
+.steps li + li::before{content:'\203A';margin-right:10px;color:#566371}
+.steps li.done{color:var(--text-dim)}
+.steps li.current{color:var(--gold-hi)}
+.setup-title{font-size:clamp(1.5rem,3.2vw,2.1rem);letter-spacing:.03em;margin-bottom:18px;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.hint{color:var(--text-dim);font-size:.95rem;line-height:1.5;margin:0 0 16px;text-align:center}
+
+#screen-name .setup-box{max-width:460px}
+input[type="text"]{width:min(280px,100%);text-align:center;font-family:var(--serif);font-size:1.4rem;letter-spacing:.06em;padding:12px 16px;background:var(--well);border:1px solid var(--line);border-radius:6px;margin-bottom:18px}
+input[type="text"]::placeholder{color:#5f6b78;letter-spacing:.04em}
+input[type="text"]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.2)}
+
+/* board picker */
+.board-option-label{font-size:clamp(1.3rem,3vw,1.8rem);margin-bottom:14px}
+.board-preview-box{background:#0b1015;border:1px solid var(--line-gold);border-radius:8px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+#board-preview-inner{border-color:#05080b;border-radius:2px}
+#screen-board{padding-top:24px;padding-bottom:28px}
+.board-select-wrap{--pv-w:min(780px,max(360px,calc((100vh - 340px) * 1.2222)))}
+.board-preview-box{max-width:var(--pv-w)}
+.board-preview-row{margin-bottom:16px}
+.board-actions{display:flex;gap:12px;width:min(100%,var(--pv-w))}
+.board-actions .btn{margin:0;flex:1;white-space:nowrap;padding-left:14px;padding-right:14px}
+.board-actions #select-board-btn{flex:2;width:auto;max-width:none;margin:0}
+
+/* class + weapon cards */
+#screen-class .setup-box{max-width:860px}
+#screen-weapon .setup-box{max-width:960px}
+.class-cards{gap:18px}
+.class-card{
+  position:relative;width:230px;padding:22px 18px 18px;text-align:center;
+  background:linear-gradient(180deg,#19222b,#12181f);border:1px solid var(--line);border-radius:8px;
+}
+#cc-mage{--c:#39b5ff;--cg:rgba(57,181,255,.28)}#cc-knight{--c:#c4c4c4;--cg:rgba(196,196,196,.22)}#cc-archer{--c:#e77d22;--cg:rgba(231,125,34,.28)}
+.class-card:hover{border-color:var(--c);transform:translateY(-3px)}
+.class-card.selected{background:linear-gradient(180deg,#212c37,#161e26);border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 12px 32px var(--cg)}
+.class-card.selected::after{content:'\2713';position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--c);color:#0d1115;font:900 14px/24px var(--sans);text-align:center}
+.class-card h3{font-size:1.25rem;color:var(--gold-hi);letter-spacing:.04em}
+.class-icon{width:56px;height:56px;margin-bottom:12px}
+.class-icon svg{width:52px;height:52px}
+.class-card .stat{font-size:.9rem;margin:5px 0}
+.class-card .passive{font-size:.82rem;line-height:1.5;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.weapon-cards{gap:18px}
+.weapon-card{width:300px;padding:18px;font-size:.86rem;background:linear-gradient(180deg,#19222b,#12181f);border:1px solid var(--line);border-radius:8px}
+.weapon-card:hover{border-color:var(--line-gold)}
+.weapon-card.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 12px 32px rgba(212,175,55,.18)}
+.custom-modal-box .weapon-card{width:100%}
+.custom-modal-box .weapon-card:hover{border-color:var(--line)}
+.weapon-card h4{font-size:1.05rem;color:var(--gold-hi)}
+.weapon-card .wc-attack-desc{line-height:1.55}
+
+/* start tile + roll order */
+#start-tile-board-container{padding:8px;background:#0b1015;border:1px solid var(--line-gold);border-radius:8px;box-shadow:0 20px 50px rgba(0,0,0,.5);max-width:100%;overflow:auto}
+.tile.valid-start{z-index:2;box-shadow:inset 0 0 14px rgba(212,175,55,.7)}
+#screen-rollorder .setup-box{max-width:520px}
+.roll-result-row{gap:14px;margin:8px 0;padding:10px 14px;background:var(--well);border:1px solid var(--line);border-radius:6px;font-size:1rem}
+.roll-result-row .char-badge{flex:1;width:auto;color:var(--gold-hi)}
+.roll-result-row .dice-val{width:44px;height:44px;display:grid;place-items:center;background:linear-gradient(160deg,#fff7df,#f1e2b8);border:2px solid #8a6a20;border-radius:9px;color:#1a0a00;font-size:1.3rem}
+.roll-result-row.rerolled{border-color:rgba(208,146,42,.45);background:linear-gradient(90deg,rgba(208,146,42,.14),var(--well) 60%)}
+.roll-result-row.rerolled .char-badge::after{content:'rerolled';margin-left:10px;padding:2px 6px;font:700 .62rem var(--sans);color:var(--accent);border:1px solid rgba(208,146,42,.5);border-radius:3px;vertical-align:middle}
+
+/* ---------- Settings, dialogs, dice ---------- */
+.custom-modal-box{padding:28px 34px}
+.custom-modal-box .dice-setting-toggle{text-align:left}
+.dice-title{font-family:var(--serif);font-size:1.35rem;letter-spacing:.03em}
+.dice-container{padding:30px 40px 26px;min-width:min(340px,90vw)}
+#dice-3d{width:92px;height:92px;margin-bottom:22px}
+.dice-face-display{
+  width:92px;height:92px;border-radius:16px;font-size:2.9rem;
+  background:linear-gradient(160deg,#fff7df,#f1e2b8);
+  box-shadow:inset 0 -6px 12px rgba(138,106,32,.25),inset 0 3px 6px rgba(255,255,255,.6),0 10px 24px rgba(0,0,0,.55);
+}
+.dice-result-text{font-size:.98rem;min-height:1.4em}
+.item-card h3{font-size:1.25rem}
+
+/* ---------- In-game HUD ---------- */
+#game-scale-inner{gap:12px;padding:10px}
+#stat-panel,#right-panel{
+  display:flex;flex-direction:column;height:var(--game-h);padding:0;overflow:hidden;
+  background:#141b22;border:1px solid var(--line-gold);border-radius:8px;
+  box-shadow:0 14px 40px rgba(0,0,0,.45);scrollbar-width:auto;
+}
+#stat-panel{width:268px;min-width:268px}
+#right-panel{width:252px;min-width:252px}
+.sp-scroll{flex:1;min-height:0;overflow-y:auto;padding:12px 14px;scrollbar-width:thin;scrollbar-color:#3a4654 transparent}
+.sp-scroll::-webkit-scrollbar,#message-log::-webkit-scrollbar{width:6px}
+.sp-scroll::-webkit-scrollbar-thumb,#message-log::-webkit-scrollbar-thumb{background:#3a4654;border-radius:3px}
+.rp-brand{flex:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);text-align:center;font:700 .78rem/1.2 var(--serif);color:var(--gold)}
+.rp-brand small{display:block;margin-top:2px;font:400 .66rem var(--sans);letter-spacing:.2em;color:var(--text-dim)}
+.section-header{font:700 .82rem var(--serif);letter-spacing:.04em;color:var(--gold);border-bottom:1px solid var(--line);margin:14px 0 8px;padding-bottom:5px}
+#stat-panel .section-header{margin:12px 0 6px}
+.sp-hero{display:flex;align-items:center;gap:10px}
+#sp-class{font:700 1.2rem var(--serif);color:var(--gold-hi)}
+#sp-vitals{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px;margin:8px 0 2px}
+.vital{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px 6px;background:var(--well);border:1px solid var(--line);border-radius:6px;text-align:center}
+.vital .stat-value{font:700 1.1rem/1.15 var(--serif)}
+.vital .stat-label{font-size:.7rem;white-space:nowrap}
+.vital .stat-label i{font-style:normal}
+#sp-ability{font-size:.8rem;line-height:1.5;color:var(--text)}
+.sp-weapon-name{display:flex;align-items:center;justify-content:space-between;gap:8px;font:700 .95rem var(--serif);color:var(--gold-hi);margin-bottom:6px;cursor:pointer}
+.sp-weapon-name::after{content:'Full stats \25B8';flex:none;padding:2px 7px;font:700 .66rem var(--sans);color:var(--text-dim);border:1px solid var(--line);border-radius:999px}
+.sp-weapon-name:hover::after{color:var(--gold-hi);border-color:var(--line-gold)}
+.sp-weapon-name:empty::after{display:none}
+.weapon-equip-box{margin-top:0;padding:8px 10px;background:var(--well);border:1px solid var(--line);border-radius:6px;font-size:.78rem;cursor:pointer;transition:border-color .15s}
+.weapon-equip-box:hover{border-color:var(--line-gold)}
+.we-row{display:grid;grid-template-columns:70px 1fr;gap:8px;margin:2px 0;line-height:1.3}
+.we-row span{text-align:left}
+#sp-inventory-block{min-height:46px}
+.inventory-item{display:flex;align-items:center;gap:8px;margin:4px 0;padding:6px 10px;font-size:.82rem;background:var(--well);border:1px solid var(--line);border-radius:5px}
+.inventory-item::before{content:'\25C6';font-size:.6rem;color:var(--text-dim)}
+.inventory-item.weapon-item::before{color:var(--accent)}
+#sp-inventory:empty::after{content:'Empty. Chests hold loot.';display:block;font-size:.8rem;color:var(--text-dim)}
+
+/* pinned actions */
+.sp-actions{display:flex;flex-direction:column;gap:8px;padding:10px 14px 12px;border-top:1px solid var(--line-gold);background:linear-gradient(180deg,#141b22,#0f151b)}
+#sp-attack-btn:empty{display:none}
+#end-turn-btn{width:100%;margin:0}
+
+/* status plate + board */
+#board-area{flex:none;width:588px;height:var(--game-h);padding:0;justify-content:space-between}
+.status-bar{width:100%;padding:12px 14px 14px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0));border:1px solid var(--line);border-radius:8px}
+#turn-info{display:block;margin:0 auto;padding:6px 18px;font:700 1.5rem/1.2 var(--serif);letter-spacing:.03em;text-shadow:0 1px 0 #000}
+#phase-indicator{display:flex;align-items:center;justify-content:center;gap:12px;text-align:left;max-width:540px;min-height:2.9em;margin:4px auto 0;font-size:1rem;line-height:1.35;color:var(--text)}
+#phase-indicator::before{content:'Guide';flex:none;padding:3px 7px;font:700 .68rem/1 var(--sans);color:#1c1405;background:var(--gold);border-radius:3px}
+#phase-indicator:empty::before{display:none}
+#board-container{flex:none}
+#game-board{border:2px solid #05080b;border-radius:2px;box-shadow:0 0 0 3px #2b2412,0 0 0 4px var(--line-gold),0 16px 40px rgba(0,0,0,.55)}
+.tile.hover-move{filter:brightness(1.25);box-shadow:inset 0 0 0 3px #2eb674,inset 0 0 14px rgba(46,182,116,.6)}
+.tile.hover-attack{box-shadow:inset 0 0 0 3px #ff3535,inset 0 0 14px rgba(255,53,53,.55)}
+.tile-label{text-shadow:0 0 2px rgba(255,255,255,.55)}
+
+/* tokens */
+.char-icon{font-family:var(--serif);text-shadow:0 1px 1px #000,0 0 3px rgba(0,0,0,.8)}
+.char-icon.mage{background:linear-gradient(160deg,#8fd8ff,#39b5ff 50%,#1d8fd1);color:#06202f;text-shadow:none}
+.char-icon.knight{background:linear-gradient(160deg,#ececec,#b7b7b7 50%,#8f8f8f);color:#0f1419;text-shadow:none}
+.char-icon.archer{background:linear-gradient(160deg,#ffae5c,#e77d22 55%,#c25f0d);color:#1d0d00;text-shadow:none}
+.char-icon.ronald{background:linear-gradient(160deg,#3fb53f,#228b22 55%,#176317)}
+.char-icon.aldemar{background:linear-gradient(160deg,#1c7a41,#0f4A25 55%,#0a3319)}
+.char-icon.helen{background:linear-gradient(160deg,#5a1068,#35063E 55%,#22042a)}
+@keyframes tokenPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.12);filter:brightness(1.25)}}
+.char-icon.active-turn{box-shadow:none;z-index:11;animation:tokenPulse 1.5s ease-in-out infinite}
+
+/* right panel: roster + log */
+#right-panel{padding:12px}
+.rp-roster{flex:none}
+.rp-log{flex:1;min-height:0;display:flex;flex-direction:column}
+#right-panel .section-header{margin:0 0 8px}
+.rp-log .section-header{margin-top:6px}
+.enemy-card{
+  display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:8px;row-gap:5px;
+  margin:0 0 7px;padding:8px 10px;font-size:.8rem;background:var(--well);
+  border:1px solid var(--line);border-radius:6px;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.enemy-card h4{grid-column:1/-1;display:flex;align-items:center;gap:7px;margin:0;font:700 .92rem/1.2 var(--serif);color:var(--text)}
+.enemy-card h4::before{order:-1}
+.enemy-card h4 > span:not(.current-player-tag){order:2;font-family:var(--sans);font-weight:400;font-size:.76rem !important;text-transform:capitalize}
+.enemy-card h4 .current-player-tag{order:3;margin-left:auto}
+.enemy-card.is-you h4::after{content:'you';order:1;padding:1px 5px;font:700 .62rem var(--sans);color:var(--text-dim);border:1px solid var(--line);border-radius:3px}
+.enemy-card .stat-row{grid-column:1;grid-row:2;margin:0;justify-content:flex-start;gap:6px;font-size:.78rem}
+.enemy-card .health-bar-bg{grid-column:1/-1;grid-row:3;margin:0}
+.enemy-card > div:last-child{grid-column:2;grid-row:2;margin:0 !important;font-size:.72rem !important;text-align:right}
+.enemy-card.is-turn{border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.14),var(--well) 70%);box-shadow:0 0 0 1px var(--gold),0 0 18px rgba(212,175,55,.22)}
+.enemy-card[data-cls="mage"]{--c:#39b5ff}.enemy-card[data-cls="knight"]{--c:#c4c4c4}.enemy-card[data-cls="archer"]{--c:#e77d22}
+.enemy-card[data-cls="ronald"]{--c:#3ddc3d}.enemy-card[data-cls="aldemar"]{--c:#2e8b57}.enemy-card[data-cls="helen"]{--c:#c77ad6}
+#stat-panel[data-cls="mage"]{--c:#39b5ff}#stat-panel[data-cls="knight"]{--c:#c4c4c4}#stat-panel[data-cls="archer"]{--c:#e77d22}
+#stat-panel[data-cls="ronald"]{--c:#3ddc3d}#stat-panel[data-cls="aldemar"]{--c:#2e8b57}#stat-panel[data-cls="helen"]{--c:#c77ad6}
+.sp-glyph,.enemy-card h4::before{content:'';display:block;flex:none;width:16px;height:16px;background:var(--c,var(--text-dim))}
+#stat-panel:not([data-cls]) .sp-glyph{display:none}
+#stat-panel[data-cls="mage"] .sp-glyph,.enemy-card[data-cls="mage"] h4::before{clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%)}
+#stat-panel[data-cls="knight"] .sp-glyph,.enemy-card[data-cls="knight"] h4::before{border-radius:2px}
+#stat-panel[data-cls="archer"] .sp-glyph,.enemy-card[data-cls="archer"] h4::before{clip-path:polygon(50% 0%,100% 100%,0% 100%)}
+#stat-panel[data-cls="ronald"] .sp-glyph,.enemy-card[data-cls="ronald"] h4::before{clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%)}
+#stat-panel[data-cls="aldemar"] .sp-glyph,.enemy-card[data-cls="aldemar"] h4::before{clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)}
+#stat-panel[data-cls="helen"] .sp-glyph,.enemy-card[data-cls="helen"] h4::before{border-radius:50%}
+#message-log{flex:1;min-height:0;max-width:none;max-height:none;margin:0;padding:6px 8px;font-size:.78rem;line-height:1.4;color:var(--text-dim);background:var(--well);border:1px solid var(--line);border-radius:6px;scrollbar-width:thin;scrollbar-color:#3a4654 transparent}
+#message-log .msg-line{margin:0;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+#message-log .msg-line.important{color:var(--gold-hi)}
+#message-log .msg-line.damage{color:#ff8a7e}
+#message-log .msg-line.heal{color:#7be8a8}
+#message-log:empty::before{content:'Attacks, damage and loot appear here.';display:block;padding:4px 2px;color:#6f7a86}
+/* scroll cues: soft shadows appear only while there is more to scroll to */
+.sp-scroll{background-color:#141b22;background-image:linear-gradient(#141b22 30%,rgba(20,27,34,0)),linear-gradient(rgba(20,27,34,0),#141b22 70%),radial-gradient(farthest-side at 50% 0,rgba(0,0,0,.55),rgba(0,0,0,0)),radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,.55),rgba(0,0,0,0))}
+#message-log{background-color:#0e1318;background-image:linear-gradient(#0e1318 30%,rgba(14,19,24,0)),linear-gradient(rgba(14,19,24,0),#0e1318 70%),radial-gradient(farthest-side at 50% 0,rgba(0,0,0,.55),rgba(0,0,0,0)),radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,.55),rgba(0,0,0,0))}
+.sp-scroll,#message-log{background-repeat:no-repeat;background-position:center top,center bottom,center top,center bottom;background-size:100% 28px,100% 28px,100% 12px,100% 12px;background-attachment:local,local,scroll,scroll}
+
+/* AI indicator + outcome */
+#ai-thinking{padding:8px 16px 8px 38px;background:rgba(13,17,21,.92);border:1px solid var(--line-gold);border-radius:999px}
+#ai-thinking::before{content:'';position:absolute;left:15px;top:50%;width:12px;height:12px;margin-top:-6px;border:2px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:uiSpin .8s linear infinite}
+@keyframes uiSpin{to{transform:rotate(360deg)}}
+#outcome-overlay{background:radial-gradient(60% 50% at 50% 50%,rgba(0,0,0,.6),rgba(0,0,0,0) 75%)}
+#outcome-word{padding:0 4vw;font-size:clamp(3rem,13vw,11rem);line-height:1.05;letter-spacing:.04em;opacity:.92;text-shadow:0 0 40px currentColor,0 6px 0 rgba(0,0,0,.5);animation:outcomeIn .6s cubic-bezier(.2,.8,.2,1)}
+#outcome-word.defeat{color:#c0392b}
+@keyframes outcomeIn{from{opacity:0;transform:scale(.8)}}
+
+/* ---------- Small screens (setup flow) ---------- */
+@media (max-width:640px){
+  .setup-box{padding:22px 16px}
+  .class-card{width:100%}
+  .weapon-card{width:100%}
+  .rules-box{columns:1}
+  .board-actions{flex-wrap:wrap}
+  .board-actions #select-board-btn{flex:1 1 100%}
+  .dice-container{padding:24px 22px}
+}
+
+</style>
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -1274,52 +1550,78 @@
   <div class="game-title">Legend Of Fenrirak™</div>
   <div class="game-subtitle">-Showdowns-</div>
   <div class="rules-box">
-    <h2>Objective</h2>
+    <section class="rule">
+<h2>Objective</h2>
     <p>Defeat all other players on the board. If you (the human player) defeat all three computer opponents, you win — even if it's not your turn. If a computer defeats you, the game ends in defeat.</p>
-    <h2>Setting Up</h2>
+    </section>
+    <section class="rule">
+<h2>Setting Up</h2>
     <p>All players choose a class (Mage, Knight, or Archer) and a starting weapon. Players then choose a starting tile. Everyone rolls a die — highest to lowest determines turn order. Ties reroll among tied players.</p>
-    <h2>Turn Structure</h2>
+    </section>
+    <section class="rule">
+<h2>Turn Structure</h2>
     <p>Players may move before attacking but cannot move after attacking. Opening a chest ends the turn immediately. One turn ends when a character has opened a chest, attacked, or clicked End Turn.</p>
-    <h2>Movement</h2>
+    </section>
+    <section class="rule">
+<h2>Movement</h2>
     <p>Move up to your movement speed in adjacent (non-diagonal) tiles. Difficult Terrain (Mud/Hill) costs 2 tiles per tile (Knights ignore this). Thorny Vines (THV) deal 2 damage when passing through and 4 damage if you stop in them, then 3 damage every 2 turn cycles until you leave.</p>
-    <h2>Tiles</h2>
+    </section>
+    <section class="rule">
+<h2>Tiles</h2>
     <p>Each tile's image tells you what it is - if a tile has a name written on it (Mud, Hill, Rock, Tree, Log, THV, Chest, High Ground), that's its type and it behaves as described below. A tile with no name on it is just Normal ground with no special effect.</p>
-    <h2>Attacks & Hit Throws</h2>
+    </section>
+    <section class="rule">
+<h2>Attacks & Hit Throws</h2>
     <p>Before attacking, roll a Hit Throw. If the total (including modifiers) equals or exceeds the target's Defence, the attack hits. Range is measured as the greater of horizontal or vertical distance.</p>
     <p>Rocks, Logs, Trees, and Chests never block a ranged attack outright - they only grant a defence bonus (see Cover below); they don't stop the shot from passing through.</p>
-    <h2>Cover</h2>
+    </section>
+    <section class="rule">
+<h2>Cover</h2>
     <ul>
       <li><strong>Partial Cover:</strong> +1 Defence if it's directly adjacent (non-diagonally) to the target AND the attacker's line of fire actually passes through it on the way to the target. Cover next to the target that the shot isn't coming through (e.g. an attack from behind) gives no bonus. Mages treat Partial Cover as Heavy Cover for this bonus too.</li>
       <li><strong>Heavy Cover:</strong> +2 Defence in the same situation (+3 if the target is a Knight).</li>
       <li><strong>Rock and Log</strong> tiles count as Partial Cover. <strong>Tree and Chest</strong> tiles count as Heavy Cover.</li>
     </ul>
-    <h2>High Ground</h2>
+    </section>
+    <section class="rule">
+<h2>High Ground</h2>
     <p>Tiles labeled High Ground give the attacker standing on them +1 to Hit Throw.</p>
-    <h2>Chests</h2>
+    </section>
+    <section class="rule">
+<h2>Chests</h2>
     <p>Opening a chest ends your turn. You must be directly adjacent (non-diagonal). Roll a die for loot. A chest can only be opened once. If a weapon is received, it goes to inventory automatically. A Chest can also sit on a High Ground tile, granting both effects at once.</p>
-    <h2>Healing & Potions</h2>
+    </section>
+    <section class="rule">
+<h2>Healing & Potions</h2>
     <p>Can't use Potion of Healing at full health. Can't heal above max health. Potions can be used any time during your turn before it ends.</p>
-    <h2>Death</h2>
+    </section>
+    <section class="rule">
+<h2>Death</h2>
     <p>Health reduced to 0 or below = defeated and removed from the game.</p>
-    <h2>Classes</h2>
+    </section>
+    <section class="rule rule-classes">
+<h2>Classes</h2>
     <p><strong>Mage:</strong> 65 HP / Defence 3 / Move 4. Passive: All PC becomes HC; Thorny Vines take one extra turn cycle to deal damage.</p>
     <p><strong>Knight:</strong> 75 HP / Defence 5 / Move 6. Passive: Difficult terrain counts as 1 tile (no movement penalty; damage from Thorny Vines still applies).</p>
     <p><strong>Archer:</strong> 70 HP / Defence 4 / Move 5. Passive: +1 Hit Throw & +1 Range when target is on lower terrain than the Archer.</p>
+    </section>
   </div>
-  <button class="btn" onclick="continueFromRules()">Continue</button>
+  <div class="cta-bar"><button class="btn" onclick="continueFromRules()">Continue</button></div>
 </div>
 
 <div id="screen-name" class="screen">
+  <ol class="steps" aria-label="Setup progress"><li class="current">Name</li><li>Board</li><li>Class</li><li>Weapon</li><li>Tile</li><li>Order</li></ol>
   <div class="setup-title">Enter Your Name</div>
   <div class="setup-box" style="text-align:center;">
-    <p style="margin-bottom:16px; color:var(--text-dim); font-size:0.9em;">Maximum 9 characters (letters, numbers, symbols, spaces). At least one visible character.</p>
+    <p class="hint">Maximum 9 characters (letters, numbers, symbols, spaces). At least one visible character.</p>
     <input type="text" id="player-name-input" maxlength="9" placeholder="Name" autocomplete="off" onkeydown="if(event.key==='Enter'){ event.preventDefault(); submitName(); }" />
-    <br><br>
+    <br>
     <button class="btn" onclick="submitName()">Continue</button>
   </div>
 </div>
 
 <div id="screen-board" class="screen">
+  <ol class="steps" aria-label="Setup progress"><li class="done">Name</li><li class="current">Board</li><li>Class</li><li>Weapon</li><li>Tile</li><li>Order</li></ol>
   <div class="setup-title">Choose a Board</div>
   <div class="board-select-wrap">
     <div class="board-option-label" id="board-option-label">Board Option 1</div>
@@ -1330,8 +1632,8 @@
       </div>
       <button class="board-arrow" id="board-arrow-right" onclick="cycleBoardPreview(1)" aria-label="Next board"></button>
     </div>
-    <button class="btn" id="select-board-btn" onclick="confirmBoardPreviewSelection()">Select Board</button>
-    <div class="board-select-extra-btns">
+    <div class="board-actions">
+      <button class="btn" id="select-board-btn" onclick="confirmBoardPreviewSelection()">Select Board</button>
       <button class="btn success" onclick="selectRandomBoard()">🎲 Random Board</button>
       <button class="btn" style="background:#2a6b8a;" onclick="selectBoard('tutorial')">📘 Tutorial</button>
     </div>
@@ -1339,10 +1641,11 @@
 </div>
 
 <div id="screen-class" class="screen">
+  <ol class="steps" aria-label="Setup progress"><li class="done">Name</li><li class="done">Board</li><li class="current">Class</li><li>Weapon</li><li>Tile</li><li>Order</li></ol>
   <div class="setup-title">Choose Your Class</div>
   <div class="setup-box">
     <div class="class-cards">
-      <div class="class-card" id="cc-mage" onclick="selectClass('mage')">
+      <div class="class-card" id="cc-mage" role="button" tabindex="0" onclick="selectClass('mage')">
         <div class="class-icon"><svg width="44" height="44" viewBox="0 0 44 44"><polygon points="22,2 42,16 35,40 9,40 2,16" fill="#39b5ff" stroke="#1a6090" stroke-width="2"/></svg></div>
         <h3>Mage</h3>
         <div class="stat">❤️ Health: 65</div>
@@ -1350,7 +1653,7 @@
         <div class="stat">⚡ Move: 4 tiles</div>
         <div class="passive">Passive: Magical Barrier — All PC becomes HC; Thorny Vines take one extra turn cycle to deal damage.</div>
       </div>
-      <div class="class-card" id="cc-knight" onclick="selectClass('knight')">
+      <div class="class-card" id="cc-knight" role="button" tabindex="0" onclick="selectClass('knight')">
         <div class="class-icon"><svg width="44" height="44" viewBox="0 0 44 44"><rect x="4" y="4" width="36" height="36" rx="3" fill="#b7b7b7" stroke="#777" stroke-width="2"/></svg></div>
         <h3>Knight</h3>
         <div class="stat">❤️ Health: 75</div>
@@ -1358,7 +1661,7 @@
         <div class="stat">⚡ Move: 6 tiles</div>
         <div class="passive">Passive: Mighty Muscles — Difficult terrain counts as 1 tile of movement (no movement penalty). Thorny Vine damage still applies.</div>
       </div>
-      <div class="class-card" id="cc-archer" onclick="selectClass('archer')">
+      <div class="class-card" id="cc-archer" role="button" tabindex="0" onclick="selectClass('archer')">
         <div class="class-icon"><svg width="44" height="44" viewBox="0 0 44 44"><polygon points="22,2 42,42 2,42" fill="#e77d22" stroke="#a04010" stroke-width="2"/></svg></div>
         <h3>Archer</h3>
         <div class="stat">❤️ Health: 70</div>
@@ -1374,6 +1677,7 @@
 </div>
 
 <div id="screen-weapon" class="screen">
+  <ol class="steps" aria-label="Setup progress"><li class="done">Name</li><li class="done">Board</li><li class="done">Class</li><li class="current">Weapon</li><li>Tile</li><li>Order</li></ol>
   <div class="setup-title">Choose Your Starting Weapon</div>
   <div class="setup-box">
     <div class="weapon-cards" id="weapon-options"></div>
@@ -1384,15 +1688,17 @@
 </div>
 
 <div id="screen-start-tile" class="screen">
+  <ol class="steps" aria-label="Setup progress"><li class="done">Name</li><li class="done">Board</li><li class="done">Class</li><li class="done">Weapon</li><li class="current">Tile</li><li>Order</li></ol>
   <div class="setup-title" id="start-tile-title">Choose Your Starting Tile</div>
-  <p style="color:var(--text-dim); font-size:0.9em; margin-bottom:12px;">Click a highlighted (gold) tile on the board</p>
+  <p class="hint">Click a highlighted (gold) tile on the board</p>
   <div id="start-tile-board-container"></div>
 </div>
 
 <div id="screen-rollorder" class="screen">
+  <ol class="steps" aria-label="Setup progress"><li class="done">Name</li><li class="done">Board</li><li class="done">Class</li><li class="done">Weapon</li><li class="done">Tile</li><li class="current">Order</li></ol>
   <div class="setup-title">Determining Turn Order</div>
   <div class="setup-box">
-    <p style="text-align:center; color:var(--text-dim); font-size:0.9em; margin-bottom:16px;">Each player rolls a die. Highest goes first. Ties reroll.</p>
+    <p class="hint">Each player rolls a die. Highest goes first. Ties reroll.</p>
     <div id="roll-order-results"></div>
     <div style="text-align:center; margin-top:20px;">
       <button class="btn" id="roll-order-btn" onclick="doRollOrder()">Roll Your Die</button>
@@ -1404,50 +1710,56 @@
 <div id="screen-game" class="screen">
  <div id="game-scale-inner">
   <div id="stat-panel">
-    <div class="stat-title">Legend Of Fenrirak™<br><small style="font-size:0.7em; color:var(--text-dim);">-Showdowns-</small></div>
-    <div class="section-header">Class</div>
-    <div id="sp-class" style="font-family:'Cinzel',serif; color:var(--gold); font-size:1em; padding:4px 0;"></div>
-    <div id="sp-vitals">
-      <div class="stat-row"><span class="stat-label">❤️ Health:</span><span class="stat-value" id="sp-hp"></span></div>
-      <div class="stat-row"><span class="stat-label">🛡️ Defence:</span><span class="stat-value" id="sp-def"></span></div>
-      <div class="stat-row"><span class="stat-label">⚡ Move:</span><span class="stat-value" id="sp-move"></span></div>
+    <div class="sp-scroll">
+      <div class="sp-hero"><span class="sp-glyph" aria-hidden="true"></span><div id="sp-class"></div></div>
+      <div id="sp-vitals">
+        <div class="vital"><span class="stat-value" id="sp-hp"></span><span class="stat-label"><i aria-hidden="true">&#10084;&#65039;</i> Health</span></div>
+        <div class="vital"><span class="stat-value" id="sp-def"></span><span class="stat-label"><i aria-hidden="true">&#128737;&#65039;</i> Defence</span></div>
+        <div class="vital"><span class="stat-value" id="sp-move"></span><span class="stat-label"><i aria-hidden="true">&#9889;</i> Move</span></div>
+      </div>
+      <div class="section-header">Ability</div>
+      <div id="sp-ability"></div>
+      <div class="section-header">Weapon Equipped</div>
+      <div id="sp-weapon-name" class="sp-weapon-name" role="button" tabindex="0" onclick="showWeaponStatsModal()" title="Click for full weapon stats"></div>
+      <div class="weapon-equip-box" id="sp-weapon-box" role="button" tabindex="0" onclick="showWeaponStatsModal()" title="Click for full weapon stats">
+        <div class="we-row">Attack: <span id="sp-w-attack"></span></div>
+        <div class="we-row">Damage: <span id="sp-w-damage"></span></div>
+        <div class="we-row">Hit Throw: <span id="sp-w-hitthrow"></span></div>
+        <div class="we-row">Effect: <span id="sp-w-effect"></span></div>
+        <div class="we-row">Range: <span id="sp-w-range"></span></div>
+        <div class="we-row">Special: <span id="sp-w-special"></span></div>
+      </div>
+      <div id="sp-inventory-block">
+        <div class="section-header">Inventory</div>
+        <div id="sp-inventory"></div>
+      </div>
     </div>
-    <div class="section-header">Ability</div>
-    <div id="sp-ability" style="font-size:0.78em; color:var(--text); line-height:1.5;"></div>
-    <div class="section-header">Weapon Equipped</div>
-    <div id="sp-weapon-name" style="font-family:'Cinzel',serif; color:var(--accent); font-size:0.9em; margin-bottom:6px; cursor:pointer; text-decoration:underline dotted;" onclick="showWeaponStatsModal()" title="Click for full weapon stats"></div>
-    <div class="weapon-equip-box" id="sp-weapon-box" style="cursor:pointer;" onclick="showWeaponStatsModal()" title="Click for full weapon stats">
-      <div class="we-row">Attack: <span id="sp-w-attack"></span></div>
-      <div class="we-row">Damage: <span id="sp-w-damage"></span></div>
-      <div class="we-row">Hit Throw: <span id="sp-w-hitthrow"></span></div>
-      <div class="we-row">Effect: <span id="sp-w-effect"></span></div>
-      <div class="we-row">Range: <span id="sp-w-range"></span></div>
-      <div class="we-row">Special: <span id="sp-w-special"></span></div>
-      <div style="text-align:center; font-size:0.72em; color:var(--text-dim); margin-top:4px;">(click for full stats)</div>
-    </div>
-    <div style="margin-top:6px;">
+    <div class="sp-actions">
       <button class="attack-name-btn" id="sp-attack-btn" onclick="playerClickAttack()"></button>
       <button class="btn" id="cancel-attack-btn" onclick="cancelPlayerAttackTargeting()" style="display:none; width:auto; padding:6px 14px; font-size:0.8em; margin:4px auto 0;">Cancel Attack</button>
+      <button class="btn danger" id="end-turn-btn" onclick="playerEndTurn()">End Turn</button>
     </div>
-    <div id="sp-inventory-block" style="min-height:46px;">
-      <div class="section-header">Inventory</div>
-      <div id="sp-inventory"></div>
-    </div>
-    <div id="phase-indicator"></div>
-    <button class="btn danger" id="end-turn-btn" onclick="playerEndTurn()">End Turn</button>
   </div>
   <div id="board-area">
-    <div id="turn-info">Loading...</div>
-    <div id="message-log"></div>
+    <div class="status-bar">
+      <div id="turn-info" aria-live="polite">Loading...</div>
+      <div id="phase-indicator" aria-live="polite"></div>
+    </div>
     <div id="board-container"><div id="game-board"></div></div>
   </div>
   <div id="right-panel">
-    <div class="section-header" style="margin-top:0;">Characters</div>
-    <div id="enemy-cards"></div>
+    <div class="rp-roster">
+      <div class="section-header">Characters</div>
+      <div id="enemy-cards"></div>
+    </div>
+    <div class="rp-log">
+      <div class="section-header">Message Log</div>
+      <div id="message-log" role="log"></div>
+    </div>
+    <div class="rp-brand">Legend Of Fenrirak&trade;<small>-Showdowns-</small></div>
   </div>
  </div>
 </div>
-
 <div id="dice-overlay">
   <div class="dice-container">
     <div class="dice-title" id="dice-title">Roll the Dice!</div>
@@ -1863,7 +2175,7 @@ function showWeaponScreen(cls){
   document.getElementById('weapon-continue-btn').disabled = true;
   WEAPONS[cls].forEach(w=>{
     const div = document.createElement('div');
-    div.className = 'weapon-card';
+    div.className = 'weapon-card'; div.tabIndex = 0; div.setAttribute('role','button');
     div.id = 'wc-'+w.id;
     div.innerHTML = buildWeaponCardHTML(w);
     div.onclick = ()=>selectWeapon(w.id);
@@ -2245,6 +2557,7 @@ function updateStatPanel(){
     return;
   }
   document.getElementById('sp-class').textContent = player.class.charAt(0).toUpperCase()+player.class.slice(1);
+  document.getElementById('stat-panel').dataset.cls = player.class;
   document.getElementById('sp-hp').textContent = `${player.hp}/${player.maxHp}`;
   document.getElementById('sp-def').textContent = player.defence;
   document.getElementById('sp-move').textContent = player.move;
@@ -2285,7 +2598,7 @@ function updateStatPanel(){
   invEl.innerHTML = '';
   player.inventory.forEach((item,i)=>{
     const div = document.createElement('div');
-    div.className = 'inventory-item' + (item.type==='weapon'?' weapon-item':'');
+    div.className = 'inventory-item' + (item.type==='weapon'?' weapon-item':''); div.tabIndex = 0; div.setAttribute('role','button');
     div.textContent = item.name + (item.amount>1?` x${item.amount}`:'');
     div.onclick = ()=>clickInventoryItem(i);
     invEl.appendChild(div);
@@ -2305,6 +2618,7 @@ function updateEnemyPanel(){
     card.className = 'enemy-card';
     const pct = c.hp/c.maxHp*100;
     const isCurrentTurn = getCurrentChar()===c;
+    card.dataset.cls = c.class; if(isCurrentTurn) card.classList.add('is-turn'); if(c.isPlayer) card.classList.add('is-you');
     card.innerHTML = `
       <h4>${c.name} <span style="font-size:0.8em;color:${c.class==='mage'?'#39b5ff':c.class==='knight'?'#b7b7b7':c.class==='archer'?'#e77d22':c.class==='ronald'?'#3ddc3d':c.class==='aldemar'?'#2e8b57':c.class==='helen'?'#c77ad6':'#d4af37'}">${c.class}</span>${isCurrentTurn?'<span class="current-player-tag">TURN</span>':''}</h4>
       <div class="stat-row"><span class="stat-label">HP:</span><span class="stat-value">${c.alive?c.hp+'/'+c.maxHp:'DEAD'}</span></div>
@@ -4297,6 +4611,12 @@ document.addEventListener('touchstart', e=>{
 },{passive:false});
 
 document.addEventListener('touchmove', onTouchMove, {passive:false});
+
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Enter' && e.key!==' ') return;
+  const t = e.target;
+  if(t && t.matches && t.matches('.class-card, .weapon-card, .inventory-item, #sp-weapon-name, #sp-weapon-box')){ e.preventDefault(); t.click(); }
+});
 
 window.addEventListener('beforeunload', ()=>{ G = {}; });
 </script>
