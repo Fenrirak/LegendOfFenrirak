@@ -1142,18 +1142,55 @@ body{
 /* ---------- Title + rules ---------- */
 .game-title{font-size:clamp(2.1rem,5.4vw,3.6rem);font-weight:900;letter-spacing:.04em;line-height:1.08;margin-bottom:10px;text-shadow:0 0 30px rgba(212,175,55,.28),0 2px 0 rgba(0,0,0,.55)}
 .game-subtitle{font-size:clamp(1rem,2.4vw,1.4rem);letter-spacing:.32em;margin-bottom:34px}
-.rules-box{max-width:1040px;max-height:none;overflow:visible;background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0 0 8px;columns:2 340px;column-gap:20px}
+.rules-box{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;max-width:1040px;max-height:none;overflow:visible;background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0 0 8px}
 .rules-box .rule{
-  break-inside:avoid;margin:0 0 18px;padding:16px 20px 10px;
-  background:linear-gradient(180deg,#18212a,#121920);border:1px solid var(--line);border-radius:8px;
+  grid-column:span 3;margin:0;padding:16px 20px 10px;
+  background:linear-gradient(180deg,#18212a,#121920);border:1px solid var(--line);border-left:3px solid rgba(212,175,55,.5);border-radius:8px;
 }
+.rules-box .rule.w2{grid-column:span 2}
+.rules-box .rule.w4{grid-column:span 4}
+.rules-box .rule.w6{grid-column:1/-1}
 .rules-box .rule h2{font-size:1.08rem;letter-spacing:.03em;margin:0 0 8px;padding:0;border:0;color:var(--gold-hi)}
 .rules-box .rule p,.rules-box .rule li{font-size:.92rem;line-height:1.65;margin:0 0 8px}
-.rules-box .rule ul{padding-left:18px;margin:0}
+.rules-box .rule ul{list-style:none;padding:0;margin:0}
+.rules-box .rule li{position:relative;padding-left:16px}
+.rules-box .rule li::before{content:'\25C6';position:absolute;left:1px;top:8px;font-size:.55rem;line-height:1;color:var(--accent)}
 .rules-box .rule strong{color:var(--gold-hi)}
-.rules-box .rule-classes{column-span:all;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;background:none;border:0;box-shadow:none;padding:0;margin:0 0 8px}
-.rule-classes h2{grid-column:1/-1;margin:0 0 2px}
-.rules-box .rule-classes p{margin:0;padding:12px 14px;background:linear-gradient(180deg,#18212a,#121920);border:1px solid var(--line);border-radius:8px}
+/* objective banner */
+.rules-box .rule.hero{padding:22px 28px 14px;text-align:center;border:1px solid var(--line-gold);background:radial-gradient(120% 150% at 50% 0%,rgba(212,175,55,.14),rgba(212,175,55,0) 62%),linear-gradient(180deg,#1b252f,#131a21)}
+.rules-box .rule.hero h2{font-size:1.3rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:10px}
+.rules-box .rule.hero p{max-width:68ch;margin:0 auto 8px;font-size:1.02rem}
+/* classes */
+.rules-box .rule-classes{background:none;border:0;padding:0;margin-top:6px}
+.rules-box .rule-classes h2{display:flex;align-items:center;gap:14px;margin:0 0 12px;font-size:1.1rem;letter-spacing:.2em;text-transform:uppercase}
+.rules-box .rule-classes h2::before,.rules-box .rule-classes h2::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line-gold))}
+.rules-box .rule-classes h2::after{transform:scaleX(-1)}
+.class-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.class-rule{--c:var(--gold);padding:14px 16px 12px;background:linear-gradient(180deg,#18212a,#121920);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:8px}
+.class-rule[data-cls="mage"]{--c:var(--mage-color)}
+.class-rule[data-cls="knight"]{--c:var(--knight-color)}
+.class-rule[data-cls="archer"]{--c:var(--archer-color)}
+.class-rule h3{display:flex;align-items:center;gap:9px;margin:0 0 10px;font:700 1.12rem/1.2 var(--serif);letter-spacing:.04em;color:var(--c)}
+.class-rule h3::before{content:'';flex:none;width:16px;height:16px;background:var(--c)}
+.class-rule[data-cls="mage"] h3::before{clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%)}
+.class-rule[data-cls="knight"] h3::before{border-radius:2px}
+.class-rule[data-cls="archer"] h3::before{clip-path:polygon(50% 0%,100% 100%,0% 100%)}
+.rules-box .rule .cls-stats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.rules-box .rule .cls-stats li{margin:0;padding:3px 10px;font-size:.78rem;line-height:1.3;color:var(--text-dim);background:var(--well);border:1px solid var(--line);border-radius:999px}
+.rules-box .rule .cls-stats li::before{content:none}
+.rules-box .rule .cls-stats b{color:var(--text)}
+.rules-box .rule .class-rule p{margin:0;font-size:.88rem;line-height:1.55}
+@media (max-width:860px){
+  .rules-box{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rules-box .rule,.rules-box .rule.w2,.rules-box .rule.w4{grid-column:span 1}
+  .rules-box .rule.w6{grid-column:1/-1}
+  .class-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+}
+@media (max-width:560px){
+  .rules-box{grid-template-columns:minmax(0,1fr)}
+  .rules-box .rule,.rules-box .rule.w2,.rules-box .rule.w4,.rules-box .rule.w6{grid-column:1/-1}
+  .rules-box .rule.hero{padding:18px 18px 10px}
+}
 .cta-bar{position:sticky;bottom:0;z-index:5;width:100%;display:flex;justify-content:center;padding:18px 0 22px;background:linear-gradient(0deg,var(--bg) 60%,rgba(13,17,21,0))}
 
 /* ---------- Setup flow ---------- */
@@ -1177,9 +1214,9 @@ input[type="text"]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .board-select-wrap{--pv-w:min(780px,max(360px,calc((100vh - 340px) * 1.2222)))}
 .board-preview-box{max-width:var(--pv-w)}
 .board-preview-row{margin-bottom:16px}
-.board-actions{display:flex;gap:12px;width:min(100%,var(--pv-w))}
-.board-actions .btn{margin:0;flex:1;white-space:nowrap;padding-left:14px;padding-right:14px}
-.board-actions #select-board-btn{flex:2;width:auto;max-width:none;margin:0}
+.board-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:12px;width:100%}
+.board-actions .btn{margin:0;flex:0 1 auto;min-width:176px;white-space:nowrap;padding:12px 22px;text-align:center}
+.board-actions #select-board-btn{flex:0 1 auto;width:auto;max-width:none;min-width:208px;margin:0}
 
 /* class + weapon cards */
 #screen-class .setup-box{max-width:860px}
@@ -1298,27 +1335,33 @@ input[type="text"]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 @keyframes tokenPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.12);filter:brightness(1.25)}}
 .char-icon.active-turn{box-shadow:none;z-index:11;animation:tokenPulse 1.5s ease-in-out infinite}
 
-/* right panel: roster + log */
+/* right panel: roster + log (everything is clamped so nothing can spill out of the panel) */
 #right-panel{padding:12px}
-.rp-roster{flex:none}
-.rp-log{flex:1;min-height:0;display:flex;flex-direction:column}
+.rp-roster{flex:none;min-width:0}
+.rp-log{flex:1 1 0;min-height:0;min-width:0;display:flex;flex-direction:column}
 #right-panel .section-header{margin:0 0 8px}
 .rp-log .section-header{margin-top:6px}
+#message-log{overflow-x:hidden}
+#message-log .msg-line{overflow-wrap:anywhere}
 .enemy-card{
-  display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:8px;row-gap:5px;
-  margin:0 0 7px;padding:8px 10px;font-size:.8rem;background:var(--well);
+  --c:var(--gold);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"head head" "meta hp" "bar bar";
+  align-items:center;column-gap:8px;row-gap:5px;min-width:0;overflow:hidden;
+  margin:0 0 6px;padding:7px 10px 8px;font-size:.8rem;background:var(--well);
   border:1px solid var(--line);border-radius:6px;
   transition:border-color .2s,box-shadow .2s,background .2s;
 }
-.enemy-card h4{grid-column:1/-1;display:flex;align-items:center;gap:7px;margin:0;font:700 .92rem/1.2 var(--serif);color:var(--text)}
+.enemy-card h4{grid-area:head;display:flex;align-items:center;gap:6px;min-width:0;margin:0;font:700 .92rem/1.2 var(--serif);color:var(--text)}
 .enemy-card h4::before{order:-1}
-.enemy-card h4 > span:not(.current-player-tag){order:2;font-family:var(--sans);font-weight:400;font-size:.76rem !important;text-transform:capitalize}
-.enemy-card h4 .current-player-tag{order:3;margin-left:auto}
-.enemy-card.is-you h4::after{content:'you';order:1;padding:1px 5px;font:700 .62rem var(--sans);color:var(--text-dim);border:1px solid var(--line);border-radius:3px}
-.enemy-card .stat-row{grid-column:1;grid-row:2;margin:0;justify-content:flex-start;gap:6px;font-size:.78rem}
-.enemy-card .health-bar-bg{grid-column:1/-1;grid-row:3;margin:0}
-.enemy-card > div:last-child{grid-column:2;grid-row:2;margin:0 !important;font-size:.72rem !important;text-align:right}
-.enemy-card.is-turn{border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.14),var(--well) 70%);box-shadow:0 0 0 1px var(--gold),0 0 18px rgba(212,175,55,.22)}
+.ec-name{order:0;flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.enemy-card.is-you h4::after{content:'you';order:1;flex:none;padding:1px 5px;font:700 .62rem var(--sans);color:var(--text-dim);border:1px solid var(--line);border-radius:3px}
+.enemy-card h4 .current-player-tag{order:2;flex:none;margin:0}
+.ec-meta{grid-area:meta;display:flex;align-items:baseline;gap:8px;min-width:0;overflow:hidden;white-space:nowrap;font-size:.74rem;color:var(--text-dim)}
+.ec-class{flex:none;font-weight:700;text-transform:capitalize;color:var(--c)}
+.ec-pos{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ec-hp{grid-area:hp;display:flex;align-items:baseline;gap:5px;white-space:nowrap;font-size:.78rem}
+.enemy-card .health-bar-bg{grid-area:bar;margin:0}
+.enemy-card.is-turn{border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.14),var(--well) 70%);box-shadow:0 0 0 1px var(--gold),0 0 8px rgba(212,175,55,.22)}
 .enemy-card[data-cls="mage"]{--c:#39b5ff}.enemy-card[data-cls="knight"]{--c:#c4c4c4}.enemy-card[data-cls="archer"]{--c:#e77d22}
 .enemy-card[data-cls="ronald"]{--c:#3ddc3d}.enemy-card[data-cls="aldemar"]{--c:#2e8b57}.enemy-card[data-cls="helen"]{--c:#c77ad6}
 #stat-panel[data-cls="mage"]{--c:#39b5ff}#stat-panel[data-cls="knight"]{--c:#c4c4c4}#stat-panel[data-cls="archer"]{--c:#e77d22}
@@ -1356,9 +1399,8 @@ input[type="text"]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
   .setup-box{padding:22px 16px}
   .class-card{width:100%}
   .weapon-card{width:100%}
-  .rules-box{columns:1}
-  .board-actions{flex-wrap:wrap}
-  .board-actions #select-board-btn{flex:1 1 100%}
+  .board-actions .btn{min-width:0;flex:1 1 calc(50% - 6px)}
+  .board-actions #select-board-btn{flex:1 1 100%;min-width:0}
   .dice-container{padding:24px 22px}
 }
 
@@ -1550,7 +1592,7 @@ input[type="text"]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
   <div class="game-title">Legend Of Fenrirak™</div>
   <div class="game-subtitle">-Showdowns-</div>
   <div class="rules-box">
-    <section class="rule">
+    <section class="rule hero w6">
 <h2>Objective</h2>
     <p>Defeat all other players on the board. If you (the human player) defeat all three computer opponents, you win — even if it's not your turn. If a computer defeats you, the game ends in defeat.</p>
     </section>
@@ -1583,27 +1625,41 @@ input[type="text"]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
       <li><strong>Rock and Log</strong> tiles count as Partial Cover. <strong>Tree and Chest</strong> tiles count as Heavy Cover.</li>
     </ul>
     </section>
-    <section class="rule">
+    <section class="rule w2">
 <h2>High Ground</h2>
     <p>Tiles labeled High Ground give the attacker standing on them +1 to Hit Throw.</p>
     </section>
-    <section class="rule">
+    <section class="rule w4">
 <h2>Chests</h2>
     <p>Opening a chest ends your turn. You must be directly adjacent (non-diagonal). Roll a die for loot. A chest can only be opened once. If a weapon is received, it goes to inventory automatically. A Chest can also sit on a High Ground tile, granting both effects at once.</p>
     </section>
-    <section class="rule">
+    <section class="rule w4">
 <h2>Healing & Potions</h2>
     <p>Can't use Potion of Healing at full health. Can't heal above max health. Potions can be used any time during your turn before it ends.</p>
     </section>
-    <section class="rule">
+    <section class="rule w2">
 <h2>Death</h2>
     <p>Health reduced to 0 or below = defeated and removed from the game.</p>
     </section>
-    <section class="rule rule-classes">
+    <section class="rule rule-classes w6">
 <h2>Classes</h2>
-    <p><strong>Mage:</strong> 65 HP / Defence 3 / Move 4. Passive: All PC becomes HC; Thorny Vines take one extra turn cycle to deal damage.</p>
-    <p><strong>Knight:</strong> 75 HP / Defence 5 / Move 6. Passive: Difficult terrain counts as 1 tile (no movement penalty; damage from Thorny Vines still applies).</p>
-    <p><strong>Archer:</strong> 70 HP / Defence 4 / Move 5. Passive: +1 Hit Throw & +1 Range when target is on lower terrain than the Archer.</p>
+    <div class="class-grid">
+      <article class="class-rule" data-cls="mage">
+        <h3>Mage</h3>
+        <ul class="cls-stats"><li><b>65</b> HP</li><li>Defence <b>3</b></li><li>Move <b>4</b></li></ul>
+        <p><strong>Passive:</strong> All PC becomes HC; Thorny Vines take one extra turn cycle to deal damage.</p>
+      </article>
+      <article class="class-rule" data-cls="knight">
+        <h3>Knight</h3>
+        <ul class="cls-stats"><li><b>75</b> HP</li><li>Defence <b>5</b></li><li>Move <b>6</b></li></ul>
+        <p><strong>Passive:</strong> Difficult terrain counts as 1 tile (no movement penalty; damage from Thorny Vines still applies).</p>
+      </article>
+      <article class="class-rule" data-cls="archer">
+        <h3>Archer</h3>
+        <ul class="cls-stats"><li><b>70</b> HP</li><li>Defence <b>4</b></li><li>Move <b>5</b></li></ul>
+        <p><strong>Passive:</strong> +1 Hit Throw & +1 Range when target is on lower terrain than the Archer.</p>
+      </article>
+    </div>
     </section>
   </div>
   <div class="cta-bar"><button class="btn" onclick="continueFromRules()">Continue</button></div>
@@ -2620,11 +2676,12 @@ function updateEnemyPanel(){
     const isCurrentTurn = getCurrentChar()===c;
     card.dataset.cls = c.class; if(isCurrentTurn) card.classList.add('is-turn'); if(c.isPlayer) card.classList.add('is-you');
     card.innerHTML = `
-      <h4>${c.name} <span style="font-size:0.8em;color:${c.class==='mage'?'#39b5ff':c.class==='knight'?'#b7b7b7':c.class==='archer'?'#e77d22':c.class==='ronald'?'#3ddc3d':c.class==='aldemar'?'#2e8b57':c.class==='helen'?'#c77ad6':'#d4af37'}">${c.class}</span>${isCurrentTurn?'<span class="current-player-tag">TURN</span>':''}</h4>
-      <div class="stat-row"><span class="stat-label">HP:</span><span class="stat-value">${c.alive?c.hp+'/'+c.maxHp:'DEAD'}</span></div>
+      <h4><span class="ec-name">${c.name}</span>${isCurrentTurn?'<span class="current-player-tag">TURN</span>':''}</h4>
+      <div class="ec-meta"><span class="ec-class">${c.class}</span>${c.alive?`<span class="ec-pos">Pos: (${c.x},${c.y})</span>`:''}</div>
+      <div class="ec-hp"><span class="stat-label">HP:</span><span class="stat-value">${c.alive?c.hp+'/'+c.maxHp:'DEAD'}</span></div>
       <div class="health-bar-bg"><div class="health-bar-fill ${pct>50?'':pct>25?'low':'critical'}" style="width:${c.alive?pct:0}%"></div></div>
-      <div style="font-size:0.78em;color:var(--text-dim);margin-top:4px;">${c.alive?`Pos: (${c.x},${c.y})`:''}</div>
     `;
+    card.querySelector('.ec-name').title = c.name;
     if(!c.alive) card.style.opacity='0.4';
     panel.appendChild(card);
   });
